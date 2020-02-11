@@ -45,7 +45,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort import pmv_ppd
+        >>> from pythermalcomfort.models import pmv_ppd
         >>> results = pmv_ppd(25, 25, 0.1, 50, 1.2, .5, wme=0)
         >>> print(results)
         {'pmv': 0.08425176342008413, 'ppd': 5.146986265266861}
@@ -117,3 +117,52 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(pmv, 4.0) - 0.2179 * pow(pmv, 2.0))
 
     return {'pmv': pmv, 'ppd': ppd}
+
+
+def pmv(ta, tr, vr, rh, met, clo, wme=0):
+    """
+    Returns Predicted Mean Vote (`PMV`_.) calculated in accordance with ASHRAE 55 2017 Standards.
+
+    Parameters
+    ----------
+    ta : float
+        dry bulb air temperature, [C]
+    tr : float
+        mean radiant temperature, [C]
+    vr : float
+        relative air velocity, [m/s]
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+
+    Returns
+    -------
+    PMV : float
+        Predicted Mean Vote
+
+    Notes
+    -----
+    You can use this function to calculate the `PMV`_. in accordance with the ASHRAE 55 2017 Standard [1].
+    More information about the `PMV`_. model are available in the Wikipedia page.
+
+    .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
+
+    References
+    --------
+    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import pmv
+        >>> pmv(25, 25, 0.1, 50, 1.2, .5, wme=0)
+        0.08425176342008413
+    """
+
+    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']

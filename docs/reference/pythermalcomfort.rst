@@ -4,6 +4,7 @@ pythermalcomfort
 .. testsetup::
 
     from pythermalcomfort import *
+    from pythermalcomfort.models import *
 
-.. automodule:: pythermalcomfort
+.. automodule:: pythermalcomfort.models
     :members:
