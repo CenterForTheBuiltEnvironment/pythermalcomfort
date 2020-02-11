@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pythermalcomfort',
-    version='0.0.0',
+    version='0.1.0',
     license='MIT',
     description='Package to calculate sevral thermal comfort indeces (e.g. PMV, PPD, SET, adaptive) and convert physical variables.',
     long_description='%s\n%s' % (

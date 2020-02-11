@@ -51,9 +51,9 @@ Overview
     :alt: Supported implementations
     :target: https://pypi.org/project/pythermalcomfort
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/CenterForTheBuiltEnvironment/pythermalcomfort/v0.0.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/CenterForTheBuiltEnvironment/pythermalcomfort/v0.1.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/compare/v0.0.0...master
+    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/compare/v0.1.0...master
 
 
 
