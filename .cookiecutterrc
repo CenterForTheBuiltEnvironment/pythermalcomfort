@@ -1,0 +1,69 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.org/project/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    _extensions:               ['jinja2_time.TimeExtension']
+    _template:                 'gh:ionelmc/cookiecutter-pylibrary'
+    allow_tests_inside_package: 'no'
+    appveyor:                  'yes'
+    c_extension_function:      'longest'
+    c_extension_module:        '_pythermalcomfort'
+    c_extension_optional:      'no'
+    c_extension_support:       'no'
+    c_extension_test_pypi:     'no'
+    c_extension_test_pypi_username: 'CenterForTheBuiltEnvironment'
+    codacy:                    'no'
+    codacy_projectid:          '[Get ID from https://app.codacy.com/app/CenterForTheBuiltEnvironment/pythermalcomfort/settings]'
+    codeclimate:               'no'
+    codecov:                   'yes'
+    command_line_interface:    'plain'
+    command_line_interface_bin_name: 'pythermalcomfort'
+    coveralls:                 'no'
+    coveralls_token:           '[Required for Appveyor, take it from https://coveralls.io/github/CenterForTheBuiltEnvironment/pythermalcomfort]'
+    distribution_name:         'pythermalcomfort'
+    email:                     'cbecomforttool@gmail.com'
+    full_name:                 'Federico Tartarini'
+    landscape:                 'no'
+    license:                   'MIT license'
+    linter:                    'flake8'
+    package_name:              'pythermalcomfort'
+    project_name:              'pythermalcomfort'
+    project_short_description: 'Package to calculate sevral thermal comfort indeces (e.g. PMV, PPD, SET, adaptive) and convert physical variables.'
+    pypi_badge:                'yes'
+    pypi_disable_upload:       'no'
+    release_date:              'today'
+    repo_hosting:              'github.com'
+    repo_hosting_domain:       'github.com'
+    repo_name:                 'pythermalcomfort'
+    repo_username:             'CenterForTheBuiltEnvironment'
+    requiresio:                'yes'
+    scrutinizer:               'no'
+    setup_py_uses_setuptools_scm: 'no'
+    setup_py_uses_test_runner: 'no'
+    sphinx_docs:               'yes'
+    sphinx_docs_hosting:       'https://pythermalcomfort.readthedocs.io/'
+    sphinx_doctest:            'no'
+    sphinx_theme:              'sphinx-rtd-theme'
+    test_matrix_configurator:  'no'
+    test_matrix_separate_coverage: 'no'
+    test_runner:               'pytest'
+    travis:                    'yes'
+    travis_osx:                'no'
+    version:                   '0.0.0'
+    website:                   'https://comfort.cbe.berkeley.edu'
+    year_from:                 '2019'
+    year_to:                   '2020'
