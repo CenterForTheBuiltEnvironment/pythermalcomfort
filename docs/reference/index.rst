@@ -1,5 +1,5 @@
-Reference
-=========
+pythermalcomfort
+================
 
 .. toctree::
     :glob:

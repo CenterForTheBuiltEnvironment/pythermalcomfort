@@ -1,5 +1,5 @@
-pythermalcomfort
-================
+Comfort models
+==============
 
 .. testsetup::
 
