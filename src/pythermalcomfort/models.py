@@ -46,13 +46,14 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> results = pmv_ppd(25, 25, 0.1, 50, 1.2, .5, wme=0)
+        >>> results = pmv_ppd(ta=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0)
         >>> print(results)
-        {'pmv': 0.08425176342008413, 'ppd': 5.146986265266861}
+        {'pmv': 0.08, 'ppd': 5.1}
 
         >>> print(results['pmv'])
-        0.08425176342008413
+        0.08
     """
+    check_standard_compliance(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (ta + 235))
 
@@ -91,8 +92,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
         xn = (p5 + p4 * hc - p2 * math.pow(xf, 4)) / (100 + p3 * hc)
         n += 1
         if n > 150:
-            print('Max iterations exceeded')
-            return 1  # todo maybe I should return message like { 'value': 20, 'comply': True}
+            raise StopIteration('Max iterations exceeded')
 
     tcl = 100 * xn - 273
 
@@ -116,7 +116,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
     ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(pmv, 4.0) - 0.2179 * pow(pmv, 2.0))
 
-    return {'pmv': pmv, 'ppd': ppd}  # todo maybe I should return message like { 'value': 20, 'comply': True}
+    return {'pmv': round(pmv, 2), 'ppd': round(ppd, 1)}
 
 
 def pmv(ta, tr, vr, rh, met, clo, wme=0):
@@ -214,8 +214,10 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
 
         >>> from pythermalcomfort.models import set_tmp
         >>> set_tmp(ta=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
-        25.31276389616353
+        25.31
     """
+    check_standard_compliance(ta=ta, tr=tr, v=v, rh=rh, met=met, clo=clo)
+
     # Initial variables as defined in the ASHRAE 55-2017
     vapor_pressure = rh * p_sat_torr(ta) / 100
     air_velocity = max(v, 0.1)
@@ -362,7 +364,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
         set = set_old - DELTA * ERR1 / (ERR2 - ERR1)
         dx = set - set_old
         set_old = set
-    return set
+    return round(set, 2)
 
 
 def adaptive_ashrae(ta, tr, t_running_mean, v):
@@ -426,6 +428,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
         # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C
 
     """
+    check_standard_compliance(ta=ta, tr=tr, v=v)
 
     # Define the variables that will be used throughout the calculation.
     results = dict()
