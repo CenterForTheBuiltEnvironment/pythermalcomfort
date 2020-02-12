@@ -13,7 +13,7 @@ def p_sat_torr(t):
 
     Returns
     -------
-    psat  : float
+    p_sat  : float
         saturation vapor pressure [torr]
     """
     return math.exp(18.6686 - 4030.183 / (t + 235.0))

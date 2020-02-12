@@ -165,7 +165,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
         0.08425176342008413
     """
 
-    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']  # todo maybe I should return message like { 'value': 20, 'comply': True}
+    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']
 
 
 def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.325):
