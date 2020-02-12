@@ -1,4 +1,5 @@
 import math
+from pythermalcomfort.psychrometrics import *
 
 
 def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
