@@ -1,4 +1,5 @@
-from pythermalcomfort.models import pmv, pmv_ppd, set_tmp
+import pytest
+from pythermalcomfort.models import pmv, pmv_ppd, set_tmp, adaptive_ashrae
 
 data_test_set = [  # I have commented the lines of code that don't pass the test
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
@@ -54,3 +55,21 @@ def test_pmv_ppd():
     for row in data_test_pmv:
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'])['pmv'], 1)) == row['pmv']
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'])['ppd'], 0)) == row['ppd']
+
+
+def test_adaptive_ashrae():
+    data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
+        {'ta': 19.6, 'tr': 19.6, 't_running_mean': 17, 'v': 0.1, 'return': {'acceptability_80': True}},
+        {'ta': 19.6, 'tr': 19.6, 't_running_mean': 17, 'v': 0.1, 'return': {'acceptability_90': False}},
+        {'ta': 19.6, 'tr': 19.6, 't_running_mean': 25, 'v': 0.1, 'return': {'acceptability_80': False}},
+        {'ta': 19.6, 'tr': 19.6, 't_running_mean': 25, 'v': 0.1, 'return': {'acceptability_80': False}},
+        {'ta': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': True}},
+        {'ta': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_90': False}},
+        {'ta': 30, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': False}},
+    ]
+    for row in data_test_adaptive_ashrae:
+        assert (adaptive_ashrae(row['ta'], row['tr'], row['t_running_mean'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
+
+    with pytest.raises(ValueError):
+        adaptive_ashrae(20, 20, 9, 0.1)
+        adaptive_ashrae(20, 20, 33, 0.1)

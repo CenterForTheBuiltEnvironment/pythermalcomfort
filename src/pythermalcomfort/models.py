@@ -92,7 +92,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
         n += 1
         if n > 150:
             print('Max iterations exceeded')
-            return 1
+            return 1  # todo maybe I should return message like { 'value': 20, 'comply': True}
 
     tcl = 100 * xn - 273
 
@@ -116,7 +116,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
     ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(pmv, 4.0) - 0.2179 * pow(pmv, 2.0))
 
-    return {'pmv': pmv, 'ppd': ppd}
+    return {'pmv': pmv, 'ppd': ppd}  # todo maybe I should return message like { 'value': 20, 'comply': True}
 
 
 def pmv(ta, tr, vr, rh, met, clo, wme=0):
@@ -165,7 +165,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
         0.08425176342008413
     """
 
-    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']
+    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']  # todo maybe I should return message like { 'value': 20, 'comply': True}
 
 
 def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.325):
@@ -178,7 +178,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
     tr : float
         mean radiant temperature, [C]
     v : float
-        relative air velocity, [m/s]
+        air velocity, [m/s]
     rh : float
         relative humidity, [%]
     met : float
@@ -363,3 +363,110 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
         dx = set - set_old
         set_old = set
     return set
+
+
+def adaptive_ashrae(ta, tr, t_running_mean, v):
+    """ Determines the adaptive thermal comfort based on ASHRAE 55
+
+    Parameters
+    ----------
+    ta : float
+        dry bulb air temperature, [C]
+    tr : float
+        mean radiant temperature, [C]
+    t_running_mean: float
+        running mean temperature, [C]
+    v : float
+        air velocity, [m/s]
+
+
+    Returns
+    -------
+    tmp_cmf : float
+        Comfort temperature a that specific running mean temperature, [C]
+    tmp_cmf_80_low : float
+        Lower acceptable comfort temperature for 80% occupants, [C]
+    tmp_cmf_80_up : float
+        Upper acceptable comfort temperature for 80% occupants, [C]
+    tmp_cmf_90_low : float
+        Lower acceptable comfort temperature for 90% occupants, [C]
+    tmp_cmf_90_up : float
+        Upper acceptable comfort temperature for 90% occupants, [C]
+    acceptability_80 : bol
+        Acceptability for 80% occupants
+    acceptability_90 : bol
+        Acceptability for 90% occupants
+
+    Notes
+    -----
+    You can use this function to calculate if your conditions are within the `adaptive thermal comfort region`.
+    Calculations with comply with the ASHRAE 55 2017 Standard [1].
+
+    .. _adaptive thermal comfort region: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
+
+    References
+    --------
+    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import adaptive_ashrae
+        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(results)
+        {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5, 'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': True, 'acceptability_90': False}
+
+        >>> print(results['acceptability_80'])
+        True
+        # The conditions you entered are considered to be comfortable for by 80% of the occupants
+
+        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=9, v=0.1)
+        ValueError: The running mean is outside the standards applicability limits
+        # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C
+
+    """
+
+    # Define the variables that will be used throughout the calculation.
+    results = dict()
+
+    to = (ta + tr) / 2  # fixme this is not the right way of calculating to
+
+    # See if the running mean temperature is between 10 C and 33.5 C (the range where the adaptive model is supposed to be used)
+    if 10.0 <= t_running_mean <= 33.5:
+
+        cooling_effect = 0
+        # calculate cooling effect of elevated air speed when top > 25 degC.
+        if v >= 0.6 and to >= 25:
+            if v < 0.9:
+                cooling_effect = 1.2
+            elif v < 1.2:
+                cooling_effect = 1.8
+            else:
+                cooling_effect = 2.2
+
+        # Figure out the relation between comfort and outdoor temperature depending on the level of conditioning.
+        t_cmf = 0.31 * t_running_mean + 17.8
+        tmp_cmf_80_low = t_cmf - 3.5
+        t_cmf_90_lower = t_cmf - 2.5
+        tmp_cmf_80_up = t_cmf + 3.5 + cooling_effect
+        tmp_cmf_90_up = t_cmf + 2.5 + cooling_effect
+
+        def acceptability(t_cmf_lower, t_cmf_upper):
+            # See if the conditions are comfortable.
+            if t_cmf_lower < to < t_cmf_upper:
+                return True
+            else:
+                return False
+
+        acceptability_80 = acceptability(tmp_cmf_80_low, tmp_cmf_80_up)
+        acceptability_90 = acceptability(t_cmf_90_lower, t_cmf_90_lower)
+
+        results = {'tmp_cmf': t_cmf, 'tmp_cmf_80_low': tmp_cmf_80_low, 'tmp_cmf_80_up': tmp_cmf_80_up,
+                   'tmp_cmf_90_low': t_cmf_90_lower, 'tmp_cmf_90_up': tmp_cmf_90_up,
+                   'acceptability_80': acceptability_80, 'acceptability_90': acceptability_90, }
+
+    else:
+        raise ValueError("The running mean is outside the standards applicability limits")
+
+    return results
