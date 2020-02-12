@@ -1,3 +1,5 @@
+import math
+
 def p_sat_torr(t):
     """ Estimate the saturation vapor pressure in [torr]
 
