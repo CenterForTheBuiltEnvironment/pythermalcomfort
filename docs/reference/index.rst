@@ -1,5 +1,5 @@
-pythermalcomfort
-================
+Functions documentation
+=======================
 
 .. toctree::
     :glob:
