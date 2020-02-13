@@ -22,15 +22,23 @@ SET
 
 .. autofunction:: pythermalcomfort.models.set_tmp
 
+Adaptive ASHRAE
+---------------
+
+.. autofunction:: pythermalcomfort.models.adaptive_ashrae
+
+UTCI
+----
+
+.. autofunction:: pythermalcomfort.models.utci
+
+
 References
 ----------
 .. [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
 
-Adaptive ASHRAE
----------------
 
-.. autofunction:: pythermalcomfort.models.adaptive_ashrae
 
 
 Psychrometrics functions

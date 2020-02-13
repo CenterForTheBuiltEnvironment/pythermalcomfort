@@ -487,7 +487,7 @@ def utci(ta, tr, rh, v):
 
     Returns
     -------
-    utci : float
+    utci
          Universal Thermal Climate Index, [C]
 
     Notes
@@ -501,19 +501,10 @@ def utci(ta, tr, rh, v):
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import adaptive_ashrae
-        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=20, v=0.1)
+        >>> from pythermalcomfort.models import utci
+        >>> results = utci(ta=25, tr=25, rh=50, v=1)
         >>> print(results)
-        {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5, 'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': True, 'acceptability_90': False}
-
-        >>> print(results['acceptability_80'])
-        True
-        # The conditions you entered are considered to be comfortable for by 80% of the occupants
-
-        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=9, v=0.1)
-        ValueError: The running mean is outside the standards applicability limits
-        # The adaptive thermal comfort model can only be used
-        # if the running mean temperature is higher than 10°C
+        24.6
 
     Raises
     ------
@@ -787,4 +778,5 @@ def utci(ta, tr, rh, v):
         cmf = None
         stress_range = None
 
-    return {'utci': round(UTCI_approx, 1), 'cmf': cmf, 'stress_range': stress_range}
+    # return {'utci': round(UTCI_approx, 1), 'cmf': cmf, 'stress_range': stress_range}
+    return round(UTCI_approx, 1)  # todo maybe return also the other parameters see line above
