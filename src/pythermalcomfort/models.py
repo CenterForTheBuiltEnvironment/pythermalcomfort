@@ -1,4 +1,5 @@
 from pythermalcomfort.psychrometrics import *
+from pythermalcomfort.utilities import *
 
 
 def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
@@ -24,22 +25,17 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
 
     Returns
     -------
-    PMV : float
+    PMV
         Predicted Mean Vote
-    PPD : float
+    PPD
         Predicted Percentage of Dissatisfied occupants, [%]
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. and `PPD`_. in accordance with the ASHRAE 55 2017 Standard [1].
-    More information about the `PMV`_. model are available in the Wikipedia page.
+    You can use this function to calculate the `PMV`_. and `PPD`_. in accordance with the ASHRAE 55 2017 Standard [1]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
     .. _PPD: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
-
-    References
-    --------
-    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
     Examples
     --------
@@ -52,6 +48,11 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
 
         >>> print(results['pmv'])
         0.08
+
+    Raises
+    ------
+    StopIteration
+        Raised if the number of iterations exceeds the threshold
     """
     check_standard_compliance(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
 
@@ -147,14 +148,9 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. in accordance with the ASHRAE 55 2017 Standard [1].
-    More information about the `PMV`_. model are available in the Wikipedia page.
+    You can use this function to calculate the `PMV`_. in accordance with the ASHRAE 55 2017 Standard [1]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
-
-    References
-    --------
-    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
     Examples
     --------
@@ -162,7 +158,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
 
         >>> from pythermalcomfort.models import pmv
         >>> pmv(25, 25, 0.1, 50, 1.2, .5, wme=0)
-        0.08425176342008413
+        0.08
     """
 
     return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']
@@ -199,14 +195,9 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
 
     Notes
     -----
-    You can use this function to calculate the `SET`_. temperature in accordance with the ASHRAE 55 2017 Standard [1].
-    More information about the `SET`_. model are available in the Wikipedia page.
+    You can use this function to calculate the `SET`_. temperature in accordance with the ASHRAE 55 2017 Standard [1]_.
 
     .. _SET: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
-
-    References
-    --------
-    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
     Examples
     --------
@@ -364,7 +355,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
         set = set_old - DELTA * ERR1 / (ERR2 - ERR1)
         dx = set - set_old
         set_old = set
-    return round(set, 2)
+    return round(set, 1)
 
 
 def adaptive_ashrae(ta, tr, t_running_mean, v):
@@ -402,13 +393,9 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
     Notes
     -----
     You can use this function to calculate if your conditions are within the `adaptive thermal comfort region`.
-    Calculations with comply with the ASHRAE 55 2017 Standard [1].
+    Calculations with comply with the ASHRAE 55 2017 Standard [1]_.
 
     .. _adaptive thermal comfort region: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
-
-    References
-    --------
-    [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
     Examples
     --------
@@ -425,7 +412,13 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
 
         >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
-        # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C
+        # The adaptive thermal comfort model can only be used
+        # if the running mean temperature is higher than 10°C
+
+    Raises
+    ------
+    ValueError
+        Raised if the input are outside the Standard's applicability limits
 
     """
     check_standard_compliance(ta=ta, tr=tr, v=v)

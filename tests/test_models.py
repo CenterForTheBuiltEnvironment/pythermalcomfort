@@ -2,14 +2,12 @@ import pytest
 from pythermalcomfort.models import pmv, pmv_ppd, set_tmp, adaptive_ashrae
 
 data_test_set = [  # I have commented the lines of code that don't pass the test
-    {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.9},
     {'ta': 25, 'tr': 25, 'v': 0.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 24},
     {'ta': 25, 'tr': 25, 'v': 0.6, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.4},
     {'ta': 25, 'tr': 25, 'v': 3, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 18.8},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 20.7},
-    {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.3},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 2, 'set': 32.5},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 4, 'set': 37.7},
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 23.3},
@@ -19,6 +17,8 @@ data_test_set = [  # I have commented the lines of code that don't pass the test
     {'ta': 20, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.6},
     {'ta': 30, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 26.4},
     {'ta': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.3},
+    {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.3},
+    {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
     # {'ta': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.3},
     # {'ta': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.8},
     # {'ta': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.2},
@@ -41,7 +41,7 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
 def test_set_tmp():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_set:
-        assert (round(set_tmp(row['ta'], row['tr'], row['v'], row['rh'], row['met'], row['clo']), 1)) == row['set']
+        assert (set_tmp(row['ta'], row['tr'], row['v'], row['rh'], row['met'], row['clo'])) == row['set']
 
 
 def test_pmv():
@@ -72,4 +72,6 @@ def test_adaptive_ashrae():
 
     with pytest.raises(ValueError):
         adaptive_ashrae(20, 20, 9, 0.1)
-        adaptive_ashrae(20, 20, 33, 0.1)
+
+    with pytest.raises(ValueError):
+        adaptive_ashrae(20, 20, 34, 0.1)
