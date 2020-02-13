@@ -1,5 +1,5 @@
 import pytest
-from pythermalcomfort.models import pmv, pmv_ppd, set_tmp, adaptive_ashrae
+from pythermalcomfort.models import *
 
 data_test_set = [  # I have commented the lines of code that don't pass the test
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
@@ -75,3 +75,16 @@ def test_adaptive_ashrae():
 
     with pytest.raises(ValueError):
         adaptive_ashrae(20, 20, 34, 0.1)
+
+
+def test_utci():
+    data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
+        {'ta': 25, 'tr': 27, 'rh': 50, 'v': 1, 'return': {'utci': 25.2}},
+        {'ta': 19, 'tr': 24, 'rh': 50, 'v': 1, 'return': {'utci': 20.0}},
+        {'ta': 19, 'tr': 14, 'rh': 50, 'v': 1, 'return': {'utci': 16.8}},
+        {'ta': 27, 'tr': 22, 'rh': 50, 'v': 1, 'return': {'utci': 25.5}},
+        {'ta': 27, 'tr': 22, 'rh': 50, 'v': 10, 'return': {'utci': 20.0}},
+        {'ta': 27, 'tr': 22, 'rh': 50, 'v': 16, 'return': {'utci': 15.8}},
+    ]
+    for row in data_test_adaptive_ashrae:
+        assert (utci(row['ta'], row['tr'], row['rh'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
