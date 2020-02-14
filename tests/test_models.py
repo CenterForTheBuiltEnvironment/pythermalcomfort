@@ -53,8 +53,13 @@ def test_pmv():
 def test_pmv_ppd():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_pmv:
-        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'])['pmv'], 1)) == row['pmv']
-        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'])['ppd'], 0)) == row['ppd']
+        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'], 1)) == row['pmv']
+        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['ppd'], 0)) == row['ppd']
+        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1)) == row['pmv']
+        assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 0)) == row['ppd']
+
+    with pytest.raises(ValueError):
+        pmv_ppd(20, 20, 0.1, 50, 1.1, 0.5, standard='random')
 
 
 def test_adaptive_ashrae():
@@ -87,4 +92,4 @@ def test_utci():
         {'ta': 27, 'tr': 22, 'rh': 50, 'v': 16, 'return': {'utci': 15.8}},
     ]
     for row in data_test_adaptive_ashrae:
-        assert (utci(row['ta'], row['tr'], row['rh'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
+        assert (utci(row['ta'], row['tr'], row['v'], row['rh'])) == row['return'][list(row['return'].keys())[0]]

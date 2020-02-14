@@ -3,9 +3,9 @@ from pythermalcomfort.utilities import *
 import math
 
 
-def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
+def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
     """
-    Returns Predicted Mean Vote (`PMV`_.) and Predicted Percentage of Dissatisfied (`PPD`_.) calculated in accordance with ASHRAE 55 2017 Standards.
+    Returns Predicted Mean Vote (`PMV`_.) and Predicted Percentage of Dissatisfied (`PPD`_.) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
@@ -21,6 +21,15 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+    standard: str (default="ISO")
+        comfort standard used for calculation
+
+        - If "ISO", then the ISO Equation is used
+        - If "ASHRAE", then the ASHRAE Equation is used
+
+        Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
+        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
+        When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
     wme : float
         external work, [met] default 0
 
@@ -33,7 +42,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. and `PPD`_. in accordance with the ASHRAE 55 2017 Standard [1]_.
+    You can use this function to calculate the `PMV`_. and `PPD`_. in accordance with either the ASHRAE 55 2017 Standard [1]_ or the ISO 7730 Standard [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
     .. _PPD: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
@@ -43,7 +52,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> results = pmv_ppd(ta=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0)
+        >>> results = pmv_ppd(ta=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0, standard="ISO")
         >>> print(results)
         {'pmv': 0.08, 'ppd': 5.1}
 
@@ -54,9 +63,28 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     ------
     StopIteration
         Raised if the number of iterations exceeds the threshold
+    ValueError
+        The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
     """
-    check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
-    check_standard_compliance(standard='iso', ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
+    standard = standard.lower()
+    if standard not in ['iso', 'ashrae']:
+        raise ValueError("PMV calculations can only be performed in compliance with ISO or ASHRAE Standards")
+
+    check_standard_compliance(standard=standard, ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
+
+    # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE Appendix H, H3
+    if standard == 'ashrae' and vr > 0.2:
+        still_air_threshold = 0.1
+
+        warnings.simplefilter("ignore")
+        ce = secant(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0, 10, 150)
+        # ce2 = bisection(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 100)
+        if ce is None:
+            raise ValueError("It could not calculate the cooling effect")
+        warnings.simplefilter("always")
+
+        ta = ta - ce
+        tr = tr - ce
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (ta + 235))
 
@@ -122,9 +150,9 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0):
     return {'pmv': round(pmv, 2), 'ppd': round(ppd, 1)}
 
 
-def pmv(ta, tr, vr, rh, met, clo, wme=0):
+def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
     """
-    Returns Predicted Mean Vote (`PMV`_.) calculated in accordance with ASHRAE 55 2017 Standards.
+    Returns Predicted Mean Vote (`PMV`_.) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
@@ -142,6 +170,16 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
         clothing insulation, [clo]
     wme : float
         external work, [met] default 0
+    standard: str (default="ISO")
+        comfort standard used for calculation
+
+        - If "ISO", then the ISO Equation is used
+        - If "ASHRAE", then the ASHRAE Equation is used
+
+        Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
+        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
+        When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
+        See ASHRAE 55 2017 Appendix H for more information [1]_.
 
     Returns
     -------
@@ -150,7 +188,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. in accordance with the ASHRAE 55 2017 Standard [1]_.
+    You can use this function to calculate the `PMV`_. [1]_ [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
 
@@ -163,7 +201,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0):
         0.08
     """
 
-    return pmv_ppd(ta, tr, vr, rh, met, clo, wme)['pmv']
+    return pmv_ppd(ta, tr, vr, rh, met, clo, wme, standard=standard)['pmv']
 
 
 def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.325):
@@ -470,7 +508,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
     return results
 
 
-def utci(ta, tr, rh, v):
+def utci(ta, tr, v, rh):
     """ Determines the Universal Thermal Climate Index (UTCI)
 
     Parameters
@@ -479,10 +517,10 @@ def utci(ta, tr, rh, v):
         dry bulb air temperature, [C]
     tr : float
         mean radiant temperature, [C]
-    rh: float
-        relative humidity, [%]
     v : float
         wind speed, [m/s]
+    rh: float
+        relative humidity, [%]
 
 
     Returns
@@ -502,7 +540,7 @@ def utci(ta, tr, rh, v):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import utci
-        >>> results = utci(ta=25, tr=25, rh=50, v=1)
+        >>> results = utci(ta=25, tr=25, v=1.0, rh=50)
         >>> print(results)
         24.6
 
@@ -780,3 +818,7 @@ def utci(ta, tr, rh, v):
 
     # return {'utci': round(UTCI_approx, 1), 'cmf': cmf, 'stress_range': stress_range}
     return round(UTCI_approx, 1)  # todo maybe return also the other parameters see line above
+
+
+if __name__ == "__main__":
+    pass
