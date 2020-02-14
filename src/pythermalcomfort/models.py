@@ -507,7 +507,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     # Define the variables that will be used throughout the calculation.
     results = dict()
 
-    to = (ta + tr) / 2  # fixme this is not the right way of calculating to
+    to = to_calc(ta, tr, v)
 
     # See if the running mean temperature is between 10 °C and 33.5 °C (the range where the adaptive model is supposed to be used)
     if 10.0 <= t_running_mean <= 33.5:
@@ -637,7 +637,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     if (t_running_mean < 10) or (t_running_mean > 30):
         raise ValueError("The running mean is outside the standards applicability limits")
 
-    to = (ta + tr) / 2  # fixme this is not the right way of calculating to
+    to = to_calc(ta, tr, v)
 
     cooling_effect = 0
     # calculate cooling effect of elevated air speed when top > 25 degC.
@@ -685,7 +685,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     return results
 
 
-def utci(ta, tr, v, rh, units='SI'):  # todo add conversion units
+def utci(ta, tr, v, rh, units='SI'):
     """ Determines the Universal Thermal Climate Index (UTCI)
 
     Parameters

@@ -76,3 +76,24 @@ def units_converter(from_units='ip', **kwargs):
                 results.append(value / 101325)
 
     return results
+
+
+def to_calc(ta, tr, v):
+    """ Calculates operative temperature in accordance with ISO 7726:1998 [5]_
+
+    Parameters
+    ----------
+    ta: float
+        air temperature, [°C]
+    tr: float
+        mean radiant temperature temperature, [°C]
+    v: float
+        air velocity, [m/s]
+
+    Returns
+    -------
+    to: float
+        operative temperature, [°C]
+    """
+
+    return (ta * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
