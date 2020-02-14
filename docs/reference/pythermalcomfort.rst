@@ -7,18 +7,18 @@ Comfort models
     from pythermalcomfort.models import *
 
 
-PMV
----
-
-.. autofunction:: pythermalcomfort.models.pmv
-
 PMV PPD
 -------
 
 .. autofunction:: pythermalcomfort.models.pmv_ppd
 
-SET
+PMV
 ---
+
+.. autofunction:: pythermalcomfort.models.pmv
+
+Standard Effective Temperature
+------------------------------
 
 .. autofunction:: pythermalcomfort.models.set_tmp
 
@@ -32,13 +32,13 @@ Adaptive EN
 
 .. autofunction:: pythermalcomfort.models.adaptive_en
 
-UTCI
-----
+Universal Thermal Climate Index (UTCI)
+--------------------------------------
 
 .. autofunction:: pythermalcomfort.models.utci
 
-Clo (outdoor temperature)
--------------------------
+Clothing prediction
+-------------------
 
 .. autofunction:: pythermalcomfort.models.clo_tout
 
