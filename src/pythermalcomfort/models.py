@@ -3,24 +3,26 @@ from pythermalcomfort.utilities import *
 import math
 
 
-def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
+def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
     Returns Predicted Mean Vote (`PMV`_.) and Predicted Percentage of Dissatisfied (`PPD`_.) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [C]
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
-        mean radiant temperature, [C]
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, [m/s]
+        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
     met : float
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
     standard: str (default="ISO")
         comfort standard used for calculation
 
@@ -30,8 +32,8 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
         Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
         the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
         When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
-    wme : float
-        external work, [met] default 0
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
@@ -59,13 +61,24 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
         >>> print(results['pmv'])
         0.08
 
+        >>> # for users who wants to use the IP system
+        >>> results_ip = pmv_ppd(ta=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
+        >>> print(results_ip)
+        {'pmv': 0.01, 'ppd': 5.0}
+
     Raises
     ------
     StopIteration
         Raised if the number of iterations exceeds the threshold
     ValueError
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
+
+    Args:
+        units:
     """
+    if units.lower() == 'ip':
+        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+
     standard = standard.lower()
     if standard not in ['iso', 'ashrae']:
         raise ValueError("PMV calculations can only be performed in compliance with ISO or ASHRAE Standards")
@@ -150,18 +163,18 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
     return {'pmv': round(pmv, 2), 'ppd': round(ppd, 1)}
 
 
-def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
+def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
     Returns Predicted Mean Vote (`PMV`_.) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [C]
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
-        mean radiant temperature, [C]
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, [m/s]
+        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: The relative air velocity caused by body movement is estimated to be zero for a metabolic rate, M, less than 1 met and var = 0,3 (M − 1) for M > 1 met.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
@@ -183,6 +196,8 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
         the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
         When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
         See ASHRAE 55 2017 Appendix H for more information [1]_.
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
@@ -207,17 +222,17 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
     return pmv_ppd(ta, tr, vr, rh, met, clo, wme, standard=standard)['pmv']
 
 
-def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.325):
+def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101325, units='SI'):
     """ Standard effective temperature (SET) calculation using SI units
 
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [C]
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
-        mean radiant temperature, [C]
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     v : float
-        air velocity, [m/s]
+        air velocity, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
     met : float
@@ -227,14 +242,14 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
     wme : float
         external work, [met] default 0
     body_surface_area : float
-        body surface area, [m2] default 1.8258
+        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
     p_atm : float
-        atmospheric pressure, [kPa] default 101.325
+        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
 
     Returns
     -------
     SET : float
-        Standard effective temperature, [C]
+        Standard effective temperature, [°C]
 
     Notes
     -----
@@ -248,8 +263,20 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
 
         >>> from pythermalcomfort.models import set_tmp
         >>> set_tmp(ta=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
-        25.31
+        25.3
+
+        >>> # for users who wants to use the IP system, you must specify the atmospheric pressure and body surface area
+        >>> set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
+        77.6
+
     """
+    if units.lower() == 'ip':
+        if body_surface_area == 1.8258:
+            body_surface_area = 19.65
+        if p_atm == 101325:
+            p_atm = 1
+        ta, tr, v, body_surface_area, p_atm = units_converter(ta=ta, tr=tr, v=v, area=body_surface_area, pressure=p_atm)
+
     check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v=v, rh=rh, met=met, clo=clo)
 
     # Initial variables as defined in the ASHRAE 55-2017
@@ -274,7 +301,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
     ALFA = 0.1
     ESK = 0.1 * met
 
-    pressure_in_atmospheres = p_atm * 0.009869
+    pressure_in_atmospheres = p_atm / 101325
     LTIME = 60
     RCL = 0.155 * clo
 
@@ -398,36 +425,41 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101.
         set = set_old - DELTA * ERR1 / (ERR2 - ERR1)
         dx = set - set_old
         set_old = set
+
+    if units.lower() == 'ip':
+        set = units_converter(tmp=set, from_units='si')[0]
+
     return round(set, 1)
 
 
-def adaptive_ashrae(ta, tr, t_running_mean, v):
+def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     """ Determines the adaptive thermal comfort based on ASHRAE 55
 
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [C]
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
-        mean radiant temperature, [C]
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     t_running_mean: float
-        running mean temperature, [C]
+        running mean temperature, [°C]
     v : float
-        air velocity, [m/s]
-
+        air velocity, default in [m/s] in [fps] if `units` = 'IP'
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
     tmp_cmf : float
-        Comfort temperature a that specific running mean temperature, [C]
+        Comfort temperature a that specific running mean temperature, default in [°C] or in [°F]
     tmp_cmf_80_low : float
-        Lower acceptable comfort temperature for 80% occupants, [C]
+        Lower acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
     tmp_cmf_80_up : float
-        Upper acceptable comfort temperature for 80% occupants, [C]
+        Upper acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
     tmp_cmf_90_low : float
-        Lower acceptable comfort temperature for 90% occupants, [C]
+        Lower acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
     tmp_cmf_90_up : float
-        Upper acceptable comfort temperature for 90% occupants, [C]
+        Upper acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
     acceptability_80 : bol
         Acceptability for 80% occupants
     acceptability_90 : bol
@@ -453,6 +485,11 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
         True
         # The conditions you entered are considered to be comfortable for by 80% of the occupants
 
+        >>> # for users who wants to use the IP system
+        >>> results = adaptive_ashrae(ta=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(results)
+        {'tmp_cmf': 75.2, 'tmp_cmf_80_low': 68.9, 'tmp_cmf_80_up': 81.5, 'tmp_cmf_90_low': 70.7, 'tmp_cmf_90_up': 79.7, 'acceptability_80': True, 'acceptability_90': False}
+
         >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
@@ -464,6 +501,9 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
         Raised if the input are outside the Standard's applicability limits
 
     """
+    if units.lower() == 'ip':
+        ta, tr, t_running_mean, vr = units_converter(ta=ta, tr=tr, tmp_running_mean=t_running_mean, v=v)
+
     check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v=v)
 
     # Define the variables that will be used throughout the calculation.
@@ -471,7 +511,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
 
     to = (ta + tr) / 2  # fixme this is not the right way of calculating to
 
-    # See if the running mean temperature is between 10 C and 33.5 C (the range where the adaptive model is supposed to be used)
+    # See if the running mean temperature is between 10 °C and 33.5 °C (the range where the adaptive model is supposed to be used)
     if 10.0 <= t_running_mean <= 33.5:
 
         cooling_effect = 0
@@ -487,7 +527,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
         # Figure out the relation between comfort and outdoor temperature depending on the level of conditioning.
         t_cmf = 0.31 * t_running_mean + 17.8
         tmp_cmf_80_low = t_cmf - 3.5
-        t_cmf_90_lower = t_cmf - 2.5
+        t_cmf_90_low = t_cmf - 2.5
         tmp_cmf_80_up = t_cmf + 3.5 + cooling_effect
         tmp_cmf_90_up = t_cmf + 2.5 + cooling_effect
 
@@ -499,10 +539,15 @@ def adaptive_ashrae(ta, tr, t_running_mean, v):
                 return False
 
         acceptability_80 = acceptability(tmp_cmf_80_low, tmp_cmf_80_up)
-        acceptability_90 = acceptability(t_cmf_90_lower, t_cmf_90_lower)
+        acceptability_90 = acceptability(t_cmf_90_low, t_cmf_90_low)
+
+        if units.lower() == 'ip':
+            t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, t_cmf_90_low, tmp_cmf_90_up = units_converter(from_units='si', tmp_cmf=t_cmf, tmp_cmf_80_low=tmp_cmf_80_low,
+                                                                                                tmp_cmf_80_up=tmp_cmf_80_up, tmp_cmf_90_low=t_cmf_90_low,
+                                                                                                tmp_cmf_90_up=tmp_cmf_90_up)
 
         results = {'tmp_cmf': t_cmf, 'tmp_cmf_80_low': tmp_cmf_80_low, 'tmp_cmf_80_up': tmp_cmf_80_up,
-                   'tmp_cmf_90_low': t_cmf_90_lower, 'tmp_cmf_90_up': tmp_cmf_90_up,
+                   'tmp_cmf_90_low': t_cmf_90_low, 'tmp_cmf_90_up': tmp_cmf_90_up,
                    'acceptability_80': acceptability_80, 'acceptability_90': acceptability_90, }
 
     else:
@@ -517,9 +562,9 @@ def utci(ta, tr, v, rh):
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [C]
+        dry bulb air temperature, [°C]
     tr : float
-        mean radiant temperature, [C]
+        mean radiant temperature, [°C]
     v : float
         wind speed, [m/s]
     rh: float
@@ -529,7 +574,7 @@ def utci(ta, tr, v, rh):
     Returns
     -------
     utci
-         Universal Thermal Climate Index, [C]
+         Universal Thermal Climate Index, [°C]
 
     Notes
     -----

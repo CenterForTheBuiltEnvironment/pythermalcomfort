@@ -1,5 +1,6 @@
 import pytest
 from pythermalcomfort.models import *
+from pythermalcomfort.psychrometrics import *
 
 data_test_set = [  # I have commented the lines of code that don't pass the test
     {'ta': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
@@ -38,10 +39,17 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
 ]
 
 
+def test_ip_units_converter():
+    assert (units_converter(ta=77, tr=77, v=3.2, from_units='ip')) == [25.0, 25.0, 0.975312404754648]
+    assert (units_converter(pressure=1, area=1/0.09, from_units='ip')) == [101325, 1.0322474090590033]
+
+
 def test_set_tmp():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_set:
         assert (set_tmp(row['ta'], row['tr'], row['v'], row['rh'], row['met'], row['clo'])) == row['set']
+
+    assert(set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')) == 77.6
 
 
 def test_pmv():
@@ -58,8 +66,10 @@ def test_pmv_ppd():
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1)) == row['pmv']
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 0)) == row['ppd']
 
+    assert (round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units='ip')['pmv'], 1)) == -0.5
+
     with pytest.raises(ValueError):
-        pmv_ppd(20, 20, 0.1, 50, 1.1, 0.5, standard='random')
+        pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard='random')
 
 
 def test_adaptive_ashrae():
@@ -74,6 +84,8 @@ def test_adaptive_ashrae():
     ]
     for row in data_test_adaptive_ashrae:
         assert (adaptive_ashrae(row['ta'], row['tr'], row['t_running_mean'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
+
+    assert (adaptive_ashrae(77, 77, 68, 0.3, units='ip')['tmp_cmf']) == 75.2
 
     with pytest.raises(ValueError):
         adaptive_ashrae(20, 20, 9, 0.1)
