@@ -339,7 +339,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
                 CTC = CHR + CHC
                 RA = 1.0 / (FACL * CTC)
                 TOP = (CHR * tr + CHC * ta) / CTC
-            TCL = (RA * temp_skin + RCL * TOP) / (RA + RCL);
+            TCL = (RA * temp_skin + RCL * TOP) / (RA + RCL)
             flag = True
         flag = False
         DRY = (temp_skin - TOP) / (RA + RCL)
@@ -442,7 +442,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     t_running_mean: float
-        running mean temperature, [°C]
+        running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
     v : float
         air velocity, default in [m/s] in [fps] if `units` = 'IP'
     units: str (default="SI")
@@ -469,8 +469,6 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     -----
     You can use this function to calculate if your conditions are within the `adaptive thermal comfort region`.
     Calculations with comply with the ASHRAE 55 2017 Standard [1]_.
-
-    .. _adaptive thermal comfort region: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
 
     Examples
     --------
@@ -552,6 +550,137 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
 
     else:
         raise ValueError("The running mean is outside the standards applicability limits")
+
+    return results
+
+
+def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
+    """ Determines the adaptive thermal comfort based on EN 16798-1 2019
+
+    Parameters
+    ----------
+    ta : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    t_running_mean: float
+        running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
+    v : float
+        air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        Note: Indoor operative temperature correction is applicable for buildings equipped
+        with fans or personal systems providing building occupants with personal control over air speed at occupant level.
+        For operative temperatures above 25°C the comfort zone upper limit can be increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C ( v > 1.2 m/s)
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    tmp_cmf : float
+        Comfort temperature at that specific running mean temperature, default in [°C] or in [°F]
+    acceptability_cat_i : bol
+        If the indoor conditions comply with comfort category I
+    acceptability_cat_ii : bol
+        If the indoor conditions comply with comfort category II
+    acceptability_cat_iii : bol
+        If the indoor conditions comply with comfort category III
+    tmp_cmf_cat_i_up : float
+        Upper acceptable comfort temperature for category I, default in [°C] or in [°F]
+    tmp_cmf_cat_ii_up : float
+        Upper acceptable comfort temperature for category II, default in [°C] or in [°F]
+    tmp_cmf_cat_iii_up : float
+        Upper acceptable comfort temperature for category III, default in [°C] or in [°F]
+    tmp_cmf_cat_i_low : float
+        Lower acceptable comfort temperature for category I, default in [°C] or in [°F]
+    tmp_cmf_cat_ii_low : float
+        Lower acceptable comfort temperature for category II, default in [°C] or in [°F]
+    tmp_cmf_cat_iii_low : float
+        Lower acceptable comfort temperature for category III, default in [°C] or in [°F]
+
+    Notes
+    -----
+    You can use this function to calculate if your conditions are within the EN adaptive thermal comfort region.
+    Calculations with comply with the EN 16798-1 2019 [1]_.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import adaptive_en
+        >>> results = adaptive_en(ta=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(results)
+        {'tmp_cmf': 25.4, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, 'acceptability_cat_iii': True, ... }
+
+        >>> print(results['acceptability_cat_i'])
+        True
+        # The conditions you entered are considered to comply with Category I
+
+        >>> # for users who wants to use the IP system
+        >>> results = adaptive_en(ta=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(results)
+        {'tmp_cmf': 77.7, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, 'acceptability_cat_iii': True, ... }
+
+        >>> results = adaptive_en(ta=25, tr=25, t_running_mean=9, v=0.1)
+        ValueError: The running mean is outside the standards applicability limits
+        # The adaptive thermal comfort model can only be used
+        # if the running mean temperature is between 10 °C and 30 °C
+
+    Raises
+    ------
+    ValueError
+        Raised if the input are outside the Standard's applicability limits
+
+    """
+
+    if units.lower() == 'ip':
+        ta, tr, t_running_mean, vr = units_converter(ta=ta, tr=tr, tmp_running_mean=t_running_mean, v=v)
+
+    if (t_running_mean < 10) or (t_running_mean > 30):
+        raise ValueError("The running mean is outside the standards applicability limits")
+
+    to = (ta + tr) / 2  # fixme this is not the right way of calculating to
+
+    cooling_effect = 0
+    # calculate cooling effect of elevated air speed when top > 25 degC.
+    if v >= 0.6 and to >= 25:
+        if v < 0.9:
+            cooling_effect = 1.2
+        elif v < 1.2:
+            cooling_effect = 1.8
+        else:
+            cooling_effect = 2.2
+
+    t_cmf = 0.33 * t_running_mean + 18.8
+
+    t_cmf_i_lower = t_cmf - 2
+    t_cmf_ii_lower = t_cmf - 3
+    t_cmf_iii_lower = t_cmf - 4
+    t_cmf_i_upper = t_cmf + 2 + cooling_effect
+    t_cmf_ii_upper = t_cmf + 3 + cooling_effect
+    t_cmf_iii_upper = t_cmf + 4 + cooling_effect
+
+    def between(val, low, high):
+        return low < val < high
+
+    if between(to, t_cmf_i_lower, t_cmf_i_upper):
+        acceptability_i, acceptability_ii, acceptability_iii = True, True, True
+    elif between(to, t_cmf_ii_lower, t_cmf_ii_upper):
+        acceptability_ii, acceptability_iii = True, True
+        acceptability_i = False
+    elif between(to, t_cmf_iii_lower, t_cmf_iii_upper):
+        acceptability_iii = True
+        acceptability_i, acceptability_ii = False, False
+    else:
+        acceptability_i, acceptability_ii, acceptability_iii = False, False, False
+
+    if units.lower() == 'ip':
+        t_cmf, t_cmf_i_upper, t_cmf_ii_upper, t_cmf_iii_upper = units_converter(from_units='si', tmp_cmf=t_cmf, tmp_cmf_cat_i_up=t_cmf_i_upper, tmp_cmf_cat_ii_up=t_cmf_ii_upper,
+                                                                                tmp_cmf_cat_iii_up=t_cmf_iii_upper)
+        t_cmf_i_lower, t_cmf_ii_lower, t_cmf_iii_lower = units_converter(from_units='si', tmp_cmf_cat_i_low=t_cmf_i_lower, tmp_cmf_cat_ii_low=t_cmf_ii_lower,
+                                                                         tmp_cmf_cat_iii_low=t_cmf_iii_lower)
+
+    results = {'tmp_cmf': round(t_cmf, 1), 'acceptability_cat_i': acceptability_i, 'acceptability_cat_ii': acceptability_ii, 'acceptability_cat_iii': acceptability_iii,
+               'tmp_cmf_cat_i_up': round(t_cmf_i_upper, 1), 'tmp_cmf_cat_ii_up': round(t_cmf_ii_upper, 1), 'tmp_cmf_cat_iii_up': round(t_cmf_iii_upper, 1),
+               'tmp_cmf_cat_i_low': round(t_cmf_i_lower, 1), 'tmp_cmf_cat_ii_low': round(t_cmf_ii_lower, 1), 'tmp_cmf_cat_iii_low': round(t_cmf_iii_lower, 1)}
 
     return results
 
