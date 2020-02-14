@@ -113,3 +113,5 @@ def test_utci():
     ]
     for row in data_test_adaptive_ashrae:
         assert (utci(row['ta'], row['tr'], row['v'], row['rh'])) == row['return'][list(row['return'].keys())[0]]
+
+    assert (utci(ta=77, tr=77, v=3.28, rh=50, units='ip')) == 76.4

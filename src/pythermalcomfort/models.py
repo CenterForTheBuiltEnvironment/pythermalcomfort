@@ -265,7 +265,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
         >>> set_tmp(ta=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
         25.3
 
-        >>> # for users who wants to use the IP system, you must specify the atmospheric pressure and body surface area
+        >>> # for users who wants to use the IP system
         >>> set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
         77.6
 
@@ -685,25 +685,26 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     return results
 
 
-def utci(ta, tr, v, rh):  # todo add conversion units
+def utci(ta, tr, v, rh, units='SI'):  # todo add conversion units
     """ Determines the Universal Thermal Climate Index (UTCI)
 
     Parameters
     ----------
     ta : float
-        dry bulb air temperature, [°C]
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
-        mean radiant temperature, [°C]
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     v : float
-        wind speed, [m/s]
-    rh: float
+        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+    rh : float
         relative humidity, [%]
-
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
     utci : float
-         Universal Thermal Climate Index, [°C]
+         Universal Thermal Climate Index, [°C] or in [°F]
 
     Notes
     -----
@@ -717,9 +718,12 @@ def utci(ta, tr, v, rh):  # todo add conversion units
     .. code-block:: python
 
         >>> from pythermalcomfort.models import utci
-        >>> results = utci(ta=25, tr=25, v=1.0, rh=50)
-        >>> print(results)
+        >>> utci(ta=25, tr=25, v=1.0, rh=50)
         24.6
+
+        >>> # for users who wants to use the IP system
+        >>> utci(ta=77, tr=77, v=3.28, rh=50, units='ip')
+        76.4
 
     Raises
     ------
@@ -727,6 +731,10 @@ def utci(ta, tr, v, rh):  # todo add conversion units
         Raised if the input are outside the Standard's applicability limits
 
     """
+
+    if units.lower() == 'ip':
+        ta, tr, v = units_converter(ta=ta, tr=tr, v=v)
+
     check_standard_compliance(standard='utci', ta=ta, tr=tr, v=v)
 
     def es(ta):
@@ -982,6 +990,9 @@ def utci(ta, tr, v, rh):  # todo add conversion units
     #     stress_range = 2
 
     # return {'utci': round(UTCI_approx, 1), 'cmf': cmf, 'stress_range': stress_range}
+    if units.lower() == 'ip':
+        utci_approx = units_converter(tmp=utci_approx, from_units='si')[0]
+
     return round(utci_approx, 1)  # todo maybe return also the other parameters see line above
 
 
