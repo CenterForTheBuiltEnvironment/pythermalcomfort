@@ -33,8 +33,8 @@ UTCI
 .. autofunction:: pythermalcomfort.models.utci
 
 
-References
-----------
+**References**
+
 .. [1]  ANSI, & ASHRAE. (2017). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 
 
