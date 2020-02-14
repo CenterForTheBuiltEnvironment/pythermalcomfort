@@ -94,6 +94,14 @@ def test_adaptive_ashrae():
         adaptive_ashrae(20, 20, 34, 0.1)
 
 
+# todo implement test for adaptive_en()
+
+
+def test_clo_tout():
+    assert (clo_tout(tout=80.6, units='ip')) == 0.46
+    assert (clo_tout(tout=27)) == 0.46
+
+
 def test_utci():
     data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
         {'ta': 25, 'tr': 27, 'rh': 50, 'v': 1, 'return': {'utci': 25.2}},
