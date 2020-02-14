@@ -162,6 +162,9 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO'):
         mean radiant temperature, [C]
     vr : float
         relative air velocity, [m/s]
+
+        Note: The relative air velocity caused by body movement is estimated to be zero for a metabolic rate, M, less than 1 met and var = 0,3 (M − 1) for M > 1 met.
+        It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
