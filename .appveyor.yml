@@ -5,13 +5,8 @@ environment:
     - TOXENV: check
       TOXPYTHON: C:\Python36\python.exe
       PYTHON_HOME: C:\Python36
-      PYTHON_VERSION: '3.6'
+      PYTHON_VERSION: '3.7'
       PYTHON_ARCH: '32'
-    - TOXENV: py35,codecov
-      TOXPYTHON: C:\Python35-x64\python.exe
-      PYTHON_HOME: C:\Python35-x64
-      PYTHON_VERSION: '3.5'
-      PYTHON_ARCH: '64'
     - TOXENV: py36,codecov
       TOXPYTHON: C:\Python36\python.exe
       PYTHON_HOME: C:\Python36

@@ -2,13 +2,13 @@
 Changelog
 =========
 
-0.4.0 (2020-02-11)
+0.4.0 (2020-02-17)
 ------------------
 
 * Created adaptive_EN, v_relative, t_clo, vertical_tmp_gradient, ankle_draft functions and wrote tests.
 * Added possibility to decide with measuring system to use SI or IP.
 
-0.3.0 (2020-02-11)
+0.3.0 (2020-02-13)
 ------------------
 
 * Created set_tmp, adaptive_ashrae, UTCI functions and wrote tests.
