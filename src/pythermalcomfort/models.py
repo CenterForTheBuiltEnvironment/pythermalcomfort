@@ -15,6 +15,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
         Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -177,6 +178,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
         Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -568,6 +570,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
     v : float
         air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
         Note: Indoor operative temperature correction is applicable for buildings equipped
         with fans or personal systems providing building occupants with personal control over air speed at occupant level.
         For operative temperatures above 25°C the comfort zone upper limit can be increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C ( v > 1.2 m/s)
@@ -1048,12 +1051,14 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
     ----------
     ta : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+
         Note: The air temperature is the average value over two heights: 0.6 m (24 in.) and 1.1 m (43 in.) for seated occupants
         and 1.1 m (43 in.) and 1.7 m (67 in.) for standing occupants.
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
         Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -1105,12 +1110,14 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
     ----------
     ta : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+
         Note: The air temperature is the average value over two heights: 0.6 m (24 in.) and 1.1 m (43 in.) for seated occupants
         and 1.1 m (43 in.) and 1.7 m (67 in.) for standing occupants.
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
         Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
