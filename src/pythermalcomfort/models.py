@@ -651,9 +651,9 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
 
     t_cmf = 0.33 * t_running_mean + 18.8
 
-    t_cmf_i_lower = t_cmf - 2
-    t_cmf_ii_lower = t_cmf - 3
-    t_cmf_iii_lower = t_cmf - 4
+    t_cmf_i_lower = t_cmf - 3
+    t_cmf_ii_lower = t_cmf - 4
+    t_cmf_iii_lower = t_cmf - 5
     t_cmf_i_upper = t_cmf + 2 + cooling_effect
     t_cmf_ii_upper = t_cmf + 3 + cooling_effect
     t_cmf_iii_upper = t_cmf + 4 + cooling_effect
