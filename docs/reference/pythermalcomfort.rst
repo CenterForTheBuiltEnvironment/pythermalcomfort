@@ -42,6 +42,11 @@ Clothing prediction
 
 .. autofunction:: pythermalcomfort.models.clo_tout
 
+Vertical air temperature gradient
+---------------------------------
+
+.. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd
+
 
 **References**
 

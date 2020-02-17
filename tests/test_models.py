@@ -102,6 +102,12 @@ def test_clo_tout():
     assert (clo_tout(tout=27)) == 0.46
 
 
+def test_vertical_tmp_grad_ppd():
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7*1.8, units='ip')) == 12.6
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)) == 12.6
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)) == 1.7
+
+
 def test_utci():
     data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
         {'ta': 25, 'tr': 27, 'rh': 50, 'v': 1, 'return': {'utci': 25.2}},

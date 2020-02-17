@@ -176,7 +176,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     vr : float
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: The relative air velocity caused by body movement is estimated to be zero for a metabolic rate, M, less than 1 met and var = 0,3 (M − 1) for M > 1 met.
+        Note: The relative air velocity caused by body movement is estimated to be zero for a metabolic rate, M, less than 1 met and var = 0.3 (M − 1) for M > 1 met.
         It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
         relative humidity, [%]
@@ -219,7 +219,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         0.08
     """
 
-    return pmv_ppd(ta, tr, vr, rh, met, clo, wme, standard=standard)['pmv']
+    return pmv_ppd(ta, tr, vr, rh, met, clo, wme, standard=standard, units=units)['pmv']
 
 
 def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101325, units='SI'):
@@ -1037,6 +1037,61 @@ def clo_tout(tout, units='SI'):
         clo = 0.46
 
     return round(clo, 2)
+
+
+def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI'):
+    """ Calculates the PPD as a function of specific personal and environmental parameters and the vertical temperature gradient between feet and head [1]_.
+
+    Parameters
+    ----------
+    ta : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        Note: The air temperature is the average value over two heights: 0.6 m (24 in.) and 1.1 m (43 in.) for seated occupants
+        and 1.1 m (43 in.) and 1.7 m (67 in.) for standing occupants.
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    vr : float
+        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
+        Note: The relative air velocity caused by body movement is estimated to be zero for a metabolic rate, M, less than 1 met and var = 0.3 (M − 1) for M > 1 met.
+        It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    vertical_tmp_grad : float
+        vertical temperature gradient between the feet and the head, [clo]
+    units: str (default="SI")
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    PPD_vert_grad: float
+        Predicted Percentage of Dissatisfied occupants, [%]
+        Note: The ASHRAE 55 2017 standard defines that indoor conditions are deemed to be comfortable if PPD estimate with this equation is lower or equal than 5 %
+
+    Notes
+    -----
+    The ASHRAE 55 2017 states that it is acceptable to determine the clothing insulation Icl using this equation in mechanically conditioned buildings [1]_.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import vertical_tmp_grad_ppd
+        >>> vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)
+        12.6
+
+    """
+    if units.lower() == 'ip':
+        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+        vertical_tmp_grad *= 1.8
+
+    tsv = pmv(ta, tr, vr, rh, met, clo, standard="ashrae")
+    numerator = math.exp(0.13 * math.pow(tsv - 1.91, 2) + 0.15 * vertical_tmp_grad - 1.6)
+    return round((numerator / (1 + numerator) - 0.345) * 100, 1)
 
 
 if __name__ == "__main__":
