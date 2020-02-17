@@ -5,7 +5,7 @@ import math
 
 def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
-    Returns Predicted Mean Vote (`PMV`_.) and Predicted Percentage of Dissatisfied (`PPD`_.) calculated in accordance to main thermal comfort Standards.
+    Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (`PPD`_) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. and `PPD`_. in accordance with either the ASHRAE 55 2017 Standard [1]_ or the ISO 7730 Standard [2]_.
+    You can use this function to calculate the `PMV`_ and `PPD`_ in accordance with either the ASHRAE 55 2017 Standard [1]_ or the ISO 7730 Standard [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
     .. _PPD: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
@@ -168,7 +168,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
 def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
-    Returns Predicted Mean Vote (`PMV`_.) calculated in accordance to main thermal comfort Standards.
+    Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
@@ -209,7 +209,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
     Notes
     -----
-    You can use this function to calculate the `PMV`_. [1]_ [2]_.
+    You can use this function to calculate the `PMV`_ [1]_ [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
 
@@ -256,7 +256,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
 
     Notes
     -----
-    You can use this function to calculate the `SET`_. temperature in accordance with the ASHRAE 55 2017 Standard [1]_.
+    You can use this function to calculate the `SET`_ temperature in accordance with the ASHRAE 55 2017 Standard [1]_.
 
     .. _SET: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
 
