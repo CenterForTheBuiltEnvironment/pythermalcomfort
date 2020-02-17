@@ -403,8 +403,8 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
     if met < 0.85:
         CHCS = 3.0
     else:
-        CHCS = 5.66 * pow(((met - 0.85)), 0.39)
-    if (CHCS < 3.0):
+        CHCS = 5.66 * math.pow((met - 0.85), 0.39)
+    if CHCS < 3.0:
         CHCS = 3.0
     CTCS = CHCS + CHRS
     RCLOS = 1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835
