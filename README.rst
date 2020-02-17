@@ -61,7 +61,7 @@ Overview
 
 .. end-badges
 
-Package to calculate sevral thermal comfort indeces (e.g. PMV, PPD, SET, adaptive) and convert physical variables.
+Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables.
 
 * Free software: MIT license
 
