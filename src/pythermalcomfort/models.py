@@ -1151,5 +1151,18 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
     return {"PPD_ad": ppd_val, "Acceptability": acceptability}
 
 
+# add the following models:
+# todo radiant_tmp_asymmetry
+# todo draft
+# todo floor_surface_tmp
+# todo globe_tmp
+# todo solar_gain
+# todo effective_tmp
+# todo a_pmv
+# todo e_pmv
+# todo humidity conversion
+# more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
+# more info here: https://rdrr.io/cran/comf/man/
+
 if __name__ == "__main__":
     pass
