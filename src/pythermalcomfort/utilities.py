@@ -31,6 +31,9 @@ def check_standard_compliance(standard, **kwargs):
             if key == 'clo':
                 if value > 1.5 or value < 0:
                     warnings.warn("ASHRAE clo applicability limits between 0.0 and 1.5 clo", UserWarning)
+            if key == 'v_limited':
+                if value > 0.2:
+                    raise ValueError("This equation is only applicable for air speed lower than 0.2 m/s")
 
     elif params['standard'] == 'iso':  # based on table 7.3.4 ashrae 55 2017
         for key, value in params.items():

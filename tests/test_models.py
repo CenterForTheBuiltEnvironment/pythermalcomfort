@@ -103,9 +103,23 @@ def test_clo_tout():
 
 
 def test_vertical_tmp_grad_ppd():
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7*1.8, units='ip')) == 12.6
-    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)) == 12.6
-    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)) == 1.7
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['PPD_vg']) == 12.6
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['Acceptability']) == False
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)['PPD_vg']) == 12.6
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['PPD_vg']) == 1.7
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['Acceptability']) == True
+
+    with pytest.raises(ValueError):
+        vertical_tmp_grad_ppd(25, 25, 0.3, 50, 1.2, 0.5, 7)
+
+
+def test_ankle_draft():
+    assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.4)["PPD_ad"]) == 23.5
+    assert (ankle_draft(77, 77, 0.2*3.28, 50, 1.2, 0.5, 0.4*3.28, units="IP")["PPD_ad"]) == 23.5
+    assert (ankle_draft(27, 22, 0.2, 60, met=1.3, clo=0.7, v_ankle=0.2)["PPD_ad"]) == 7.8
+
+    with pytest.raises(ValueError):
+        ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)
 
 
 def test_utci():

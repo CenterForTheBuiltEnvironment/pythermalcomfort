@@ -47,6 +47,11 @@ Vertical air temperature gradient
 
 .. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd
 
+Ankle draft
+-----------
+
+.. autofunction:: pythermalcomfort.models.ankle_draft
+
 
 **References**
 

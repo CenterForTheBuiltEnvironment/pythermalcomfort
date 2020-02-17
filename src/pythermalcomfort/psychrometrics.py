@@ -57,7 +57,7 @@ def units_converter(from_units='ip', **kwargs):
         for key, value in kwargs.items():
             if 'tmp' in key or key == 'tr' or key == 'ta':
                 results.append((value - 32) * 5 / 9)
-            if key in ['v', 'vr']:
+            if key in ['v', 'vr', 'vel']:
                 results.append(value / 3.281)
             if key == 'area':
                 results.append(value / 10.764)
@@ -68,7 +68,7 @@ def units_converter(from_units='ip', **kwargs):
         for key, value in kwargs.items():
             if 'tmp' in key or key == 'tr' or key == 'ta':
                 results.append((value * 9 / 5) + 32)
-            if key in ['v', 'vr']:
+            if key in ['v', 'vr', 'vel']:
                 results.append(value * 3.281)
             if key == 'area':
                 results.append(value * 10.764)
