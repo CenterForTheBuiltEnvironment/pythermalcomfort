@@ -75,9 +75,6 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         Raised if the number of iterations exceeds the threshold
     ValueError
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
-
-    Args:
-        units:
     """
     if units.lower() == 'ip':
         ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
@@ -1068,7 +1065,7 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
     clo : float
         clothing insulation, [clo]
     vertical_tmp_grad : float
-        vertical temperature gradient between the feet and the head, default in [°C] in [°F] if `units` = 'IP'
+        vertical temperature gradient between the feet and the head, default in [°C/m] in [°F/ft] if `units` = 'IP'
     units: str (default="SI")
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -1090,7 +1087,7 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
     """
     if units.lower() == 'ip':
         ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
-        vertical_tmp_grad *= 1.8
+        vertical_tmp_grad = vertical_tmp_grad / 1.8 * 3.28
 
     check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo)
 
