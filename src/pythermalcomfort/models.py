@@ -35,7 +35,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
         the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
         When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -196,7 +196,7 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20 m/s (40 fpm).
         When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are adjusted based on the SET model.
         See ASHRAE 55 2017 Appendix H for more information [1]_.
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -245,6 +245,8 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
     p_atm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
@@ -445,7 +447,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
     v : float
         air velocity, default in [m/s] in [fps] if `units` = 'IP'
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -571,7 +573,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
         Note: Indoor operative temperature correction is applicable for buildings equipped
         with fans or personal systems providing building occupants with personal control over air speed at occupant level.
         For operative temperatures above 25°C the comfort zone upper limit can be increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C ( v > 1.2 m/s)
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -699,7 +701,7 @@ def utci(ta, tr, v, rh, units='SI'):
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -1004,7 +1006,7 @@ def clo_tout(tout, units='SI'):
     ----------
     tout : float
         outdoor air temperature at 06:00 a.m., default in [°C] in [°F] if `units` = 'IP'
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -1066,7 +1068,7 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
         clothing insulation, [clo]
     vertical_tmp_grad : float
         vertical temperature gradient between the feet and the head, default in [°C/m] in [°F/ft] if `units` = 'IP'
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -1125,7 +1127,7 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
         clothing insulation, [clo]
     v_ankle : float
         air speed at the 0.1 m (4 in.) above the floor, default in [m/s] in [fps] if `units` = 'IP'
-    units: str (default="SI")
+    units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
