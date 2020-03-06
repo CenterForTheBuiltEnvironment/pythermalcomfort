@@ -63,6 +63,17 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
     {'ta': 24.7, 'tr': 24.7, 'rh': 16, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
 ]
 
+data_test_pmv_ip = [  # I have commented the lines of code that don't pass the test
+    {'ta': 67.3, 'rh': 86, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 75.0, 'rh': 66, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
+    # {'ta': 78.2, 'rh': 15, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
+    {'ta': 70.2, 'rh': 20, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 74.5, 'rh': 67, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
+    # {'ta': 80.2, 'rh': 56, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
+    {'ta': 82.2, 'rh': 13, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
+    {'ta': 76.5, 'rh': 16, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
+]
+
 
 def test_ip_units_converter():
     assert (cooling_effect(ta=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.06
@@ -98,6 +109,10 @@ def test_pmv_ppd():
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['ppd'], 0)) == row['ppd']
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1)) == row['pmv']
         assert (round(pmv_ppd(row['ta'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 0)) == row['ppd']
+
+    for row in data_test_pmv_ip:
+        assert (round(pmv_ppd(row['ta'], row['ta'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['pmv'], 1)) == row['pmv']
+        assert (round(pmv_ppd(row['ta'], row['ta'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['ppd'], 0)) == row['ppd']
 
     assert (round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units='ip')['pmv'], 1)) == -0.5
 

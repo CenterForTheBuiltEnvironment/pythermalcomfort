@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.5.0 (2020-03-06)
+------------------
+
+* There was an error in version 0.4.2 in the calculation of PMV and PPD with elevated air speed, i.e. vr > 0.2 which has been fixed in this version
+
 0.4.2 (2020-03-06)
 ------------------
 

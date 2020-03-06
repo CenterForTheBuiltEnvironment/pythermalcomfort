@@ -164,6 +164,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
         ta = ta - ce
         tr = tr - ce
+        vr = 0.1
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (ta + 235))
 
