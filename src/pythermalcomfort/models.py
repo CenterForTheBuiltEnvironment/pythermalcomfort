@@ -43,12 +43,12 @@ def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
         >>> from pythermalcomfort.models import cooling_effect
         >>> ce = cooling_effect(ta=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
         >>> print(ce)
-        1.59
+        1.64
 
         >>> # for users who wants to use the IP system
         >>> ce = cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
         >>> print(ce)
-        3.75
+        3.74
 
     Raises
     ------
@@ -1150,8 +1150,9 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
     .. code-block:: python
 
         >>> from pythermalcomfort.models import vertical_tmp_grad_ppd
-        >>> vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)
-        12.6
+        >>> results = vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)
+        >>> print(results)
+        {'PPD_vg': 12.6, 'Acceptability': False}
 
     """
     if units.lower() == 'ip':
@@ -1210,7 +1211,8 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
 
         >>> from pythermalcomfort.models import ankle_draft
         >>> results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
-        {'PPD_ad': 18.5, 'Acceptability': True}
+        >>> print(results)
+        {'PPD_ad': 18.6, 'Acceptability': True}
 
     """
     if units.lower() == 'ip':

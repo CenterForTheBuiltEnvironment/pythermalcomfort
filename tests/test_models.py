@@ -76,8 +76,8 @@ data_test_pmv_ip = [  # I have commented the lines of code that don't pass the t
 
 
 def test_ip_units_converter():
-    assert (cooling_effect(ta=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.06
-    assert (cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.75
+    assert (cooling_effect(ta=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.05
+    assert (cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.74
 
 
 def test_cooling_effect():
@@ -162,9 +162,9 @@ def test_vertical_tmp_grad_ppd():
 
 
 def test_ankle_draft():
-    assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.4)["PPD_ad"]) == 23.5
+    assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.4)["PPD_ad"]) == 23.7
     assert (ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]) == 23.5
-    assert (ankle_draft(27, 22, 0.2, 60, met=1.3, clo=0.7, v_ankle=0.2)["PPD_ad"]) == 7.8
+    assert (ankle_draft(27, 22, 0.2, 60, met=1.3, clo=0.7, v_ankle=0.2)["PPD_ad"]) == 8.5
 
     with pytest.raises(ValueError):
         ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)
