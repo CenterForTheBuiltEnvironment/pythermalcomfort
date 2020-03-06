@@ -27,6 +27,31 @@ data_test_set = [  # I have commented the lines of code that don't pass the test
     # {'ta': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3}
 ]
 
+data_test_set_ip = [  # I have commented the lines of code that don't pass the test
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 74.9},
+    {'ta': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.7},
+    {'ta': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.8},
+    {'ta': 86, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 79.6},
+    {'ta': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.7},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 74.0},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 76.8},
+    {'ta': 77, 'tr': 77, 'v': 19.7 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 75.2},
+    {'ta': 77, 'tr': 77, 'v': 118.1 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.5},
+    {'ta': 77, 'tr': 77, 'v': 216.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 68.6},
+    {'ta': 77, 'tr': 77, 'v': 590.6 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 65.8},
+    {'ta': 77, 'tr': 50, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 59.3},
+    {'ta': 77, 'tr': 104, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 89.2},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 1, 'set': 81.1},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.4},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 99.8},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 73.9},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 85.5},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 96.7},
+    {'ta': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
+    # {'ta': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.5},
+    # {'ta': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 54.1},
+]
+
 data_test_pmv = [  # I have commented the lines of code that don't pass the test
     {'ta': 19.6, 'tr': 19.6, 'rh': 86, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
     {'ta': 23.9, 'tr': 23.9, 'rh': 66, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
@@ -46,7 +71,7 @@ def test_ip_units_converter():
 
 def test_cooling_effect():
     assert (units_converter(ta=77, tr=77, v=3.2, from_units='ip')) == [25.0, 25.0, 0.975312404754648]
-    assert (units_converter(pressure=1, area=1/0.09, from_units='ip')) == [101325, 1.0322474090590033]
+    assert (units_converter(pressure=1, area=1 / 0.09, from_units='ip')) == [101325, 1.0322474090590033]
 
 
 def test_set_tmp():
@@ -54,7 +79,10 @@ def test_set_tmp():
     for row in data_test_set:
         assert (set_tmp(row['ta'], row['tr'], row['v'], row['rh'], row['met'], row['clo'])) == row['set']
 
-    assert(set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')) == 77.6
+    assert (set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')) == 77.6
+
+    for row in data_test_set_ip:
+        assert (set_tmp(row['ta'], row['tr'], row['v'], row['rh'], row['met'], row['clo'], units='IP')) == row['set']
 
 
 def test_pmv():
@@ -108,8 +136,8 @@ def test_clo_tout():
 
 
 def test_vertical_tmp_grad_ppd():
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['PPD_vg']) == 13.0
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['Acceptability']) == False
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units='ip')['PPD_vg']) == 13.0
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units='ip')['Acceptability']) == False
     assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)['PPD_vg']) == 12.6
     assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['PPD_vg']) == 1.7
     assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['Acceptability']) == True
@@ -120,7 +148,7 @@ def test_vertical_tmp_grad_ppd():
 
 def test_ankle_draft():
     assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.4)["PPD_ad"]) == 23.5
-    assert (ankle_draft(77, 77, 0.2*3.28, 50, 1.2, 0.5, 0.4*3.28, units="IP")["PPD_ad"]) == 23.5
+    assert (ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]) == 23.5
     assert (ankle_draft(27, 22, 0.2, 60, met=1.3, clo=0.7, v_ankle=0.2)["PPD_ad"]) == 7.8
 
     with pytest.raises(ValueError):
