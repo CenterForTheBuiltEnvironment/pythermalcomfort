@@ -22,6 +22,11 @@ Standard Effective Temperature
 
 .. autofunction:: pythermalcomfort.models.set_tmp
 
+Cooling Effect
+--------------
+
+.. autofunction:: pythermalcomfort.models.cooling_effect
+
 Adaptive ASHRAE
 ---------------
 

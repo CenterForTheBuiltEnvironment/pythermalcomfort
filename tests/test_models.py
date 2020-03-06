@@ -40,6 +40,11 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
 
 
 def test_ip_units_converter():
+    assert (cooling_effect(ta=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.06
+    assert (cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.75
+
+
+def test_cooling_effect():
     assert (units_converter(ta=77, tr=77, v=3.2, from_units='ip')) == [25.0, 25.0, 0.975312404754648]
     assert (units_converter(pressure=1, area=1/0.09, from_units='ip')) == [101325, 1.0322474090590033]
 
@@ -103,7 +108,7 @@ def test_clo_tout():
 
 
 def test_vertical_tmp_grad_ppd():
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['PPD_vg']) == 12.6
+    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['PPD_vg']) == 13.0
     assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7/1.8, units='ip')['Acceptability']) == False
     assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)['PPD_vg']) == 12.6
     assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['PPD_vg']) == 1.7

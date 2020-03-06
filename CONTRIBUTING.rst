@@ -92,8 +92,7 @@ To run all the test environments in *parallel* (you need to ``pip install detox`
 To add a function
 ^^^^^^^^^^^^^^^^^
 
-1. Add the function to the python file `src/pythermalcomfort/models.py`.
+1. Add the function to the python file `src/pythermalcomfort/models.py` and document it.
 2. Add any related functions that are used by your function either in `src/pythermalcomfort/utilities.py` or `src/pythermalcomfort/psychrometrics.py`. See existing code as example.
-3. Test your function by writing a test in `tests/test_XXXX.py`.
-4. Document your function. See existing code as example.
-5. Add `autofunction` to `doc.reference.pythermalcomfort.py`.
+3. Test your function by writing a test in `tests/test_XXXX.py`. Test it by running tox -e pyXX where XX is the Python version you want to use, e.g. 3.7
+4. Add `autofunction` to `doc.reference.pythermalcomfort.py`.

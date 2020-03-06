@@ -3,6 +3,77 @@ from pythermalcomfort.utilities import *
 import math
 
 
+def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
+    """
+    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 552017.
+
+    Parameters
+    ----------
+    ta : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    vr : float
+        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+
+        Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
+        It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    CE
+        Cooling Effect, default in [°C] in [°F] if `units` = 'IP'
+
+    .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import cooling_effect
+        >>> ce = cooling_effect(ta=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+        >>> print(ce)
+        1.59
+
+        >>> # for users who wants to use the IP system
+        >>> ce = cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+        >>> print(ce)
+        3.75
+
+    Raises
+    ------
+    ValueError
+        If the cooling effect could not be calculated
+    """
+
+    if units.lower() == 'ip':
+        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+
+    still_air_threshold = 0.1
+
+    warnings.simplefilter("ignore")
+    ce = secant(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 10, 150)
+    # ce2 = bisection(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 100)
+    if ce is None:
+        raise ValueError("It could not calculate the cooling effect")
+    warnings.simplefilter("always")
+
+    if units.lower() == 'ip':
+        ce = ce / 1.8 * 3.28
+
+    return round(ce, 2)
+
+
 def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (`PPD`_) calculated in accordance to main thermal comfort Standards.
@@ -87,14 +158,9 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
     # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE Appendix H, H3
     if standard == 'ashrae' and vr > 0.2:
-        still_air_threshold = 0.1
 
-        warnings.simplefilter("ignore")
-        ce = secant(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0, 10, 150)
-        # ce2 = bisection(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 100)
-        if ce is None:
-            raise ValueError("It could not calculate the cooling effect")
-        warnings.simplefilter("always")
+        # calculate the cooling effect
+        ce = cooling_effect(ta=ta, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
 
         ta = ta - ce
         tr = tr - ce
@@ -1167,6 +1233,7 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
 # todo a_pmv
 # todo e_pmv
 # todo humidity conversion
+# todo running mean temperature adaptive model
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
 
