@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.4.2 (2020-03-06)
+------------------
+
+* Added function to calculate the cooling effect in accordance with ASHRAE
+
 0.4.1 (2020-02-17)
 ------------------
 
