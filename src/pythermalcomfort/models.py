@@ -62,8 +62,8 @@ def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
     still_air_threshold = 0.1
 
     warnings.simplefilter("ignore")
-    ce = secant(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 10, 150)
-    # ce2 = bisection(lambda x: set_tmp(ta - x, ta - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 100)
+    # ce = secant(lambda x: set_tmp(ta - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 15, 150)
+    ce = bisection(lambda x: set_tmp(ta - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 150)
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
     warnings.simplefilter("always")
@@ -157,7 +157,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     check_standard_compliance(standard=standard, ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
 
     # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE Appendix H, H3
-    if standard == 'ashrae' and vr > 0.2:
+    if standard == 'ashrae' and vr >= 0.2:
 
         # calculate the cooling effect
         ce = cooling_effect(ta=ta, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
