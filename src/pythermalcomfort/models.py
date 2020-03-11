@@ -1236,7 +1236,6 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
 # todo a_pmv
 # todo e_pmv
 # todo humidity conversion
-# todo running mean temperature adaptive model
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
 

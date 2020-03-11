@@ -39,6 +39,39 @@ def v_relative(v, met):
         return v
 
 
+def running_mean_outdoor_temperature(temp_array, alpha=0.8, units='SI'):
+    """ Estimates the running mean temperature
+
+    Parameters
+    ----------
+    temp_array: list
+        array containing the mean daily temperature in descending order (i.e. from newest/yesterday to oldest) :math:`[\Theta_{day-1}, \Theta_{day-2}, \dots , \Theta_{day-n}]`.
+        Where :math:`\Theta_{day-1}` is yesterday's daily mean temperature. The EN 16798-1 2019 [3]_ states that n should be equal to 7
+    alpha : float
+        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8, while the ASHRAE 55 2017 recommends to choose values between 0.9 and 0.6, corresponding to a slow- and fast- response running mean, respectively.
+        Adaptive comfort theory suggests that a slow-response running mean (alpha = 0.9) could be more appropriate for climates in which synoptic-scale (day-to- day) temperature dynamics are relatively minor, such as the humid tropics.
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    t_rm  : float
+        running mean outdoor temperature
+    """
+
+    if units.lower() == 'ip':
+        for ix, x in enumerate(temp_array):
+            temp_array[ix] = units_converter(ta=temp_array[ix])[0]
+
+    coeff = [alpha ** (ix) for ix, x in enumerate(temp_array)]
+    t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
+
+    if units.lower() == 'ip':
+        t_rm = units_converter(tmp=t_rm, from_units='si')[0]
+
+    return round(t_rm, 1)
+
+
 def units_converter(from_units='ip', **kwargs):
     """ Converts IP values to SI units
 
