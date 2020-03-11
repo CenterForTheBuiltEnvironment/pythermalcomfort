@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.5.2 (2020-03-11)
+------------------
+
+* Added function to calculate the running mean outdoor temperature
+
 0.5.1 (2020-03-06)
 ------------------
 
