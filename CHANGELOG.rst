@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.5.x
+------------------
+
+* Renamed function to_calc to t_o
+* Added function to calculate mean radiant temperature from black globe temperature
+
 0.5.2 (2020-03-11)
 ------------------
 

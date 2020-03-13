@@ -576,7 +576,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     # Define the variables that will be used throughout the calculation.
     results = dict()
 
-    to = to_calc(ta, tr, v)
+    to = t_o(ta, tr, v)
 
     # See if the running mean temperature is between 10 °C and 33.5 °C (the range where the adaptive model is supposed to be used)
     if 10.0 <= t_running_mean <= 33.5:
@@ -707,7 +707,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     if (t_running_mean < 10) or (t_running_mean > 30):
         raise ValueError("The running mean is outside the standards applicability limits")
 
-    to = to_calc(ta, tr, v)
+    to = t_o(ta, tr, v)
 
     cooling_effect = 0
     # calculate cooling effect of elevated air speed when top > 25 degC.
@@ -1230,7 +1230,6 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
 # todo radiant_tmp_asymmetry
 # todo draft
 # todo floor_surface_tmp
-# todo globe_tmp
 # todo solar_gain
 # todo effective_tmp
 # todo a_pmv

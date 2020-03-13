@@ -75,23 +75,9 @@ data_test_pmv_ip = [  # I have commented the lines of code that don't pass the t
 ]
 
 
-def test_running_mean_outdoor_temperature():
-    assert (running_mean_outdoor_temperature([20, 20], alpha=0.7)) == 20
-    assert (running_mean_outdoor_temperature([20, 20], alpha=0.9)) == 20
-    assert (running_mean_outdoor_temperature([20, 20, 20, 20], alpha=0.7)) == 20
-    assert (running_mean_outdoor_temperature([20, 20, 20, 20], alpha=0.5)) == 20
-    assert (running_mean_outdoor_temperature([77, 77, 77, 77, 77, 77, 77], alpha=0.8, units='IP')) == 77
-    assert (running_mean_outdoor_temperature([77, 77, 77, 77, 77, 77, 77], alpha=0.8, units='ip')) == 77
-
-
-def test_ip_units_converter():
+def test_cooling_effect():
     assert (cooling_effect(ta=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.05
     assert (cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.74
-
-
-def test_cooling_effect():
-    assert (units_converter(ta=77, tr=77, v=3.2, from_units='ip')) == [25.0, 25.0, 0.975312404754648]
-    assert (units_converter(pressure=1, area=1 / 0.09, from_units='ip')) == [101325, 1.0322474090590033]
 
 
 def test_set_tmp():

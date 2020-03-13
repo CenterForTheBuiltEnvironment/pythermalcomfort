@@ -111,7 +111,7 @@ def units_converter(from_units='ip', **kwargs):
     return results
 
 
-def to_calc(ta, tr, v):
+def t_o(ta, tr, v):
     """ Calculates operative temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
@@ -130,3 +130,40 @@ def to_calc(ta, tr, v):
     """
 
     return (ta * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
+
+
+def t_mrt(tg, ta, v, d=.015, emissivity=0.9):
+    """ Converts globe temperature reading into mean radiant temperature in accordance with ISO 7726:1998 [5]_
+
+    Parameters
+    ----------
+    tg: float
+        globe temperature, [°C]
+    ta: float
+        air temperature, [°C]
+    v: float
+        air velocity, [m/s]
+    d: float
+        diameter of the globe, [m]
+    emissivity: float
+        emissivity of the globe temperature sensor
+
+    Returns
+    -------
+    tr: float
+        mean radiant temperature, [°C]
+    """
+    tg += 273.15
+    ta += 273.15
+
+    # calculate heat transfer coefficient
+    h_n = 1.4 * (abs(tg - ta) / d) ** 0.25  # natural convection
+    h_f = 6.3 * v ** 0.6 / d ** 0.4  # forced convection
+
+    # get the biggest between the tow coefficients
+    h = max(h_f, h_n)
+    print(h_n, h_f, h)
+
+    tr = (tg ** 4 + h * (tg - ta) / (emissivity * (5.67 * 10 ** -8))) ** 0.25 - 273.15
+
+    return round(tr, 1)
