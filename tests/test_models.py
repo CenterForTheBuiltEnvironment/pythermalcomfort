@@ -64,15 +64,35 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
 ]
 
 data_test_pmv_ip = [  # I have commented the lines of code that don't pass the test
-    {'ta': 67.3, 'rh': 86, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
-    {'ta': 75.0, 'rh': 66, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
+    {'ta': 67.3, 'rh': 86, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 75.0, 'rh': 66, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
     # {'ta': 78.2, 'rh': 15, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
-    {'ta': 70.2, 'rh': 20, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
-    {'ta': 74.5, 'rh': 67, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 70.2, 'rh': 20, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 74.5, 'rh': 67, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
     # {'ta': 80.2, 'rh': 56, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
-    {'ta': 82.2, 'rh': 13, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
-    {'ta': 76.5, 'rh': 16, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
+    {'ta': 82.2, 'rh': 13, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
+    {'ta': 76.5, 'rh': 16, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
 ]
+
+data_test_erf = {
+    "alt": [45, 0, 60, 90, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+    "sharp": [0, 120, 120, 120, 0, 30, 60, 90, 150, 180, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120],
+    "posture": ["Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Standing", "Seated",
+                "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated"],
+    "Idir": [700, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 400, 600, 1000, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800],
+    "tsol": [0.8, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    "fsvv": [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    "fbes": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5],
+    "asa": [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.3, 0.5, 0.9, 0.7],
+    "ERF": [64.7, 42.9, 63.7, 64.9, 62.7, 62.7, 59.8, 56.8, 52.4, 49.5, 59.6, 27.7, 41.5, 69.2, 11.1, 33.2, 77.5, 29.9, 42.7, 68.1, 36.5, 45.9, 64.8, 23.7, 39.6, 71.2, 55.4],
+    "trsw": [15.5, 6.4, 14.2, 15.2, 12.9, 12.7, 12.3, 11.5, 10.2, 9.5, 11.4, 5.5, 8.2, 13.6, 2.2, 6.5, 15.3, 6.6, 8.7, 13.1, 6.5, 8.7, 13.1, 4.7, 7.8, 14, 10.9, 29],
+}
+
+
+def test_solar_gain():
+    for ix in range(0, len(data_test_erf['alt'])):
+        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['Idir'][ix], sol_transmittance= data_test_erf['tsol'][ix],
+                           f_svv=data_test_erf['fsvv'][ix], f_bes=data_test_erf['fbes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['erf']) == data_test_erf['ERF'][ix]
 
 
 def test_cooling_effect():
