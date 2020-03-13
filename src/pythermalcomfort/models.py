@@ -3,13 +3,13 @@ from pythermalcomfort.utilities import *
 import math
 
 
-def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
+def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
     """
     Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 552017.
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -41,12 +41,12 @@ def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import cooling_effect
-        >>> ce = cooling_effect(ta=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+        >>> ce = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
         >>> print(ce)
         1.64
 
         >>> # for users who wants to use the IP system
-        >>> ce = cooling_effect(ta=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+        >>> ce = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
         >>> print(ce)
         3.74
 
@@ -57,13 +57,13 @@ def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
     """
 
     if units.lower() == 'ip':
-        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+        tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     still_air_threshold = 0.1
 
     warnings.simplefilter("ignore")
-    # ce = secant(lambda x: set_tmp(ta - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 15, 150)
-    ce = bisection(lambda x: set_tmp(ta - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 150)
+    # ce = secant(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 15, 150)
+    ce = bisection(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 150)
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
     warnings.simplefilter("always")
@@ -74,13 +74,13 @@ def cooling_effect(ta, tr, vr, rh, met, clo, wme=0, units='SI'):
     return round(ce, 2)
 
 
-def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
+def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (`PPD`_) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -128,7 +128,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> results = pmv_ppd(ta=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0, standard="ISO")
+        >>> results = pmv_ppd(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0, standard="ISO")
         >>> print(results)
         {'pmv': 0.08, 'ppd': 5.1}
 
@@ -136,7 +136,7 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         0.08
 
         >>> # for users who wants to use the IP system
-        >>> results_ip = pmv_ppd(ta=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
+        >>> results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
         >>> print(results_ip)
         {'pmv': 0.01, 'ppd': 5.0}
 
@@ -148,24 +148,24 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
     """
     if units.lower() == 'ip':
-        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+        tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     standard = standard.lower()
     if standard not in ['iso', 'ashrae']:
         raise ValueError("PMV calculations can only be performed in compliance with ISO or ASHRAE Standards")
 
-    check_standard_compliance(standard=standard, ta=ta, tr=tr, v=vr, rh=rh, met=met, clo=clo)
+    check_standard_compliance(standard=standard, tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo)
 
     # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE Appendix H, H3
     if standard == 'ashrae' and vr >= 0.2:
         # calculate the cooling effect
-        ce = cooling_effect(ta=ta, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
+        ce = cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
 
-        ta = ta - ce
+        tdb = tdb - ce
         tr = tr - ce
         vr = 0.1
 
-    pa = rh * 10 * math.exp(16.6536 - 4030.183 / (ta + 235))
+    pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))
 
     icl = 0.155 * clo  # thermal insulation of the clothing in M2K/W
     m = met * 58.15  # metabolic rate in W/M2
@@ -178,9 +178,9 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
     # heat transf. coeff. by forced convection
     hcf = 12.1 * math.sqrt(vr)
-    taa = ta + 273
+    taa = tdb + 273
     tra = tr + 273
-    tcla = taa + (35.5 - ta) / (3.5 * icl + 0.1)
+    tcla = taa + (35.5 - tdb) / (3.5 * icl + 0.1)
 
     p1 = icl * fcl
     p2 = p1 * 3.96
@@ -216,11 +216,11 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     # latent respiration heat loss
     hl3 = 1.7 * 0.00001 * m * (5867 - pa)
     # dry respiration heat loss
-    hl4 = 0.0014 * m * (34 - ta)
+    hl4 = 0.0014 * m * (34 - tdb)
     # heat loss by radiation
     hl5 = 3.96 * fcl * (math.pow(xn, 4) - math.pow(tra / 100.0, 4))
     # heat loss by convection
-    hl6 = fcl * hc * (tcl - ta)
+    hl6 = fcl * hc * (tcl - tdb)
 
     ts = 0.303 * math.exp(-0.036 * m) + 0.028
     pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
@@ -229,13 +229,13 @@ def pmv_ppd(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     return {'pmv': round(pmv, 2), 'ppd': round(ppd, 1)}
 
 
-def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
+def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
     Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal comfort Standards.
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -285,15 +285,15 @@ def pmv(ta, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         0.08
     """
 
-    return pmv_ppd(ta, tr, vr, rh, met, clo, wme, standard=standard, units=units)['pmv']
+    return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard=standard, units=units)['pmv']
 
 
-def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=101325, units='SI'):
+def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units='SI'):
     """ Standard effective temperature (SET) calculation using SI units
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -309,7 +309,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
         external work, [met] default 0
     body_surface_area : float
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
-    p_atm : float
+    patm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -330,25 +330,25 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
     .. code-block:: python
 
         >>> from pythermalcomfort.models import set_tmp
-        >>> set_tmp(ta=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
+        >>> set_tmp(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
         25.3
 
         >>> # for users who wants to use the IP system
-        >>> set_tmp(ta=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
+        >>> set_tmp(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
         77.6
 
     """
     if units.lower() == 'ip':
         if body_surface_area == 1.8258:
             body_surface_area = 19.65
-        if p_atm == 101325:
-            p_atm = 1
-        ta, tr, v, body_surface_area, p_atm = units_converter(ta=ta, tr=tr, v=v, area=body_surface_area, pressure=p_atm)
+        if patm == 101325:
+            patm = 1
+        tdb, tr, v, body_surface_area, patm = units_converter(tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=patm)
 
-    check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v=v, rh=rh, met=met, clo=clo)
+    check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo)
 
     # Initial variables as defined in the ASHRAE 55-2017
-    vapor_pressure = rh * p_sat_torr(ta) / 100
+    vapor_pressure = rh * p_sat_torr(tdb) / 100
     air_velocity = max(v, 0.1)
     k_clo = 0.25
     body_weight = 69.9
@@ -369,7 +369,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
     ALFA = 0.1
     ESK = 0.1 * met
 
-    pressure_in_atmospheres = p_atm / 101325
+    pressure_in_atmospheres = patm / 101325
     LTIME = 60
     RCL = 0.155 * clo
 
@@ -392,7 +392,7 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
     CHR = 4.7
     CTC = CHR + CHC
     RA = 1.0 / (FACL * CTC)
-    TOP = (CHR * tr + CHC * ta) / CTC
+    TOP = (CHR * tr + CHC * tdb) / CTC
     TCL = TOP + (temp_skin - TOP) / (CTC * (RA + RCL))
 
     TCL_OLD = False
@@ -406,14 +406,14 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
                 CHR = 4.0 * SBC * pow(((TCL + tr) / 2.0 + 273.15), 3.0) * 0.72
                 CTC = CHR + CHC
                 RA = 1.0 / (FACL * CTC)
-                TOP = (CHR * tr + CHC * ta) / CTC
+                TOP = (CHR * tr + CHC * tdb) / CTC
             TCL = (RA * temp_skin + RCL * TOP) / (RA + RCL)
             flag = True
         flag = False
         DRY = (temp_skin - TOP) / (RA + RCL)
         HFCS = (temp_core - temp_skin) * (5.28 + 1.163 * skin_blood_flow)
         ERES = 0.0023 * M * (44.0 - vapor_pressure)
-        CRES = 0.0014 * M * (34.0 - ta)
+        CRES = 0.0014 * M * (34.0 - tdb)
         SCR = M - HFCS - ERES - CRES - wme
         SSK = HFCS - DRY - ESK
         TCSK = 0.97 * ALFA * body_weight
@@ -500,12 +500,12 @@ def set_tmp(ta, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, p_atm=1013
     return round(set, 1)
 
 
-def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
+def adaptive_ashrae(tdb, tr, t_running_mean, v, units='SI'):
     """ Determines the adaptive thermal comfort based on ASHRAE 55
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -543,7 +543,7 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_ashrae
-        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=20, v=0.1)
+        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
         >>> print(results)
         {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5, 'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': True, 'acceptability_90': False}
 
@@ -552,11 +552,11 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
         # The conditions you entered are considered to be comfortable for by 80% of the occupants
 
         >>> # for users who wants to use the IP system
-        >>> results = adaptive_ashrae(ta=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
         >>> print(results)
         {'tmp_cmf': 75.2, 'tmp_cmf_80_low': 68.9, 'tmp_cmf_80_up': 81.5, 'tmp_cmf_90_low': 70.7, 'tmp_cmf_90_up': 79.7, 'acceptability_80': True, 'acceptability_90': False}
 
-        >>> results = adaptive_ashrae(ta=25, tr=25, t_running_mean=9, v=0.1)
+        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is higher than 10°C
@@ -568,14 +568,14 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
 
     """
     if units.lower() == 'ip':
-        ta, tr, t_running_mean, vr = units_converter(ta=ta, tr=tr, tmp_running_mean=t_running_mean, v=v)
+        tdb, tr, t_running_mean, vr = units_converter(tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v)
 
-    check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v=v)
+    check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v=v)
 
     # Define the variables that will be used throughout the calculation.
     results = dict()
 
-    to = t_o(ta, tr, v)
+    to = t_o(tdb, tr, v)
 
     # See if the running mean temperature is between 10 °C and 33.5 °C (the range where the adaptive model is supposed to be used)
     if 10.0 <= t_running_mean <= 33.5:
@@ -622,12 +622,12 @@ def adaptive_ashrae(ta, tr, t_running_mean, v, units='SI'):
     return results
 
 
-def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
+def adaptive_en(tdb, tr, t_running_mean, v, units='SI'):
     """ Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -675,7 +675,7 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_en
-        >>> results = adaptive_en(ta=25, tr=25, t_running_mean=20, v=0.1)
+        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
         >>> print(results)
         {'tmp_cmf': 25.4, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, 'acceptability_cat_iii': True, ... }
 
@@ -684,11 +684,11 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
         # The conditions you entered are considered to comply with Category I
 
         >>> # for users who wants to use the IP system
-        >>> results = adaptive_en(ta=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
         >>> print(results)
         {'tmp_cmf': 77.7, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, 'acceptability_cat_iii': True, ... }
 
-        >>> results = adaptive_en(ta=25, tr=25, t_running_mean=9, v=0.1)
+        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C
@@ -701,12 +701,12 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     """
 
     if units.lower() == 'ip':
-        ta, tr, t_running_mean, vr = units_converter(ta=ta, tr=tr, tmp_running_mean=t_running_mean, v=v)
+        tdb, tr, t_running_mean, vr = units_converter(tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v)
 
     if (t_running_mean < 10) or (t_running_mean > 30):
         raise ValueError("The running mean is outside the standards applicability limits")
 
-    to = t_o(ta, tr, v)
+    to = t_o(tdb, tr, v)
 
     cooling_effect = 0
     # calculate cooling effect of elevated air speed when top > 25 degC.
@@ -754,12 +754,12 @@ def adaptive_en(ta, tr, t_running_mean, v, units='SI'):
     return results
 
 
-def utci(ta, tr, v, rh, units='SI'):
+def utci(tdb, tr, v, rh, units='SI'):
     """ Determines the Universal Thermal Climate Index (UTCI)
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
@@ -787,11 +787,11 @@ def utci(ta, tr, v, rh, units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import utci
-        >>> utci(ta=25, tr=25, v=1.0, rh=50)
+        >>> utci(tdb=25, tr=25, v=1.0, rh=50)
         24.6
 
         >>> # for users who wants to use the IP system
-        >>> utci(ta=77, tr=77, v=3.28, rh=50, units='ip')
+        >>> utci(tdb=77, tr=77, v=3.28, rh=50, units='ip')
         76.4
 
     Raises
@@ -802,16 +802,16 @@ def utci(ta, tr, v, rh, units='SI'):
     """
 
     if units.lower() == 'ip':
-        ta, tr, v = units_converter(ta=ta, tr=tr, v=v)
+        tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
-    check_standard_compliance(standard='utci', ta=ta, tr=tr, v=v)
+    check_standard_compliance(standard='utci', tdb=tdb, tr=tr, v=v)
 
-    def es(ta):
+    def es(tdb):
         g = [
             -2836.5744, -6028.076559, 19.54263612,
             -0.02737830188, 0.000016261698,
             (7.0229056 * (10 ** (-10))), (-1.8680009 * (10 ** (-13)))]
-        tk = ta + 273.15  # air temp in K
+        tk = tdb + 273.15  # air temp in K
         es = 2.7150305 * math.log1p(tk)
         for count, i in enumerate(g):
             es = es + (i * (tk ** (count - 2)))
@@ -819,228 +819,228 @@ def utci(ta, tr, v, rh, units='SI'):
         return es
 
     # Do a series of checks to be sure that the input values are within the bounds accepted by the model.
-    if (ta < -50.0) or (ta > 50.0) or (tr - ta < -30.0) or (tr - ta > 70.0) or (v < 0.5) or (v > 17):
+    if (tdb < -50.0) or (tdb > 50.0) or (tr - tdb < -30.0) or (tr - tdb > 70.0) or (v < 0.5) or (v > 17):
         raise ValueError("The value you entered are outside the equation applicability limits")
 
     # This is a python version of the UTCI_approx function
     # Version a 0.002, October 2009
-    # Ta: air temperature, degrees Celsius
+    # tdb: air temperature, degrees Celsius
     # ehPa: water vapour presure, hPa=hecto Pascal
     # Tmrt: mean radiant temperature, degrees Celsius
     # va10m: wind speed 10m above ground level in m/s
 
-    ehPa = es(ta) * (rh / 100.0)
-    delta_t_tr = tr - ta
+    ehPa = es(tdb) * (rh / 100.0)
+    delta_t_tr = tr - tdb
     Pa = ehPa / 10.0  # convert vapour pressure to kPa
 
-    utci_approx = (ta +
+    utci_approx = (tdb +
                    (0.607562052) +
-                   (-0.0227712343) * ta +
-                   (8.06470249 * (10 ** (-4))) * ta * ta +
-                   (-1.54271372 * (10 ** (-4))) * ta * ta * ta +
-                   (-3.24651735 * (10 ** (-6))) * ta * ta * ta * ta +
-                   (7.32602852 * (10 ** (-8))) * ta * ta * ta * ta * ta +
-                   (1.35959073 * (10 ** (-9))) * ta * ta * ta * ta * ta * ta +
+                   (-0.0227712343) * tdb +
+                   (8.06470249 * (10 ** (-4))) * tdb * tdb +
+                   (-1.54271372 * (10 ** (-4))) * tdb * tdb * tdb +
+                   (-3.24651735 * (10 ** (-6))) * tdb * tdb * tdb * tdb +
+                   (7.32602852 * (10 ** (-8))) * tdb * tdb * tdb * tdb * tdb +
+                   (1.35959073 * (10 ** (-9))) * tdb * tdb * tdb * tdb * tdb * tdb +
                    (-2.25836520) * v +
-                   (0.0880326035) * ta * v +
-                   (0.00216844454) * ta * ta * v +
-                   (-1.53347087 * (10 ** (-5))) * ta * ta * ta * v +
-                   (-5.72983704 * (10 ** (-7))) * ta * ta * ta * ta * v +
-                   (-2.55090145 * (10 ** (-9))) * ta * ta * ta * ta * ta * v +
+                   (0.0880326035) * tdb * v +
+                   (0.00216844454) * tdb * tdb * v +
+                   (-1.53347087 * (10 ** (-5))) * tdb * tdb * tdb * v +
+                   (-5.72983704 * (10 ** (-7))) * tdb * tdb * tdb * tdb * v +
+                   (-2.55090145 * (10 ** (-9))) * tdb * tdb * tdb * tdb * tdb * v +
                    (-0.751269505) * v * v +
-                   (-0.00408350271) * ta * v * v +
-                   (-5.21670675 * (10 ** (-5))) * ta * ta * v * v +
-                   (1.94544667 * (10 ** (-6))) * ta * ta * ta * v * v +
-                   (1.14099531 * (10 ** (-8))) * ta * ta * ta * ta * v * v +
+                   (-0.00408350271) * tdb * v * v +
+                   (-5.21670675 * (10 ** (-5))) * tdb * tdb * v * v +
+                   (1.94544667 * (10 ** (-6))) * tdb * tdb * tdb * v * v +
+                   (1.14099531 * (10 ** (-8))) * tdb * tdb * tdb * tdb * v * v +
                    (0.158137256) * v * v * v +
-                   (-6.57263143 * (10 ** (-5))) * ta * v * v * v +
-                   (2.22697524 * (10 ** (-7))) * ta * ta * v * v * v +
-                   (-4.16117031 * (10 ** (-8))) * ta * ta * ta * v * v * v +
+                   (-6.57263143 * (10 ** (-5))) * tdb * v * v * v +
+                   (2.22697524 * (10 ** (-7))) * tdb * tdb * v * v * v +
+                   (-4.16117031 * (10 ** (-8))) * tdb * tdb * tdb * v * v * v +
                    (-0.0127762753) * v * v * v * v +
-                   (9.66891875 * (10 ** (-6))) * ta * v * v * v * v +
-                   (2.52785852 * (10 ** (-9))) * ta * ta * v * v * v * v +
+                   (9.66891875 * (10 ** (-6))) * tdb * v * v * v * v +
+                   (2.52785852 * (10 ** (-9))) * tdb * tdb * v * v * v * v +
                    (4.56306672 * (10 ** (-4))) * v * v * v * v * v +
-                   (-1.74202546 * (10 ** (-7))) * ta * v * v * v * v * v +
+                   (-1.74202546 * (10 ** (-7))) * tdb * v * v * v * v * v +
                    (-5.91491269 * (10 ** (-6))) * v * v * v * v * v * v +
                    (0.398374029) * delta_t_tr +
-                   (1.83945314 * (10 ** (-4))) * ta * delta_t_tr +
-                   (-1.73754510 * (10 ** (-4))) * ta * ta * delta_t_tr +
-                   (-7.60781159 * (10 ** (-7))) * ta * ta * ta * delta_t_tr +
-                   (3.77830287 * (10 ** (-8))) * ta * ta * ta * ta * delta_t_tr +
-                   (5.43079673 * (10 ** (-10))) * ta * ta * ta * ta * ta * delta_t_tr +
+                   (1.83945314 * (10 ** (-4))) * tdb * delta_t_tr +
+                   (-1.73754510 * (10 ** (-4))) * tdb * tdb * delta_t_tr +
+                   (-7.60781159 * (10 ** (-7))) * tdb * tdb * tdb * delta_t_tr +
+                   (3.77830287 * (10 ** (-8))) * tdb * tdb * tdb * tdb * delta_t_tr +
+                   (5.43079673 * (10 ** (-10))) * tdb * tdb * tdb * tdb * tdb * delta_t_tr +
                    (-0.0200518269) * v * delta_t_tr +
-                   (8.92859837 * (10 ** (-4))) * ta * v * delta_t_tr +
-                   (3.45433048 * (10 ** (-6))) * ta * ta * v * delta_t_tr +
-                   (-3.77925774 * (10 ** (-7))) * ta * ta * ta * v * delta_t_tr +
-                   (-1.69699377 * (10 ** (-9))) * ta * ta * ta * ta * v * delta_t_tr +
+                   (8.92859837 * (10 ** (-4))) * tdb * v * delta_t_tr +
+                   (3.45433048 * (10 ** (-6))) * tdb * tdb * v * delta_t_tr +
+                   (-3.77925774 * (10 ** (-7))) * tdb * tdb * tdb * v * delta_t_tr +
+                   (-1.69699377 * (10 ** (-9))) * tdb * tdb * tdb * tdb * v * delta_t_tr +
                    (1.69992415 * (10 ** (-4))) * v * v * delta_t_tr +
-                   (-4.99204314 * (10 ** (-5))) * ta * v * v * delta_t_tr +
-                   (2.47417178 * (10 ** (-7))) * ta * ta * v * v * delta_t_tr +
-                   (1.07596466 * (10 ** (-8))) * ta * ta * ta * v * v * delta_t_tr +
+                   (-4.99204314 * (10 ** (-5))) * tdb * v * v * delta_t_tr +
+                   (2.47417178 * (10 ** (-7))) * tdb * tdb * v * v * delta_t_tr +
+                   (1.07596466 * (10 ** (-8))) * tdb * tdb * tdb * v * v * delta_t_tr +
                    (8.49242932 * (10 ** (-5))) * v * v * v * delta_t_tr +
-                   (1.35191328 * (10 ** (-6))) * ta * v * v * v * delta_t_tr +
-                   (-6.21531254 * (10 ** (-9))) * ta * ta * v * v * v * delta_t_tr +
+                   (1.35191328 * (10 ** (-6))) * tdb * v * v * v * delta_t_tr +
+                   (-6.21531254 * (10 ** (-9))) * tdb * tdb * v * v * v * delta_t_tr +
                    (-4.99410301 * (10 ** (-6))) * v * v * v * v * delta_t_tr +
-                   (-1.89489258 * (10 ** (-8))) * ta * v * v * v * v * delta_t_tr +
+                   (-1.89489258 * (10 ** (-8))) * tdb * v * v * v * v * delta_t_tr +
                    (8.15300114 * (10 ** (-8))) * v * v * v * v * v * delta_t_tr +
                    (7.55043090 * (10 ** (-4))) * delta_t_tr * delta_t_tr +
-                   (-5.65095215 * (10 ** (-5))) * ta * delta_t_tr * delta_t_tr +
-                   (-4.52166564 * (10 ** (-7))) * ta * ta * delta_t_tr * delta_t_tr +
-                   (2.46688878 * (10 ** (-8))) * ta * ta * ta * delta_t_tr * delta_t_tr +
-                   (2.42674348 * (10 ** (-10))) * ta * ta * ta * ta * delta_t_tr * delta_t_tr +
+                   (-5.65095215 * (10 ** (-5))) * tdb * delta_t_tr * delta_t_tr +
+                   (-4.52166564 * (10 ** (-7))) * tdb * tdb * delta_t_tr * delta_t_tr +
+                   (2.46688878 * (10 ** (-8))) * tdb * tdb * tdb * delta_t_tr * delta_t_tr +
+                   (2.42674348 * (10 ** (-10))) * tdb * tdb * tdb * tdb * delta_t_tr * delta_t_tr +
                    (1.54547250 * (10 ** (-4))) * v * delta_t_tr * delta_t_tr +
-                   (5.24110970 * (10 ** (-6))) * ta * v * delta_t_tr * delta_t_tr +
-                   (-8.75874982 * (10 ** (-8))) * ta * ta * v * delta_t_tr * delta_t_tr +
-                   (-1.50743064 * (10 ** (-9))) * ta * ta * ta * v * delta_t_tr * delta_t_tr +
+                   (5.24110970 * (10 ** (-6))) * tdb * v * delta_t_tr * delta_t_tr +
+                   (-8.75874982 * (10 ** (-8))) * tdb * tdb * v * delta_t_tr * delta_t_tr +
+                   (-1.50743064 * (10 ** (-9))) * tdb * tdb * tdb * v * delta_t_tr * delta_t_tr +
                    (-1.56236307 * (10 ** (-5))) * v * v * delta_t_tr * delta_t_tr +
-                   (-1.33895614 * (10 ** (-7))) * ta * v * v * delta_t_tr * delta_t_tr +
-                   (2.49709824 * (10 ** (-9))) * ta * ta * v * v * delta_t_tr * delta_t_tr +
+                   (-1.33895614 * (10 ** (-7))) * tdb * v * v * delta_t_tr * delta_t_tr +
+                   (2.49709824 * (10 ** (-9))) * tdb * tdb * v * v * delta_t_tr * delta_t_tr +
                    (6.51711721 * (10 ** (-7))) * v * v * v * delta_t_tr * delta_t_tr +
-                   (1.94960053 * (10 ** (-9))) * ta * v * v * v * delta_t_tr * delta_t_tr +
+                   (1.94960053 * (10 ** (-9))) * tdb * v * v * v * delta_t_tr * delta_t_tr +
                    (-1.00361113 * (10 ** (-8))) * v * v * v * v * delta_t_tr * delta_t_tr +
                    (-1.21206673 * (10 ** (-5))) * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (-2.18203660 * (10 ** (-7))) * ta * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (7.51269482 * (10 ** (-9))) * ta * ta * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (9.79063848 * (10 ** (-11))) * ta * ta * ta * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (-2.18203660 * (10 ** (-7))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (7.51269482 * (10 ** (-9))) * tdb * tdb * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (9.79063848 * (10 ** (-11))) * tdb * tdb * tdb * delta_t_tr * delta_t_tr * delta_t_tr +
                    (1.25006734 * (10 ** (-6))) * v * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (-1.81584736 * (10 ** (-9))) * ta * v * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (-3.52197671 * (10 ** (-10))) * ta * ta * v * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (-1.81584736 * (10 ** (-9))) * tdb * v * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (-3.52197671 * (10 ** (-10))) * tdb * tdb * v * delta_t_tr * delta_t_tr * delta_t_tr +
                    (-3.36514630 * (10 ** (-8))) * v * v * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (1.35908359 * (10 ** (-10))) * ta * v * v * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (1.35908359 * (10 ** (-10))) * tdb * v * v * delta_t_tr * delta_t_tr * delta_t_tr +
                    (4.17032620 * (10 ** (-10))) * v * v * v * delta_t_tr * delta_t_tr * delta_t_tr +
                    (-1.30369025 * (10 ** (-9))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (4.13908461 * (10 ** (-10))) * ta * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (9.22652254 * (10 ** (-12))) * ta * ta * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (4.13908461 * (10 ** (-10))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (9.22652254 * (10 ** (-12))) * tdb * tdb * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (-5.08220384 * (10 ** (-9))) * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (-2.24730961 * (10 ** (-11))) * ta * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (-2.24730961 * (10 ** (-11))) * tdb * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (1.17139133 * (10 ** (-10))) * v * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (6.62154879 * (10 ** (-10))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
-                   (4.03863260 * (10 ** (-13))) * ta * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
+                   (4.03863260 * (10 ** (-13))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (1.95087203 * (10 ** (-12))) * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (-4.73602469 * (10 ** (-12))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr +
                    (5.12733497) * Pa +
-                   (-0.312788561) * ta * Pa +
-                   (-0.0196701861) * ta * ta * Pa +
-                   (9.99690870 * (10 ** (-4))) * ta * ta * ta * Pa +
-                   (9.51738512 * (10 ** (-6))) * ta * ta * ta * ta * Pa +
-                   (-4.66426341 * (10 ** (-7))) * ta * ta * ta * ta * ta * Pa +
+                   (-0.312788561) * tdb * Pa +
+                   (-0.0196701861) * tdb * tdb * Pa +
+                   (9.99690870 * (10 ** (-4))) * tdb * tdb * tdb * Pa +
+                   (9.51738512 * (10 ** (-6))) * tdb * tdb * tdb * tdb * Pa +
+                   (-4.66426341 * (10 ** (-7))) * tdb * tdb * tdb * tdb * tdb * Pa +
                    (0.548050612) * v * Pa +
-                   (-0.00330552823) * ta * v * Pa +
-                   (-0.00164119440) * ta * ta * v * Pa +
-                   (-5.16670694 * (10 ** (-6))) * ta * ta * ta * v * Pa +
-                   (9.52692432 * (10 ** (-7))) * ta * ta * ta * ta * v * Pa +
+                   (-0.00330552823) * tdb * v * Pa +
+                   (-0.00164119440) * tdb * tdb * v * Pa +
+                   (-5.16670694 * (10 ** (-6))) * tdb * tdb * tdb * v * Pa +
+                   (9.52692432 * (10 ** (-7))) * tdb * tdb * tdb * tdb * v * Pa +
                    (-0.0429223622) * v * v * Pa +
-                   (0.00500845667) * ta * v * v * Pa +
-                   (1.00601257 * (10 ** (-6))) * ta * ta * v * v * Pa +
-                   (-1.81748644 * (10 ** (-6))) * ta * ta * ta * v * v * Pa +
+                   (0.00500845667) * tdb * v * v * Pa +
+                   (1.00601257 * (10 ** (-6))) * tdb * tdb * v * v * Pa +
+                   (-1.81748644 * (10 ** (-6))) * tdb * tdb * tdb * v * v * Pa +
                    (-1.25813502 * (10 ** (-3))) * v * v * v * Pa +
-                   (-1.79330391 * (10 ** (-4))) * ta * v * v * v * Pa +
-                   (2.34994441 * (10 ** (-6))) * ta * ta * v * v * v * Pa +
+                   (-1.79330391 * (10 ** (-4))) * tdb * v * v * v * Pa +
+                   (2.34994441 * (10 ** (-6))) * tdb * tdb * v * v * v * Pa +
                    (1.29735808 * (10 ** (-4))) * v * v * v * v * Pa +
-                   (1.29064870 * (10 ** (-6))) * ta * v * v * v * v * Pa +
+                   (1.29064870 * (10 ** (-6))) * tdb * v * v * v * v * Pa +
                    (-2.28558686 * (10 ** (-6))) * v * v * v * v * v * Pa +
                    (-0.0369476348) * delta_t_tr * Pa +
-                   (0.00162325322) * ta * delta_t_tr * Pa +
-                   (-3.14279680 * (10 ** (-5))) * ta * ta * delta_t_tr * Pa +
-                   (2.59835559 * (10 ** (-6))) * ta * ta * ta * delta_t_tr * Pa +
-                   (-4.77136523 * (10 ** (-8))) * ta * ta * ta * ta * delta_t_tr * Pa +
+                   (0.00162325322) * tdb * delta_t_tr * Pa +
+                   (-3.14279680 * (10 ** (-5))) * tdb * tdb * delta_t_tr * Pa +
+                   (2.59835559 * (10 ** (-6))) * tdb * tdb * tdb * delta_t_tr * Pa +
+                   (-4.77136523 * (10 ** (-8))) * tdb * tdb * tdb * tdb * delta_t_tr * Pa +
                    (8.64203390 * (10 ** (-3))) * v * delta_t_tr * Pa +
-                   (-6.87405181 * (10 ** (-4))) * ta * v * delta_t_tr * Pa +
-                   (-9.13863872 * (10 ** (-6))) * ta * ta * v * delta_t_tr * Pa +
-                   (5.15916806 * (10 ** (-7))) * ta * ta * ta * v * delta_t_tr * Pa +
+                   (-6.87405181 * (10 ** (-4))) * tdb * v * delta_t_tr * Pa +
+                   (-9.13863872 * (10 ** (-6))) * tdb * tdb * v * delta_t_tr * Pa +
+                   (5.15916806 * (10 ** (-7))) * tdb * tdb * tdb * v * delta_t_tr * Pa +
                    (-3.59217476 * (10 ** (-5))) * v * v * delta_t_tr * Pa +
-                   (3.28696511 * (10 ** (-5))) * ta * v * v * delta_t_tr * Pa +
-                   (-7.10542454 * (10 ** (-7))) * ta * ta * v * v * delta_t_tr * Pa +
+                   (3.28696511 * (10 ** (-5))) * tdb * v * v * delta_t_tr * Pa +
+                   (-7.10542454 * (10 ** (-7))) * tdb * tdb * v * v * delta_t_tr * Pa +
                    (-1.24382300 * (10 ** (-5))) * v * v * v * delta_t_tr * Pa +
-                   (-7.38584400 * (10 ** (-9))) * ta * v * v * v * delta_t_tr * Pa +
+                   (-7.38584400 * (10 ** (-9))) * tdb * v * v * v * delta_t_tr * Pa +
                    (2.20609296 * (10 ** (-7))) * v * v * v * v * delta_t_tr * Pa +
                    (-7.32469180 * (10 ** (-4))) * delta_t_tr * delta_t_tr * Pa +
-                   (-1.87381964 * (10 ** (-5))) * ta * delta_t_tr * delta_t_tr * Pa +
-                   (4.80925239 * (10 ** (-6))) * ta * ta * delta_t_tr * delta_t_tr * Pa +
-                   (-8.75492040 * (10 ** (-8))) * ta * ta * ta * delta_t_tr * delta_t_tr * Pa +
+                   (-1.87381964 * (10 ** (-5))) * tdb * delta_t_tr * delta_t_tr * Pa +
+                   (4.80925239 * (10 ** (-6))) * tdb * tdb * delta_t_tr * delta_t_tr * Pa +
+                   (-8.75492040 * (10 ** (-8))) * tdb * tdb * tdb * delta_t_tr * delta_t_tr * Pa +
                    (2.77862930 * (10 ** (-5))) * v * delta_t_tr * delta_t_tr * Pa +
-                   (-5.06004592 * (10 ** (-6))) * ta * v * delta_t_tr * delta_t_tr * Pa +
-                   (1.14325367 * (10 ** (-7))) * ta * ta * v * delta_t_tr * delta_t_tr * Pa +
+                   (-5.06004592 * (10 ** (-6))) * tdb * v * delta_t_tr * delta_t_tr * Pa +
+                   (1.14325367 * (10 ** (-7))) * tdb * tdb * v * delta_t_tr * delta_t_tr * Pa +
                    (2.53016723 * (10 ** (-6))) * v * v * delta_t_tr * delta_t_tr * Pa +
-                   (-1.72857035 * (10 ** (-8))) * ta * v * v * delta_t_tr * delta_t_tr * Pa +
+                   (-1.72857035 * (10 ** (-8))) * tdb * v * v * delta_t_tr * delta_t_tr * Pa +
                    (-3.95079398 * (10 ** (-8))) * v * v * v * delta_t_tr * delta_t_tr * Pa +
                    (-3.59413173 * (10 ** (-7))) * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
-                   (7.04388046 * (10 ** (-7))) * ta * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
-                   (-1.89309167 * (10 ** (-8))) * ta * ta * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
+                   (7.04388046 * (10 ** (-7))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
+                   (-1.89309167 * (10 ** (-8))) * tdb * tdb * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (-4.79768731 * (10 ** (-7))) * v * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
-                   (7.96079978 * (10 ** (-9))) * ta * v * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
+                   (7.96079978 * (10 ** (-9))) * tdb * v * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (1.62897058 * (10 ** (-9))) * v * v * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (3.94367674 * (10 ** (-8))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
-                   (-1.18566247 * (10 ** (-9))) * ta * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
+                   (-1.18566247 * (10 ** (-9))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (3.34678041 * (10 ** (-10))) * v * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (-1.15606447 * (10 ** (-10))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa +
                    (-2.80626406) * Pa * Pa +
-                   (0.548712484) * ta * Pa * Pa +
-                   (-0.00399428410) * ta * ta * Pa * Pa +
-                   (-9.54009191 * (10 ** (-4))) * ta * ta * ta * Pa * Pa +
-                   (1.93090978 * (10 ** (-5))) * ta * ta * ta * ta * Pa * Pa +
+                   (0.548712484) * tdb * Pa * Pa +
+                   (-0.00399428410) * tdb * tdb * Pa * Pa +
+                   (-9.54009191 * (10 ** (-4))) * tdb * tdb * tdb * Pa * Pa +
+                   (1.93090978 * (10 ** (-5))) * tdb * tdb * tdb * tdb * Pa * Pa +
                    (-0.308806365) * v * Pa * Pa +
-                   (0.0116952364) * ta * v * Pa * Pa +
-                   (4.95271903 * (10 ** (-4))) * ta * ta * v * Pa * Pa +
-                   (-1.90710882 * (10 ** (-5))) * ta * ta * ta * v * Pa * Pa +
+                   (0.0116952364) * tdb * v * Pa * Pa +
+                   (4.95271903 * (10 ** (-4))) * tdb * tdb * v * Pa * Pa +
+                   (-1.90710882 * (10 ** (-5))) * tdb * tdb * tdb * v * Pa * Pa +
                    (0.00210787756) * v * v * Pa * Pa +
-                   (-6.98445738 * (10 ** (-4))) * ta * v * v * Pa * Pa +
-                   (2.30109073 * (10 ** (-5))) * ta * ta * v * v * Pa * Pa +
+                   (-6.98445738 * (10 ** (-4))) * tdb * v * v * Pa * Pa +
+                   (2.30109073 * (10 ** (-5))) * tdb * tdb * v * v * Pa * Pa +
                    (4.17856590 * (10 ** (-4))) * v * v * v * Pa * Pa +
-                   (-1.27043871 * (10 ** (-5))) * ta * v * v * v * Pa * Pa +
+                   (-1.27043871 * (10 ** (-5))) * tdb * v * v * v * Pa * Pa +
                    (-3.04620472 * (10 ** (-6))) * v * v * v * v * Pa * Pa +
                    (0.0514507424) * delta_t_tr * Pa * Pa +
-                   (-0.00432510997) * ta * delta_t_tr * Pa * Pa +
-                   (8.99281156 * (10 ** (-5))) * ta * ta * delta_t_tr * Pa * Pa +
-                   (-7.14663943 * (10 ** (-7))) * ta * ta * ta * delta_t_tr * Pa * Pa +
+                   (-0.00432510997) * tdb * delta_t_tr * Pa * Pa +
+                   (8.99281156 * (10 ** (-5))) * tdb * tdb * delta_t_tr * Pa * Pa +
+                   (-7.14663943 * (10 ** (-7))) * tdb * tdb * tdb * delta_t_tr * Pa * Pa +
                    (-2.66016305 * (10 ** (-4))) * v * delta_t_tr * Pa * Pa +
-                   (2.63789586 * (10 ** (-4))) * ta * v * delta_t_tr * Pa * Pa +
-                   (-7.01199003 * (10 ** (-6))) * ta * ta * v * delta_t_tr * Pa * Pa +
+                   (2.63789586 * (10 ** (-4))) * tdb * v * delta_t_tr * Pa * Pa +
+                   (-7.01199003 * (10 ** (-6))) * tdb * tdb * v * delta_t_tr * Pa * Pa +
                    (-1.06823306 * (10 ** (-4))) * v * v * delta_t_tr * Pa * Pa +
-                   (3.61341136 * (10 ** (-6))) * ta * v * v * delta_t_tr * Pa * Pa +
+                   (3.61341136 * (10 ** (-6))) * tdb * v * v * delta_t_tr * Pa * Pa +
                    (2.29748967 * (10 ** (-7))) * v * v * v * delta_t_tr * Pa * Pa +
                    (3.04788893 * (10 ** (-4))) * delta_t_tr * delta_t_tr * Pa * Pa +
-                   (-6.42070836 * (10 ** (-5))) * ta * delta_t_tr * delta_t_tr * Pa * Pa +
-                   (1.16257971 * (10 ** (-6))) * ta * ta * delta_t_tr * delta_t_tr * Pa * Pa +
+                   (-6.42070836 * (10 ** (-5))) * tdb * delta_t_tr * delta_t_tr * Pa * Pa +
+                   (1.16257971 * (10 ** (-6))) * tdb * tdb * delta_t_tr * delta_t_tr * Pa * Pa +
                    (7.68023384 * (10 ** (-6))) * v * delta_t_tr * delta_t_tr * Pa * Pa +
-                   (-5.47446896 * (10 ** (-7))) * ta * v * delta_t_tr * delta_t_tr * Pa * Pa +
+                   (-5.47446896 * (10 ** (-7))) * tdb * v * delta_t_tr * delta_t_tr * Pa * Pa +
                    (-3.59937910 * (10 ** (-8))) * v * v * delta_t_tr * delta_t_tr * Pa * Pa +
                    (-4.36497725 * (10 ** (-6))) * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa +
-                   (1.68737969 * (10 ** (-7))) * ta * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa +
+                   (1.68737969 * (10 ** (-7))) * tdb * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa +
                    (2.67489271 * (10 ** (-8))) * v * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa +
                    (3.23926897 * (10 ** (-9))) * delta_t_tr * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa +
                    (-0.0353874123) * Pa * Pa * Pa +
-                   (-0.221201190) * ta * Pa * Pa * Pa +
-                   (0.0155126038) * ta * ta * Pa * Pa * Pa +
-                   (-2.63917279 * (10 ** (-4))) * ta * ta * ta * Pa * Pa * Pa +
+                   (-0.221201190) * tdb * Pa * Pa * Pa +
+                   (0.0155126038) * tdb * tdb * Pa * Pa * Pa +
+                   (-2.63917279 * (10 ** (-4))) * tdb * tdb * tdb * Pa * Pa * Pa +
                    (0.0453433455) * v * Pa * Pa * Pa +
-                   (-0.00432943862) * ta * v * Pa * Pa * Pa +
-                   (1.45389826 * (10 ** (-4))) * ta * ta * v * Pa * Pa * Pa +
+                   (-0.00432943862) * tdb * v * Pa * Pa * Pa +
+                   (1.45389826 * (10 ** (-4))) * tdb * tdb * v * Pa * Pa * Pa +
                    (2.17508610 * (10 ** (-4))) * v * v * Pa * Pa * Pa +
-                   (-6.66724702 * (10 ** (-5))) * ta * v * v * Pa * Pa * Pa +
+                   (-6.66724702 * (10 ** (-5))) * tdb * v * v * Pa * Pa * Pa +
                    (3.33217140 * (10 ** (-5))) * v * v * v * Pa * Pa * Pa +
                    (-0.00226921615) * delta_t_tr * Pa * Pa * Pa +
-                   (3.80261982 * (10 ** (-4))) * ta * delta_t_tr * Pa * Pa * Pa +
-                   (-5.45314314 * (10 ** (-9))) * ta * ta * delta_t_tr * Pa * Pa * Pa +
+                   (3.80261982 * (10 ** (-4))) * tdb * delta_t_tr * Pa * Pa * Pa +
+                   (-5.45314314 * (10 ** (-9))) * tdb * tdb * delta_t_tr * Pa * Pa * Pa +
                    (-7.96355448 * (10 ** (-4))) * v * delta_t_tr * Pa * Pa * Pa +
-                   (2.53458034 * (10 ** (-5))) * ta * v * delta_t_tr * Pa * Pa * Pa +
+                   (2.53458034 * (10 ** (-5))) * tdb * v * delta_t_tr * Pa * Pa * Pa +
                    (-6.31223658 * (10 ** (-6))) * v * v * delta_t_tr * Pa * Pa * Pa +
                    (3.02122035 * (10 ** (-4))) * delta_t_tr * delta_t_tr * Pa * Pa * Pa +
-                   (-4.77403547 * (10 ** (-6))) * ta * delta_t_tr * delta_t_tr * Pa * Pa * Pa +
+                   (-4.77403547 * (10 ** (-6))) * tdb * delta_t_tr * delta_t_tr * Pa * Pa * Pa +
                    (1.73825715 * (10 ** (-6))) * v * delta_t_tr * delta_t_tr * Pa * Pa * Pa +
                    (-4.09087898 * (10 ** (-7))) * delta_t_tr * delta_t_tr * delta_t_tr * Pa * Pa * Pa +
                    (0.614155345) * Pa * Pa * Pa * Pa +
-                   (-0.0616755931) * ta * Pa * Pa * Pa * Pa +
-                   (0.00133374846) * ta * ta * Pa * Pa * Pa * Pa +
+                   (-0.0616755931) * tdb * Pa * Pa * Pa * Pa +
+                   (0.00133374846) * tdb * tdb * Pa * Pa * Pa * Pa +
                    (0.00355375387) * v * Pa * Pa * Pa * Pa +
-                   (-5.13027851 * (10 ** (-4))) * ta * v * Pa * Pa * Pa * Pa +
+                   (-5.13027851 * (10 ** (-4))) * tdb * v * Pa * Pa * Pa * Pa +
                    (1.02449757 * (10 ** (-4))) * v * v * Pa * Pa * Pa * Pa +
                    (-0.00148526421) * delta_t_tr * Pa * Pa * Pa * Pa +
-                   (-4.11469183 * (10 ** (-5))) * ta * delta_t_tr * Pa * Pa * Pa * Pa +
+                   (-4.11469183 * (10 ** (-5))) * tdb * delta_t_tr * Pa * Pa * Pa * Pa +
                    (-6.80434415 * (10 ** (-6))) * v * delta_t_tr * Pa * Pa * Pa * Pa +
                    (-9.77675906 * (10 ** (-6))) * delta_t_tr * delta_t_tr * Pa * Pa * Pa * Pa +
                    (0.0882773108) * Pa * Pa * Pa * Pa * Pa +
-                   (-0.00301859306) * ta * Pa * Pa * Pa * Pa * Pa +
+                   (-0.00301859306) * tdb * Pa * Pa * Pa * Pa * Pa +
                    (0.00104452989) * v * Pa * Pa * Pa * Pa * Pa +
                    (2.47090539 * (10 ** (-4))) * delta_t_tr * Pa * Pa * Pa * Pa * Pa +
                    (0.00148348065) * Pa * Pa * Pa * Pa * Pa * Pa)
@@ -1108,13 +1108,13 @@ def clo_tout(tout, units='SI'):
     return round(clo, 2)
 
 
-def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI'):
+def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI'):
     """ Calculates the percentage of thermally dissatisfied people with a vertical temperature gradient between feet and head [1]_.
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
 
         Note: The air temperature is the average value over two heights: 0.6 m (24 in.) and 1.1 m (43 in.) for seated occupants
@@ -1155,26 +1155,26 @@ def vertical_tmp_grad_ppd(ta, tr, vr, rh, met, clo, vertical_tmp_grad, units='SI
 
     """
     if units.lower() == 'ip':
-        ta, tr, vr = units_converter(ta=ta, tr=tr, v=vr)
+        tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
         vertical_tmp_grad = vertical_tmp_grad / 1.8 * 3.28
 
-    check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo)
+    check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo)
 
-    tsv = pmv(ta, tr, vr, rh, met, clo, standard="ashrae")
+    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
     numerator = math.exp(0.13 * math.pow(tsv - 1.91, 2) + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = round((numerator / (1 + numerator) - 0.345) * 100, 1)
     acceptability = ppd_val <= 5
     return {"PPD_vg": ppd_val, "Acceptability": acceptability}
 
 
-def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
+def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units='SI'):
     """
     Calculates the percentage of thermally dissatisfied people with the ankle draft (0.1 m) above floor level [1]_.
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
     ----------
-    ta : float
+    tdb : float
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
 
         Note: The air temperature is the average value over two heights: 0.6 m (24 in.) and 1.1 m (43 in.) for seated occupants
@@ -1215,11 +1215,11 @@ def ankle_draft(ta, tr, vr, rh, met, clo, v_ankle, units='SI'):
 
     """
     if units.lower() == 'ip':
-        ta, tr, vr, v_ankle = units_converter(ta=ta, tr=tr, v=vr, vel=v_ankle)
+        tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, v=vr, vel=v_ankle)
 
-    check_standard_compliance(standard='ashrae', ta=ta, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo)
+    check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo)
 
-    tsv = pmv(ta, tr, vr, rh, met, clo, standard="ashrae")
+    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
     ppd_val = round(math.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv) / (1 + math.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)) * 100, 1)
     acceptability = ppd_val <= 20
     return {"PPD_ad": ppd_val, "Acceptability": acceptability}

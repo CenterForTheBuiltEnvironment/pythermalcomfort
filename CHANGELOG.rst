@@ -7,6 +7,8 @@ Changelog
 
 * Renamed function to_calc to t_o
 * Added function to calculate mean radiant temperature from black globe temperature
+* renamed input parameter ta to tdb
+* Added functions to calculate vapour pressure, wet-bulb temperature, dew point temperature, and psychrometric data from dry bulb temperature and RH
 
 0.5.2 (2020-03-11)
 ------------------

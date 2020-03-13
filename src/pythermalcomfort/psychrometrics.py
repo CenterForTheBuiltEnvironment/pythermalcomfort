@@ -1,4 +1,12 @@
 import math
+from pythermalcomfort.utilities import *
+
+c_to_k = 273.15
+cp_vapour = 1805.0
+cp_water = 4186
+cp_air = 1004
+h_fg = 2501000
+r_air = 287.055
 
 
 def p_sat_torr(t):
@@ -61,9 +69,9 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units='SI'):
 
     if units.lower() == 'ip':
         for ix, x in enumerate(temp_array):
-            temp_array[ix] = units_converter(ta=temp_array[ix])[0]
+            temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
-    coeff = [alpha ** (ix) for ix, x in enumerate(temp_array)]
+    coeff = [alpha ** ix for ix, x in enumerate(temp_array)]
     t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
 
     if units.lower() == 'ip':
@@ -88,7 +96,7 @@ def units_converter(from_units='ip', **kwargs):
     results = list()
     if from_units == 'ip':
         for key, value in kwargs.items():
-            if 'tmp' in key or key == 'tr' or key == 'ta':
+            if 'tmp' in key or key == 'tr' or key == 'tdb':
                 results.append((value - 32) * 5 / 9)
             if key in ['v', 'vr', 'vel']:
                 results.append(value / 3.281)
@@ -99,7 +107,7 @@ def units_converter(from_units='ip', **kwargs):
 
     elif from_units == 'si':
         for key, value in kwargs.items():
-            if 'tmp' in key or key == 'tr' or key == 'ta':
+            if 'tmp' in key or key == 'tr' or key == 'tdb':
                 results.append((value * 9 / 5) + 32)
             if key in ['v', 'vr', 'vel']:
                 results.append(value * 3.281)
@@ -111,12 +119,12 @@ def units_converter(from_units='ip', **kwargs):
     return results
 
 
-def t_o(ta, tr, v):
+def t_o(tdb, tr, v):
     """ Calculates operative temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
     ----------
-    ta: float
+    tdb: float
         air temperature, [°C]
     tr: float
         mean radiant temperature temperature, [°C]
@@ -129,17 +137,127 @@ def t_o(ta, tr, v):
         operative temperature, [°C]
     """
 
-    return (ta * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
+    return (tdb * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
 
 
-def t_mrt(tg, ta, v, d=.015, emissivity=0.9):
+def p_sat(tdb):
+    """ Calculates vapour pressure of water at different temperatures
+
+    Parameters
+    ----------
+    tdb: float
+        air temperature, [°C]
+
+    Returns
+    -------
+    p_sat: float
+        operative temperature, [Pa]
+    """
+
+    ta_k = tdb + c_to_k
+    c1 = -5674.5359
+    c2 = 6.3925247
+    c3 = -0.9677843 * math.pow(10, -2)
+    c4 = 0.62215701 * math.pow(10, -6)
+    c5 = 0.20747825 * math.pow(10, -8)
+    c6 = -0.9484024 * math.pow(10, -12)
+    c7 = 4.1635019
+    c8 = -5800.2206
+    c9 = 1.3914993
+    c10 = -0.048640239
+    c11 = 0.41764768 * math.pow(10, -4)
+    c12 = -0.14452093 * math.pow(10, -7)
+    c13 = 6.5459673
+
+    if ta_k < c_to_k:
+        pascals = math.exp(c1 / ta_k + c2 + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k))) + c7 * math.log(ta_k))
+    else:
+        pascals = math.exp(c8 / ta_k + c9 + ta_k * (c10 + ta_k * (c11 + ta_k * c12)) + c13 * math.log(ta_k))
+
+    return round(pascals, 1)
+
+
+def psy_ta_rh(tdb, rh, patm=101325):
+    """ Calculates psychrometric values of air based on dry bulb air temperature and relative humidity
+
+        Parameters
+        ----------
+        tdb: float
+            air temperature, [°C]
+        rh: float
+            relative humidity, [%]
+        patm: float
+            atmospheric pressure, [Pa]
+
+        Returns
+        -------
+        p_vap: float
+            vapour pressure, [Pa]
+        hr: float
+            humidity ratio, [kg water/kg dry air]
+        t_wb: float
+            wet bulb temperature, [°C]
+        t_dp: float
+            dew point temperature, [°C]
+    """
+    psat = p_sat(tdb)
+    pvap = rh / 100 * psat
+    hr = 0.62198 * pvap / (patm - pvap)
+    tdp = t_dp(tdb)
+    twb = t_wb(tdb, rh)
+
+    return {'p_sat': psat, 'p_vap': pvap, 'hr': hr, 't_wb': twb, 't_dp': tdp}
+
+
+def t_wb(tdb, rh):
+    """ Calculates the wet-bulb temperature using the Stull equation [6]_
+        Parameters
+        ----------
+        tdb: float
+            air temperature, [°C]
+        rh: float
+            relative humidity, [%]
+
+        Returns
+        -------
+        tdb: float
+            wet-bulb temperature, [°C]"""
+    return tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
+        0.023101 * rh) - 4.686035
+
+
+def t_dp(tdb, rh):
+    """ Calculates the dew point temperature.
+        Parameters
+        ----------
+        tdb: float
+            dry-bulb air temperature, [°C]
+        rh: float
+            relative humidity, [%]
+
+        Returns
+        -------
+        t_dp: float
+            dew point temperature, [°C]"""
+
+    c = 257.14
+    b = 18.678
+    a = 6.1121
+    d = 234.5
+
+    gamma_m = math.log(rh/100 * math.exp((b-tdb/d)*(tdb/(c+tdb))))
+
+    return c * gamma_m / (b - gamma_m)
+
+
+def t_mrt(tg, tdb, v, d=.015, emissivity=0.9):
     """ Converts globe temperature reading into mean radiant temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
     ----------
     tg: float
         globe temperature, [°C]
-    ta: float
+    tdb: float
         air temperature, [°C]
     v: float
         air velocity, [m/s]
@@ -153,17 +271,17 @@ def t_mrt(tg, ta, v, d=.015, emissivity=0.9):
     tr: float
         mean radiant temperature, [°C]
     """
-    tg += 273.15
-    ta += 273.15
+    tg += c_to_k
+    tdb += c_to_k
 
     # calculate heat transfer coefficient
-    h_n = 1.4 * (abs(tg - ta) / d) ** 0.25  # natural convection
+    h_n = 1.4 * (abs(tg - tdb) / d) ** 0.25  # natural convection
     h_f = 6.3 * v ** 0.6 / d ** 0.4  # forced convection
 
     # get the biggest between the tow coefficients
     h = max(h_f, h_n)
     print(h_n, h_f, h)
 
-    tr = (tg ** 4 + h * (tg - ta) / (emissivity * (5.67 * 10 ** -8))) ** 0.25 - 273.15
+    tr = (tg ** 4 + h * (tg - tdb) / (emissivity * (5.67 * 10 ** -8))) ** 0.25 - c_to_k
 
     return round(tr, 1)
