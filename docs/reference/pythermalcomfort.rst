@@ -17,8 +17,8 @@ PMV
 
 .. autofunction:: pythermalcomfort.models.pmv
 
-Standard Effective Temperature
-------------------------------
+Standard Effective Temperature (SET)
+------------------------------------
 
 .. autofunction:: pythermalcomfort.models.set_tmp
 
@@ -36,6 +36,11 @@ Adaptive EN
 -----------
 
 .. autofunction:: pythermalcomfort.models.adaptive_en
+
+Solar gain on people
+--------------------
+
+.. autofunction:: pythermalcomfort.models.solar_gain
 
 Universal Thermal Climate Index (UTCI)
 --------------------------------------
