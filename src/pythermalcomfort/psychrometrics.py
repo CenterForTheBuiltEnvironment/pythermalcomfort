@@ -203,8 +203,10 @@ def psy_ta_rh(tdb, rh, patm=101325):
     psat = p_sat(tdb)
     pvap = rh / 100 * psat
     hr = 0.62198 * pvap / (patm - pvap)
-    tdp = t_dp(tdb)
+    tdp = t_dp(tdb, rh)
     twb = t_wb(tdb, rh)
+
+    # todo also calculate enthalpy, specific heat
 
     return {'p_sat': psat, 'p_vap': pvap, 'hr': hr, 't_wb': twb, 't_dp': tdp}
 
@@ -222,8 +224,8 @@ def t_wb(tdb, rh):
         -------
         tdb: float
             wet-bulb temperature, [°C]"""
-    return tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
-        0.023101 * rh) - 4.686035
+    return round(tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
+        0.023101 * rh) - 4.686035, 1)
 
 
 def t_dp(tdb, rh):
@@ -247,7 +249,7 @@ def t_dp(tdb, rh):
 
     gamma_m = math.log(rh/100 * math.exp((b-tdb/d)*(tdb/(c+tdb))))
 
-    return c * gamma_m / (b - gamma_m)
+    return round(c * gamma_m / (b - gamma_m), 1)
 
 
 def t_mrt(tg, tdb, v, d=.015, emissivity=0.9):

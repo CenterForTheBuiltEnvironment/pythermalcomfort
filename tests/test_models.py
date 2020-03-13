@@ -89,6 +89,21 @@ data_test_erf = {
 }
 
 
+def test_t_dp():
+    assert t_dp(31.6, 59.6) == 22.6
+    assert t_dp(29.3, 75.4) == 24.3
+    assert t_dp(27.1, 66.4) == 20.2
+
+
+def test_t_wb():
+    assert t_wb(27.1, 66.4) == 22.4
+    assert t_wb(25, 50) == 18.0
+
+
+def test_psy_ta_rh():
+    assert psy_ta_rh(25, 50, patm=101325) == {'p_sat': 3169.2, 'p_vap': 1584.6, 'hr': 0.009881547577511219, 't_wb': 18.0, 't_dp': 13.8}
+
+
 def test_solar_gain():
     for ix in range(0, len(data_test_erf['alt'])):
         assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['Idir'][ix], sol_transmittance= data_test_erf['tsol'][ix],
