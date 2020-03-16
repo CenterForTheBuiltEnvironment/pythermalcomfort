@@ -11,8 +11,8 @@ Authors
 .. _Stefano Schiavon: https://www.linkedin.com/in/stefanoschiavon/
 .. _Tyler Hoyt: https://www.linkedin.com/in/tyler-hoyt1/
 
-Derivative work
-===============
+**Derivative work**
+
 `pythermalcomfort`_ is a derivative work of the following software projects:
 
 * `CBE Comfort Tool`_ for indoor thermal comfort calculations. Available under GPL.

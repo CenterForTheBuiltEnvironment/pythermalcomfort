@@ -213,17 +213,18 @@ def psy_ta_rh(tdb, rh, patm=101325):
 
 def t_wb(tdb, rh):
     """ Calculates the wet-bulb temperature using the Stull equation [6]_
-        Parameters
-        ----------
-        tdb: float
-            air temperature, [°C]
-        rh: float
-            relative humidity, [%]
 
-        Returns
-        -------
-        tdb: float
-            wet-bulb temperature, [°C]
+    Parameters
+    ----------
+    tdb: float
+        air temperature, [°C]
+    rh: float
+        relative humidity, [%]
+
+    Returns
+    -------
+    tdb: float
+        wet-bulb temperature, [°C]
     """
     twb = round(tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
         0.023101 * rh) - 4.686035, 1)
@@ -232,17 +233,18 @@ def t_wb(tdb, rh):
 
 def t_dp(tdb, rh):
     """ Calculates the dew point temperature.
-        Parameters
-        ----------
-        tdb: float
-            dry-bulb air temperature, [°C]
-        rh: float
-            relative humidity, [%]
 
-        Returns
-        -------
-        t_dp: float
-            dew point temperature, [°C]
+    Parameters
+    ----------
+    tdb: float
+        dry-bulb air temperature, [°C]
+    rh: float
+        relative humidity, [%]
+
+    Returns
+    -------
+    t_dp: float
+        dew point temperature, [°C]
     """
 
     c = 257.14
