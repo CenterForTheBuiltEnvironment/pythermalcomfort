@@ -9,12 +9,12 @@ h_fg = 2501000
 r_air = 287.055
 
 
-def p_sat_torr(t):
+def p_sat_torr(tdb):
     """ Estimates the saturation vapor pressure in [torr]
 
     Parameters
     ----------
-    t : float
+    tdb : float
         dry bulb air temperature, [C]
 
     Returns
@@ -22,7 +22,7 @@ def p_sat_torr(t):
     p_sat  : float
         saturation vapor pressure [torr]
     """
-    return math.exp(18.6686 - 4030.183 / (t + 235.0))
+    return math.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
 def v_relative(v, met):
@@ -140,6 +140,29 @@ def t_o(tdb, tr, v):
     return (tdb * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
 
 
+def enthalpy(tdb, hr):
+    """ Calculates air enthalpy
+
+    Parameters
+    ----------
+    tdb: float
+        air temperature, [°C]
+    hr: float
+        humidity ratio, [kg water/kg dry air]
+
+    Returns
+    -------
+    enthalpy: float
+        enthalpy [J/kg dry air]
+    """
+
+    h_dry_air = cp_air * tdb
+    h_sat_vap = h_fg + cp_vapour * tdb
+    h = h_dry_air + hr * h_sat_vap
+
+    return round(h, 2)
+
+
 def p_sat(tdb):
     """ Calculates vapour pressure of water at different temperatures
 
@@ -178,37 +201,41 @@ def p_sat(tdb):
 
 
 def psy_ta_rh(tdb, rh, patm=101325):
-    """ Calculates psychrometric values of air based on dry bulb air temperature and relative humidity
+    """ Calculates psychrometric values of air based on dry bulb air temperature and relative humidity.
+    For more accurate results we recommend the use of the the Python package `psychrolib`_.
 
-        Parameters
-        ----------
-        tdb: float
-            air temperature, [°C]
-        rh: float
-            relative humidity, [%]
-        patm: float
-            atmospheric pressure, [Pa]
+    .. _psychrolib: https://pypi.org/project/PsychroLib/
 
-        Returns
-        -------
-        p_vap: float
-            vapour pressure, [Pa]
-        hr: float
-            humidity ratio, [kg water/kg dry air]
-        t_wb: float
-            wet bulb temperature, [°C]
-        t_dp: float
-            dew point temperature, [°C]
+    Parameters
+    ----------
+    tdb: float
+        air temperature, [°C]
+    rh: float
+        relative humidity, [%]
+    patm: float
+        atmospheric pressure, [Pa]
+
+    Returns
+    -------
+    p_vap: float
+        partial pressure of water vapor in moist air, [Pa]
+    hr: float
+        humidity ratio, [kg water/kg dry air]
+    t_wb: float
+        wet bulb temperature, [°C]
+    t_dp: float
+        dew point temperature, [°C]
+    h: float
+        enthalpy [J/kg dry air]
     """
     psat = p_sat(tdb)
     pvap = rh / 100 * psat
     hr = 0.62198 * pvap / (patm - pvap)
     tdp = t_dp(tdb, rh)
     twb = t_wb(tdb, rh)
+    h = enthalpy(tdb, hr)
 
-    # todo also calculate enthalpy, specific heat
-
-    return {'p_sat': psat, 'p_vap': pvap, 'hr': hr, 't_wb': twb, 't_dp': tdp}
+    return {'p_sat': psat, 'p_vap': pvap, 'hr': hr, 't_wb': twb, 't_dp': tdp, 'h': h}
 
 
 def t_wb(tdb, rh):

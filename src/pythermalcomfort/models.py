@@ -1062,7 +1062,7 @@ def utci(tdb, tr, v, rh, units='SI'):
     if units.lower() == 'ip':
         utci_approx = units_converter(tmp=utci_approx, from_units='si')[0]
 
-    return round(utci_approx, 1)  # todo maybe return also the other parameters see line above
+    return round(utci_approx, 1)
 
 
 def clo_tout(tout, units='SI'):
@@ -1367,9 +1367,7 @@ def solar_gain(sol_altitude, sol_azimuth, sol_radiation_dir, sol_transmittance, 
 # todo draft
 # todo floor_surface_tmp
 # todo effective_tmp
-# todo a_pmv
 # todo e_pmv
-# todo humidity conversion
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
 

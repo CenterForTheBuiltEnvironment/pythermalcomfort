@@ -77,3 +77,53 @@ Psychrometrics functions
 
 .. automodule:: pythermalcomfort.psychrometrics
     :members:
+
+
+Reference values clo and met
+============================
+
+Met typical tasks, [met]
+------------------------
+
+.. autodata:: pythermalcomfort.utilities.met_typical_tasks
+
+**Example**
+
+.. code-block:: python
+
+    >>> from pythermalcomfort.utilities import met_typical_tasks
+    >>> print(met_typical_tasks['Filing, standing'])
+    1.4
+
+Clothing insulation of typical ensembles, [clo]
+-----------------------------------------------
+
+.. autodata:: pythermalcomfort.utilities.clo_typical_ensembles
+
+**Example**
+
+.. code-block:: python
+
+    >>> from pythermalcomfort.utilities import clo_typical_ensembles
+    >>> print(clo_typical_ensembles['Typical summer indoor clothing'])
+    0.5
+
+Insulation of individual garments, [clo]
+----------------------------------------
+
+.. autodata:: pythermalcomfort.utilities.clo_individual_garments
+
+**Example**
+
+.. code-block:: python
+
+    >>> from pythermalcomfort.utilities import clo_individual_garments
+    >>> print(clo_individual_garments['T-shirt'])
+    0.08
+
+    >>> # calculate total clothing insulation
+    >>> i_cl = clo_individual_garments['T-shirt'] + clo_individual_garments["Men's underwear"] +
+    >>>        clo_individual_garments['Thin trousers'] + clo_individual_garments['Shoes or sandals']
+    >>> print(i_cl)
+    0.29
+
