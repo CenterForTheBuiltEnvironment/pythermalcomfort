@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.6.1
+0.6.2
 ------------------
 
 * Renamed function to_calc to t_o
@@ -11,6 +11,8 @@ Changelog
 * Added function to calculate solar gain on people
 * Added functions to calculate vapour pressure, wet-bulb temperature, dew point temperature, and psychrometric data from dry bulb temperature and RH
 * Added authors
+* Added dictionaries with reference clo and met values
+* Added function to calculate enthalpy
 
 0.5.2 (2020-03-11)
 ------------------
