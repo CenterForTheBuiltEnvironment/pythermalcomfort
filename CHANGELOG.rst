@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.6.0
+0.6.1
 ------------------
 
 * Renamed function to_calc to t_o
@@ -10,6 +10,7 @@ Changelog
 * Added function to calculate mean radiant temperature from black globe temperature
 * Added function to calculate solar gain on people
 * Added functions to calculate vapour pressure, wet-bulb temperature, dew point temperature, and psychrometric data from dry bulb temperature and RH
+* Added authors
 
 0.5.2 (2020-03-11)
 ------------------
