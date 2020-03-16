@@ -1367,7 +1367,6 @@ def solar_gain(sol_altitude, sol_azimuth, sol_radiation_dir, sol_transmittance, 
 # todo draft
 # todo floor_surface_tmp
 # todo effective_tmp
-# todo e_pmv
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
 
