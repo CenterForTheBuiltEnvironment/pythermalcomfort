@@ -25,9 +25,9 @@ def read(*names, **kwargs):
 
 setup(
     name='pythermalcomfort',
-    version='0.5.2',
+    version='0.6.0',
     license='MIT',
-    description='Package to calculate sevral thermal comfort indeces (e.g. PMV, PPD, SET, adaptive) and convert physical variables.',
+    description='Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables.',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
@@ -44,6 +44,8 @@ setup(
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Operating System :: Unix',
         'Operating System :: POSIX',
@@ -59,6 +61,7 @@ setup(
         # 'Programming Language :: Python :: Implementation :: IronPython',
         # 'Programming Language :: Python :: Implementation :: Jython',
         # 'Programming Language :: Python :: Implementation :: Stackless',
+        'Topic :: Scientific/Engineering :: Email',
         'Topic :: Utilities',
     ],
     project_urls={
@@ -67,7 +70,7 @@ setup(
         'Issue Tracker': 'https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues',
     },
     keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
+        'thermal comfort', 'pmv', 'ppd', 'building design', 'compliance', 'thermal environment', 'buit environment'
     ],
     python_requires='>=3.6.*',
     install_requires=[

@@ -2,10 +2,10 @@
 Usage
 =====
 
-Examples
+`Examples`_ files on how to use some of the functions
 
-https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/tree/master/examples
+.. _Examples: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/tree/master/examples
 
-YouTube tutorials
+YouTube `tutorials`_ playlist
 
-https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto
+.. _tutorials: https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto

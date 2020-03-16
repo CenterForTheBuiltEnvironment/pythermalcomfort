@@ -223,9 +223,11 @@ def t_wb(tdb, rh):
         Returns
         -------
         tdb: float
-            wet-bulb temperature, [°C]"""
-    return round(tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
+            wet-bulb temperature, [°C]
+    """
+    twb = round(tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
         0.023101 * rh) - 4.686035, 1)
+    return twb
 
 
 def t_dp(tdb, rh):
@@ -240,7 +242,8 @@ def t_dp(tdb, rh):
         Returns
         -------
         t_dp: float
-            dew point temperature, [°C]"""
+            dew point temperature, [°C]
+    """
 
     c = 257.14
     b = 18.678

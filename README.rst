@@ -53,9 +53,9 @@ Overview
     :alt: Supported implementations
     :target: https://pypi.org/project/pythermalcomfort
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/CenterForTheBuiltEnvironment/pythermalcomfort/v0.5.2.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/CenterForTheBuiltEnvironment/pythermalcomfort/v0.6.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/compare/v0.5.2...master
+    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/compare/v0.6.0...master
 
 
 
@@ -87,35 +87,12 @@ https://pythermalcomfort.readthedocs.io/
 Examples and Tutorials
 ======================
 
-Examples
+`Examples`_ files on how to use some of the functions
 
-https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/tree/master/examples
+.. _Examples: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/tree/master/examples
 
-YouTube tutorials
+YouTube `tutorials`_ playlist
 
-https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto
+.. _tutorials: https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto
 
 
-Development
-===========
-
-To run the all tests run::
-
-    tox
-
-Note, to combine the coverage data from all the tox environments run:
-
-.. list-table::
-    :widths: 10 90
-    :stub-columns: 1
-
-    - - Windows
-      - ::
-
-            set PYTEST_ADDOPTS=--cov-append
-            tox
-
-    - - Other
-      - ::
-
-            PYTEST_ADDOPTS=--cov-append tox

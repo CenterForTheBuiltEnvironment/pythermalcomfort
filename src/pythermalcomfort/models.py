@@ -5,7 +5,9 @@ import math
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
     """
-    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 552017.
+    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 55 2017 Standard [1]_.
+
+    .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
     Parameters
     ----------
@@ -31,10 +33,8 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
 
     Returns
     -------
-    CE
+    ce
         Cooling Effect, default in [°C] in [°F] if `units` = 'IP'
-
-    .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
     Examples
     --------
