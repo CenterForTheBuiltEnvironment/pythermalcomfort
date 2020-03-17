@@ -42,7 +42,7 @@ def v_relative(v, met):
     """
 
     if met > 1:
-        return 0.3 * (met - 1)
+        return round(v + 0.3 * (met - 1), 3)
     else:
         return v
 

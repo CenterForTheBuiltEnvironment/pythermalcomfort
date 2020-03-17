@@ -2,10 +2,11 @@
 Changelog
 =========
 
-0.6.2
+0.6.3 (2020-03-17)
 ------------------
 
 * Renamed function to_calc to t_o
+* Fixed error calculation of relative air velocity
 * renamed input parameter ta to tdb
 * Added function to calculate mean radiant temperature from black globe temperature
 * Added function to calculate solar gain on people
