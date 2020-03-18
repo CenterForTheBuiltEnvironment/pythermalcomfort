@@ -26,7 +26,7 @@ def p_sat_torr(tdb):
 
 
 def v_relative(v, met):
-    """ Estimates the relative air velocity
+    """ Estimates the relative air velocity which combines the average air velocity of the space plus the relative air velocity caused by the body movement.
 
     Parameters
     ----------
