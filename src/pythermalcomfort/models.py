@@ -1227,7 +1227,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units='SI'):
 
 def solar_gain(sol_altitude, sol_azimuth, sol_radiation_dir, sol_transmittance, f_svv, f_bes, asw=0.7, posture='seated', floor_reflectance=0.6):
     """
-        Calculates the solar gain to the human body using the Effective Radiant Field (ERF) [1]_. The ERF is a measure of the net energy fluc to or from the human body.
+        Calculates the solar gain to the human body using the Effective Radiant Field (ERF) [1]_. The ERF is a measure of the net energy flux to or from the human body.
         ERF is expressed in W over human body surface area [w/m2]. In addition, it calculates the delta mean radiant temperature. Which is the amount by which the mean radiant
         temperature of the space should be increased if no solar radiation is present.
 
