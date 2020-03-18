@@ -5,7 +5,9 @@ import math
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
     """
-    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 55 2017 Standard [1]_.
+    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 55 2017 Standard [1]_. The `CE`_ of the elevated air speed is the value that,
+    when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same `SET`_ under still air as in the first `SET`_ calculation
+    under elevated air speed.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
@@ -76,7 +78,10 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
 
 def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
-    Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (`PPD`_) calculated in accordance to main thermal comfort Standards.
+    Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (`PPD`_) calculated in accordance to main thermal comfort Standards. The `PMV`_ is an index that
+    predicts the mean value of the thermal sensation votes (self-reported perceptions) of a large group of people on a sensation scale expressed from –3 to +3 corresponding to
+    the categories \"cold,\" \"cool,\" \"slightly cool,\" \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\"[1]_. The `PPD`_ is an index that establishes a quantitative
+    prediction of the percentage of thermally dissatisfied people determined from `PMV`_ [1]_.
 
     Parameters
     ----------
@@ -231,7 +236,9 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
 def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     """
-    Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal comfort Standards.
+    Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal comfort Standards. The PMV is an index that predicts the mean value of the thermal sensation votes
+    (self-reported perceptions) of a large group of people on a sensation scale expressed from –3 to +3 corresponding to the categories \"cold,\" \"cool,\" \"slightly cool,\"
+    \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
 
     Parameters
     ----------
@@ -289,7 +296,10 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
 
 
 def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units='SI'):
-    """ Standard effective temperature (SET) calculation using SI units
+    """
+    Calculates the Standard Effective Temperature (SET). The SET is the temperature of an imaginary environment at 50% (rh), <0.1 m/s (20 fpm) average air speed (v), and tr = tdb ,
+    in which the total heat loss from the skin of an imaginary occupant with an activity level of 1.0 met and a clothing level of 0.6 clo is the same as that
+    from a person in the actual environment with actual clothing and activity level.
 
     Parameters
     ----------
@@ -501,7 +511,9 @@ def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=1013
 
 
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units='SI'):
-    """ Determines the adaptive thermal comfort based on ASHRAE 55
+    """
+    Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model relates indoor design temperatures or acceptable temperature ranges to outdoor meteorological
+    or climatological parameters.
 
     Parameters
     ----------
@@ -755,7 +767,10 @@ def adaptive_en(tdb, tr, t_running_mean, v, units='SI'):
 
 
 def utci(tdb, tr, v, rh, units='SI'):
-    """ Determines the Universal Thermal Climate Index (UTCI)
+    """ Determines the Universal Thermal Climate Index (UTCI). The UTCI is the equivalent temperature for the environment derived from a reference environment.
+    It is defined as the air temperature of the reference environment which produces the same strain index value in comparison with the reference individual's response to the real
+    environment. It is regarded as one of the most comprehensive indices for calculating heat stress in outdoor spaces. The parameters that are taken into account for calculating
+    UTCI involve dry-bulb temperature, mean radiation temperature, the pressure of water vapor or relative humidity, and wind speed (at the elevation of 10 m) [7]_.
 
     Parameters
     ----------
@@ -1272,8 +1287,9 @@ def solar_gain(sol_altitude, sol_azimuth, sol_radiation_dir, sol_transmittance, 
         .. code-block:: python
 
             >>> from pythermalcomfort.models import solar_gain
-            >>> results = solar_gain(sol_altitude=0, sol_azimuth=120, sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5, asw=0.7, posture='seated', floor_reflectance=0.6)
+            >>> results = solar_gain(sol_altitude=0, sol_azimuth=120, sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5, asw=0.7, posture='seated')
             >>> print(results)
+            {'erf': 42.9, 'delta_mrt': 10.3}
 
         """
 
