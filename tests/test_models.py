@@ -106,7 +106,7 @@ def test_enthalpy():
 
 
 def test_psy_ta_rh():
-    assert psy_ta_rh(25, 50, patm=101325) == {'p_sat': 3169.2, 'p_vap': 1584.6, 'hr': 0.009881547577511219, 't_wb': 18.0, 't_dp': 13.8}
+    assert psy_ta_rh(25, 50, patm=101325) == {'p_sat': 3169.2, 'p_vap': 1584.6, 'hr': 0.009881547577511219, 't_wb': 18.0, 't_dp': 13.8, 'h': 50259.66}
 
 
 def test_solar_gain():
@@ -188,6 +188,8 @@ def test_adaptive_ashrae():
         {'tdb': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': True}},
         {'tdb': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_90': False}},
         {'tdb': 30, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': False}},
+        {'tdb': 25, 'tr': 25, 't_running_mean': 23, 'v': 0.1, 'return': {'acceptability_80': True}},
+        {'tdb': 25, 'tr': 25, 't_running_mean': 23, 'v': 0.1, 'return': {'acceptability_90': True}},
     ]
     for row in data_test_adaptive_ashrae:
         assert (adaptive_ashrae(row['tdb'], row['tr'], row['t_running_mean'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
