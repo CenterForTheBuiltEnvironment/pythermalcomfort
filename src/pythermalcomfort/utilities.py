@@ -51,7 +51,7 @@ def check_standard_compliance(standard, **kwargs):
                     warnings.warn("ISO met applicability limits between 1.0 and 2.0 met", UserWarning)
             if key == 'clo':
                 if value > 2 or value < 0:
-                    warnings.warn("ISO clo applicability limits between 0.0 and 1.5 clo", UserWarning)
+                    warnings.warn("ISO clo applicability limits between 0.0 and 2 clo", UserWarning)
 
 
 def secant(f, a, b, n):
