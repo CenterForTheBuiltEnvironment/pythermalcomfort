@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.6.3 (2020-04-11)
+------------------
+
+* Fixed error in calculation adaptive ASHRAE
+* Added some examples
+
 0.6.3 (2020-03-17)
 ------------------
 
