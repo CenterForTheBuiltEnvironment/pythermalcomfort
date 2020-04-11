@@ -35,20 +35,20 @@ def check_standard_compliance(standard, **kwargs):
                 if value > 0.2:
                     raise ValueError("This equation is only applicable for air speed lower than 0.2 m/s")
 
-    elif params['standard'] == 'iso':  # based on table 7.3.4 ashrae 55 2017
+    elif params['standard'] == 'iso':  # based on ISO 7730:2005 page 3
         for key, value in params.items():
             if key == 'tdb':
                 if value > 30 or value < 10:
-                    warnings.warn("ISO air temperature applicability limits between 10 and 50 °C", UserWarning)
+                    warnings.warn("ISO air temperature applicability limits between 10 and 30 °C", UserWarning)
             if key == 'tr':
                 if value > 40 or value < 10:
-                    warnings.warn("ISO air temperature applicability limits between 10 and 50 °C", UserWarning)
+                    warnings.warn("ISO air temperature applicability limits between 10 and 40 °C", UserWarning)
             if key in ['v', 'vr']:
                 if value > 1 or value < 0:
-                    warnings.warn("ISO air velocity applicability limits between 0 and 2 m/s", UserWarning)
+                    warnings.warn("ISO air velocity applicability limits between 0 and 1 m/s", UserWarning)
             if key == 'met':
                 if value > 4 or value < 0.8:
-                    warnings.warn("ISO met applicability limits between 1.0 and 2.0 met", UserWarning)
+                    warnings.warn("ISO met applicability limits between 0.8 and 4.0 met", UserWarning)
             if key == 'clo':
                 if value > 2 or value < 0:
                     warnings.warn("ISO clo applicability limits between 0.0 and 2 clo", UserWarning)
