@@ -605,7 +605,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units='SI'):
         # Figure out the relation between comfort and outdoor temperature depending on the level of conditioning.
         t_cmf = 0.31 * t_running_mean + 17.8
         tmp_cmf_80_low = t_cmf - 3.5
-        t_cmf_90_low = t_cmf - 2.5
+        tmp_cmf_90_low = t_cmf - 2.5
         tmp_cmf_80_up = t_cmf + 3.5 + cooling_effect
         tmp_cmf_90_up = t_cmf + 2.5 + cooling_effect
 
@@ -617,15 +617,15 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units='SI'):
                 return False
 
         acceptability_80 = acceptability(tmp_cmf_80_low, tmp_cmf_80_up)
-        acceptability_90 = acceptability(t_cmf_90_low, t_cmf_90_low)
+        acceptability_90 = acceptability(tmp_cmf_90_low, tmp_cmf_90_up)
 
         if units.lower() == 'ip':
-            t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, t_cmf_90_low, tmp_cmf_90_up = units_converter(from_units='si', tmp_cmf=t_cmf, tmp_cmf_80_low=tmp_cmf_80_low,
-                                                                                                tmp_cmf_80_up=tmp_cmf_80_up, tmp_cmf_90_low=t_cmf_90_low,
+            t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, tmp_cmf_90_low, tmp_cmf_90_up = units_converter(from_units='si', tmp_cmf=t_cmf, tmp_cmf_80_low=tmp_cmf_80_low,
+                                                                                                tmp_cmf_80_up=tmp_cmf_80_up, tmp_cmf_90_low=tmp_cmf_90_low,
                                                                                                 tmp_cmf_90_up=tmp_cmf_90_up)
 
         results = {'tmp_cmf': t_cmf, 'tmp_cmf_80_low': tmp_cmf_80_low, 'tmp_cmf_80_up': tmp_cmf_80_up,
-                   'tmp_cmf_90_low': t_cmf_90_low, 'tmp_cmf_90_up': tmp_cmf_90_up,
+                   'tmp_cmf_90_low': tmp_cmf_90_low, 'tmp_cmf_90_up': tmp_cmf_90_up,
                    'acceptability_80': acceptability_80, 'acceptability_90': acceptability_90, }
 
     else:
