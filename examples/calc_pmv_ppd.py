@@ -29,7 +29,6 @@ print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 # for users who wants to use the IP system
 results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
 print(results_ip)
-# {"pmv": 0.01, "ppd": 5.0}
 
 import pandas as pd
 import os
