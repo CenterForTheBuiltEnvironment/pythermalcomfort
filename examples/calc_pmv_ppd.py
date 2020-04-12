@@ -2,8 +2,6 @@ from pythermalcomfort.models import pmv_ppd
 from pythermalcomfort.psychrometrics import v_relative
 from pythermalcomfort.utilities import met_typical_tasks
 from pythermalcomfort.utilities import clo_individual_garments
-import pandas as pd
-import os
 
 # input variables
 tdb = 27  # dry-bulb air temperature, [$^{\circ}$C]
@@ -20,22 +18,21 @@ icl = sum([clo_individual_garments[item] for item in garments])  # calculate tot
 vr = v_relative(v=v, met=met)
 
 # calculate PMV in accordance with the ASHRAE 55 2017
-results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met,
-                  clo=icl, standard="ASHRAE")
+results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=icl, standard="ASHRAE")
 
 # print the results
 print(results)
-# {"pmv": -0.11, "ppd": 5.2}
 
 # print PMV value
-print(results["pmv"])
-# -0.11
+print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
 # for users who wants to use the IP system
-results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50,
-                     met=1.2, clo=0.5, units="IP")
+results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
 print(results_ip)
 # {"pmv": 0.01, "ppd": 5.0}
+
+import pandas as pd
+import os
 
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
