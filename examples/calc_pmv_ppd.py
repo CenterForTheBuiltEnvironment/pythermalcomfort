@@ -1,22 +1,52 @@
 from pythermalcomfort.models import pmv_ppd
 from pythermalcomfort.psychrometrics import v_relative
+from pythermalcomfort.utilities import met_typical_tasks
+from pythermalcomfort.utilities import clo_individual_garments
+import pandas as pd
+import os
 
-# measured air velocity
-v = 0.1
-met = 1.2
+# input variables
+tdb = 27  # dry-bulb air temperature, [$^{\circ}$C]
+tr = 25  # mean radiant temperature, [$^{\circ}$C]
+v = 0.1  # average air velocity, [m/s]
+rh = 50  # relative humidity, [%]
+activity = "Typing"  # participant's activity description
+garments = ["Sweatpants", "T-shirt", "Shoes or sandals"]
 
-v_r = v_relative(v=v, met=met)
-print(v_r)
+met = met_typical_tasks[activity]  # activity met, [met]
+icl = sum([clo_individual_garments[item] for item in garments])  # calculate total clothing insulation
+
+# calculate the relative air velocity
+vr = v_relative(v=v, met=met)
 
 # calculate PMV in accordance with the ASHRAE 55 2017
-results = pmv_ppd(tdb=27, tr=25, vr=v_r, rh=50, met=met, clo=0.5, wme=0, standard="ISO")
+results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met,
+                  clo=icl, standard="ASHRAE")
 
 # print the results
 print(results)
+# {"pmv": -0.11, "ppd": 5.2}
 
 # print PMV value
-print(results['pmv'])
+print(results["pmv"])
+# -0.11
 
 # for users who wants to use the IP system
-results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
+results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50,
+                     met=1.2, clo=0.5, units="IP")
 print(results_ip)
+# {"pmv": 0.01, "ppd": 5.0}
+
+df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
+
+df['PMV'] = None
+df['PPD'] = None
+
+for index, row in df.iterrows():
+    vr = v_relative(v=row['v'], met=row['met'])
+    results = pmv_ppd(tdb=row['tdb'], tr=row['tr'], vr=vr, rh=row['rh'], met=row['met'], clo=row['clo'], standard="ashrae")
+    df.loc[index, 'PMV'] = results['pmv']
+    df.loc[index, 'PPD'] = results['ppd']
+
+print(df)
+df.to_csv('results.csv')
