@@ -21,7 +21,7 @@ def check_standard_compliance(standard, **kwargs):
         for key, value in params.items():
             if key in ['tdb', 'tr']:
                 if value > 40 or value < 10:
-                    warnings.warn("ASHRAE air temperature applicability limits between 10 and 50 °C", UserWarning)
+                    warnings.warn("ASHRAE air temperature applicability limits between 10 and 40 °C", UserWarning)
             if key in ['v', 'vr']:
                 if value > 2 or value < 0:
                     warnings.warn("ASHRAE air velocity applicability limits between 0 and 2 m/s", UserWarning)
