@@ -47,6 +47,33 @@ def v_relative(v, met):
         return v
 
 
+def clo_dynamic(clo, met, standard='ASHRAE'):
+    """ Estimates the dynamic clothing insulation of a moving occupant.
+
+    Parameters
+    ----------
+    clo : float
+        clothing insulation, [clo]
+    met : float
+        metabolic rate, [met]
+    standard: str (default="ASHRAE")
+        - If "ASHRAE", then the ASHRAE 55 2017 Equation provided in Section 5.2.2.2 is used
+
+    Returns
+    -------
+    clo : float
+        dynamic clothing insulation, [clo]
+    """
+
+    if standard.lower() not in ['ashrae']:
+        raise ValueError("PMV calculations can only be performed in compliance with ISO or ASHRAE Standards")
+
+    if 1.2 < met < 2:
+        return round(clo * (0.6 + 0.4 / met), 3)
+    else:
+        return clo
+
+
 def running_mean_outdoor_temperature(temp_array, alpha=0.8, units='SI'):
     """ Estimates the running mean temperature
 
@@ -279,7 +306,7 @@ def t_dp(tdb, rh):
     a = 6.1121
     d = 234.5
 
-    gamma_m = math.log(rh/100 * math.exp((b-tdb/d)*(tdb/(c+tdb))))
+    gamma_m = math.log(rh / 100 * math.exp((b - tdb / d) * (tdb / (c + tdb))))
 
     return round(c * gamma_m / (b - gamma_m), 1)
 

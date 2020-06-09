@@ -93,13 +93,16 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor.
-        It can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        The relative air velocity can be calculate using the function :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+
+        Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is used as input in the PMV model.
+        The dynamic clothing insulation can be calculated using the function :py:meth:`pythermalcomfort.psychrometrics.clo_dynamic`.
     wme : float
         external work, [met] default 0
     standard: str (default="ISO")
@@ -176,12 +179,13 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     m = met * 58.15  # metabolic rate in W/M2
     w = wme * 58.15  # external work in W/M2
     mw = m - w  # internal heat production in the human body
+    # calculation of the clothing area factor
     if icl <= 0.078:
         fcl = 1 + (1.29 * icl)
     else:
         fcl = 1.05 + (0.645 * icl)
 
-    # heat transf. coeff. by forced convection
+    # heat transfer coefficient by forced convection
     hcf = 12.1 * math.sqrt(vr)
     taa = tdb + 273
     tra = tr + 273
@@ -200,7 +204,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     while abs(xn - xf) > eps:
         xf = (xf + xn) / 2
         hcn = 2.38 * math.pow(abs(100.0 * xf - taa), 0.25)
-        if (hcf > hcn):
+        if hcf > hcn:
             hc = hcf
         else:
             hc = hcn
@@ -257,6 +261,9 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+
+        Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is used as input in the PMV model.
+        The dynamic clothing insulation can be calculated using the function :py:meth:`pythermalcomfort.psychrometrics.clo_dynamic`.
     wme : float
         external work, [met] default 0
     standard: str (default="ISO")
@@ -621,8 +628,8 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units='SI'):
 
         if units.lower() == 'ip':
             t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, tmp_cmf_90_low, tmp_cmf_90_up = units_converter(from_units='si', tmp_cmf=t_cmf, tmp_cmf_80_low=tmp_cmf_80_low,
-                                                                                                tmp_cmf_80_up=tmp_cmf_80_up, tmp_cmf_90_low=tmp_cmf_90_low,
-                                                                                                tmp_cmf_90_up=tmp_cmf_90_up)
+                                                                                                  tmp_cmf_80_up=tmp_cmf_80_up, tmp_cmf_90_low=tmp_cmf_90_low,
+                                                                                                  tmp_cmf_90_up=tmp_cmf_90_up)
 
         results = {'tmp_cmf': t_cmf, 'tmp_cmf_80_low': tmp_cmf_80_low, 'tmp_cmf_80_up': tmp_cmf_80_up,
                    'tmp_cmf_90_low': tmp_cmf_90_low, 'tmp_cmf_90_up': tmp_cmf_90_up,

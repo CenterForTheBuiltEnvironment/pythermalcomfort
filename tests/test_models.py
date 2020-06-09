@@ -244,3 +244,9 @@ def test_utci():
         assert (utci(row['tdb'], row['tr'], row['v'], row['rh'])) == row['return'][list(row['return'].keys())[0]]
 
     assert (utci(tdb=77, tr=77, v=3.28, rh=50, units='ip')) == 76.4
+
+
+def test_clo_dynamic():
+    assert (clo_dynamic(clo=1, met=1, standard="ASHRAE")) == 1
+    assert (clo_dynamic(clo=1, met=0.5, standard="ASHRAE")) == 1
+    assert (clo_dynamic(clo=2, met=0.5, standard="ASHRAE")) == 2
