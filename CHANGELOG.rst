@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.6.3 (2020-06-09)
+0.7.0 (2020-06-09)
 ------------------
 
 * Added equation to calculate the dynamic clothing insulation
