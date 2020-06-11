@@ -145,10 +145,14 @@ def bisection(f, a, b, max_iterations, error=0.0001):
     a_n = a
     b_n = b
     n = 0
-    while (error < abs(f(a_n) - f(b_n))) or (n < max_iterations):
-        # for n in range(1, max_iterations + 1):
+    while error < abs(f(a_n) - f(b_n)):
         m_n = (a_n + b_n) / 2
         f_m_n = f(m_n)
+
+        n += 1
+        if n > max_iterations:
+            return None
+
         if error > abs(f(a_n) - f(b_n)):
             return (a_n + b_n) / 2
         elif f(a_n) * f_m_n < 0:
