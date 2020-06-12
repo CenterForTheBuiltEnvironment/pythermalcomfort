@@ -68,7 +68,8 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
 
     warnings.simplefilter("ignore")
     # ce = secant(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme), 0, 15, 150)
-    ce = bisection(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo), 0.0, 15.0, 150)
+    ce = bisection(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, check_compliance=False) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo,
+                                                                                                                                    check_compliance=False), 0.0, 15.0, 150)
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
     warnings.simplefilter("always")
@@ -312,7 +313,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard=standard, units=units)['pmv']
 
 
-def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units='SI'):
+def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units='SI', check_compliance=True):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of an imaginary environment at 50% (rh), <0.1 m/s (20 fpm) average air speed (v), and tr = tdb ,
     in which the total heat loss from the skin of an imaginary occupant with an activity level of 1.0 met and a clothing level of 0.6 clo is the same as that
@@ -372,7 +373,8 @@ def set_tmp(tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=1013
             patm = 1
         tdb, tr, v, body_surface_area, patm = units_converter(tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=patm)
 
-    check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo)
+    if check_compliance:
+        check_standard_compliance(standard='ashrae', tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo)
 
     # Initial variables as defined in the ASHRAE 55-2017
     vapor_pressure = rh * p_sat_torr(tdb) / 100
