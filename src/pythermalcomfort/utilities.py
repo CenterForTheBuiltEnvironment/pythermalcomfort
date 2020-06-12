@@ -26,9 +26,13 @@ def check_standard_compliance(standard, **kwargs):
     elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2017
         for key, value in params.items():
             if key in ["tdb", "tr"]:
+                if key == "tdb":
+                    parameter = "dry-bulb"
+                else:
+                    parameter = "mean radiant"
                 if value > 40 or value < 10:
                     warnings.warn(
-                        "ASHRAE air temperature applicability limits between 10 and 40 °C",
+                        f"ASHRAE {parameter} temperature applicability limits between 10 and 40 °C",
                         UserWarning,
                     )
             if key in ["v", "vr"]:
@@ -66,7 +70,7 @@ def check_standard_compliance(standard, **kwargs):
             if key == "tr":
                 if value > 40 or value < 10:
                     warnings.warn(
-                        "ISO air temperature applicability limits between 10 and 40 °C",
+                        "ISO mean radiant temperature applicability limits between 10 and 40 °C",
                         UserWarning,
                     )
             if key in ["v", "vr"]:

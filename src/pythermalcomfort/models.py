@@ -83,11 +83,8 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
             rh=rh,
             met=met,
             clo=clo,
-            check_compliance=False,
         )
-        - set_tmp(
-            tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, check_compliance=False
-        ),
+        - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo),
         0.0,
         15.0,
         150,
@@ -381,7 +378,6 @@ def set_tmp(
     body_surface_area=1.8258,
     patm=101325,
     units="SI",
-    check_compliance=True,
 ):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
@@ -448,10 +444,9 @@ def set_tmp(
             tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=patm
         )
 
-    if check_compliance:
-        check_standard_compliance(
-            standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
-        )
+    check_standard_compliance(
+        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
 
     # Initial variables as defined in the ASHRAE 55-2017
     vapor_pressure = rh * p_sat_torr(tdb) / 100
