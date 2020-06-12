@@ -7,7 +7,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
     """
     Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the ASHRAE 55 2017 Standard [1]_. The `CE`_ of the elevated air speed is the value that,
     when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same `SET`_ under still air as in the first `SET`_ calculation
-    under elevated air speed.
+    under elevated air speed. The cooling effect is calculated only for air speed higher than 0.2 m/s.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
@@ -60,6 +60,9 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units='SI'):
 
     if units.lower() == 'ip':
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
+
+    if vr <= 0.2:
+        return 0
 
     still_air_threshold = 0.1
 
@@ -136,12 +139,15 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> results = pmv_ppd(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, wme=0, standard="ISO")
+        >>> # calculate relative air velocity
+        >>> vr = v_relative(v=0.1, met=1.2)
+        >>> # as you can see the relative air velocity is 0.16 m/s which is significantly higher than v
+        >>> results = pmv_ppd(tdb=25, tr=25, vr=vr, rh=50, met=1.2, clo=0.5, wme=0, standard="ISO")
         >>> print(results)
-        {'pmv': 0.08, 'ppd': 5.1}
+        {'pmv': -0.09, 'ppd': 5.2}
 
         >>> print(results['pmv'])
-        0.08
+        -0.09
 
         >>> # for users who wants to use the IP system
         >>> results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
@@ -295,8 +301,12 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard='ISO', units='SI'):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv
-        >>> pmv(25, 25, 0.1, 50, 1.2, .5, wme=0)
-        0.08
+        >>> # calculate relative air velocity
+        >>> vr = v_relative(v=0.1, met=1.2)
+        >>> # as you can see the relative air velocity is 0.16 m/s which is significantly higher than v
+        >>> results = pmv(tdb=25, tr=25, vr=vr, rh=50, met=1.2, clo=0.5)
+        >>> print(results)
+        -0.09
     """
 
     return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard=standard, units=units)['pmv']

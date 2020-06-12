@@ -106,7 +106,7 @@ def secant(f, a, b, n):
     return a_n - f(a_n) * (b_n - a_n) / (f(b_n) - f(a_n))
 
 
-def bisection(f, a, b, max_iterations, error=0.0001):
+def bisection(f, a, b, max_iterations, error=0.01):
     """Approximate solution of f(x)=0 on interval [a,b] by the bisection method.
 
     Parameters
