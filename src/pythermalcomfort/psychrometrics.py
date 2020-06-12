@@ -49,7 +49,11 @@ def v_relative(v, met):
 
 
 def clo_dynamic(clo, met, standard="ASHRAE"):
-    """ Estimates the dynamic clothing insulation of a moving occupant.
+    """ Estimates the dynamic clothing insulation of a moving occupant. The activity as
+    well as the air speed modify the insulation characteristics of the clothing and the
+    adjacent air layer. Consequently the ISO 7730 states that the clothing insulation
+    shall be corrected [2]_. The ASHRAE 55 Standard, instead, only corrects for the effect
+    of the body movement, and states that the correction is permitted but not required.
 
     Parameters
     ----------
