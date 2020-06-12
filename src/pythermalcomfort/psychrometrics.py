@@ -62,8 +62,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     met : float
         metabolic rate, [met]
     standard: str (default="ASHRAE")
-        - If "ASHRAE", then the ASHRAE 55 2017 Equation provided in Section 5.2.2.2 is
-        used
+        - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2017
 
     Returns
     -------
