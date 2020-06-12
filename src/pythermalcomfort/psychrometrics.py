@@ -26,7 +26,8 @@ def p_sat_torr(tdb):
 
 
 def v_relative(v, met):
-    """ Estimates the relative air velocity which combines the average air velocity of the space plus the relative air velocity caused by the body movement.
+    """ Estimates the relative air velocity which combines the average air velocity of
+    the space plus the relative air velocity caused by the body movement.
 
     Parameters
     ----------
@@ -47,7 +48,7 @@ def v_relative(v, met):
         return v
 
 
-def clo_dynamic(clo, met, standard='ASHRAE'):
+def clo_dynamic(clo, met, standard="ASHRAE"):
     """ Estimates the dynamic clothing insulation of a moving occupant.
 
     Parameters
@@ -57,7 +58,8 @@ def clo_dynamic(clo, met, standard='ASHRAE'):
     met : float
         metabolic rate, [met]
     standard: str (default="ASHRAE")
-        - If "ASHRAE", then the ASHRAE 55 2017 Equation provided in Section 5.2.2.2 is used
+        - If "ASHRAE", then the ASHRAE 55 2017 Equation provided in Section 5.2.2.2 is
+        used
 
     Returns
     -------
@@ -65,8 +67,11 @@ def clo_dynamic(clo, met, standard='ASHRAE'):
         dynamic clothing insulation, [clo]
     """
 
-    if standard.lower() not in ['ashrae']:
-        raise ValueError("PMV calculations can only be performed in compliance with ISO or ASHRAE Standards")
+    if standard.lower() not in ["ashrae"]:
+        raise ValueError(
+            "PMV calculations can only be performed in compliance with ISO or ASHRAE "
+            "Standards"
+            )
 
     if 1.2 < met < 2:
         return round(clo * (0.6 + 0.4 / met), 3)
@@ -74,17 +79,24 @@ def clo_dynamic(clo, met, standard='ASHRAE'):
         return clo
 
 
-def running_mean_outdoor_temperature(temp_array, alpha=0.8, units='SI'):
+def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     """ Estimates the running mean temperature
 
     Parameters
     ----------
     temp_array: list
-        array containing the mean daily temperature in descending order (i.e. from newest/yesterday to oldest) :math:`[\Theta_{day-1}, \Theta_{day-2}, \dots , \Theta_{day-n}]`.
-        Where :math:`\Theta_{day-1}` is yesterday's daily mean temperature. The EN 16798-1 2019 [3]_ states that n should be equal to 7
+        array containing the mean daily temperature in descending order (i.e. from
+        newest/yesterday to oldest) :math:`[\Theta_{day-1}, \Theta_{day-2}, \dots ,
+        \Theta_{day-n}]`.
+        Where :math:`\Theta_{day-1}` is yesterday's daily mean temperature. The EN
+        16798-1 2019 [3]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8, while the ASHRAE 55 2017 recommends to choose values between 0.9 and 0.6, corresponding to a slow- and fast- response running mean, respectively.
-        Adaptive comfort theory suggests that a slow-response running mean (alpha = 0.9) could be more appropriate for climates in which synoptic-scale (day-to- day) temperature dynamics are relatively minor, such as the humid tropics.
+        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
+        while the ASHRAE 55 2017 recommends to choose values between 0.9 and 0.6,
+        corresponding to a slow- and fast- response running mean, respectively.
+        Adaptive comfort theory suggests that a slow-response running mean (alpha =
+        0.9) could be more appropriate for climates in which synoptic-scale (day-to-
+        day) temperature dynamics are relatively minor, such as the humid tropics.
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -94,20 +106,20 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units='SI'):
         running mean outdoor temperature
     """
 
-    if units.lower() == 'ip':
+    if units.lower() == "ip":
         for ix, x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
     coeff = [alpha ** ix for ix, x in enumerate(temp_array)]
     t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
 
-    if units.lower() == 'ip':
-        t_rm = units_converter(tmp=t_rm, from_units='si')[0]
+    if units.lower() == "ip":
+        t_rm = units_converter(tmp=t_rm, from_units="si")[0]
 
     return round(t_rm, 1)
 
 
-def units_converter(from_units='ip', **kwargs):
+def units_converter(from_units="ip", **kwargs):
     """ Converts IP values to SI units
 
     Parameters
@@ -121,26 +133,26 @@ def units_converter(from_units='ip', **kwargs):
     converted values in SI units
     """
     results = list()
-    if from_units == 'ip':
+    if from_units == "ip":
         for key, value in kwargs.items():
-            if 'tmp' in key or key == 'tr' or key == 'tdb':
+            if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value - 32) * 5 / 9)
-            if key in ['v', 'vr', 'vel']:
+            if key in ["v", "vr", "vel"]:
                 results.append(value / 3.281)
-            if key == 'area':
+            if key == "area":
                 results.append(value / 10.764)
-            if key == 'pressure':
+            if key == "pressure":
                 results.append(value * 101325)
 
-    elif from_units == 'si':
+    elif from_units == "si":
         for key, value in kwargs.items():
-            if 'tmp' in key or key == 'tr' or key == 'tdb':
+            if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value * 9 / 5) + 32)
-            if key in ['v', 'vr', 'vel']:
+            if key in ["v", "vr", "vel"]:
                 results.append(value * 3.281)
-            if key == 'area':
+            if key == "area":
                 results.append(value * 10.764)
-            if key == 'pressure':
+            if key == "pressure":
                 results.append(value / 101325)
 
     return results
@@ -220,16 +232,28 @@ def p_sat(tdb):
     c13 = 6.5459673
 
     if ta_k < c_to_k:
-        pascals = math.exp(c1 / ta_k + c2 + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k))) + c7 * math.log(ta_k))
+        pascals = math.exp(
+            c1 / ta_k
+            + c2
+            + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k)))
+            + c7 * math.log(ta_k)
+            )
     else:
-        pascals = math.exp(c8 / ta_k + c9 + ta_k * (c10 + ta_k * (c11 + ta_k * c12)) + c13 * math.log(ta_k))
+        pascals = math.exp(
+            c8 / ta_k
+            + c9
+            + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
+            + c13 * math.log(ta_k)
+            )
 
     return round(pascals, 1)
 
 
 def psy_ta_rh(tdb, rh, patm=101325):
-    """ Calculates psychrometric values of air based on dry bulb air temperature and relative humidity.
-    For more accurate results we recommend the use of the the Python package `psychrolib`_.
+    """ Calculates psychrometric values of air based on dry bulb air temperature and
+    relative humidity.
+    For more accurate results we recommend the use of the the Python package
+    `psychrolib`_.
 
     .. _psychrolib: https://pypi.org/project/PsychroLib/
 
@@ -262,7 +286,7 @@ def psy_ta_rh(tdb, rh, patm=101325):
     twb = t_wb(tdb, rh)
     h = enthalpy(tdb, hr)
 
-    return {'p_sat': psat, 'p_vap': pvap, 'hr': hr, 't_wb': twb, 't_dp': tdp, 'h': h}
+    return {"p_sat": psat, "p_vap": pvap, "hr": hr, "t_wb": twb, "t_dp": tdp, "h": h}
 
 
 def t_wb(tdb, rh):
@@ -280,8 +304,14 @@ def t_wb(tdb, rh):
     tdb: float
         wet-bulb temperature, [°C]
     """
-    twb = round(tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2)) + math.atan(tdb + rh) - math.atan(rh - 1.676331) + 0.00391838 * rh ** (3 / 2) * math.atan(
-        0.023101 * rh) - 4.686035, 1)
+    twb = round(
+        tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2))
+        + math.atan(tdb + rh)
+        - math.atan(rh - 1.676331)
+        + 0.00391838 * rh ** (3 / 2) * math.atan(0.023101 * rh)
+        - 4.686035,
+        1,
+        )
     return twb
 
 
@@ -311,8 +341,9 @@ def t_dp(tdb, rh):
     return round(c * gamma_m / (b - gamma_m), 1)
 
 
-def t_mrt(tg, tdb, v, d=.015, emissivity=0.9):
-    """ Converts globe temperature reading into mean radiant temperature in accordance with ISO 7726:1998 [5]_
+def t_mrt(tg, tdb, v, d=0.015, emissivity=0.9):
+    """ Converts globe temperature reading into mean radiant temperature in accordance
+    with ISO 7726:1998 [5]_
 
     Parameters
     ----------
