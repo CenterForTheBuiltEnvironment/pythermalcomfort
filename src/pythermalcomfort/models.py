@@ -441,7 +441,7 @@ def set_tmp(
     body_weight = 69.9
     met_factor = 58.2
     sbc = 0.000000056697  # Stefan-Boltzmann constant (W/m2K4)
-    csw = 170  # driving coefficient for regulatory sweating
+    c_sw = 170  # driving coefficient for regulatory sweating
     c_dil = 120  # driving coefficient for vasodilation
     c_str = 0.5  # driving coefficient for vasoconstriction
 
@@ -454,7 +454,7 @@ def set_tmp(
     temp_core = temp_core_neutral
     skin_blood_flow = skin_blood_flow_neutral
     alfa = 0.1  # fractional skin mass
-    esk = 0.1 * met  # total evaporative heat loss, W
+    e_sk = 0.1 * met  # total evaporative heat loss, W
 
     pressure_in_atmospheres = patm / 101325
     length_time_simulation = 60  # length time simulation
@@ -474,10 +474,11 @@ def set_tmp(
 
     # h_cc corrected convective heat transfer coefficient
     h_cc = 3.0 * pow(pressure_in_atmospheres, 0.53)
-    CHCV = 8.600001 * pow((air_velocity * pressure_in_atmospheres), 0.53)
-    h_cc = max(h_cc, CHCV)
+    # h_fc forced convective heat transfer coefficient, W/(m2 °C)
+    h_fc = 8.600001 * pow((air_velocity * pressure_in_atmospheres), 0.53)
+    h_cc = max(h_cc, h_fc)
 
-    c_hr = 4.7  # radiant heat coefficient
+    c_hr = 4.7  # linearized radiative heat transfer coefficient
     CTC = c_hr + h_cc
     r_a = 1.0 / (f_a_cl * CTC)  # resistance of air layer to dry heat
     t_op = (c_hr * tr + h_cc * tdb) / CTC  # operative temperature
@@ -510,23 +511,21 @@ def set_tmp(
         dry = (temp_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # h_fcs rate of energy transport between core and skin, W
         h_fcs = (temp_core - temp_skin) * (5.28 + 1.163 * skin_blood_flow)
-        e_res = 0.0023 * m * (44.0 - vapor_pressure)  # heat loss due to respiration
+        q_res = 0.0023 * m * (44.0 - vapor_pressure)  # heat loss due to respiration
         CRES = 0.0014 * m * (34.0 - tdb)
-        s_core = m - h_fcs - e_res - CRES - wme  # rate of energy storage in the core
-        s_skin = h_fcs - dry - esk  # rate of energy storage in the skin
+        s_core = m - h_fcs - q_res - CRES - wme  # rate of energy storage in the core
+        s_skin = h_fcs - dry - e_sk  # rate of energy storage in the skin
         TCSK = 0.97 * alfa * body_weight
         TCCR = 0.97 * (1 - alfa) * body_weight
-        # fixme me the equation in the document A derivation of the gagge 2-node model is different
         DTSK = (s_skin * body_surface_area) / (TCSK * 60.0)  # °C per minute
-        # fixme me the equation in the document A derivation of the gagge 2-node model is different
         DTCR = s_core * body_surface_area / (TCCR * 60.0)
         temp_skin = temp_skin + DTSK
         temp_core = temp_core + DTCR
         t_body = alfa * temp_skin + (1 - alfa) * temp_core  # mean body temperature, °C
         # sk_sig thermoregulatory control signal from the skin
         sk_sig = temp_skin - temp_skin_neutral
-        WARMS = (sk_sig > 0) * sk_sig
-        COLDS = ((-1.0 * sk_sig) > 0) * (-1.0 * sk_sig)
+        warms = (sk_sig > 0) * sk_sig  # vasodialtion signal
+        colds = ((-1.0 * sk_sig) > 0) * (-1.0 * sk_sig)  # vasoconstriction signal
         # c_reg_sig thermoregulatory control signal from the skin, °C
         c_reg_sig = temp_core - temp_core_neutral
         # c_warm vasodilation signal
@@ -536,39 +535,40 @@ def set_tmp(
         BDSIG = t_body - temp_body_neutral
         WARMB = (BDSIG > 0) * BDSIG
         skin_blood_flow = (skin_blood_flow_neutral + c_dil * c_warm) / (
-            1 + c_str * COLDS
+            1 + c_str * colds
         )
         if skin_blood_flow > 90.0:
             skin_blood_flow = 90.0
         if skin_blood_flow < 0.5:
             skin_blood_flow = 0.5
-        REGSW = csw * WARMB * math.exp(WARMS / 10.7)
+        REGSW = c_sw * WARMB * math.exp(warms / 10.7)
         if REGSW > 500.0:
             REGSW = 500.0
-        ERSW = 0.68 * REGSW
+        e_rsw = 0.68 * REGSW  # heat lost by vaporization sweat
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
         # e_max = maximum evaporative capacity
         e_max = (p_sat_torr(temp_skin) - vapor_pressure) / (r_ea + r_ecl)
-        p_rsw = ERSW / e_max  # ratio heat loss sweating to max heat loss sweating
+        p_rsw = e_rsw / e_max  # ratio heat loss sweating to max heat loss sweating
         p_wet = 0.06 + 0.94 * p_rsw  # skin wetness
-        EDIF = p_wet * e_max - ERSW
-        esk = ERSW + EDIF
+        e_diff = p_wet * e_max - e_rsw  # vapor diffusion through skin
         if p_wet > w_crit:
             p_wet = w_crit
             p_rsw = w_crit / 0.94
-            ERSW = p_rsw * e_max
-            EDIF = 0.06 * (1.0 - p_rsw) * e_max
+            e_rsw = p_rsw * e_max
+            e_diff = 0.06 * (1.0 - p_rsw) * e_max
         if e_max < 0:
-            EDIF = 0
-            ERSW = 0
+            e_diff = 0
+            e_rsw = 0
             p_wet = w_crit
-        esk = ERSW + EDIF
-        MSHIV = 19.4 * COLDS * c_cold
+        e_sk = (
+            e_rsw + e_diff
+        )  # total evaporative heat loss sweating and vapor diffusion
+        MSHIV = 19.4 * colds * c_cold
         m = rm + MSHIV
         alfa = 0.0417737 + 0.7451833 / (skin_blood_flow + 0.585417)
 
-    hsk = dry + esk  # total heat loss from skin, W
+    hsk = dry + e_sk  # total heat loss from skin, W
     W = p_wet
     PSSK = p_sat_torr(temp_skin)
     CHRS = c_hr
@@ -591,28 +591,28 @@ def set_tmp(
     HD_S = 1.0 / (RAS + RCLS)
     HE_S = 1.0 / (REAS + RECLS)
 
-    DELTA = 0.0001
+    delta = 0.0001
     dx = 100.0
     set_old = round(temp_skin - hsk / HD_S, 2)
     while abs(dx) > 0.01:
-        ERR1 = (
+        err_1 = (
             hsk
             - HD_S * (temp_skin - set_old)
             - W * HE_S * (PSSK - 0.5 * p_sat_torr(set_old))
         )
-        ERR2 = (
+        err_2 = (
             hsk
-            - HD_S * (temp_skin - (set_old + DELTA))
-            - W * HE_S * (PSSK - 0.5 * p_sat_torr((set_old + DELTA)))
+            - HD_S * (temp_skin - (set_old + delta))
+            - W * HE_S * (PSSK - 0.5 * p_sat_torr((set_old + delta)))
         )
-        set = set_old - DELTA * ERR1 / (ERR2 - ERR1)
-        dx = set - set_old
-        set_old = set
+        _set = set_old - delta * err_1 / (err_2 - err_1)
+        dx = _set - set_old
+        set_old = _set
 
     if units.lower() == "ip":
-        set = units_converter(tmp=set, from_units="si")[0]
+        _set = units_converter(tmp=_set, from_units="si")[0]
 
-    return round(set, 1)
+    return round(_set, 1)
 
 
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
