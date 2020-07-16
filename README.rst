@@ -95,3 +95,10 @@ YouTube `tutorials`_ playlist
 .. _tutorials: https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto
 
 
+Contributing
+============
+
+Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given. Click `here`_  to learn more on how to contribute to the project.
+
+.. _here: https://pythermalcomfort.readthedocs.io/en/latest/contributing.html
+
