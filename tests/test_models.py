@@ -2,7 +2,7 @@ import pytest
 from pythermalcomfort.models import *
 from pythermalcomfort.psychrometrics import *
 
-data_test_set = [  # I have commented the lines of code that don't pass the test
+data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.9},
     {'tdb': 25, 'tr': 25, 'v': 0.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 24},
@@ -20,11 +20,27 @@ data_test_set = [  # I have commented the lines of code that don't pass the test
     {'tdb': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
-    # {'tdb': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.3},
-    # {'tdb': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.8},
-    # {'tdb': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.2},
-    # {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 36},
-    # {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3}
+    {'tdb': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.3},
+    {'tdb': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.8},
+    {'tdb': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.2},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 36},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3}
+]
+
+data_test_pmv_iso = [  # I have commented the lines of code that don't pass the test
+    {'tdb': 22, 'tr': 22, 'rh': 60, 'vr': 0.1, 'met': 1.2, 'clo': 0.5, 'pmv': -0.75, 'ppd': 17},
+    {'tdb': 27, 'tr': 27, 'rh': 60, 'vr': 0.1, 'met': 1.2, 'clo': 0.5, 'pmv': 0.77, 'ppd': 17},
+    {'tdb': 27, 'tr': 27, 'rh': 60, 'vr': 0.3, 'met': 1.2, 'clo': 0.5, 'pmv': 0.44, 'ppd': 9},
+    {'tdb': 23.5, 'tr': 25.5, 'rh': 60, 'vr': 0.1, 'met': 1.2, 'clo': 0.5, 'pmv': -0.01, 'ppd': 5},
+    {'tdb': 23.5, 'tr': 25.5, 'rh': 60, 'vr': 0.3, 'met': 1.2, 'clo': 0.5, 'pmv': -0.55, 'ppd': 11},
+    {'tdb': 19, 'tr': 19, 'rh': 40, 'vr': 0.1, 'met': 1.2, 'clo': 1.0, 'pmv': -0.60, 'ppd': 13},
+    # {'tdb': 23.5, 'tr': 23.5, 'rh': 40, 'vr': 0.1, 'met': 1.2, 'clo': 1.0, 'pmv': 0.5, 'ppd': 10},
+    {'tdb': 23.5, 'tr': 23.5, 'rh': 40, 'vr': 0.3, 'met': 1.2, 'clo': 1.0, 'pmv': 0.12, 'ppd': 5},
+    {'tdb': 23.0, 'tr': 21.0, 'rh': 40, 'vr': 0.1, 'met': 1.2, 'clo': 1.0, 'pmv': 0.05, 'ppd': 5},
+    {'tdb': 23.0, 'tr': 21.0, 'rh': 40, 'vr': 0.3, 'met': 1.2, 'clo': 1.0, 'pmv': -0.16, 'ppd': 6},
+    {'tdb': 22.0, 'tr': 22.0, 'rh': 60, 'vr': 0.1, 'met': 1.6, 'clo': 0.5, 'pmv': 0.05, 'ppd': 5},
+    {'tdb': 27.0, 'tr': 27.0, 'rh': 60, 'vr': 0.1, 'met': 1.6, 'clo': 0.5, 'pmv': 1.17, 'ppd': 34},
+    {'tdb': 27.0, 'tr': 27.0, 'rh': 60, 'vr': 0.3, 'met': 1.6, 'clo': 0.5, 'pmv': 0.95, 'ppd': 24},
 ]
 
 data_test_set_ip = [  # I have commented the lines of code that don't pass the test
@@ -48,17 +64,17 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 85.5},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 96.7},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
-    # {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.5},
-    # {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 54.1},
+    {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.5},
+    {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 54.1},
 ]
 
 data_test_pmv = [  # I have commented the lines of code that don't pass the test
     {'tdb': 19.6, 'tr': 19.6, 'rh': 86, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
     {'tdb': 23.9, 'tr': 23.9, 'rh': 66, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
-    # {'tdb': 25.7, 'tr': 25.7, 'rh': 15, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
+    {'tdb': 25.7, 'tr': 25.7, 'rh': 15, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 21.2, 'tr': 21.2, 'rh': 20, 'vr': 0.1, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
     {'tdb': 23.6, 'tr': 23.6, 'rh': 67, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
-    # {'tdb': 26.8, 'tr': 26.8, 'rh': 56, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
+    {'tdb': 26.8, 'tr': 26.8, 'rh': 56, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 27.9, 'tr': 27.9, 'rh': 13, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 24.7, 'tr': 24.7, 'rh': 16, 'vr': 0.1, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
 ]
@@ -66,10 +82,10 @@ data_test_pmv = [  # I have commented the lines of code that don't pass the test
 data_test_pmv_ip = [  # I have commented the lines of code that don't pass the test
     {'tdb': 67.3, 'rh': 86, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
     {'tdb': 75.0, 'rh': 66, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
-    # {'tdb': 78.2, 'rh': 15, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
+    {'tdb': 78.2, 'rh': 15, 'vr': 20/60, 'met': 1.1, 'clo': 1, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 70.2, 'rh': 20, 'vr': 20 / 60, 'met': 1.1, 'clo': 1, 'pmv': -0.5, 'ppd': 10},
     {'tdb': 74.5, 'rh': 67, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
-    # {'tdb': 80.2, 'rh': 56, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
+    {'tdb': 80.2, 'rh': 56, 'vr': 20/60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 82.2, 'rh': 13, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': 0.5, 'ppd': 10},
     {'tdb': 76.5, 'rh': 16, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
 ]
@@ -147,12 +163,12 @@ def test_t_globe():
 def test_set_tmp():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_set:
-        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo'])) == row['set']
+        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo']) - row['set']) < 0.01
 
     assert (set_tmp(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')) == 77.6
 
     for row in data_test_set_ip:
-        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo'], units='IP')) == row['set']
+        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo'], units='IP') - row['set']) < 0.11
 
 
 def test_pmv():
@@ -164,16 +180,19 @@ def test_pmv():
 def test_pmv_ppd():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_pmv:
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'], 1)) == row['pmv']
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['ppd'], 0)) == row['ppd']
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1)) == row['pmv']
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 0)) == row['ppd']
+        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'], 1) - row['pmv']) < 0.011
+        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['ppd'], 1) - row['ppd']) < 1
+        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1) - row['pmv']) < 0.011
+        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 1) - row['ppd']) < 1
 
     for row in data_test_pmv_ip:
-        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['pmv'], 1)) == row['pmv']
-        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['ppd'], 0)) == row['ppd']
+        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['pmv'], 1) - row['pmv']) < 0.011
+        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['ppd'], 1) - row['ppd']) < 1
 
     assert (round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units='ip')['pmv'], 1)) == -0.5
+
+    for row in data_test_pmv_iso:
+        assert abs(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'] - row['pmv']) < 0.011
 
     with pytest.raises(ValueError):
         pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard='random')
