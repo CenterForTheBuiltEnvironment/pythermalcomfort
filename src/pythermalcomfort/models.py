@@ -1,6 +1,7 @@
 from pythermalcomfort.psychrometrics import *
 from pythermalcomfort.utilities import *
 import math
+from scipy import optimize
 
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
@@ -72,18 +73,19 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     still_air_threshold = 0.1
 
     warnings.simplefilter("ignore")
-    # ce = secant(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh,
-    # met=met, clo=clo, wme=wme) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met,
-    # clo=clo, wme=wme), 0, 15, 150)
+
     initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo)
-    ce = bisection(
-        lambda x: set_tmp(
-            tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo,
-        ) - initial_set_tmp,
+
+    def f(x):
+        return set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met,
+            clo=clo) - initial_set_tmp
+
+    ce = optimize.brentq(
+        f,
         0.0,
-        15.0,
-        150,
-    )
+        15
+        )
+
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
     warnings.simplefilter("always")

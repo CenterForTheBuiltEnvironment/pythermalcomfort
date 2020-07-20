@@ -133,7 +133,7 @@ def test_solar_gain():
 
 def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.05
-    assert (cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.74
+    assert (cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.73
 
 
 def test_running_mean_outdoor_temperature():
