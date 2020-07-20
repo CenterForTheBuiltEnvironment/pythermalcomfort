@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pythermalcomfort.psychrometrics import *
 from pythermalcomfort.utilities import *
 import math
