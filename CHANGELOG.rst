@@ -2,11 +2,16 @@
 Changelog
 =========
 
+1.0.4 (2020-07-20)
+------------------
+
+* Improved speed calculation of the Cooling Effect
+* Bisection has been replaced with Brentq function from scipy
+
 1.0.3 (2020-07-01)
 ------------------
 
 * Annotated variables in the SET code.
-* Improved speed calculation of the Cooling Effect
 
 1.0.2 (2020-06-11)
 ------------------
