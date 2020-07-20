@@ -75,11 +75,11 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     # ce = secant(lambda x: set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh,
     # met=met, clo=clo, wme=wme) - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met,
     # clo=clo, wme=wme), 0, 15, 150)
+    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo)
     ce = bisection(
         lambda x: set_tmp(
             tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo,
-        )
-        - set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo),
+        ) - initial_set_tmp,
         0.0,
         15.0,
         150,
