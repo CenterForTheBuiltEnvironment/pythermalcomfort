@@ -490,24 +490,24 @@ def set_tmp(
 
     for TIM in range(length_time_simulation):
 
+        iteration_limit = 150
+        t_cl = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)  # initial guess
         n_iterations = 0
-        # t_cl temperature of the outer surface of clothing
-        t_cl = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)
+        tc_converged = False
 
-        while abs(t_cl - t_cl_old) > 0.01:
-            n_iterations += 1
+        while not tc_converged:
 
-            # print(f"iterations: {nIterations}")
-
-            t_cl_old = t_cl
             c_hr = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
             CTC = c_hr + h_cc
             r_a = 1.0 / (f_a_cl * CTC)
             t_op = (c_hr * tr + h_cc * tdb) / CTC
+            t_cl_new = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)
+            if abs(t_cl_new - t_cl) <= 0.01:
+                tc_converged = True
+            t_cl = t_cl_new
+            n_iterations += 1
 
-            t_cl = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)
-
-            if n_iterations > 150:
+            if n_iterations > iteration_limit:
                 raise ("Error and stop code")
 
         dry = (temp_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
