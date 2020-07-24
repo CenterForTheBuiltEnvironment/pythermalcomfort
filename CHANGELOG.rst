@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.0.5 (2020-07-24)
+1.0.6 (2020-07-24)
 ------------------
 
 * Minor speed improvement changed math.pow with **
