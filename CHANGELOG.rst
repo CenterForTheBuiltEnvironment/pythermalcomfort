@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.0.5 (2020-07-24)
+------------------
+
+* Minor speed improvement changed math.pow with **
+* Added validation PMV validation table from ISO 7730
+
 1.0.4 (2020-07-20)
 ------------------
 
