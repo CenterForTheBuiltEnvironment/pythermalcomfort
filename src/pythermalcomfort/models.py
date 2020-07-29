@@ -2,6 +2,7 @@ from pythermalcomfort.psychrometrics import *
 from pythermalcomfort.utilities import *
 import math
 from scipy import optimize
+from numba import jit
 
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
@@ -77,14 +78,12 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo)
 
     def f(x):
-        return set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met,
-            clo=clo) - initial_set_tmp
-
-    ce = optimize.brentq(
-        f,
-        0.0,
-        15
+        return (
+            set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo)
+            - initial_set_tmp
         )
+
+    ce = optimize.brentq(f, 0.0, 15)
 
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
@@ -202,11 +201,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         raise ValueError(
             "PMV calculations can only be performed in compliance with ISO or ASHRAE "
             "Standards"
-            )
+        )
 
     check_standard_compliance(
         standard=standard, tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo
-        )
+    )
 
     # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE
     # Appendix H, H3
@@ -217,6 +216,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         tdb = tdb - ce
         tr = tr - ce
         vr = 0.1
+
+    return pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme)
+
+
+def pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme):
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))
 
@@ -366,7 +370,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
 def set_tmp(
     tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units="SI",
-    ):
+):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
     an imaginary environment at 50% (rh), <0.1 m/s (20 fpm) average air speed (v),
@@ -430,14 +434,36 @@ def set_tmp(
             patm = 1
         tdb, tr, v, body_surface_area, patm = units_converter(
             tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=patm
-            )
+        )
 
     check_standard_compliance(
         standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
-        )
+    )
 
-    # Initial variables as defined in the ASHRAE 55-2017
     vapor_pressure = rh * p_sat_torr(tdb) / 100
+
+    _set = set_main(tdb, tr, v, rh, met, clo, vapor_pressure)
+
+    if units.lower() == "ip":
+        _set = units_converter(tmp=_set, from_units="si")[0]
+
+    return round(_set, 1)
+
+
+@jit(nopython=True)
+def set_main(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    vapor_pressure,
+    wme=0,
+    body_surface_area=1.8258,
+    patm=101325,
+):
+    # Initial variables as defined in the ASHRAE 55-2017
     air_velocity = max(v, 0.1)
     k_clo = 0.25
     body_weight = 69.9
@@ -485,12 +511,10 @@ def set_tmp(
     r_a = 1.0 / (f_a_cl * CTC)  # resistance of air layer to dry heat
     t_op = (c_hr * tr + h_cc * tdb) / CTC  # operative temperature
 
-    # t_cl temperature of the outer surface of clothing, first tentative
-    t_cl_old = False
-
     for TIM in range(length_time_simulation):
 
         iteration_limit = 150
+        # t_cl temperature of the outer surface of clothing
         t_cl = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)  # initial guess
         n_iterations = 0
         tc_converged = False
@@ -508,7 +532,7 @@ def set_tmp(
             n_iterations += 1
 
             if n_iterations > iteration_limit:
-                raise ("Error and stop code")
+                raise StopIteration("Max iterations exceeded")
 
         dry = (temp_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # h_fcs rate of energy transport between core and skin, W
@@ -550,7 +574,9 @@ def set_tmp(
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
         # e_max = maximum evaporative capacity
-        e_max = (p_sat_torr(temp_skin) - vapor_pressure) / (r_ea + r_ecl)
+        e_max = (
+            math.exp(18.6686 - 4030.183 / (temp_skin + 235.0)) - vapor_pressure
+        ) / (r_ea + r_ecl)
         p_rsw = e_rsw / e_max  # ratio heat loss sweating to max heat loss sweating
         p_wet = 0.06 + 0.94 * p_rsw  # skin wetness
         e_diff = p_wet * e_max - e_rsw  # vapor diffusion through skin
@@ -572,7 +598,7 @@ def set_tmp(
 
     hsk = dry + e_sk  # total heat loss from skin, W
     W = p_wet
-    PSSK = p_sat_torr(temp_skin)
+    PSSK = math.exp(18.6686 - 4030.183 / (temp_skin + 235.0))
     CHRS = c_hr
     if met < 0.85:
         CHCS = 3.0
@@ -600,21 +626,22 @@ def set_tmp(
         err_1 = (
             hsk
             - HD_S * (temp_skin - set_old)
-            - W * HE_S * (PSSK - 0.5 * p_sat_torr(set_old))
+            - W
+            * HE_S
+            * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + 235.0))))
         )
         err_2 = (
             hsk
             - HD_S * (temp_skin - (set_old + delta))
-            - W * HE_S * (PSSK - 0.5 * p_sat_torr((set_old + delta)))
+            - W
+            * HE_S
+            * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0))))
         )
         _set = set_old - delta * err_1 / (err_2 - err_1)
         dx = _set - set_old
         set_old = _set
 
-    if units.lower() == "ip":
-        _set = units_converter(tmp=_set, from_units="si")[0]
-
-    return round(_set, 1)
+    return _set
 
 
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
@@ -698,7 +725,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     if units.lower() == "ip":
         tdb, tr, t_running_mean, vr = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
-            )
+        )
 
     check_standard_compliance(standard="ashrae", tdb=tdb, tr=tr, v=v)
 
@@ -746,14 +773,14 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
                 tmp_cmf_80_up,
                 tmp_cmf_90_low,
                 tmp_cmf_90_up,
-                ) = units_converter(
+            ) = units_converter(
                 from_units="si",
                 tmp_cmf=t_cmf,
                 tmp_cmf_80_low=tmp_cmf_80_low,
                 tmp_cmf_80_up=tmp_cmf_80_up,
                 tmp_cmf_90_low=tmp_cmf_90_low,
                 tmp_cmf_90_up=tmp_cmf_90_up,
-                )
+            )
 
         results = {
             "tmp_cmf": t_cmf,
@@ -763,12 +790,12 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
             "tmp_cmf_90_up": tmp_cmf_90_up,
             "acceptability_80": acceptability_80,
             "acceptability_90": acceptability_90,
-            }
+        }
 
     else:
         raise ValueError(
             "The running mean is outside the standards applicability limits"
-            )
+        )
 
     return results
 
@@ -861,12 +888,12 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     if units.lower() == "ip":
         tdb, tr, t_running_mean, vr = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
-            )
+        )
 
     if (t_running_mean < 10) or (t_running_mean > 30):
         raise ValueError(
             "The running mean is outside the standards applicability limits"
-            )
+        )
 
     to = t_o(tdb, tr, v)
 
@@ -910,13 +937,13 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
             tmp_cmf_cat_i_up=t_cmf_i_upper,
             tmp_cmf_cat_ii_up=t_cmf_ii_upper,
             tmp_cmf_cat_iii_up=t_cmf_iii_upper,
-            )
+        )
         t_cmf_i_lower, t_cmf_ii_lower, t_cmf_iii_lower = units_converter(
             from_units="si",
             tmp_cmf_cat_i_low=t_cmf_i_lower,
             tmp_cmf_cat_ii_low=t_cmf_ii_lower,
             tmp_cmf_cat_iii_low=t_cmf_iii_lower,
-            )
+        )
 
     results = {
         "tmp_cmf": round(t_cmf, 1),
@@ -929,7 +956,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
         "tmp_cmf_cat_i_low": round(t_cmf_i_lower, 1),
         "tmp_cmf_cat_ii_low": round(t_cmf_ii_lower, 1),
         "tmp_cmf_cat_iii_low": round(t_cmf_iii_lower, 1),
-        }
+    }
 
     return results
 
@@ -1004,7 +1031,7 @@ def utci(tdb, tr, v, rh, units="SI"):
             0.000016261698,
             (7.0229056 * (10 ** (-10))),
             (-1.8680009 * (10 ** (-13))),
-            ]
+        ]
         tk = tdb + 273.15  # air temp in K
         es = 2.7150305 * math.log1p(tk)
         for count, i in enumerate(g):
@@ -1024,7 +1051,7 @@ def utci(tdb, tr, v, rh, units="SI"):
     ):
         raise ValueError(
             "The value you entered are outside the equation applicability limits"
-            )
+        )
 
     # This is a python version of the UTCI_approx function
     # Version a 0.002, October 2009
@@ -1519,12 +1546,10 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
 
     check_standard_compliance(
         standard="ashrae", tdb=tdb, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo
-        )
+    )
 
     tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
-    numerator = math.exp(
-        0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6
-        )
+    numerator = math.exp(0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = round((numerator / (1 + numerator) - 0.345) * 100, 1)
     acceptability = ppd_val <= 5
     return {"PPD_vg": ppd_val, "Acceptability": acceptability}
@@ -1588,7 +1613,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
 
     check_standard_compliance(
         standard="ashrae", tdb=tdb, tr=tr, v_limited=vr, rh=rh, met=met, clo=clo
-        )
+    )
 
     tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
     ppd_val = round(
@@ -1596,7 +1621,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
         / (1 + math.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv))
         * 100,
         1,
-        )
+    )
     acceptability = ppd_val <= 20
     return {"PPD_ad": ppd_val, "Acceptability": acceptability}
 
@@ -1611,7 +1636,7 @@ def solar_gain(
     asw=0.7,
     posture="seated",
     floor_reflectance=0.6,
-    ):
+):
     """
         Calculates the solar gain to the human body using the Effective Radiant Field (
         ERF) [1]_. The ERF is a measure of the net energy flux to or from the human body.
@@ -1710,7 +1735,7 @@ def solar_gain(
         [0.24, 0.24, 0.21, 0.17, 0.13, 0.09, 0.06],
         [0.25, 0.25, 0.22, 0.18, 0.14, 0.09, 0.06],
         [0.25, 0.25, 0.22, 0.18, 0.14, 0.09, 0.06],
-        ]
+    ]
     if posture == "seated":
         fp_table = [
             [0.20, 0.23, 0.21, 0.21, 0.18, 0.16, 0.12],
@@ -1726,7 +1751,7 @@ def solar_gain(
             [0.21, 0.18, 0.14, 0.12, 0.12, 0.12, 0.12],
             [0.21, 0.17, 0.13, 0.11, 0.11, 0.12, 0.12],
             [0.21, 0.17, 0.12, 0.11, 0.11, 0.11, 0.12],
-            ]
+        ]
 
     if posture == "supine":
         alt_temp = sol_altitude
