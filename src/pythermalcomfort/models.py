@@ -75,15 +75,17 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
     warnings.simplefilter("ignore")
 
-    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo)
+    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme)
 
-    def f(x):
+    def function(x):
         return (
-            set_tmp(tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo)
+            set_tmp(
+                tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme
+            )
             - initial_set_tmp
         )
 
-    ce = optimize.brentq(f, 0.0, 15)
+    ce = optimize.brentq(function, 0.0, 15)
 
     if ce is None:
         raise ValueError("It could not calculate the cooling effect")
@@ -217,10 +219,15 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         tr = tr - ce
         vr = 0.1
 
-    return pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme)
+    _pmv = pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
+
+    _ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(_pmv, 4.0) - 0.2179 * pow(_pmv, 2.0))
+
+    return {"pmv": round(_pmv, 2), "ppd": round(_ppd, 1)}
 
 
-def pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme):
+@jit(nopython=True)
+def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))
 
@@ -236,6 +243,7 @@ def pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme):
 
     # heat transfer coefficient by forced convection
     hcf = 12.1 * math.sqrt(vr)
+    hc = hcf  # initialize variable
     taa = tdb + 273
     tra = tr + 273
     tcla = taa + (35.5 - tdb) / (3.5 * icl + 0.1)
@@ -281,10 +289,9 @@ def pmv_ppd_main(tdb, tr, vr, rh, met, clo, wme):
     hl6 = fcl * hc * (tcl - tdb)
 
     ts = 0.303 * math.exp(-0.036 * m) + 0.028
-    pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
-    ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(pmv, 4.0) - 0.2179 * pow(pmv, 2.0))
+    _pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
 
-    return {"pmv": round(pmv, 2), "ppd": round(ppd, 1)}
+    return _pmv
 
 
 def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
@@ -442,7 +449,9 @@ def set_tmp(
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
-    _set = set_main(tdb, tr, v, rh, met, clo, vapor_pressure)
+    _set = set_optimized(
+        tdb, tr, v, rh, met, clo, vapor_pressure, wme, body_surface_area, patm
+    )
 
     if units.lower() == "ip":
         _set = units_converter(tmp=_set, from_units="si")[0]
@@ -451,17 +460,8 @@ def set_tmp(
 
 
 @jit(nopython=True)
-def set_main(
-    tdb,
-    tr,
-    v,
-    rh,
-    met,
-    clo,
-    vapor_pressure,
-    wme=0,
-    body_surface_area=1.8258,
-    patm=101325,
+def set_optimized(
+    tdb, tr, v, rh, met, clo, vapor_pressure, wme, body_surface_area, patm,
 ):
     # Initial variables as defined in the ASHRAE 55-2017
     air_velocity = max(v, 0.1)
@@ -510,6 +510,11 @@ def set_main(
     CTC = c_hr + h_cc
     r_a = 1.0 / (f_a_cl * CTC)  # resistance of air layer to dry heat
     t_op = (c_hr * tr + h_cc * tdb) / CTC  # operative temperature
+
+    # initialize some variables
+    dry = 0
+    p_wet = 0
+    _set = 0
 
     for TIM in range(length_time_simulation):
 
@@ -728,9 +733,6 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
         )
 
     check_standard_compliance(standard="ashrae", tdb=tdb, tr=tr, v=v)
-
-    # Define the variables that will be used throughout the calculation.
-    results = dict()
 
     to = t_o(tdb, tr, v)
 
@@ -1755,7 +1757,7 @@ def solar_gain(
 
     if posture == "supine":
         alt_temp = sol_altitude
-        sol_altitude = math.abs(90 - sol_azimuth)
+        sol_altitude = abs(90 - sol_azimuth)
         sol_azimuth = alt_temp
 
     alt_range = [0, 15, 30, 45, 60, 75, 90]
