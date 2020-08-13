@@ -94,7 +94,7 @@ Examples and Tutorials
 
 YouTube `tutorials`_ playlist
 
-.. _tutorials: https://www.youtube.com/watch?v=MLQecKYQFvg&list=PL9DCOjERDBeGGVBBlaEWMMDoS_06MZcto
+.. _tutorials: https://www.youtube.com/playlist?list=PLY91jl6VVD7zMaJjRVrVkaBtI56U7ztQC
 
 
 Contributing
