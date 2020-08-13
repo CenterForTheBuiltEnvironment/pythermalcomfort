@@ -27,7 +27,7 @@ setup(
     name='pythermalcomfort',
     version='1.2.0',
     license='MIT',
-    description='Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables.',
+    description='Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables. Please cite us if you use this package: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
