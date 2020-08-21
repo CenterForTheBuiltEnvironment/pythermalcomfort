@@ -344,7 +344,7 @@ def t_dp(tdb, rh):
     return round(c * gamma_m / (b - gamma_m), 1)
 
 
-def t_mrt(tg, tdb, v, d=0.015, emissivity=0.9):
+def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9):
     """ Converts globe temperature reading into mean radiant temperature in accordance
     with ISO 7726:1998 [5]_
 
