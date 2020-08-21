@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.2.2 (2020-08-21)
+------------------
+
+* Changed default diameter in t_mrt
+* Improved documentation
+
+
 1.2.0 (2020-07-29)
 ------------------
 
