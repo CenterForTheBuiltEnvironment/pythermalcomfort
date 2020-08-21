@@ -357,9 +357,9 @@ def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9):
     v: float
         air velocity, [m/s]
     d: float
-        diameter of the globe, [m]
+        diameter of the globe, [m] default 0.15 m
     emissivity: float
-        emissivity of the globe temperature sensor
+        emissivity of the globe temperature sensor, default 0.9
 
     Returns
     -------
