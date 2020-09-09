@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.2.3 (2020-09-09)
+------------------
+
+* Fixed error in the calculation of erf
+* Updated validation table erf
+
 1.2.2 (2020-08-21)
 ------------------
 

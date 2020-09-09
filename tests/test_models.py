@@ -1,6 +1,8 @@
 import pytest
-from pythermalcomfort.models import *
-from pythermalcomfort.psychrometrics import *
+from pythermalcomfort.models import solar_gain, pmv_ppd, set_tmp, cooling_effect, \
+    adaptive_ashrae, clo_tout, vertical_tmp_grad_ppd, utci, pmv, ankle_draft
+from pythermalcomfort.psychrometrics import t_dp, t_wb, enthalpy, psy_ta_rh, \
+    running_mean_outdoor_temperature, units_converter, p_sat, clo_dynamic, t_mrt
 
 data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
@@ -95,13 +97,13 @@ data_test_erf = {
     "sharp": [0, 120, 120, 120, 0, 30, 60, 90, 150, 180, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120],
     "posture": ["Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Standing", "Seated",
                 "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated"],
-    "Idir": [700, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 400, 600, 1000, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800],
-    "tsol": [0.8, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-    "fsvv": [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-    "fbes": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5],
+    "I_dir": [700, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 400, 600, 1000, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800],
+    "t_sol": [0.8, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    "f_svv": [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    "f_bes": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5],
     "asa": [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.3, 0.5, 0.9, 0.7],
-    "ERF": [64.7, 42.9, 63.7, 64.9, 62.7, 62.7, 59.8, 56.8, 52.4, 49.5, 59.6, 27.7, 41.5, 69.2, 11.1, 33.2, 77.5, 29.9, 42.7, 68.1, 36.5, 45.9, 64.8, 23.7, 39.6, 71.2, 55.4],
-    "trsw": [15.5, 6.4, 14.2, 15.2, 12.9, 12.7, 12.3, 11.5, 10.2, 9.5, 11.4, 5.5, 8.2, 13.6, 2.2, 6.5, 15.3, 6.6, 8.7, 13.1, 6.5, 8.7, 13.1, 4.7, 7.8, 14, 10.9, 29],
+    "ERF": [64.9, 43.3, 63.2, 65.3, 63.1, 62.4, 60.5, 57.2, 51.7, 49.0, 59.3, 27.4, 41.1, 68.5, 11.0, 32.9, 76.7, 29.3, 42.1, 67.5, 36.4, 45.6, 64.0, 23.5, 39.1, 70.4, 54.8],
+    "t_rsw": [15.5, 10.4, 15.1, 15.6, 15.1, 14.9, 14.5, 13.7, 12.4, 11.7, 13.6, 6.6, 9.8, 16.4, 2.6, 7.9, 18.4, 7.0, 10.1, 16.2, 8.7, 10.9, 15.3, 5.6, 9.4, 16.9, 13.1],
 }
 
 
@@ -127,8 +129,10 @@ def test_psy_ta_rh():
 
 def test_solar_gain():
     for ix in range(0, len(data_test_erf['alt'])):
-        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['Idir'][ix], sol_transmittance= data_test_erf['tsol'][ix],
-                           f_svv=data_test_erf['fsvv'][ix], f_bes=data_test_erf['fbes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['erf']) == data_test_erf['ERF'][ix]
+        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
+                           f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['erf']) == data_test_erf['ERF'][ix]
+        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
+                           f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['delta_mrt']) == data_test_erf['t_rsw'][ix]
 
 
 def test_cooling_effect():
@@ -242,9 +246,7 @@ def test_vertical_tmp_grad_ppd():
 
 
 def test_ankle_draft():
-    # assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.4)["PPD_ad"]) == 23.7
     assert (ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]) == 23.5
-    # assert (ankle_draft(27, 22, 0.2, 60, met=1.3, clo=0.7, v_ankle=0.2)["PPD_ad"]) == 8.5
 
     with pytest.raises(ValueError):
         ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)
