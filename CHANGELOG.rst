@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.3.0 (2020-10-19)
+------------------
+
+* Changed PMV elevated air speed limit from 0.2 to 0.1 m/s
+
 1.2.3 (2020-09-09)
 ------------------
 

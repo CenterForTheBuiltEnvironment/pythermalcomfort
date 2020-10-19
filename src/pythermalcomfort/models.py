@@ -12,7 +12,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     when subtracted equally from both the average air temperature and the mean radiant
     temperature, yields the same `SET`_ under still air as in the first `SET`_ calculation
     under elevated air speed. The cooling effect is calculated only for air speed
-    higher than 0.2 m/s.
+    higher than 0.1 m/s.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
@@ -68,7 +68,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
-    if vr <= 0.2:
+    if vr <= 0.1:
         return 0
 
     still_air_threshold = 0.1
@@ -209,9 +209,9 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         standard=standard, tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo
     )
 
-    # if the relative air velocity is higher than 0.2 then follow methodology ASHRAE
+    # if the relative air velocity is higher than 0.1 then follow methodology ASHRAE
     # Appendix H, H3
-    if standard == "ashrae" and vr >= 0.2:
+    if standard == "ashrae" and vr >= 0.1:
         # calculate the cooling effect
         ce = cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
 
@@ -1798,6 +1798,3 @@ def solar_gain(
 # todo effective_tmp
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
-
-if __name__ == "__main__":
-    pass
