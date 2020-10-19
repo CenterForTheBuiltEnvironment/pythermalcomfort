@@ -3,9 +3,6 @@ from __future__ import unicode_literals
 
 import os
 
-# import sys
-# sys.path.insert(0, os.path.abspath('../src/temperature_converter'))
-
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -23,7 +20,7 @@ project = 'pythermalcomfort'
 year = '2019-2020'
 author = 'Federico Tartarini'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '1.2.3'
+version = release = '1.3.0'
 
 pygments_style = 'trac'
 templates_path = ['.']
