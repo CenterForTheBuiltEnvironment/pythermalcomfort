@@ -507,9 +507,9 @@ def set_optimized(
     h_cc = max(h_cc, h_fc)
 
     c_hr = 4.7  # linearized radiative heat transfer coefficient
-    CTC = c_hr + h_cc
-    r_a = 1.0 / (f_a_cl * CTC)  # resistance of air layer to dry heat
-    t_op = (c_hr * tr + h_cc * tdb) / CTC  # operative temperature
+    h_t = c_hr + h_cc  # sum of convective and radiant heat transfer coefficient W/(m2*K)
+    r_a = 1.0 / (f_a_cl * h_t)  # resistance of air layer to dry heat
+    t_op = (c_hr * tr + h_cc * tdb) / h_t  # operative temperature
 
     # initialize some variables
     dry = 0
@@ -527,9 +527,9 @@ def set_optimized(
         while not tc_converged:
 
             c_hr = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
-            CTC = c_hr + h_cc
-            r_a = 1.0 / (f_a_cl * CTC)
-            t_op = (c_hr * tr + h_cc * tdb) / CTC
+            h_t = c_hr + h_cc
+            r_a = 1.0 / (f_a_cl * h_t)
+            t_op = (c_hr * tr + h_cc * tdb) / h_t
             t_cl_new = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)
             if abs(t_cl_new - t_cl) <= 0.01:
                 tc_converged = True
@@ -542,16 +542,17 @@ def set_optimized(
         dry = (temp_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # h_fcs rate of energy transport between core and skin, W
         h_fcs = (temp_core - temp_skin) * (5.28 + 1.163 * skin_blood_flow)
-        q_res = 0.0023 * m * (44.0 - vapor_pressure)  # heat loss due to respiration
-        CRES = 0.0014 * m * (34.0 - tdb)
-        s_core = m - h_fcs - q_res - CRES - wme  # rate of energy storage in the core
+        q_res = 0.0023 * m * (44.0 - vapor_pressure)  # latent heat loss due to respiration
+        c_res = 0.0014 * m * (34.0 - tdb)  # rate of convective heat loss from respiration, W/m2
+        # todo maybe the iteration should stop when the following two terms are 0
+        s_core = m - h_fcs - q_res - c_res - wme  # rate of energy storage in the core
         s_skin = h_fcs - dry - e_sk  # rate of energy storage in the skin
         TCSK = 0.97 * alfa * body_weight
         TCCR = 0.97 * (1 - alfa) * body_weight
-        DTSK = (s_skin * body_surface_area) / (TCSK * 60.0)  # °C per minute
-        DTCR = s_core * body_surface_area / (TCCR * 60.0)
-        temp_skin = temp_skin + DTSK
-        temp_core = temp_core + DTCR
+        d_t_sk = (s_skin * body_surface_area) / (TCSK * 60.0)  # rate of change skin temperature °C per minute
+        d_t_cr = s_core * body_surface_area / (TCCR * 60.0)  # rate of change core temperature °C per minute
+        temp_skin = temp_skin + d_t_sk
+        temp_core = temp_core + d_t_cr
         t_body = alfa * temp_skin + (1 - alfa) * temp_core  # mean body temperature, °C
         # sk_sig thermoregulatory control signal from the skin
         sk_sig = temp_skin - temp_skin_neutral
@@ -563,8 +564,8 @@ def set_optimized(
         c_warm = (c_reg_sig > 0) * c_reg_sig
         # c_cold vasoconstriction signal
         c_cold = ((-1.0 * c_reg_sig) > 0) * (-1.0 * c_reg_sig)
-        BDSIG = t_body - temp_body_neutral
-        WARMB = (BDSIG > 0) * BDSIG
+        body_signal = t_body - temp_body_neutral
+        WARMB = (body_signal > 0) * body_signal
         skin_blood_flow = (skin_blood_flow_neutral + c_dil * c_warm) / (
             1 + c_str * colds
         )
@@ -572,10 +573,10 @@ def set_optimized(
             skin_blood_flow = 90.0
         if skin_blood_flow < 0.5:
             skin_blood_flow = 0.5
-        REGSW = c_sw * WARMB * math.exp(warms / 10.7)
-        if REGSW > 500.0:
-            REGSW = 500.0
-        e_rsw = 0.68 * REGSW  # heat lost by vaporization sweat
+        regulatory_sweating = c_sw * WARMB * math.exp(warms / 10.7)
+        if regulatory_sweating > 500.0:
+            regulatory_sweating = 500.0
+        e_rsw = 0.68 * regulatory_sweating  # heat lost by vaporization sweat
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
         # e_max = maximum evaporative capacity
@@ -597,8 +598,8 @@ def set_optimized(
         e_sk = (
             e_rsw + e_diff
         )  # total evaporative heat loss sweating and vapor diffusion
-        MSHIV = 19.4 * colds * c_cold
-        m = rm + MSHIV
+        met_shivering = 19.4 * colds * c_cold  # met shivering W/m2
+        m = rm + met_shivering
         alfa = 0.0417737 + 0.7451833 / (skin_blood_flow + 0.585417)
 
     hsk = dry + e_sk  # total heat loss from skin, W
