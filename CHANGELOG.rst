@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.3.1 (2020-10-30)
+------------------
+
+* Fixed error calculation of cooling effect with elevated air temperatures
+
 1.3.0 (2020-10-19)
 ------------------
 
