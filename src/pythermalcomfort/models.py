@@ -85,11 +85,15 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
             - initial_set_tmp
         )
 
-    ce = optimize.brentq(function, 0.0, 15)
+    try:
+        ce = optimize.brentq(function, 0.0, 15)
+    except ValueError:
+        ce = 0
 
-    if ce is None:
-        raise ValueError("It could not calculate the cooling effect")
     warnings.simplefilter("always")
+
+    if ce == 0:
+        warnings.warn("The cooling effect could not be calculated, assuming ce = 0", UserWarning)
 
     if units.lower() == "ip":
         ce = ce / 1.8 * 3.28
