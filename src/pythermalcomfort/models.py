@@ -1,6 +1,10 @@
 import warnings
-from pythermalcomfort.psychrometrics import units_converter, t_o, p_sat_torr, \
-    check_standard_compliance
+from pythermalcomfort.psychrometrics import (
+    units_converter,
+    t_o,
+    p_sat_torr,
+    check_standard_compliance,
+)
 import math
 from scipy import optimize
 from numba import jit
@@ -94,7 +98,9 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     warnings.simplefilter("always")
 
     if ce == 0:
-        warnings.warn("The cooling effect could not be calculated, assuming ce = 0", UserWarning)
+        warnings.warn(
+            "The cooling effect could not be calculated, assuming ce = 0", UserWarning
+        )
 
     if units.lower() == "ip":
         ce = ce / 1.8 * 3.28
@@ -514,7 +520,9 @@ def set_optimized(
     h_cc = max(h_cc, h_fc)
 
     c_hr = 4.7  # linearized radiative heat transfer coefficient
-    h_t = c_hr + h_cc  # sum of convective and radiant heat transfer coefficient W/(m2*K)
+    h_t = (
+        c_hr + h_cc
+    )  # sum of convective and radiant heat transfer coefficient W/(m2*K)
     r_a = 1.0 / (f_a_cl * h_t)  # resistance of air layer to dry heat
     t_op = (c_hr * tr + h_cc * tdb) / h_t  # operative temperature
 
@@ -553,15 +561,23 @@ def set_optimized(
         dry = (temp_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # h_fcs rate of energy transport between core and skin, W
         h_fcs = (temp_core - temp_skin) * (5.28 + 1.163 * skin_blood_flow)
-        q_res = 0.0023 * m * (44.0 - vapor_pressure)  # latent heat loss due to respiration
-        c_res = 0.0014 * m * (34.0 - tdb)  # rate of convective heat loss from respiration, W/m2
+        q_res = (
+            0.0023 * m * (44.0 - vapor_pressure)
+        )  # latent heat loss due to respiration
+        c_res = (
+            0.0014 * m * (34.0 - tdb)
+        )  # rate of convective heat loss from respiration, W/m2
         # todo maybe the iteration should stop when the following two terms are 0
         s_core = m - h_fcs - q_res - c_res - wme  # rate of energy storage in the core
         s_skin = h_fcs - dry - e_sk  # rate of energy storage in the skin
         TCSK = 0.97 * alfa * body_weight
         TCCR = 0.97 * (1 - alfa) * body_weight
-        d_t_sk = (s_skin * body_surface_area) / (TCSK * 60.0)  # rate of change skin temperature °C per minute
-        d_t_cr = s_core * body_surface_area / (TCCR * 60.0)  # rate of change core temperature °C per minute
+        d_t_sk = (s_skin * body_surface_area) / (
+            TCSK * 60.0
+        )  # rate of change skin temperature °C per minute
+        d_t_cr = (
+            s_core * body_surface_area / (TCCR * 60.0)
+        )  # rate of change core temperature °C per minute
         temp_skin = temp_skin + d_t_sk
         temp_core = temp_core + d_t_cr
         t_body = alfa * temp_skin + (1 - alfa) * temp_core  # mean body temperature, °C
@@ -1672,7 +1688,9 @@ def solar_gain(
             shall be calculated using National Fenestration Rating Council approved
             software or Lawrence Berkeley National Lab Complex Glazing Database.
         f_svv : float
-            Fraction of sky vault exposed to body, ranges from 0 to 1.
+            Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
+            It can be calculate using the function
+            :py:meth:`pythermalcomfort.psychrometrics.f_svv`.
         f_bes : float
             Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
             See Table C2-2 and equation C-7 ASHRAE 55 2017 [1]_.

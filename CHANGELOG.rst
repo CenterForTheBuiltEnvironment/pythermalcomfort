@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.3.3 (2020-12-14)
+------------------
+
+* added function to calculate sky-vault view fraction
+
 1.3.2 (2020-12-14)
 ------------------
 

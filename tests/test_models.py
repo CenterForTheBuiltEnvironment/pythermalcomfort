@@ -2,7 +2,7 @@ import pytest
 from pythermalcomfort.models import solar_gain, pmv_ppd, set_tmp, cooling_effect, \
     adaptive_ashrae, clo_tout, vertical_tmp_grad_ppd, utci, pmv, ankle_draft
 from pythermalcomfort.psychrometrics import t_dp, t_wb, enthalpy, psy_ta_rh, \
-    running_mean_outdoor_temperature, units_converter, p_sat, clo_dynamic, t_mrt
+    running_mean_outdoor_temperature, units_converter, p_sat, clo_dynamic, t_mrt, f_svv
 
 data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
@@ -105,6 +105,22 @@ data_test_erf = {
     "ERF": [64.9, 43.3, 63.2, 65.3, 63.1, 62.4, 60.5, 57.2, 51.7, 49.0, 59.3, 27.4, 41.1, 68.5, 11.0, 32.9, 76.7, 29.3, 42.1, 67.5, 36.4, 45.6, 64.0, 23.5, 39.1, 70.4, 54.8],
     "t_rsw": [15.5, 10.4, 15.1, 15.6, 15.1, 14.9, 14.5, 13.7, 12.4, 11.7, 13.6, 6.6, 9.8, 16.4, 2.6, 7.9, 18.4, 7.0, 10.1, 16.2, 8.7, 10.9, 15.3, 5.6, 9.4, 16.9, 13.1],
 }
+
+
+def test_f_svv():
+    assert round(f_svv(30, 10, 3.3), 2) == 0.27
+    assert round(f_svv(150, 10, 3.3), 2) == 0.31
+    assert round(f_svv(30, 6, 3.3), 2) == 0.20
+    assert round(f_svv(150, 6, 3.3), 2) == 0.23
+    assert round(f_svv(30, 10, 6), 2) == 0.17
+    assert round(f_svv(150, 10, 6), 2) == 0.21
+    assert round(f_svv(30, 6, 6), 2) == 0.11
+    assert round(f_svv(150, 6, 6), 2) == 0.14
+    assert round(f_svv(6, 9, 3.3), 2) == 0.14
+    assert round(f_svv(6, 6, 3.3), 2) == 0.11
+    assert round(f_svv(6, 6, 6), 2) == 0.04
+    assert round(f_svv(4, 4, 3.3), 2) == 0.06
+    assert round(f_svv(4, 4, 6), 2) == 0.02
 
 
 def test_t_dp():

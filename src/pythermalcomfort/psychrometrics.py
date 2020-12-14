@@ -9,6 +9,31 @@ h_fg = 2501000
 r_air = 287.055
 
 
+def f_svv(w, h, d):
+    """ Calculates the sky-vault view fraction
+
+    Parameters
+    ----------
+    w : float
+        width of the window, [m]
+    h : float
+        height of the window, [m]
+    d : float
+        distance between the occupant and the window, [m]
+
+    Returns
+    -------
+    f_svv  : float
+        sky-vault view fraction ranges between 0 and 1
+    """
+
+    return (
+        math.degrees(math.atan(h / (2 * d)))
+        * math.degrees(math.atan(w / (2 * d)))
+        / 16200
+    )
+
+
 def p_sat_torr(tdb):
     """ Estimates the saturation vapor pressure in [torr]
 
@@ -74,7 +99,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
         raise ValueError(
             "PMV calculations can only be performed in compliance with ISO or ASHRAE "
             "Standards"
-            )
+        )
 
     if 1.2 < met < 2:
         return round(clo * (0.6 + 0.4 / met), 3)
@@ -240,14 +265,14 @@ def p_sat(tdb):
             + c2
             + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k)))
             + c7 * math.log(ta_k)
-            )
+        )
     else:
         pascals = math.exp(
             c8 / ta_k
             + c9
             + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
             + c13 * math.log(ta_k)
-            )
+        )
 
     return round(pascals, 1)
 
@@ -314,7 +339,7 @@ def t_wb(tdb, rh):
         + 0.00391838 * rh ** (3 / 2) * math.atan(0.023101 * rh)
         - 4.686035,
         1,
-        )
+    )
     return twb
 
 
@@ -336,7 +361,6 @@ def t_dp(tdb, rh):
 
     c = 257.14
     b = 18.678
-    a = 6.1121
     d = 234.5
 
     gamma_m = math.log(rh / 100 * math.exp((b - tdb / d) * (tdb / (c + tdb))))
