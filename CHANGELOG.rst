@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.3.2 (2020-12-14)
+------------------
+
+* replaced input solar_azimuth with sharp in the solar_gain() function
+* fixed small error in example pmv calculation
+
 1.3.1 (2020-10-30)
 ------------------
 
