@@ -1,5 +1,6 @@
-from pythermalcomfort.psychrometrics import *
-from pythermalcomfort.utilities import *
+import warnings
+from pythermalcomfort.psychrometrics import units_converter, t_o, p_sat_torr, \
+    check_standard_compliance
 import math
 from scipy import optimize
 from numba import jit
@@ -174,11 +175,12 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
+        >>> from pythermalcomfort.psychrometrics import v_relative
         >>> # calculate relative air velocity
-        >>> vr = v_relative(v=0.1, met=1.2)
+        >>> v_r = v_relative(v=0.1, met=1.2)
         >>> # as you can see the relative air velocity is 0.16 m/s which is
         significantly higher than v
-        >>> results = pmv_ppd(tdb=25, tr=25, vr=vr, rh=50, met=1.2, clo=0.5, wme=0,
+        >>> results = pmv_ppd(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5, wme=0,
         standard="ISO")
         >>> print(results)
         {'pmv': -0.09, 'ppd': 5.2}
@@ -365,11 +367,12 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv
+        >>> from pythermalcomfort.psychrometrics import v_relative
         >>> # calculate relative air velocity
-        >>> vr = v_relative(v=0.1, met=1.2)
+        >>> v_r = v_relative(v=0.1, met=1.2)
         >>> # as you can see the relative air velocity is 0.16 m/s which is
         significantly higher than v
-        >>> results = pmv(tdb=25, tr=25, vr=vr, rh=50, met=1.2, clo=0.5)
+        >>> results = pmv(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5)
         >>> print(results)
         -0.09
     """
@@ -520,7 +523,11 @@ def set_optimized(
     p_wet = 0
     _set = 0
 
-    for i in range(length_time_simulation):
+    n_simulation = 0
+
+    while n_simulation < length_time_simulation:
+
+        n_simulation += 1
 
         iteration_limit = 150
         # t_cl temperature of the outer surface of clothing
@@ -1621,7 +1628,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
 
 def solar_gain(
     sol_altitude,
-    sol_azimuth,
+    sharp,
     sol_radiation_dir,
     sol_transmittance,
     f_svv,
@@ -1642,8 +1649,13 @@ def solar_gain(
         ----------
         sol_altitude : float
             Solar altitude, degrees from horizontal [deg]. Ranges between 0 and 90.
-        sol_azimuth : float
-            Solar azimuth, degrees clockwise from North [deg]. Ranges between 0 and 180.
+        sharp : float
+            Solar horizontal angle relative to the front of the person (SHARP) [deg].
+            Ranges between 0 and 180 and is symmetrical on either side. Zero (0) degrees
+            represents direct-beam radiation from the front, 90 degrees represents
+            direct-beam radiation from the side, and 180 degrees rep- resent direct-beam
+            radiation from the back. SHARP is the angle between the sun and the person
+            only. Orientation relative to compass or to room is not included in SHARP.
         posture : str
             Default 'seated' list of available options 'standing', 'supine' or 'seated'
         sol_radiation_dir : float
@@ -1692,7 +1704,7 @@ def solar_gain(
         .. code-block:: python
 
             >>> from pythermalcomfort.models import solar_gain
-            >>> results = solar_gain(sol_altitude=0, sol_azimuth=120,
+            >>> results = solar_gain(sol_altitude=0, sharp=120,
             sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5,
             asw=0.7, posture='seated')
             >>> print(results)
@@ -1748,13 +1760,13 @@ def solar_gain(
 
     if posture == "supine":
         alt_temp = sol_altitude
-        sol_altitude = abs(90 - sol_azimuth)
-        sol_azimuth = alt_temp
+        sol_altitude = abs(90 - sharp)
+        sharp = alt_temp
 
     alt_range = [0, 15, 30, 45, 60, 75, 90]
     az_range = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180]
     alt_i = find_span(alt_range, sol_altitude)
-    az_i = find_span(az_range, sol_azimuth)
+    az_i = find_span(az_range, sharp)
     fp11 = fp_table[az_i][alt_i]
     fp12 = fp_table[az_i][alt_i + 1]
     fp21 = fp_table[az_i + 1][alt_i]
@@ -1763,10 +1775,10 @@ def solar_gain(
     az2 = az_range[az_i + 1]
     alt1 = alt_range[alt_i]
     alt2 = alt_range[alt_i + 1]
-    fp = fp11 * (az2 - sol_azimuth) * (alt2 - sol_altitude)
-    fp += fp21 * (sol_azimuth - az1) * (alt2 - sol_altitude)
-    fp += fp12 * (az2 - sol_azimuth) * (sol_altitude - alt1)
-    fp += fp22 * (sol_azimuth - az1) * (sol_altitude - alt1)
+    fp = fp11 * (az2 - sharp) * (alt2 - sol_altitude)
+    fp += fp21 * (sharp - az1) * (alt2 - sol_altitude)
+    fp += fp12 * (az2 - sharp) * (sol_altitude - alt1)
+    fp += fp22 * (sharp - az1) * (sol_altitude - alt1)
     fp /= (az2 - az1) * (alt2 - alt1)
 
     f_eff = 0.725

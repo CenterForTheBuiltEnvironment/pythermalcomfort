@@ -129,9 +129,9 @@ def test_psy_ta_rh():
 
 def test_solar_gain():
     for ix in range(0, len(data_test_erf['alt'])):
-        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
+        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sharp=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
                            f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['erf']) == data_test_erf['ERF'][ix]
-        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sol_azimuth=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
+        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sharp=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
                            f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['delta_mrt']) == data_test_erf['t_rsw'][ix]
 
 
