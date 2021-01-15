@@ -508,10 +508,10 @@ def set_optimized(
 
     if clo <= 0:
         w_crit = 0.38 * pow(air_velocity, -0.29)  # evaporative efficiency
-        i_cl = 1.0  # thermal resistance of clothing, clo
+        i_cl = 1.0  # permeation efficiency of water vapour through the clothing layer
     else:
         w_crit = 0.59 * pow(air_velocity, -0.08)
-        i_cl = 0.45
+        i_cl = 0.45 # permeation efficiency of water vapour through the clothing layer
 
     # h_cc corrected convective heat transfer coefficient
     h_cc = 3.0 * pow(pressure_in_atmospheres, 0.53)
@@ -545,6 +545,7 @@ def set_optimized(
 
         while not tc_converged:
 
+            # 0.72 in the following equation is the ratio of A_r/A_body see eq 35 ASHRAE fund 2017
             c_hr = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
             h_t = c_hr + h_cc
             r_a = 1.0 / (f_a_cl * h_t)
