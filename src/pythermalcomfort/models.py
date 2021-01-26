@@ -511,7 +511,7 @@ def set_optimized(
         i_cl = 1.0  # permeation efficiency of water vapour through the clothing layer
     else:
         w_crit = 0.59 * pow(air_velocity, -0.08)
-        i_cl = 0.45 # permeation efficiency of water vapour through the clothing layer
+        i_cl = 0.45  # permeation efficiency of water vapour through the clothing layer
 
     # h_cc corrected convective heat transfer coefficient
     h_cc = 3.0 * pow(pressure_in_atmospheres, 0.53)
@@ -568,7 +568,6 @@ def set_optimized(
         c_res = (
             0.0014 * m * (34.0 - tdb)
         )  # rate of convective heat loss from respiration, W/m2
-        # todo maybe the iteration should stop when the following two terms are 0
         s_core = m - h_fcs - q_res - c_res - wme  # rate of energy storage in the core
         s_skin = h_fcs - dry - e_sk  # rate of energy storage in the skin
         TCSK = 0.97 * alfa * body_weight
@@ -631,7 +630,7 @@ def set_optimized(
         alfa = 0.0417737 + 0.7451833 / (skin_blood_flow + 0.585417)
 
     hsk = dry + e_sk  # total heat loss from skin, W
-    W = p_wet
+    w = p_wet
     PSSK = math.exp(18.6686 - 4030.183 / (temp_skin + 235.0))
     CHRS = c_hr
     if met < 0.85:
@@ -660,14 +659,14 @@ def set_optimized(
         err_1 = (
             hsk
             - HD_S * (temp_skin - set_old)
-            - W
+            - w
             * HE_S
             * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + 235.0))))
         )
         err_2 = (
             hsk
             - HD_S * (temp_skin - (set_old + delta))
-            - W
+            - w
             * HE_S
             * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0))))
         )
@@ -1097,7 +1096,7 @@ def utci(tdb, tr, v, rh, units="SI"):
 
     utci_approx = (
         tdb
-        + (0.607562052)
+        + 0.607562052
         + (-0.0227712343) * tdb
         + (8.06470249 * (10 ** (-4))) * tdb * tdb
         + (-1.54271372 * (10 ** (-4))) * tdb * tdb * tdb
@@ -1105,8 +1104,8 @@ def utci(tdb, tr, v, rh, units="SI"):
         + (7.32602852 * (10 ** (-8))) * tdb * tdb * tdb * tdb * tdb
         + (1.35959073 * (10 ** (-9))) * tdb * tdb * tdb * tdb * tdb * tdb
         + (-2.25836520) * v
-        + (0.0880326035) * tdb * v
-        + (0.00216844454) * tdb * tdb * v
+        + 0.0880326035 * tdb * v
+        + 0.00216844454 * tdb * tdb * v
         + (-1.53347087 * (10 ** (-5))) * tdb * tdb * tdb * v
         + (-5.72983704 * (10 ** (-7))) * tdb * tdb * tdb * tdb * v
         + (-2.55090145 * (10 ** (-9))) * tdb * tdb * tdb * tdb * tdb * v
@@ -1115,7 +1114,7 @@ def utci(tdb, tr, v, rh, units="SI"):
         + (-5.21670675 * (10 ** (-5))) * tdb * tdb * v * v
         + (1.94544667 * (10 ** (-6))) * tdb * tdb * tdb * v * v
         + (1.14099531 * (10 ** (-8))) * tdb * tdb * tdb * tdb * v * v
-        + (0.158137256) * v * v * v
+        + 0.158137256 * v * v * v
         + (-6.57263143 * (10 ** (-5))) * tdb * v * v * v
         + (2.22697524 * (10 ** (-7))) * tdb * tdb * v * v * v
         + (-4.16117031 * (10 ** (-8))) * tdb * tdb * tdb * v * v * v
@@ -1125,7 +1124,7 @@ def utci(tdb, tr, v, rh, units="SI"):
         + (4.56306672 * (10 ** (-4))) * v * v * v * v * v
         + (-1.74202546 * (10 ** (-7))) * tdb * v * v * v * v * v
         + (-5.91491269 * (10 ** (-6))) * v * v * v * v * v * v
-        + (0.398374029) * delta_t_tr
+        + 0.398374029 * delta_t_tr
         + (1.83945314 * (10 ** (-4))) * tdb * delta_t_tr
         + (-1.73754510 * (10 ** (-4))) * tdb * tdb * delta_t_tr
         + (-7.60781159 * (10 ** (-7))) * tdb * tdb * tdb * delta_t_tr
@@ -1260,19 +1259,19 @@ def utci(tdb, tr, v, rh, units="SI"):
         * delta_t_tr
         * delta_t_tr
         * delta_t_tr
-        + (5.12733497) * pa
+        + 5.12733497 * pa
         + (-0.312788561) * tdb * pa
         + (-0.0196701861) * tdb * tdb * pa
         + (9.99690870 * (10 ** (-4))) * tdb * tdb * tdb * pa
         + (9.51738512 * (10 ** (-6))) * tdb * tdb * tdb * tdb * pa
         + (-4.66426341 * (10 ** (-7))) * tdb * tdb * tdb * tdb * tdb * pa
-        + (0.548050612) * v * pa
+        + 0.548050612 * v * pa
         + (-0.00330552823) * tdb * v * pa
         + (-0.00164119440) * tdb * tdb * v * pa
         + (-5.16670694 * (10 ** (-6))) * tdb * tdb * tdb * v * pa
         + (9.52692432 * (10 ** (-7))) * tdb * tdb * tdb * tdb * v * pa
         + (-0.0429223622) * v * v * pa
-        + (0.00500845667) * tdb * v * v * pa
+        + 0.00500845667 * tdb * v * v * pa
         + (1.00601257 * (10 ** (-6))) * tdb * tdb * v * v * pa
         + (-1.81748644 * (10 ** (-6))) * tdb * tdb * tdb * v * v * pa
         + (-1.25813502 * (10 ** (-3))) * v * v * v * pa
@@ -1282,7 +1281,7 @@ def utci(tdb, tr, v, rh, units="SI"):
         + (1.29064870 * (10 ** (-6))) * tdb * v * v * v * v * pa
         + (-2.28558686 * (10 ** (-6))) * v * v * v * v * v * pa
         + (-0.0369476348) * delta_t_tr * pa
-        + (0.00162325322) * tdb * delta_t_tr * pa
+        + 0.00162325322 * tdb * delta_t_tr * pa
         + (-3.14279680 * (10 ** (-5))) * tdb * tdb * delta_t_tr * pa
         + (2.59835559 * (10 ** (-6))) * tdb * tdb * tdb * delta_t_tr * pa
         + (-4.77136523 * (10 ** (-8))) * tdb * tdb * tdb * tdb * delta_t_tr * pa
@@ -1358,21 +1357,21 @@ def utci(tdb, tr, v, rh, units="SI"):
         * delta_t_tr
         * pa
         + (-2.80626406) * pa * pa
-        + (0.548712484) * tdb * pa * pa
+        + 0.548712484 * tdb * pa * pa
         + (-0.00399428410) * tdb * tdb * pa * pa
         + (-9.54009191 * (10 ** (-4))) * tdb * tdb * tdb * pa * pa
         + (1.93090978 * (10 ** (-5))) * tdb * tdb * tdb * tdb * pa * pa
         + (-0.308806365) * v * pa * pa
-        + (0.0116952364) * tdb * v * pa * pa
+        + 0.0116952364 * tdb * v * pa * pa
         + (4.95271903 * (10 ** (-4))) * tdb * tdb * v * pa * pa
         + (-1.90710882 * (10 ** (-5))) * tdb * tdb * tdb * v * pa * pa
-        + (0.00210787756) * v * v * pa * pa
+        + 0.00210787756 * v * v * pa * pa
         + (-6.98445738 * (10 ** (-4))) * tdb * v * v * pa * pa
         + (2.30109073 * (10 ** (-5))) * tdb * tdb * v * v * pa * pa
         + (4.17856590 * (10 ** (-4))) * v * v * v * pa * pa
         + (-1.27043871 * (10 ** (-5))) * tdb * v * v * v * pa * pa
         + (-3.04620472 * (10 ** (-6))) * v * v * v * v * pa * pa
-        + (0.0514507424) * delta_t_tr * pa * pa
+        + 0.0514507424 * delta_t_tr * pa * pa
         + (-0.00432510997) * tdb * delta_t_tr * pa * pa
         + (8.99281156 * (10 ** (-5))) * tdb * tdb * delta_t_tr * pa * pa
         + (-7.14663943 * (10 ** (-7))) * tdb * tdb * tdb * delta_t_tr * pa * pa
@@ -1412,9 +1411,9 @@ def utci(tdb, tr, v, rh, units="SI"):
         * pa
         + (-0.0353874123) * pa * pa * pa
         + (-0.221201190) * tdb * pa * pa * pa
-        + (0.0155126038) * tdb * tdb * pa * pa * pa
+        + 0.0155126038 * tdb * tdb * pa * pa * pa
         + (-2.63917279 * (10 ** (-4))) * tdb * tdb * tdb * pa * pa * pa
-        + (0.0453433455) * v * pa * pa * pa
+        + 0.0453433455 * v * pa * pa * pa
         + (-0.00432943862) * tdb * v * pa * pa * pa
         + (1.45389826 * (10 ** (-4))) * tdb * tdb * v * pa * pa * pa
         + (2.17508610 * (10 ** (-4))) * v * v * pa * pa * pa
@@ -1436,21 +1435,21 @@ def utci(tdb, tr, v, rh, units="SI"):
         * pa
         * pa
         * pa
-        + (0.614155345) * pa * pa * pa * pa
+        + 0.614155345 * pa * pa * pa * pa
         + (-0.0616755931) * tdb * pa * pa * pa * pa
-        + (0.00133374846) * tdb * tdb * pa * pa * pa * pa
-        + (0.00355375387) * v * pa * pa * pa * pa
+        + 0.00133374846 * tdb * tdb * pa * pa * pa * pa
+        + 0.00355375387 * v * pa * pa * pa * pa
         + (-5.13027851 * (10 ** (-4))) * tdb * v * pa * pa * pa * pa
         + (1.02449757 * (10 ** (-4))) * v * v * pa * pa * pa * pa
         + (-0.00148526421) * delta_t_tr * pa * pa * pa * pa
         + (-4.11469183 * (10 ** (-5))) * tdb * delta_t_tr * pa * pa * pa * pa
         + (-6.80434415 * (10 ** (-6))) * v * delta_t_tr * pa * pa * pa * pa
         + (-9.77675906 * (10 ** (-6))) * delta_t_tr * delta_t_tr * pa * pa * pa * pa
-        + (0.0882773108) * pa * pa * pa * pa * pa
+        + 0.0882773108 * pa * pa * pa * pa * pa
         + (-0.00301859306) * tdb * pa * pa * pa * pa * pa
-        + (0.00104452989) * v * pa * pa * pa * pa * pa
+        + 0.00104452989 * v * pa * pa * pa * pa * pa
         + (2.47090539 * (10 ** (-4))) * delta_t_tr * pa * pa * pa * pa * pa
-        + (0.00148348065) * pa * pa * pa * pa * pa * pa
+        + 0.00148348065 * pa * pa * pa * pa * pa * pa
     )
 
     if units.lower() == "ip":
