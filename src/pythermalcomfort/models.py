@@ -1744,6 +1744,7 @@ def solar_gain(
     hr = 6
     i_diff = 0.2 * sol_radiation_dir
 
+    # fp is the projected area factor
     fp_table = [
         [0.35, 0.35, 0.314, 0.258, 0.206, 0.144, 0.082],
         [0.342, 0.342, 0.31, 0.252, 0.2, 0.14, 0.082],
@@ -1777,9 +1778,9 @@ def solar_gain(
         ]
 
     if posture == "supine":
-        alt_temp = sol_altitude
-        sol_altitude = abs(90 - sharp)
-        sharp = alt_temp
+        altitude_new = math.asin(math.sin(abs(sharp - 90) * math.cos(sol_altitude)))
+        sharp = math.atan(math.sin(sharp) * math.tan(90 - sol_altitude))
+        sol_altitude = altitude_new
 
     alt_range = [0, 15, 30, 45, 60, 75, 90]
     az_range = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180]
@@ -1799,7 +1800,7 @@ def solar_gain(
     fp += fp22 * (sharp - az1) * (sol_altitude - alt1)
     fp /= (az2 - az1) * (alt2 - alt1)
 
-    f_eff = 0.725
+    f_eff = 0.725  # fraction of the body surface exposed to radiation from the environment
     if posture == "seated":
         f_eff = 0.696
 
@@ -1821,8 +1822,6 @@ def solar_gain(
     erf = e_solar * (sw_abs / lw_abs)
     d_mrt = erf / (hr * f_eff)
 
-    # print(fp, e_diff, e_direct, e_refl, e_solar, erf, d_mrt)
-
     return {"erf": round(erf, 1), "delta_mrt": round(d_mrt, 1)}
 
 
@@ -1830,6 +1829,5 @@ def solar_gain(
 # todo radiant_tmp_asymmetry
 # todo draft
 # todo floor_surface_tmp
-# todo effective_tmp
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/
