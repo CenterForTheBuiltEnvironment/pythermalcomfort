@@ -249,9 +249,9 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     mw = m - w  # internal heat production in the human body
     # calculation of the clothing area factor
     if icl <= 0.078:
-        fcl = 1 + (1.29 * icl)  # ratio of surface clothed body over nude body
+        f_cl = 1 + (1.29 * icl)  # ratio of surface clothed body over nude body
     else:
-        fcl = 1.05 + (0.645 * icl)
+        f_cl = 1.05 + (0.645 * icl)
 
     # heat transfer coefficient by forced convection
     hcf = 12.1 * math.sqrt(vr)
@@ -260,7 +260,7 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     tra = tr + 273
     tcla = taa + (35.5 - tdb) / (3.5 * icl + 0.1)
 
-    p1 = icl * fcl
+    p1 = icl * f_cl
     p2 = p1 * 3.96
     p3 = p1 * 100
     p4 = p1 * taa
@@ -296,9 +296,9 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     # dry respiration heat loss
     hl4 = 0.0014 * m * (34 - tdb)
     # heat loss by radiation
-    hl5 = 3.96 * fcl * (xn ** 4 - (tra / 100.0) ** 4)
+    hl5 = 3.96 * f_cl * (xn ** 4 - (tra / 100.0) ** 4)
     # heat loss by convection
-    hl6 = fcl * hc * (tcl - tdb)
+    hl6 = f_cl * hc * (tcl - tdb)
 
     ts = 0.303 * math.exp(-0.036 * m) + 0.028
     _pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
@@ -530,12 +530,12 @@ def set_optimized(
     h_fc = 8.600001 * pow((air_velocity * pressure_in_atmospheres), 0.53)
     h_cc = max(h_cc, h_fc)
 
-    c_hr = 4.7  # linearized radiative heat transfer coefficient
+    h_r = 4.7  # linearized radiative heat transfer coefficient
     h_t = (
-        c_hr + h_cc
+        h_r + h_cc
     )  # sum of convective and radiant heat transfer coefficient W/(m2*K)
     r_a = 1.0 / (f_a_cl * h_t)  # resistance of air layer to dry heat
-    t_op = (c_hr * tr + h_cc * tdb) / h_t  # operative temperature
+    t_op = (h_r * tr + h_cc * tdb) / h_t  # operative temperature
 
     # initialize some variables
     dry = 0
@@ -557,10 +557,10 @@ def set_optimized(
         while not tc_converged:
 
             # 0.72 in the following equation is the ratio of A_r/A_body see eq 35 ASHRAE fund 2017
-            c_hr = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
-            h_t = c_hr + h_cc
+            h_r = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
+            h_t = h_r + h_cc
             r_a = 1.0 / (f_a_cl * h_t)
-            t_op = (c_hr * tr + h_cc * tdb) / h_t
+            t_op = (h_r * tr + h_cc * tdb) / h_t
             t_cl_new = (r_a * temp_skin + r_clo * t_op) / (r_a + r_clo)
             if abs(t_cl_new - t_cl) <= 0.01:
                 tc_converged = True
@@ -581,13 +581,13 @@ def set_optimized(
         )  # rate of convective heat loss from respiration, W/m2
         s_core = m - h_fcs - q_res - c_res - wme  # rate of energy storage in the core
         s_skin = h_fcs - dry - e_sk  # rate of energy storage in the skin
-        TCSK = 0.97 * alfa * body_weight
-        TCCR = 0.97 * (1 - alfa) * body_weight
+        tc_sk = 0.97 * alfa * body_weight  # thermal capacity skin
+        tc_cr = 0.97 * (1 - alfa) * body_weight  # thermal capacity core
         d_t_sk = (s_skin * body_surface_area) / (
-            TCSK * 60.0
+            tc_sk * 60.0
         )  # rate of change skin temperature °C per minute
         d_t_cr = (
-            s_core * body_surface_area / (TCCR * 60.0)
+            s_core * body_surface_area / (tc_cr * 60.0)
         )  # rate of change core temperature °C per minute
         temp_skin = temp_skin + d_t_sk
         temp_core = temp_core + d_t_cr
@@ -603,7 +603,7 @@ def set_optimized(
         # c_cold vasoconstriction signal
         c_cold = ((-1.0 * c_reg_sig) > 0) * (-1.0 * c_reg_sig)
         body_signal = t_body - temp_body_neutral
-        WARMB = (body_signal > 0) * body_signal
+        warm_b = (body_signal > 0) * body_signal
         skin_blood_flow = (skin_blood_flow_neutral + c_dil * c_warm) / (
             1 + c_str * colds
         )
@@ -611,7 +611,7 @@ def set_optimized(
             skin_blood_flow = 90.0
         if skin_blood_flow < 0.5:
             skin_blood_flow = 0.5
-        regulatory_sweating = c_sw * WARMB * math.exp(warms / 10.7)
+        regulatory_sweating = c_sw * warm_b * math.exp(warms / 10.7)
         if regulatory_sweating > 500.0:
             regulatory_sweating = 500.0
         e_rsw = 0.68 * regulatory_sweating  # heat lost by vaporization sweat
@@ -642,44 +642,47 @@ def set_optimized(
 
     hsk = dry + e_sk  # total heat loss from skin, W
     w = p_wet
-    PSSK = math.exp(18.6686 - 4030.183 / (temp_skin + 235.0))
-    CHRS = c_hr
+    # p_s_sk saturation vapour pressure of water of the skin
+    p_s_sk = math.exp(18.6686 - 4030.183 / (temp_skin + 235.0))
+
+    # standard environment - where _s at end of the variable names stands for standard
+    h_r_s = h_r  # standard environment radiative heat transfer coefficient
     if met < 0.85:
-        CHCS = 3.0
+        h_c_s = 3.0  # standard environment convective heat transfer coefficient
     else:
-        CHCS = 5.66 * (met - 0.85) ** 0.39
-    if CHCS < 3.0:
-        CHCS = 3.0
-    CTCS = CHCS + CHRS
-    RCLOS = 1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835
-    RCLS = 0.155 * RCLOS
-    FACLS = 1.0 + k_clo * RCLOS
-    FCLS = 1.0 / (1.0 + 0.155 * FACLS * CTCS * RCLOS)
-    IMS = 0.45
-    ICLS = IMS * CHCS / CTCS * (1 - FCLS) / (CHCS / CTCS - FCLS * IMS)
-    RAS = 1.0 / (FACLS * CTCS)
-    REAS = 1.0 / (lr * FACLS * CHCS)
-    RECLS = RCLS / (lr * ICLS)
-    HD_S = 1.0 / (RAS + RCLS)
-    HE_S = 1.0 / (REAS + RECLS)
+        h_c_s = 5.66 * (met - 0.85) ** 0.39
+    if h_c_s < 3.0:
+        h_c_s = 3.0
+    h_t_s = h_c_s + h_r_s  # sum of convective and radiant heat transfer coefficient W/(m2*K)
+    r_clo_s = 1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835  # thermal resistance of clothing, °C M^2 /W
+    r_cl_s = 0.155 * r_clo_s  # thermal insulation of the clothing in M2K/W
+    f_a_cl_s = 1.0 + k_clo * r_clo_s  # increase in body surface area due to clothing
+    f_cl_s = 1.0 / (1.0 + 0.155 * f_a_cl_s * h_t_s * r_clo_s)  # ratio of surface clothed body over nude body
+    i_m_s = 0.45  # permeation efficiency of water vapour through the clothing layer
+    i_cl_s = i_m_s * h_c_s / h_t_s * (1 - f_cl_s) / (h_c_s / h_t_s - f_cl_s * i_m_s) # clothing vapor permeation efficiency
+    r_a_s = 1.0 / (f_a_cl_s * h_t_s)  # resistance of air layer to dry heat
+    r_ea_s = 1.0 / (lr * f_a_cl_s * h_c_s)
+    r_ecl_s = r_cl_s / (lr * i_cl_s)
+    h_d_s = 1.0 / (r_a_s + r_cl_s)
+    h_e_s = 1.0 / (r_ea_s + r_ecl_s)
 
     delta = 0.0001
     dx = 100.0
-    set_old = round(temp_skin - hsk / HD_S, 2)
+    set_old = round(temp_skin - hsk / h_d_s, 2)
     while abs(dx) > 0.01:
         err_1 = (
             hsk
-            - HD_S * (temp_skin - set_old)
+            - h_d_s * (temp_skin - set_old)
             - w
-            * HE_S
-            * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + 235.0))))
+            * h_e_s
+            * (p_s_sk - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + 235.0))))
         )
         err_2 = (
             hsk
-            - HD_S * (temp_skin - (set_old + delta))
+            - h_d_s * (temp_skin - (set_old + delta))
             - w
-            * HE_S
-            * (PSSK - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0))))
+            * h_e_s
+            * (p_s_sk - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0))))
         )
         _set = set_old - delta * err_1 / (err_2 - err_1)
         dx = _set - set_old
