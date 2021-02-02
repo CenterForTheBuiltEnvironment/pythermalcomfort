@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.3.5 (2021-02-02)
+------------------
+
+* not rounding SET temperature when calculating cooling effect
+
+
 1.3.4 (2021-02-01)
 ------------------
 
