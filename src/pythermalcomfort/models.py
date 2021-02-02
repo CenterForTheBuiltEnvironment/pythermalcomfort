@@ -55,13 +55,13 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import cooling_effect
-        >>> ce = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
-        >>> print(ce)
+        >>> CE = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+        >>> print(CE)
         1.64
 
         >>> # for users who wants to use the IP system
-        >>> ce = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
-        >>> print(ce)
+        >>> CE = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+        >>> print(CE)
         3.74
 
     Raises
@@ -80,12 +80,12 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
     warnings.simplefilter("ignore")
 
-    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme)
+    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme, round=False)
 
     def function(x):
         return (
             set_tmp(
-                tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme
+                tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme, round=False
             )
             - initial_set_tmp
         )
@@ -389,7 +389,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
 
 def set_tmp(
-    tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units="SI",
+    tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units="SI", **kwargs
 ):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
@@ -422,6 +422,11 @@ def set_tmp(
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
+    Other Parameters
+    ----------------
+    round: boolean, deafult True
+        if True rounds the SET temperature value, if False it does not round it
+
     Returns
     -------
     SET : float
@@ -447,6 +452,9 @@ def set_tmp(
         77.6
 
     """
+    default_kwargs = {'round': True}
+    kwargs = {**default_kwargs, **kwargs}
+
     if units.lower() == "ip":
         if body_surface_area == 1.8258:
             body_surface_area = 19.65
@@ -463,18 +471,21 @@ def set_tmp(
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
     _set = set_optimized(
-        tdb, tr, v, rh, met, clo, vapor_pressure, wme, body_surface_area, patm
+        tdb, tr, v, met, clo, vapor_pressure, wme, body_surface_area, patm
     )
 
     if units.lower() == "ip":
         _set = units_converter(tmp=_set, from_units="si")[0]
 
-    return round(_set, 1)
+    if kwargs["round"]:
+        return round(_set, 1)
+    else:
+        return _set
 
 
 @jit(nopython=True)
 def set_optimized(
-    tdb, tr, v, rh, met, clo, vapor_pressure, wme, body_surface_area, patm,
+    tdb, tr, v, met, clo, vapor_pressure, wme, body_surface_area, patm,
 ):
     # Initial variables as defined in the ASHRAE 55-2017
     air_velocity = max(v, 0.1)
@@ -726,25 +737,25 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_ashrae
-        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(results)
+        >>> Results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(Results)
         {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5,
         'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': True,
         'acceptability_90': False}
 
-        >>> print(results['acceptability_80'])
+        >>> print(Results['acceptability_80'])
         True
         # The conditions you entered are considered to be comfortable for by 80% of the
         occupants
 
         >>> # for users who wants to use the IP system
-        >>> results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(results)
+        >>> Results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(Results)
         {'tmp_cmf': 75.2, 'tmp_cmf_80_low': 68.9, 'tmp_cmf_80_up': 81.5,
         'tmp_cmf_90_low': 70.7, 'tmp_cmf_90_up': 79.7, 'acceptability_80': True,
         'acceptability_90': False}
 
-        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        >>> Results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is higher than 10°C
@@ -768,23 +779,23 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     # the adaptive model is supposed to be used)
     if 10.0 <= t_running_mean <= 33.5:
 
-        cooling_effect = 0
-        # calculate cooling effect of elevated air speed when top > 25 degC.
+        ce = 0
+        # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
         if v >= 0.6 and to >= 25:
             if v < 0.9:
-                cooling_effect = 1.2
+                ce = 1.2
             elif v < 1.2:
-                cooling_effect = 1.8
+                ce = 1.8
             else:
-                cooling_effect = 2.2
+                ce = 2.2
 
         # Figure out the relation between comfort and outdoor temperature depending on
         # the level of conditioning.
         t_cmf = 0.31 * t_running_mean + 17.8
         tmp_cmf_80_low = t_cmf - 3.5
         tmp_cmf_90_low = t_cmf - 2.5
-        tmp_cmf_80_up = t_cmf + 3.5 + cooling_effect
-        tmp_cmf_90_up = t_cmf + 2.5 + cooling_effect
+        tmp_cmf_80_up = t_cmf + 3.5 + ce
+        tmp_cmf_90_up = t_cmf + 2.5 + ce
 
         def acceptability(t_cmf_lower, t_cmf_upper):
             # See if the conditions are comfortable.
@@ -888,22 +899,22 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_en
-        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(results)
+        >>> Results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(Results)
         {'tmp_cmf': 25.4, 'acceptability_cat_i': True, 'acceptability_cat_ii': True,
         'acceptability_cat_iii': True, ... }
 
-        >>> print(results['acceptability_cat_i'])
+        >>> print(Results['acceptability_cat_i'])
         True
         # The conditions you entered are considered to comply with Category I
 
         >>> # for users who wants to use the IP system
-        >>> results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(results)
+        >>> Results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(Results)
         {'tmp_cmf': 77.7, 'acceptability_cat_i': True, 'acceptability_cat_ii': True,
         'acceptability_cat_iii': True, ... }
 
-        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        >>> Results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C
@@ -927,24 +938,24 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
 
     to = t_o(tdb, tr, v)
 
-    cooling_effect = 0
-    # calculate cooling effect of elevated air speed when top > 25 degC.
+    ce = 0
+    # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
     if v >= 0.6 and to >= 25:
         if v < 0.9:
-            cooling_effect = 1.2
+            ce = 1.2
         elif v < 1.2:
-            cooling_effect = 1.8
+            ce = 1.8
         else:
-            cooling_effect = 2.2
+            ce = 2.2
 
     t_cmf = 0.33 * t_running_mean + 18.8
 
     t_cmf_i_lower = t_cmf - 3
     t_cmf_ii_lower = t_cmf - 4
     t_cmf_iii_lower = t_cmf - 5
-    t_cmf_i_upper = t_cmf + 2 + cooling_effect
-    t_cmf_ii_upper = t_cmf + 3 + cooling_effect
-    t_cmf_iii_upper = t_cmf + 4 + cooling_effect
+    t_cmf_i_upper = t_cmf + 2 + ce
+    t_cmf_ii_upper = t_cmf + 3 + ce
+    t_cmf_iii_upper = t_cmf + 4 + ce
 
     def between(val, low, high):
         return low < val < high

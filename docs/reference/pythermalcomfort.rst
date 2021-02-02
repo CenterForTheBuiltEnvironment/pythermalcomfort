@@ -15,7 +15,7 @@ PMV PPD
 PMV
 ---
 
-.. autofunction:: pythermalcomfort.models.pmv
+.. autofunction:: PYTHERMALCOMFORT.models.pmv
 
 Standard Effective Temperature (SET)
 ------------------------------------
@@ -78,7 +78,6 @@ Psychrometrics functions
 
 .. automodule:: pythermalcomfort.psychrometrics
     :members:
-
 
 Reference values clo and met
 ============================
