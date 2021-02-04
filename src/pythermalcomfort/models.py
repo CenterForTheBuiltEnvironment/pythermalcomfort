@@ -5,6 +5,7 @@ from pythermalcomfort.psychrometrics import (
     p_sat_torr,
     check_standard_compliance,
 )
+from pythermalcomfort.utilities import transpose_sharp_altitude
 import math
 from scipy import optimize
 from numba import jit
@@ -1792,9 +1793,7 @@ def solar_gain(
         ]
 
     if posture == "supine":
-        altitude_new = math.asin(math.sin(abs(sharp - 90) * math.cos(sol_altitude)))
-        sharp = math.atan(math.sin(sharp) * math.tan(90 - sol_altitude))
-        sol_altitude = altitude_new
+        sharp, sol_altitude = transpose_sharp_altitude(sharp, sol_altitude)
 
     alt_range = [0, 15, 30, 45, 60, 75, 90]
     az_range = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180]

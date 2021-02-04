@@ -3,6 +3,7 @@ from pythermalcomfort.models import solar_gain, pmv_ppd, set_tmp, cooling_effect
     adaptive_ashrae, clo_tout, vertical_tmp_grad_ppd, utci, pmv, ankle_draft
 from pythermalcomfort.psychrometrics import t_dp, t_wb, enthalpy, psy_ta_rh, \
     running_mean_outdoor_temperature, units_converter, p_sat, clo_dynamic, t_mrt, f_svv
+from pythermalcomfort.utilities import transpose_sharp_altitude
 
 data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
@@ -105,6 +106,19 @@ data_test_erf = {
     "ERF": [64.9, 43.3, 63.2, 65.3, 63.1, 62.4, 60.5, 57.2, 51.7, 49.0, 59.3, 27.4, 41.1, 68.5, 11.0, 32.9, 76.7, 29.3, 42.1, 67.5, 36.4, 45.6, 64.0, 23.5, 39.1, 70.4, 54.8],
     "t_rsw": [15.5, 10.4, 15.1, 15.6, 15.1, 14.9, 14.5, 13.7, 12.4, 11.7, 13.6, 6.6, 9.8, 16.4, 2.6, 7.9, 18.4, 7.0, 10.1, 16.2, 8.7, 10.9, 15.3, 5.6, 9.4, 16.9, 13.1],
 }
+
+
+def test_transpose_sharp_altitude():
+    assert transpose_sharp_altitude(sharp=0, altitude=0) == (0, 90)
+    assert transpose_sharp_altitude(sharp=0, altitude=20) == (0, 70)
+    assert transpose_sharp_altitude(sharp=0, altitude=45) == (0, 45)
+    assert transpose_sharp_altitude(sharp=0, altitude=60) == (0, 30)
+    assert transpose_sharp_altitude(sharp=90, altitude=0) == (90, 0)
+    assert transpose_sharp_altitude(sharp=90, altitude=45) == (45, 0)
+    assert transpose_sharp_altitude(sharp=90, altitude=30) == (60, 0)
+    assert transpose_sharp_altitude(sharp=135, altitude=60) == (22.208, 20.705)
+    assert transpose_sharp_altitude(sharp=120, altitude=75) == (13.064, 7.435)
+    assert transpose_sharp_altitude(sharp=150, altitude=30) == (40.893, 48.590)
 
 
 def test_f_svv():
