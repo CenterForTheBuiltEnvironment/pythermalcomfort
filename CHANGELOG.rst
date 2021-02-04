@@ -2,17 +2,15 @@
 Changelog
 =========
 
-1.3.5 (2021-02-02)
-------------------
-
-* not rounding SET temperature when calculating cooling effect
-
-
-1.3.4 (2021-02-01)
+1.3.6 (2021-02-04)
 ------------------
 
 * fixed error calculation solar_altitude and sharp for supine person in solar_gain
 
+1.3.5 (2021-02-02)
+------------------
+
+* not rounding SET temperature when calculating cooling effect
 
 1.3.3 (2020-12-14)
 ------------------
