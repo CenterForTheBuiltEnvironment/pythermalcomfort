@@ -9,6 +9,8 @@ Overview
 
     * - docs
       - |docs|
+    * - downloads
+      - |downloads|
     * - tests
       - | |codecov| |requires|
     * - package
@@ -19,6 +21,10 @@ Overview
 .. |docs| image:: https://readthedocs.org/projects/pythermalcomfort/badge/?style=flat
     :target: https://readthedocs.org/projects/pythermalcomfort
     :alt: Documentation Status
+
+.. |downloads| image:: https://pepy.tech/badge/pythermalcomfort
+    :target: https://pepy.tech/project/pythermalcomfort
+    :alt: Total downloads
 
 .. |travis| image:: https://api.travis-ci.org/CenterForTheBuiltEnvironment/pythermalcomfort.svg?branch=master
     :alt: Travis-CI Build Status
