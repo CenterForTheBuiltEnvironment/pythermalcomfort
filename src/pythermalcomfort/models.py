@@ -81,12 +81,30 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
     warnings.simplefilter("ignore")
 
-    initial_set_tmp = set_tmp(tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo, wme=wme, round=False)
+    initial_set_tmp = set_tmp(
+        tdb=tdb,
+        tr=tr,
+        v=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        round=False,
+        calculate_ce=True,
+    )
 
     def function(x):
         return (
             set_tmp(
-                tdb - x, tr - x, v=still_air_threshold, rh=rh, met=met, clo=clo, wme=wme, round=False
+                tdb - x,
+                tr - x,
+                v=still_air_threshold,
+                rh=rh,
+                met=met,
+                clo=clo,
+                wme=wme,
+                round=False,
+                calculate_ce=True,
             )
             - initial_set_tmp
         )
@@ -465,7 +483,7 @@ def set_tmp(
     """
     # If the SET function is used to calculate the cooling effect then the h_c is
     # calculated in a slightly different way
-    default_kwargs = {"round": True}
+    default_kwargs = {"round": True, "calculate_ce": False}
     kwargs = {**default_kwargs, **kwargs}
 
     if units.lower() == "ip":
@@ -493,6 +511,7 @@ def set_tmp(
         wme=wme,
         body_surface_area=body_surface_area,
         p_atm=p_atm,
+        calculate_ce=kwargs["calculate_ce"],
     )
 
     if units.lower() == "ip":
@@ -515,6 +534,7 @@ def set_optimized(
     wme,
     body_surface_area,
     p_atm,
+    calculate_ce=False,
 ):
     # Initial variables as defined in the ASHRAE 55-2017
     air_speed = max(v, 0.1)
@@ -563,6 +583,9 @@ def set_optimized(
     # h_fc forced convective heat transfer coefficient, W/(m2 °C)
     h_fc = 8.600001 * pow((air_speed * pressure_in_atmospheres), 0.53)
     h_cc = max(h_cc, h_fc)
+    if not calculate_ce:
+        h_c_met = 5.66 * (met - 0.85) ** 0.39
+        h_cc = max(h_cc, h_c_met)
 
     h_r = 4.7  # linearized radiative heat transfer coefficient
     h_t = h_r + h_cc  # sum of convective and radiant heat transfer coefficient W/(m2*K)
@@ -674,14 +697,20 @@ def set_optimized(
 
     # standard environment - where _s at end of the variable names stands for standard
     h_r_s = h_r  # standard environment radiative heat transfer coefficient
-    if met < 0.85:
-        h_c_s = 3.0  # standard environment convective heat transfer coefficient
-    else:
-        h_c_s = 5.66 * (met - 0.85) ** 0.39
+
+    h_c_s = 3.0 * pow(pressure_in_atmospheres, 0.53)
+    if not calculate_ce:
+        h_c_met = 5.66 * (met - 0.85) ** 0.39
+        h_c_s = max(h_c_s, h_c_met)
     if h_c_s < 3.0:
         h_c_s = 3.0
-    h_t_s = h_c_s + h_r_s  # sum of convective and radiant heat transfer coefficient W/(m2*K)
-    r_clo_s = 1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835  # thermal resistance of clothing, °C M^2 /W
+
+    h_t_s = (
+        h_c_s + h_r_s
+    )  # sum of convective and radiant heat transfer coefficient W/(m2*K)
+    r_clo_s = (
+        1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835
+    )  # thermal resistance of clothing, °C M^2 /W
     r_cl_s = 0.155 * r_clo_s  # thermal insulation of the clothing in M2K/W
     f_a_cl_s = 1.0 + k_clo * r_clo_s  # increase in body surface area due to clothing
     f_cl_s = 1.0 / (
