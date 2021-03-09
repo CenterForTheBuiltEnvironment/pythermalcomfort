@@ -52,7 +52,7 @@ def check_standard_compliance(standard, **kwargs):
                     )
             if key in ["v", "vr"] and (value > 2 or value < 0):
                 warnings.warn(
-                    "ASHRAE air velocity applicability limits between 0 and 2 m/s",
+                    "ASHRAE air speed applicability limits between 0 and 2 m/s",
                     UserWarning,
                 )
             if key == "met" and (value > 2 or value < 1):
@@ -84,7 +84,7 @@ def check_standard_compliance(standard, **kwargs):
                 )
             if key in ["v", "vr"] and (value > 1 or value < 0):
                 warnings.warn(
-                    "ISO air velocity applicability limits between 0 and 1 m/s",
+                    "ISO air speed applicability limits between 0 and 1 m/s",
                     UserWarning,
                 )
             if key == "met" and (value > 4 or value < 0.8):

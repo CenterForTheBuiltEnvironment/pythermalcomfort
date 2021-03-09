@@ -51,20 +51,20 @@ def p_sat_torr(tdb):
 
 
 def v_relative(v, met):
-    """ Estimates the relative air velocity which combines the average air velocity of
-    the space plus the relative air velocity caused by the body movement.
+    """ Estimates the relative air speed which combines the average air speed of
+    the space plus the relative air speed caused by the body movement.
 
     Parameters
     ----------
     v : float
-        air velocity measured by the sensor, [m/s]
+        air speed measured by the sensor, [m/s]
     met : float
         metabolic rate, [met]
 
     Returns
     -------
     vr  : float
-        relative air velocity, [m/s]
+        relative air speed, [m/s]
     """
 
     if met > 1:
@@ -196,7 +196,7 @@ def t_o(tdb, tr, v):
     tr: float
         mean radiant temperature temperature, [°C]
     v: float
-        air velocity, [m/s]
+        air speed, [m/s]
 
     Returns
     -------
@@ -379,7 +379,7 @@ def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9):
     tdb: float
         air temperature, [°C]
     v: float
-        air velocity, [m/s]
+        air speed, [m/s]
     d: float
         diameter of the globe, [m] default 0.15 m
     emissivity: float

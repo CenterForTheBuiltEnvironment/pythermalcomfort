@@ -29,10 +29,10 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: vr is the relative air velocity caused by body movement and not the air
-        speed measured by the air velocity sensor.
+        Note: vr is the relative air speed caused by body movement and not the air
+        speed measured by the air speed sensor.
         It can be calculate using the function
         :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -129,11 +129,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: vr is the relative air velocity caused by body movement and not the air
-        speed measured by the air velocity sensor.
-        The relative air velocity can be calculate using the function
+        Note: vr is the relative air speed caused by body movement and not the air
+        speed measured by the air speed sensor.
+        The relative air speed can be calculate using the function
         :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
         relative humidity, [%]
@@ -183,9 +183,9 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
         >>> from pythermalcomfort.models import pmv_ppd
         >>> from pythermalcomfort.psychrometrics import v_relative
-        >>> # calculate relative air velocity
+        >>> # calculate relative air speed
         >>> v_r = v_relative(v=0.1, met=1.2)
-        >>> # as you can see the relative air velocity is 0.16 m/s which is
+        >>> # as you can see the relative air speed is 0.16 m/s which is
         significantly higher than v
         >>> results = pmv_ppd(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5, wme=0,
         standard="ISO")
@@ -222,7 +222,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         standard=standard, tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo
     )
 
-    # if the relative air velocity is higher than 0.1 then follow methodology ASHRAE
+    # if the relative air speed is higher than 0.1 then follow methodology ASHRAE
     # Appendix H, H3
     if standard == "ashrae" and vr >= 0.1:
         # calculate the cooling effect
@@ -324,10 +324,10 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: vr is the relative air velocity caused by body movement and not the air
-        speed measured by the air velocity sensor.
+        Note: vr is the relative air speed caused by body movement and not the air
+        speed measured by the air speed sensor.
         It can be calculate using the function
         :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -375,9 +375,9 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
         >>> from pythermalcomfort.models import pmv
         >>> from pythermalcomfort.psychrometrics import v_relative
-        >>> # calculate relative air velocity
+        >>> # calculate relative air speed
         >>> v_r = v_relative(v=0.1, met=1.2)
-        >>> # as you can see the relative air velocity is 0.16 m/s which is
+        >>> # as you can see the relative air speed is 0.16 m/s which is
         significantly higher than v
         >>> results = pmv(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5)
         >>> print(results)
@@ -390,7 +390,17 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
 
 def set_tmp(
-    tdb, tr, v, rh, met, clo, wme=0, body_surface_area=1.8258, patm=101325, units="SI", **kwargs
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    wme=0,
+    body_surface_area=1.8258,
+    patm=101325,
+    units="SI",
+    **kwargs
 ):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
@@ -407,7 +417,7 @@ def set_tmp(
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     v : float
-        air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
     met : float
@@ -453,7 +463,9 @@ def set_tmp(
         77.6
 
     """
-    default_kwargs = {'round': True}
+    # If the SET function is used to calculate the cooling effect then the h_c is
+    # calculated in a slightly different way
+    default_kwargs = {"round": True, "calculate_ce": False}
     kwargs = {**default_kwargs, **kwargs}
 
     if units.lower() == "ip":
@@ -472,7 +484,16 @@ def set_tmp(
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
     _set = set_optimized(
-        tdb, tr, v, met, clo, vapor_pressure, wme, body_surface_area, patm
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        patm=patm,
+        calculate_ce=kwargs["calculate_ce"],
     )
 
     if units.lower() == "ip":
@@ -486,10 +507,19 @@ def set_tmp(
 
 @jit(nopython=True)
 def set_optimized(
-    tdb, tr, v, met, clo, vapor_pressure, wme, body_surface_area, patm,
+    tdb,
+    tr,
+    v,
+    met,
+    clo,
+    vapor_pressure,
+    wme,
+    body_surface_area,
+    patm,
+    calculate_ce=False,
 ):
     # Initial variables as defined in the ASHRAE 55-2017
-    air_velocity = max(v, 0.1)
+    air_speed = max(v, 0.1)
     k_clo = 0.25
     body_weight = 69.9
     met_factor = 58.2
@@ -506,42 +536,40 @@ def set_optimized(
     temp_skin = temp_skin_neutral
     temp_core = temp_core_neutral
     skin_blood_flow = skin_blood_flow_neutral
+
+    # initialize some variables
+    dry = 0
+    p_wet = 0
+    _set = 0
     alfa = 0.1  # fractional skin mass
     e_sk = 0.1 * met  # total evaporative heat loss, W
 
     pressure_in_atmospheres = patm / 101325
     length_time_simulation = 60  # length time simulation
-    r_clo = 0.155 * clo  # thermal resistance of clothing, °C M^2 /W
 
+    r_clo = 0.155 * clo  # thermal resistance of clothing, °C M^2 /W
     f_a_cl = 1.0 + 0.15 * clo  # increase in body surface area due to clothing
     lr = 2.2 / pressure_in_atmospheres  # Lewis ratio
     rm = met * met_factor  # metabolic rate
     m = met * met_factor
 
     if clo <= 0:
-        w_crit = 0.38 * pow(air_velocity, -0.29)  # evaporative efficiency
+        w_max = 0.38 * pow(air_speed, -0.29)  # evaporative efficiency
         i_cl = 1.0  # permeation efficiency of water vapour through the clothing layer
     else:
-        w_crit = 0.59 * pow(air_velocity, -0.08)
+        w_max = 0.59 * pow(air_speed, -0.08)
         i_cl = 0.45  # permeation efficiency of water vapour through the clothing layer
 
     # h_cc corrected convective heat transfer coefficient
     h_cc = 3.0 * pow(pressure_in_atmospheres, 0.53)
     # h_fc forced convective heat transfer coefficient, W/(m2 °C)
-    h_fc = 8.600001 * pow((air_velocity * pressure_in_atmospheres), 0.53)
+    h_fc = 8.600001 * pow((air_speed * pressure_in_atmospheres), 0.53)
     h_cc = max(h_cc, h_fc)
 
     h_r = 4.7  # linearized radiative heat transfer coefficient
-    h_t = (
-        h_r + h_cc
-    )  # sum of convective and radiant heat transfer coefficient W/(m2*K)
+    h_t = h_r + h_cc  # sum of convective and radiant heat transfer coefficient W/(m2*K)
     r_a = 1.0 / (f_a_cl * h_t)  # resistance of air layer to dry heat
     t_op = (h_r * tr + h_cc * tdb) / h_t  # operative temperature
-
-    # initialize some variables
-    dry = 0
-    p_wet = 0
-    _set = 0
 
     n_simulation = 0
 
@@ -625,15 +653,15 @@ def set_optimized(
         p_rsw = e_rsw / e_max  # ratio heat loss sweating to max heat loss sweating
         p_wet = 0.06 + 0.94 * p_rsw  # skin wetness
         e_diff = p_wet * e_max - e_rsw  # vapor diffusion through skin
-        if p_wet > w_crit:
-            p_wet = w_crit
-            p_rsw = w_crit / 0.94
+        if p_wet > w_max:
+            p_wet = w_max
+            p_rsw = w_max / 0.94
             e_rsw = p_rsw * e_max
             e_diff = 0.06 * (1.0 - p_rsw) * e_max
         if e_max < 0:
             e_diff = 0
             e_rsw = 0
-            p_wet = w_crit
+            p_wet = w_max
         e_sk = (
             e_rsw + e_diff
         )  # total evaporative heat loss sweating and vapor diffusion
@@ -658,9 +686,13 @@ def set_optimized(
     r_clo_s = 1.52 / ((met - wme / met_factor) + 0.6944) - 0.1835  # thermal resistance of clothing, °C M^2 /W
     r_cl_s = 0.155 * r_clo_s  # thermal insulation of the clothing in M2K/W
     f_a_cl_s = 1.0 + k_clo * r_clo_s  # increase in body surface area due to clothing
-    f_cl_s = 1.0 / (1.0 + 0.155 * f_a_cl_s * h_t_s * r_clo_s)  # ratio of surface clothed body over nude body
+    f_cl_s = 1.0 / (
+        1.0 + 0.155 * f_a_cl_s * h_t_s * r_clo_s
+    )  # ratio of surface clothed body over nude body
     i_m_s = 0.45  # permeation efficiency of water vapour through the clothing layer
-    i_cl_s = i_m_s * h_c_s / h_t_s * (1 - f_cl_s) / (h_c_s / h_t_s - f_cl_s * i_m_s) # clothing vapor permeation efficiency
+    i_cl_s = (
+        i_m_s * h_c_s / h_t_s * (1 - f_cl_s) / (h_c_s / h_t_s - f_cl_s * i_m_s)
+    )  # clothing vapor permeation efficiency
     r_a_s = 1.0 / (f_a_cl_s * h_t_s)  # resistance of air layer to dry heat
     r_ea_s = 1.0 / (lr * f_a_cl_s * h_c_s)
     r_ecl_s = r_cl_s / (lr * i_cl_s)
@@ -683,7 +715,10 @@ def set_optimized(
             - h_d_s * (temp_skin - (set_old + delta))
             - w
             * h_e_s
-            * (p_s_sk - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0))))
+            * (
+                p_s_sk
+                - 0.5 * (math.exp(18.6686 - 4030.183 / (set_old + delta + 235.0)))
+            )
         )
         _set = set_old - delta * err_1 / (err_2 - err_1)
         dx = _set - set_old
@@ -708,7 +743,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     t_running_mean: float
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
     v : float
-        air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -846,7 +881,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
 
 
 def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
-    """ Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
+    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
     ----------
@@ -857,7 +892,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     t_running_mean: float
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
     v : float
-        air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: Indoor operative temperature correction is applicable for buildings equipped
         with fans or personal systems providing building occupants with personal
@@ -1007,7 +1042,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
 
 
 def utci(tdb, tr, v, rh, units="SI"):
-    """ Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
+    """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
     the same strain index value in comparison with the reference individual's response
@@ -1025,7 +1060,7 @@ def utci(tdb, tr, v, rh, units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     v : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
     units: str default="SI"
@@ -1474,7 +1509,7 @@ def utci(tdb, tr, v, rh, units="SI"):
 
 
 def clo_tout(tout, units="SI"):
-    """ Representative clothing insulation Icl as a function of outdoor air temperature
+    """Representative clothing insulation Icl as a function of outdoor air temperature
     at 06:00 a.m [4]_.
 
     Parameters
@@ -1519,7 +1554,7 @@ def clo_tout(tout, units="SI"):
 
 
 def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="SI"):
-    """ Calculates the percentage of thermally dissatisfied people with a vertical
+    """Calculates the percentage of thermally dissatisfied people with a vertical
     temperature gradient between feet and head [1]_.
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
@@ -1534,10 +1569,10 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: vr is the relative air velocity caused by body movement and not the air
-        speed measured by the air velocity sensor.
+        Note: vr is the relative air speed caused by body movement and not the air
+        speed measured by the air speed sensor.
         It can be calculate using the function
         :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -1603,10 +1638,10 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     vr : float
-        relative air velocity, default in [m/s] in [fps] if `units` = 'IP'
+        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
-        Note: vr is the relative air velocity caused by body movement and not the air
-        speed measured by the air velocity sensor.
+        Note: vr is the relative air speed caused by body movement and not the air
+        speed measured by the air speed sensor.
         It can be calculate using the function
         :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
     rh : float
@@ -1669,81 +1704,81 @@ def solar_gain(
     floor_reflectance=0.6,
 ):
     """
-        Calculates the solar gain to the human body using the Effective Radiant Field (
-        ERF) [1]_. The ERF is a measure of the net energy flux to or from the human body.
-        ERF is expressed in W over human body surface area [w/m2]. In addition,
-        it calculates the delta mean radiant temperature. Which is the amount by which
-        the mean radiant
+    Calculates the solar gain to the human body using the Effective Radiant Field (
+    ERF) [1]_. The ERF is a measure of the net energy flux to or from the human body.
+    ERF is expressed in W over human body surface area [w/m2]. In addition,
+    it calculates the delta mean radiant temperature. Which is the amount by which
+    the mean radiant
+    temperature of the space should be increased if no solar radiation is present.
+
+    Parameters
+    ----------
+    sol_altitude : float
+        Solar altitude, degrees from horizontal [deg]. Ranges between 0 and 90.
+    sharp : float
+        Solar horizontal angle relative to the front of the person (SHARP) [deg].
+        Ranges between 0 and 180 and is symmetrical on either side. Zero (0) degrees
+        represents direct-beam radiation from the front, 90 degrees represents
+        direct-beam radiation from the side, and 180 degrees rep- resent direct-beam
+        radiation from the back. SHARP is the angle between the sun and the person
+        only. Orientation relative to compass or to room is not included in SHARP.
+    posture : str
+        Default 'seated' list of available options 'standing', 'supine' or 'seated'
+    sol_radiation_dir : float
+        Direct-beam solar radiation, [W/m2]. Ranges between 200 and 1000. See Table
+        C2-3 of ASHRAE 55 2017 [1]_.
+    sol_transmittance : float
+        Total solar transmittance, ranges from 0 to 1. The total solar
+        transmittance of window systems, including glazing unit, blinds, and other
+        façade treatments, shall be determined using one of the following methods:
+        i) Provided by manufacturer or from the National Fenestration Rating
+        Council approved Lawrence Berkeley National Lab International Glazing
+        Database.
+        ii) Glazing unit plus venetian blinds or other complex or unique shades
+        shall be calculated using National Fenestration Rating Council approved
+        software or Lawrence Berkeley National Lab Complex Glazing Database.
+    f_svv : float
+        Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
+        It can be calculate using the function
+        :py:meth:`pythermalcomfort.psychrometrics.f_svv`.
+    f_bes : float
+        Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
+        See Table C2-2 and equation C-7 ASHRAE 55 2017 [1]_.
+    asw: float
+        The average short-wave absorptivity of the occupant. It will range widely,
+        depending on the color of the occupant’s skin as well as the color and
+        amount of clothing covering the body.
+        A value of 0.7 shall be used unless more specific information about the
+        clothing or skin color of the occupants is available.
+        Note: Short-wave absorptivity typically ranges from 0.57 to 0.84, depending
+        on skin and clothing color. More information is available in Blum (1945).
+    floor_reflectance: float
+        Floor refectance. It is assumed to be constant and equal to 0.6.
+
+    Notes
+    -----
+    More information on the calculation procedure can be found in Appendix C of [1]_.
+
+    Returns
+    -------
+    erf: float
+        Solar gain to the human body using the Effective Radiant Field [W/m2]
+    delta_mrt: float
+        Delta mean radiant temperature. The amount by which the mean radiant
         temperature of the space should be increased if no solar radiation is present.
 
-        Parameters
-        ----------
-        sol_altitude : float
-            Solar altitude, degrees from horizontal [deg]. Ranges between 0 and 90.
-        sharp : float
-            Solar horizontal angle relative to the front of the person (SHARP) [deg].
-            Ranges between 0 and 180 and is symmetrical on either side. Zero (0) degrees
-            represents direct-beam radiation from the front, 90 degrees represents
-            direct-beam radiation from the side, and 180 degrees rep- resent direct-beam
-            radiation from the back. SHARP is the angle between the sun and the person
-            only. Orientation relative to compass or to room is not included in SHARP.
-        posture : str
-            Default 'seated' list of available options 'standing', 'supine' or 'seated'
-        sol_radiation_dir : float
-            Direct-beam solar radiation, [W/m2]. Ranges between 200 and 1000. See Table
-            C2-3 of ASHRAE 55 2017 [1]_.
-        sol_transmittance : float
-            Total solar transmittance, ranges from 0 to 1. The total solar
-            transmittance of window systems, including glazing unit, blinds, and other
-            façade treatments, shall be determined using one of the following methods:
-            i) Provided by manufacturer or from the National Fenestration Rating
-            Council approved Lawrence Berkeley National Lab International Glazing
-            Database.
-            ii) Glazing unit plus venetian blinds or other complex or unique shades
-            shall be calculated using National Fenestration Rating Council approved
-            software or Lawrence Berkeley National Lab Complex Glazing Database.
-        f_svv : float
-            Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
-            It can be calculate using the function
-            :py:meth:`pythermalcomfort.psychrometrics.f_svv`.
-        f_bes : float
-            Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
-            See Table C2-2 and equation C-7 ASHRAE 55 2017 [1]_.
-        asw: float
-            The average short-wave absorptivity of the occupant. It will range widely,
-            depending on the color of the occupant’s skin as well as the color and
-            amount of clothing covering the body.
-            A value of 0.7 shall be used unless more specific information about the
-            clothing or skin color of the occupants is available.
-            Note: Short-wave absorptivity typically ranges from 0.57 to 0.84, depending
-            on skin and clothing color. More information is available in Blum (1945).
-        floor_reflectance: float
-            Floor refectance. It is assumed to be constant and equal to 0.6.
+    Examples
+    --------
+    .. code-block:: python
 
-        Notes
-        -----
-        More information on the calculation procedure can be found in Appendix C of [1]_.
+        >>> from pythermalcomfort.models import solar_gain
+        >>> results = solar_gain(sol_altitude=0, sharp=120,
+        sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5,
+        asw=0.7, posture='seated')
+        >>> print(results)
+        {'erf': 42.9, 'delta_mrt': 10.3}
 
-        Returns
-        -------
-        erf: float
-            Solar gain to the human body using the Effective Radiant Field [W/m2]
-        delta_mrt: float
-            Delta mean radiant temperature. The amount by which the mean radiant
-            temperature of the space should be increased if no solar radiation is present.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            >>> from pythermalcomfort.models import solar_gain
-            >>> results = solar_gain(sol_altitude=0, sharp=120,
-            sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5,
-            asw=0.7, posture='seated')
-            >>> print(results)
-            {'erf': 42.9, 'delta_mrt': 10.3}
-
-        """
+    """
 
     posture = posture.lower()
     if posture not in ["standing", "supine", "seated"]:

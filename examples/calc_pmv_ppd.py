@@ -6,7 +6,7 @@ from pythermalcomfort.utilities import clo_individual_garments
 # input variables
 tdb = 27  # dry-bulb air temperature, [$^{\circ}$C]
 tr = 25  # mean radiant temperature, [$^{\circ}$C]
-v = 0.1  # average air velocity, [m/s]
+v = 0.1  # average air speed, [m/s]
 rh = 50  # relative humidity, [%]
 activity = "Typing"  # participant's activity description
 garments = ["Sweatpants", "T-shirt", "Shoes or sandals"]

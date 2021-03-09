@@ -1,10 +1,31 @@
 import pytest
-from pythermalcomfort.models import solar_gain, pmv_ppd, set_tmp, cooling_effect, \
-    adaptive_ashrae, clo_tout, vertical_tmp_grad_ppd, utci, pmv, ankle_draft
-from pythermalcomfort.psychrometrics import t_dp, t_wb, enthalpy, psy_ta_rh, \
-    running_mean_outdoor_temperature, units_converter, p_sat, clo_dynamic, t_mrt, f_svv
+from pythermalcomfort.models import (
+    solar_gain,
+    pmv_ppd,
+    set_tmp,
+    cooling_effect,
+    adaptive_ashrae,
+    clo_tout,
+    vertical_tmp_grad_ppd,
+    utci,
+    pmv,
+    ankle_draft,
+)
+from pythermalcomfort.psychrometrics import (
+    t_dp,
+    t_wb,
+    enthalpy,
+    psy_ta_rh,
+    running_mean_outdoor_temperature,
+    units_converter,
+    p_sat,
+    clo_dynamic,
+    t_mrt,
+    f_svv,
+)
 from pythermalcomfort.utilities import transpose_sharp_altitude
 
+# fmt: off
 data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.9},
@@ -107,7 +128,7 @@ data_test_erf = {
     "t_rsw": [15.5, 10.4, 15.1, 15.6, 15.1, 14.9, 14.5, 13.7, 12.4, 11.7, 13.6, 6.6, 9.8, 16.4, 2.6, 7.9, 18.4, 7.0, 10.1, 16.2, 8.7, 10.9, 15.3, 5.6, 9.4, 16.9, 13.1],
 }
 
-
+# fmt: on
 def test_transpose_sharp_altitude():
     assert transpose_sharp_altitude(sharp=0, altitude=0) == (0, 90)
     assert transpose_sharp_altitude(sharp=0, altitude=20) == (0, 70)
@@ -154,20 +175,49 @@ def test_enthalpy():
 
 
 def test_psy_ta_rh():
-    assert psy_ta_rh(25, 50, patm=101325) == {'p_sat': 3169.2, 'p_vap': 1584.6, 'hr': 0.009881547577511219, 't_wb': 18.0, 't_dp': 13.8, 'h': 50259.66}
+    assert psy_ta_rh(25, 50, patm=101325) == {
+        "p_sat": 3169.2,
+        "p_vap": 1584.6,
+        "hr": 0.009881547577511219,
+        "t_wb": 18.0,
+        "t_dp": 13.8,
+        "h": 50259.66,
+    }
 
 
 def test_solar_gain():
-    for ix in range(0, len(data_test_erf['alt'])):
-        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sharp=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
-                           f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['erf']) == data_test_erf['ERF'][ix]
-        assert (solar_gain(sol_altitude=data_test_erf['alt'][ix], sharp=data_test_erf['sharp'][ix], sol_radiation_dir=data_test_erf['I_dir'][ix], sol_transmittance= data_test_erf['t_sol'][ix],
-                           f_svv=data_test_erf['f_svv'][ix], f_bes=data_test_erf['f_bes'][ix], asw=data_test_erf['asa'][ix], posture=data_test_erf['posture'][ix])['delta_mrt']) == data_test_erf['t_rsw'][ix]
+    for ix in range(0, len(data_test_erf["alt"])):
+        assert (
+            solar_gain(
+                sol_altitude=data_test_erf["alt"][ix],
+                sharp=data_test_erf["sharp"][ix],
+                sol_radiation_dir=data_test_erf["I_dir"][ix],
+                sol_transmittance=data_test_erf["t_sol"][ix],
+                f_svv=data_test_erf["f_svv"][ix],
+                f_bes=data_test_erf["f_bes"][ix],
+                asw=data_test_erf["asa"][ix],
+                posture=data_test_erf["posture"][ix],
+            )["erf"]
+        ) == data_test_erf["ERF"][ix]
+        assert (
+            solar_gain(
+                sol_altitude=data_test_erf["alt"][ix],
+                sharp=data_test_erf["sharp"][ix],
+                sol_radiation_dir=data_test_erf["I_dir"][ix],
+                sol_transmittance=data_test_erf["t_sol"][ix],
+                f_svv=data_test_erf["f_svv"][ix],
+                f_bes=data_test_erf["f_bes"][ix],
+                asw=data_test_erf["asa"][ix],
+                posture=data_test_erf["posture"][ix],
+            )["delta_mrt"]
+        ) == data_test_erf["t_rsw"][ix]
 
 
 def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.1
-    assert (cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")) == 3.83
+    assert (
+        cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+    ) == 3.83
 
 
 def test_running_mean_outdoor_temperature():
@@ -175,13 +225,28 @@ def test_running_mean_outdoor_temperature():
     assert (running_mean_outdoor_temperature([20, 20], alpha=0.9)) == 20
     assert (running_mean_outdoor_temperature([20, 20, 20, 20], alpha=0.7)) == 20
     assert (running_mean_outdoor_temperature([20, 20, 20, 20], alpha=0.5)) == 20
-    assert (running_mean_outdoor_temperature([77, 77, 77, 77, 77, 77, 77], alpha=0.8, units='IP')) == 77
-    assert (running_mean_outdoor_temperature([77, 77, 77, 77, 77, 77, 77], alpha=0.8, units='ip')) == 77
+    assert (
+        running_mean_outdoor_temperature(
+            [77, 77, 77, 77, 77, 77, 77], alpha=0.8, units="IP"
+        )
+    ) == 77
+    assert (
+        running_mean_outdoor_temperature(
+            [77, 77, 77, 77, 77, 77, 77], alpha=0.8, units="ip"
+        )
+    ) == 77
 
 
 def test_ip_units_converter():
-    assert (units_converter(tdb=77, tr=77, v=3.2, from_units='ip')) == [25.0, 25.0, 0.975312404754648]
-    assert (units_converter(pressure=1, area=1 / 0.09, from_units='ip')) == [101325, 1.0322474090590033]
+    assert (units_converter(tdb=77, tr=77, v=3.2, from_units="ip")) == [
+        25.0,
+        25.0,
+        0.975312404754648,
+    ]
+    assert (units_converter(pressure=1, area=1 / 0.09, from_units="ip")) == [
+        101325,
+        1.0322474090590033,
+    ]
 
 
 def test_p_sat():
@@ -197,57 +262,257 @@ def test_t_globe():
 def test_set_tmp():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_set:
-        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo']) - row['set']) < 0.01
+        assert (
+            set_tmp(
+                tdb=row["tdb"],
+                tr=row["tr"],
+                v=row["v"],
+                rh=row["rh"],
+                met=row["met"],
+                clo=row["clo"],
+            )
+            - row["set"]
+        ) < 0.01
 
-    assert (set_tmp(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')) == 77.6
+    assert (
+        set_tmp(
+            tdb=77,
+            tr=77,
+            v=0.328,
+            rh=50,
+            met=1.2,
+            clo=0.5,
+            units="IP",
+        )
+    ) == 77.6
 
     for row in data_test_set_ip:
-        assert (set_tmp(row['tdb'], row['tr'], row['v'], row['rh'], row['met'], row['clo'], units='IP') - row['set']) < 0.11
+        assert (
+            set_tmp(
+                row["tdb"],
+                row["tr"],
+                row["v"],
+                row["rh"],
+                row["met"],
+                row["clo"],
+                units="IP",
+            )
+            - row["set"]
+        ) < 0.11
 
 
 def test_pmv():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_pmv:
-        assert (round(pmv(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo']), 1)) == row['pmv']
+        assert (
+            round(
+                pmv(
+                    row["tdb"], row["tr"], row["vr"], row["rh"], row["met"], row["clo"]
+                ),
+                1,
+            )
+        ) == row["pmv"]
 
 
 def test_pmv_ppd():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_pmv:
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'], 1) - row['pmv']) < 0.011
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['ppd'], 1) - row['ppd']) < 1
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['pmv'], 1) - row['pmv']) < 0.011
-        assert (round(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae')['ppd'], 1) - row['ppd']) < 1
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tr"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="iso",
+                )["pmv"],
+                1,
+            )
+            - row["pmv"]
+        ) < 0.011
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tr"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="iso",
+                )["ppd"],
+                1,
+            )
+            - row["ppd"]
+        ) < 1
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tr"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="ashrae",
+                )["pmv"],
+                1,
+            )
+            - row["pmv"]
+        ) < 0.011
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tr"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="ashrae",
+                )["ppd"],
+                1,
+            )
+            - row["ppd"]
+        ) < 1
 
     for row in data_test_pmv_ip:
-        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['pmv'], 1) - row['pmv']) < 0.011
-        assert (round(pmv_ppd(row['tdb'], row['tdb'], row['vr'], row['rh'], row['met'], row['clo'], standard='ashrae', units='ip')['ppd'], 1) - row['ppd']) < 1
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tdb"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="ashrae",
+                    units="ip",
+                )["pmv"],
+                1,
+            )
+            - row["pmv"]
+        ) < 0.011
+        assert (
+            round(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tdb"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="ashrae",
+                    units="ip",
+                )["ppd"],
+                1,
+            )
+            - row["ppd"]
+        ) < 1
 
-    assert (round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units='ip')['pmv'], 1)) == -0.5
+    assert (
+        round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1)
+    ) == -0.5
 
     for row in data_test_pmv_iso:
-        assert abs(pmv_ppd(row['tdb'], row['tr'], row['vr'], row['rh'], row['met'], row['clo'], standard='iso')['pmv'] - row['pmv']) < 0.011
+        assert (
+            abs(
+                pmv_ppd(
+                    row["tdb"],
+                    row["tr"],
+                    row["vr"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    standard="iso",
+                )["pmv"]
+                - row["pmv"]
+            )
+            < 0.011
+        )
 
     with pytest.raises(ValueError):
-        pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard='random')
+        pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard="random")
 
 
 def test_adaptive_ashrae():
-    data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
-        {'tdb': 19.6, 'tr': 19.6, 't_running_mean': 17, 'v': 0.1, 'return': {'acceptability_80': True}},
-        {'tdb': 19.6, 'tr': 19.6, 't_running_mean': 17, 'v': 0.1, 'return': {'acceptability_90': False}},
-        {'tdb': 19.6, 'tr': 19.6, 't_running_mean': 25, 'v': 0.1, 'return': {'acceptability_80': False}},
-        {'tdb': 19.6, 'tr': 19.6, 't_running_mean': 25, 'v': 0.1, 'return': {'acceptability_80': False}},
-        {'tdb': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': True}},
-        {'tdb': 26, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_90': False}},
-        {'tdb': 30, 'tr': 26, 't_running_mean': 16, 'v': 0.1, 'return': {'acceptability_80': False}},
-        {'tdb': 25, 'tr': 25, 't_running_mean': 23, 'v': 0.1, 'return': {'acceptability_80': True}},
-        {'tdb': 25, 'tr': 25, 't_running_mean': 23, 'v': 0.1, 'return': {'acceptability_90': True}},
-    ]
+    data_test_adaptive_ashrae = (
+        [  # I have commented the lines of code that don't pass the test
+            {
+                "tdb": 19.6,
+                "tr": 19.6,
+                "t_running_mean": 17,
+                "v": 0.1,
+                "return": {"acceptability_80": True},
+            },
+            {
+                "tdb": 19.6,
+                "tr": 19.6,
+                "t_running_mean": 17,
+                "v": 0.1,
+                "return": {"acceptability_90": False},
+            },
+            {
+                "tdb": 19.6,
+                "tr": 19.6,
+                "t_running_mean": 25,
+                "v": 0.1,
+                "return": {"acceptability_80": False},
+            },
+            {
+                "tdb": 19.6,
+                "tr": 19.6,
+                "t_running_mean": 25,
+                "v": 0.1,
+                "return": {"acceptability_80": False},
+            },
+            {
+                "tdb": 26,
+                "tr": 26,
+                "t_running_mean": 16,
+                "v": 0.1,
+                "return": {"acceptability_80": True},
+            },
+            {
+                "tdb": 26,
+                "tr": 26,
+                "t_running_mean": 16,
+                "v": 0.1,
+                "return": {"acceptability_90": False},
+            },
+            {
+                "tdb": 30,
+                "tr": 26,
+                "t_running_mean": 16,
+                "v": 0.1,
+                "return": {"acceptability_80": False},
+            },
+            {
+                "tdb": 25,
+                "tr": 25,
+                "t_running_mean": 23,
+                "v": 0.1,
+                "return": {"acceptability_80": True},
+            },
+            {
+                "tdb": 25,
+                "tr": 25,
+                "t_running_mean": 23,
+                "v": 0.1,
+                "return": {"acceptability_90": True},
+            },
+        ]
+    )
     for row in data_test_adaptive_ashrae:
-        assert (adaptive_ashrae(row['tdb'], row['tr'], row['t_running_mean'], row['v'])[list(row['return'].keys())[0]]) == row['return'][list(row['return'].keys())[0]]
+        assert (
+            adaptive_ashrae(row["tdb"], row["tr"], row["t_running_mean"], row["v"])[
+                list(row["return"].keys())[0]
+            ]
+        ) == row["return"][list(row["return"].keys())[0]]
 
-    assert (adaptive_ashrae(77, 77, 68, 0.3, units='ip')['tmp_cmf']) == 75.2
+    assert (adaptive_ashrae(77, 77, 68, 0.3, units="ip")["tmp_cmf"]) == 75.2
 
     with pytest.raises(ValueError):
         adaptive_ashrae(20, 20, 9, 0.1)
@@ -260,41 +525,57 @@ def test_adaptive_ashrae():
 
 
 def test_clo_tout():
-    assert (clo_tout(tout=80.6, units='ip')) == 0.46
+    assert (clo_tout(tout=80.6, units="ip")) == 0.46
     assert (clo_tout(tout=27)) == 0.46
 
 
 def test_vertical_tmp_grad_ppd():
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units='ip')['PPD_vg']) == 13.0
-    assert (vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units='ip')['Acceptability']) == False
-    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)['PPD_vg']) == 12.6
-    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['PPD_vg']) == 1.7
-    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)['Acceptability']) == True
+    assert (
+        vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units="ip")[
+            "PPD_vg"
+        ]
+    ) == 13.0
+    assert (
+        vertical_tmp_grad_ppd(77, 77, 0.328, 50, 1.2, 0.5, 7 / 1.8, units="ip")[
+            "Acceptability"
+        ]
+    ) == False
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)["PPD_vg"]) == 12.6
+    assert (vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)["PPD_vg"]) == 1.7
+    assert (
+        vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 4)["Acceptability"]
+    ) == True
 
     with pytest.raises(ValueError):
         vertical_tmp_grad_ppd(25, 25, 0.3, 50, 1.2, 0.5, 7)
 
 
 def test_ankle_draft():
-    assert (ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]) == 23.3
+    assert (
+        ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]
+    ) == 23.3
 
     with pytest.raises(ValueError):
         ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)
 
 
 def test_utci():
-    data_test_adaptive_ashrae = [  # I have commented the lines of code that don't pass the test
-        {'tdb': 25, 'tr': 27, 'rh': 50, 'v': 1, 'return': {'utci': 25.2}},
-        {'tdb': 19, 'tr': 24, 'rh': 50, 'v': 1, 'return': {'utci': 20.0}},
-        {'tdb': 19, 'tr': 14, 'rh': 50, 'v': 1, 'return': {'utci': 16.8}},
-        {'tdb': 27, 'tr': 22, 'rh': 50, 'v': 1, 'return': {'utci': 25.5}},
-        {'tdb': 27, 'tr': 22, 'rh': 50, 'v': 10, 'return': {'utci': 20.0}},
-        {'tdb': 27, 'tr': 22, 'rh': 50, 'v': 16, 'return': {'utci': 15.8}},
-    ]
+    data_test_adaptive_ashrae = (
+        [  # I have commented the lines of code that don't pass the test
+            {"tdb": 25, "tr": 27, "rh": 50, "v": 1, "return": {"utci": 25.2}},
+            {"tdb": 19, "tr": 24, "rh": 50, "v": 1, "return": {"utci": 20.0}},
+            {"tdb": 19, "tr": 14, "rh": 50, "v": 1, "return": {"utci": 16.8}},
+            {"tdb": 27, "tr": 22, "rh": 50, "v": 1, "return": {"utci": 25.5}},
+            {"tdb": 27, "tr": 22, "rh": 50, "v": 10, "return": {"utci": 20.0}},
+            {"tdb": 27, "tr": 22, "rh": 50, "v": 16, "return": {"utci": 15.8}},
+        ]
+    )
     for row in data_test_adaptive_ashrae:
-        assert (utci(row['tdb'], row['tr'], row['v'], row['rh'])) == row['return'][list(row['return'].keys())[0]]
+        assert (utci(row["tdb"], row["tr"], row["v"], row["rh"])) == row["return"][
+            list(row["return"].keys())[0]
+        ]
 
-    assert (utci(tdb=77, tr=77, v=3.28, rh=50, units='ip')) == 76.4
+    assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")) == 76.4
 
 
 def test_clo_dynamic():
