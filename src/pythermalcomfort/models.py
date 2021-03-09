@@ -259,15 +259,15 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     hc = hcf  # initialize variable
     taa = tdb + 273
     tra = tr + 273
-    tcla = taa + (35.5 - tdb) / (3.5 * icl + 0.1)
+    t_cla = taa + (35.5 - tdb) / (3.5 * icl + 0.1)
 
     p1 = icl * f_cl
     p2 = p1 * 3.96
     p3 = p1 * 100
     p4 = p1 * taa
     p5 = (308.7 - 0.028 * mw) + (p2 * (tra / 100.0) ** 4)
-    xn = tcla / 100
-    xf = tcla / 50
+    xn = t_cla / 100
+    xf = t_cla / 50
     eps = 0.00015
 
     n = 0
@@ -398,7 +398,7 @@ def set_tmp(
     clo,
     wme=0,
     body_surface_area=1.8258,
-    patm=101325,
+    p_atm=101325,
     units="SI",
     **kwargs
 ):
@@ -428,7 +428,7 @@ def set_tmp(
         external work, [met] default 0
     body_surface_area : float
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
-    patm : float
+    p_atm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -465,16 +465,16 @@ def set_tmp(
     """
     # If the SET function is used to calculate the cooling effect then the h_c is
     # calculated in a slightly different way
-    default_kwargs = {"round": True, "calculate_ce": False}
+    default_kwargs = {"round": True}
     kwargs = {**default_kwargs, **kwargs}
 
     if units.lower() == "ip":
         if body_surface_area == 1.8258:
             body_surface_area = 19.65
-        if patm == 101325:
-            patm = 1
-        tdb, tr, v, body_surface_area, patm = units_converter(
-            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=patm
+        if p_atm == 101325:
+            p_atm = 1
+        tdb, tr, v, body_surface_area, p_atm = units_converter(
+            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
         )
 
     check_standard_compliance(
@@ -492,8 +492,7 @@ def set_tmp(
         vapor_pressure=vapor_pressure,
         wme=wme,
         body_surface_area=body_surface_area,
-        patm=patm,
-        calculate_ce=kwargs["calculate_ce"],
+        p_atm=p_atm,
     )
 
     if units.lower() == "ip":
@@ -515,8 +514,7 @@ def set_optimized(
     vapor_pressure,
     wme,
     body_surface_area,
-    patm,
-    calculate_ce=False,
+    p_atm,
 ):
     # Initial variables as defined in the ASHRAE 55-2017
     air_speed = max(v, 0.1)
@@ -544,7 +542,7 @@ def set_optimized(
     alfa = 0.1  # fractional skin mass
     e_sk = 0.1 * met  # total evaporative heat loss, W
 
-    pressure_in_atmospheres = patm / 101325
+    pressure_in_atmospheres = p_atm / 101325
     length_time_simulation = 60  # length time simulation
 
     r_clo = 0.155 * clo  # thermal resistance of clothing, °C M^2 /W
@@ -623,7 +621,7 @@ def set_optimized(
         t_body = alfa * temp_skin + (1 - alfa) * temp_core  # mean body temperature, °C
         # sk_sig thermoregulatory control signal from the skin
         sk_sig = temp_skin - temp_skin_neutral
-        warms = (sk_sig > 0) * sk_sig  # vasodialtion signal
+        warms = (sk_sig > 0) * sk_sig  # vasodilation signal
         colds = ((-1.0 * sk_sig) > 0) * (-1.0 * sk_sig)  # vasoconstriction signal
         # c_reg_sig thermoregulatory control signal from the skin, °C
         c_reg_sig = temp_core - temp_core_neutral
@@ -1051,7 +1049,8 @@ def utci(tdb, tr, v, rh, units="SI"):
     calculating heat stress in outdoor spaces. The parameters that are taken into
     account for calculating
     UTCI involve dry-bulb temperature, mean radiation temperature, the pressure of
-    water vapor or relative humidity, and wind speed (at the elevation of 10 m) [7]_.
+    water vapor or relative humidity, and wind speed (at the elevation of 10 m above the
+    ground) [7]_.
 
     Parameters
     ----------
@@ -1060,7 +1059,7 @@ def utci(tdb, tr, v, rh, units="SI"):
     tr : float
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     v : float
-        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
+        wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
     rh : float
         relative humidity, [%]
     units: str default="SI"
@@ -1132,13 +1131,6 @@ def utci(tdb, tr, v, rh, units="SI"):
         raise ValueError(
             "The value you entered are outside the equation applicability limits"
         )
-
-    # This is a python version of the UTCI_approx function
-    # Version a 0.002, October 2009
-    # tdb: air temperature, degrees Celsius
-    # ehPa: water vapour presure, hPa=hecto Pascal
-    # Tmrt: mean radiant temperature, degrees Celsius
-    # va10m: wind speed 10m above ground level in m/s
 
     eh_pa = exponential(tdb) * (rh / 100.0)
     delta_t_tr = tr - tdb
@@ -1848,7 +1840,7 @@ def solar_gain(
     fp += fp22 * (sharp - az1) * (sol_altitude - alt1)
     fp /= (az2 - az1) * (alt2 - alt1)
 
-    f_eff = 0.725  # fraction of the body surface exposed to radiation from the environment
+    f_eff = 0.725  # fraction of the body surface exposed to environmental radiation
     if posture == "seated":
         f_eff = 0.696
 
@@ -1857,7 +1849,7 @@ def solar_gain(
 
     e_diff = f_eff * f_svv * 0.5 * sol_transmittance * i_diff
     e_direct = f_eff * fp * sol_transmittance * f_bes * sol_radiation_dir
-    e_refl = (
+    e_reflected = (
         f_eff
         * f_svv
         * 0.5
@@ -1866,7 +1858,7 @@ def solar_gain(
         * floor_reflectance
     )
 
-    e_solar = e_diff + e_direct + e_refl
+    e_solar = e_diff + e_direct + e_reflected
     erf = e_solar * (sw_abs / lw_abs)
     d_mrt = erf / (hr * f_eff)
 
