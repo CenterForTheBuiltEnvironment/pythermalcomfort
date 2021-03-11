@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.4.0 (2021-03-11)
+------------------
+
+* changed equation to calculate convective heat transfer coefficient in set_tmp() as per Gagge's 1986
+* fixed vasodilation coefficient in set_tmp()
+* docs changed term air velocity with air speed and improved documentation
+
 1.3.6 (2021-02-04)
 ------------------
 
