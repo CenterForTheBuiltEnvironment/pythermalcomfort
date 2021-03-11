@@ -543,7 +543,7 @@ def set_optimized(
     met_factor = 58.2
     sbc = 0.000000056697  # Stefan-Boltzmann constant (W/m2K4)
     c_sw = 170  # driving coefficient for regulatory sweating
-    c_dil = 120  # driving coefficient for vasodilation
+    c_dil = 200  # driving coefficient for vasodilation
     c_str = 0.5  # driving coefficient for vasoconstriction
 
     temp_skin_neutral = 33.7
@@ -583,7 +583,7 @@ def set_optimized(
     # h_fc forced convective heat transfer coefficient, W/(m2 °C)
     h_fc = 8.600001 * pow((air_speed * pressure_in_atmospheres), 0.53)
     h_cc = max(h_cc, h_fc)
-    if not calculate_ce:
+    if not calculate_ce and met > 0.85:
         h_c_met = 5.66 * (met - 0.85) ** 0.39
         h_cc = max(h_cc, h_c_met)
 
@@ -699,7 +699,7 @@ def set_optimized(
     h_r_s = h_r  # standard environment radiative heat transfer coefficient
 
     h_c_s = 3.0 * pow(pressure_in_atmospheres, 0.53)
-    if not calculate_ce:
+    if not calculate_ce and met > 0.85:
         h_c_met = 5.66 * (met - 0.85) ** 0.39
         h_c_s = max(h_c_s, h_c_met)
     if h_c_s < 3.0:
