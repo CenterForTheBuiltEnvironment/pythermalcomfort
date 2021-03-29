@@ -21,7 +21,7 @@ year = "2019-2020"
 author = "Federico Tartarini"
 copyright = "{0}, {1}".format(year, author)
 # fmt: off
-version = release = '1.4.0'
+version = release = '1.4.1'
 # fmt: on
 
 pygments_style = "trac"
