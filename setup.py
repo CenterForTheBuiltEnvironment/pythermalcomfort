@@ -23,10 +23,8 @@ def read(*names, **kwargs):
 
 
 setup(
-    # fmt: off
-    name='pythermalcomfort',
-    version='1.4.1',
-    # fmt: on
+    name="pythermalcomfort",
+    version="1.4.1",
     license="MIT",
     description="Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables. Please cite us if you use this package: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578",
     long_description="%s\n%s"
@@ -80,8 +78,8 @@ setup(
     ],
     python_requires=">=3.6.*",
     install_requires=[
-        "scipy==1.5.3",
-        "numba==0.50.1"
+        "scipy",
+        "numba"
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={

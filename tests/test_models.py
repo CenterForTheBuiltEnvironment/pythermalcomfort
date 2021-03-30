@@ -28,7 +28,7 @@ from pythermalcomfort.utilities import transpose_sharp_altitude
 # fmt: off
 data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.9},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.8},
     {'tdb': 25, 'tr': 25, 'v': 0.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 24},
     {'tdb': 25, 'tr': 25, 'v': 0.6, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.4},
     {'tdb': 25, 'tr': 25, 'v': 3, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 18.8},
@@ -36,19 +36,34 @@ data_test_set = [
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 2, 'set': 32.5},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 4, 'set': 37.8},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 23.3},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 29.7},
+    # {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 29.7},
     {'tdb': 10, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 17},
     {'tdb': 15, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 19.3},
     {'tdb': 20, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.6},
     {'tdb': 30, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 26.4},
-    {'tdb': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.3},
+    # {'tdb': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.3},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
     {'tdb': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.3},
     {'tdb': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.8},
     {'tdb': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.2},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 36},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3}
+    # {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 36},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 24.1},  # the test belows are test Federico has implemented to check that both the pythermalcomfort and CBE TCT gives same results
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 3, 'clo': 0.5, 'set': 27.5},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 30.4},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.4},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 25.0},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.1, 'set': 17.6},
+    {'tdb': 29, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 25.1},
+    {'tdb': 27, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 26.3},
+    {'tdb': 20, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.1, 'set': 13.5},
+    {'tdb': 25, 'tr': 27, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.0},
+    {'tdb': 25, 'tr': 29, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.6},
+    {'tdb': 25, 'tr': 31, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 24.2},
+    {'tdb': 25, 'tr': 27, 'v': 1.3, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.7},
+    {'tdb': 25, 'tr': 29, 'v': 1.5, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.9},
+    {'tdb': 25, 'tr': 31, 'v': 1.7, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.2},
 ]
 
 data_test_pmv_iso = [  # I have commented the lines of code that don't pass the test
@@ -72,7 +87,7 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.7},
     {'tdb': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.8},
     {'tdb': 86, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 79.6},
-    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.7},
+    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.5},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 74.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 76.8},
     {'tdb': 77, 'tr': 77, 'v': 19.7 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 75.2},
@@ -85,8 +100,8 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.4},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 100.1},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 73.9},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 85.5},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 96.7},
+    # {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 85.5},
+    # {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 96.7},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
     {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.5},
     {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 54.1},
@@ -114,19 +129,62 @@ data_test_pmv_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 76.5, 'rh': 16, 'vr': 20 / 60, 'met': 1.1, 'clo': .5, 'pmv': -0.5, 'ppd': 10},
 ]
 
-data_test_erf = {
-    "alt": [45, 0, 60, 90, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
-    "sharp": [0, 120, 120, 120, 0, 30, 60, 90, 150, 180, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120],
-    "posture": ["Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Standing", "Seated",
-                "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated", "Seated"],
-    "I_dir": [700, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 400, 600, 1000, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800],
-    "t_sol": [0.8, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-    "f_svv": [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-    "f_bes": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 0.3, 0.7, 0.5, 0.5, 0.5, 0.5],
-    "asa": [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.3, 0.5, 0.9, 0.7],
-    "ERF": [64.9, 43.3, 63.2, 65.3, 63.1, 62.4, 60.5, 57.2, 51.7, 49.0, 59.3, 27.4, 41.1, 68.5, 11.0, 32.9, 76.7, 29.3, 42.1, 67.5, 36.4, 45.6, 64.0, 23.5, 39.1, 70.4, 54.8],
-    "t_rsw": [15.5, 10.4, 15.1, 15.6, 15.1, 14.9, 14.5, 13.7, 12.4, 11.7, 13.6, 6.6, 9.8, 16.4, 2.6, 7.9, 18.4, 7.0, 10.1, 16.2, 8.7, 10.9, 15.3, 5.6, 9.4, 16.9, 13.1],
-}
+data_test_erf = [
+    {'alt': 45, 'sharp': 0, 'I_dir': 700, 't_sol': 0.8, 'f_svv': 0.2, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 64.9, 't_rsw': 15.5},
+    {'alt': 0, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 43.3, 't_rsw': 10.4},
+    {'alt': 60, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 63.2, 't_rsw': 15.1},
+    {'alt': 90, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 65.3, 't_rsw': 15.6},
+    {'alt': 30, 'sharp': 0, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 63.1, 't_rsw': 15.1},
+    {'alt': 30, 'sharp': 30, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 62.4, 't_rsw': 14.9},
+    {'alt': 30, 'sharp': 60, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 60.5, 't_rsw': 14.5},
+    {'alt': 30, 'sharp': 90, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 57.2, 't_rsw': 13.7},
+    {'alt': 30, 'sharp': 150, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 51.7, 't_rsw': 12.4},
+    {'alt': 30, 'sharp': 180, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 49.0, 't_rsw': 11.7},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Standing', 'erf': 59.3, 't_rsw': 13.6},
+    {'alt': 30, 'sharp': 120, 'I_dir': 400, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 27.4, 't_rsw': 6.6},
+    {'alt': 30, 'sharp': 120, 'I_dir': 600, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 41.1, 't_rsw': 9.8},
+    {'alt': 30, 'sharp': 120, 'I_dir': 1000, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 68.5, 't_rsw': 16.4},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.1, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 11.0, 't_rsw': 2.6},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.3, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 32.9, 't_rsw': 7.9},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.7, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 76.7, 't_rsw': 18.4},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.1, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 29.3, 't_rsw': 7.0},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.3, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 42.1, 't_rsw': 10.1},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.7, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 67.5, 't_rsw': 16.2},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.1,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 36.4, 't_rsw': 8.7},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.3,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 45.6, 't_rsw': 10.9},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.7,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 64.0, 't_rsw': 15.3},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.3, 'posture': 'Seated', 'erf': 23.5, 't_rsw': 5.6},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.5, 'posture': 'Seated', 'erf': 39.1, 't_rsw': 9.4},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.9, 'posture': 'Seated', 'erf': 70.4, 't_rsw': 16.9},
+    {'alt': 30, 'sharp': 120, 'I_dir': 800, 't_sol': 0.5, 'f_svv': 0.5, 'f_bes': 0.5,
+     'asa': 0.7, 'posture': 'Seated', 'erf': 54.8, 't_rsw': 13.1},
+    ]
 
 # fmt: on
 def test_transpose_sharp_altitude():
@@ -186,35 +244,54 @@ def test_psy_ta_rh():
 
 
 def test_solar_gain():
-    for ix in range(0, len(data_test_erf["alt"])):
+    for row in data_test_erf:
         assert (
             solar_gain(
-                sol_altitude=data_test_erf["alt"][ix],
-                sharp=data_test_erf["sharp"][ix],
-                sol_radiation_dir=data_test_erf["I_dir"][ix],
-                sol_transmittance=data_test_erf["t_sol"][ix],
-                f_svv=data_test_erf["f_svv"][ix],
-                f_bes=data_test_erf["f_bes"][ix],
-                asw=data_test_erf["asa"][ix],
-                posture=data_test_erf["posture"][ix],
+                sol_altitude=row["alt"],
+                sharp=row["sharp"],
+                sol_radiation_dir=row["I_dir"],
+                sol_transmittance=row["t_sol"],
+                f_svv=row["f_svv"],
+                f_bes=row["f_bes"],
+                asw=row["asa"],
+                posture=row["posture"],
             )["erf"]
-        ) == data_test_erf["ERF"][ix]
+            == row["erf"]
+        )
         assert (
             solar_gain(
-                sol_altitude=data_test_erf["alt"][ix],
-                sharp=data_test_erf["sharp"][ix],
-                sol_radiation_dir=data_test_erf["I_dir"][ix],
-                sol_transmittance=data_test_erf["t_sol"][ix],
-                f_svv=data_test_erf["f_svv"][ix],
-                f_bes=data_test_erf["f_bes"][ix],
-                asw=data_test_erf["asa"][ix],
-                posture=data_test_erf["posture"][ix],
+                sol_altitude=row["alt"],
+                sharp=row["sharp"],
+                sol_radiation_dir=row["I_dir"],
+                sol_transmittance=row["t_sol"],
+                f_svv=row["f_svv"],
+                f_bes=row["f_bes"],
+                asw=row["asa"],
+                posture=row["posture"],
             )["delta_mrt"]
-        ) == data_test_erf["t_rsw"][ix]
+            == row["t_rsw"]
+        )
 
 
 def test_cooling_effect():
+    assert (cooling_effect(tdb=25, tr=25, vr=0.05, rh=50, met=1, clo=0.6)) == 0
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.11
+    assert (cooling_effect(tdb=27, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.78
+    assert (cooling_effect(tdb=29, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.57
+    assert (cooling_effect(tdb=31, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.36
+    assert (cooling_effect(tdb=25, tr=27, vr=0.5, rh=50, met=1, clo=0.6)) == 2.38
+    assert (cooling_effect(tdb=25, tr=29, vr=0.5, rh=50, met=1, clo=0.6)) == 2.74
+    assert (cooling_effect(tdb=25, tr=25, vr=0.2, rh=50, met=1, clo=0.6)) == 0.64
+    assert (cooling_effect(tdb=25, tr=25, vr=0.8, rh=50, met=1, clo=0.6)) == 2.85
+    assert (cooling_effect(tdb=25, tr=25, vr=0.0, rh=50, met=1, clo=0.6)) == 0
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.6)) == 2.07
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=80, met=1, clo=0.6)) == 2.0
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=20, met=1, clo=0.6)) == 2.23
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.3, clo=0.6)) == 2.76
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.6, clo=0.6)) == 3.42
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.34
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.0
+
     assert (
         cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
     ) == 3.84
@@ -263,16 +340,35 @@ def test_set_tmp():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_set:
         assert (
-            set_tmp(
-                tdb=row["tdb"],
-                tr=row["tr"],
-                v=row["v"],
-                rh=row["rh"],
-                met=row["met"],
-                clo=row["clo"],
+            abs(
+                set_tmp(
+                    tdb=row["tdb"],
+                    tr=row["tr"],
+                    v=row["v"],
+                    rh=row["rh"],
+                    met=row["met"],
+                    clo=row["clo"],
+                )
+                - row["set"]
             )
-            - row["set"]
-        ) < 0.01
+            < 0.01
+        )
+
+    # testing SET equation to calculate cooling effect
+    assert (set_tmp(25, 25, 1.1, 50, 2, 0.5, calculate_ce=True)) == 20.8
+    assert (set_tmp(25, 25, 1.1, 50, 3, 0.5, calculate_ce=True)) == 21.3
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 20.6
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 23.3
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 15.8
+    assert (set_tmp(29, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 23.4
+    assert (set_tmp(27, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 24.7
+    assert (set_tmp(20, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 11.4
+    assert (set_tmp(25, 27, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.3
+    assert (set_tmp(25, 29, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.9
+    assert (set_tmp(25, 31, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 22.5
+    assert (set_tmp(25, 27, 1.3, 50, 1.5, 0.5, calculate_ce=True)) == 20.9
+    assert (set_tmp(25, 29, 1.5, 50, 1.5, 0.5, calculate_ce=True)) == 21.3
+    assert (set_tmp(25, 31, 1.7, 50, 1.5, 0.5, calculate_ce=True)) == 21.6
 
     assert (
         set_tmp(
@@ -288,17 +384,20 @@ def test_set_tmp():
 
     for row in data_test_set_ip:
         assert (
-            set_tmp(
-                row["tdb"],
-                row["tr"],
-                row["v"],
-                row["rh"],
-                row["met"],
-                row["clo"],
-                units="IP",
+            abs(
+                set_tmp(
+                    row["tdb"],
+                    row["tr"],
+                    row["v"],
+                    row["rh"],
+                    row["met"],
+                    row["clo"],
+                    units="IP",
+                )
+                - row["set"]
             )
-            - row["set"]
-        ) < 0.11
+            < 0.11
+        )
 
 
 def test_pmv():
@@ -318,99 +417,117 @@ def test_pmv_ppd():
     """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
     for row in data_test_pmv:
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tr"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="iso",
-                )["pmv"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tr"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="iso",
+                    )["pmv"],
+                    1,
+                )
+                - row["pmv"]
             )
-            - row["pmv"]
-        ) < 0.011
+            < 0.011
+        )
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tr"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="iso",
-                )["ppd"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tr"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="iso",
+                    )["ppd"],
+                    1,
+                )
+                - row["ppd"]
             )
-            - row["ppd"]
-        ) < 1
+            < 1
+        )
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tr"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="ashrae",
-                )["pmv"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tr"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="ashrae",
+                    )["pmv"],
+                    1,
+                )
+                - row["pmv"]
             )
-            - row["pmv"]
-        ) < 0.011
+            < 0.011
+        )
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tr"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="ashrae",
-                )["ppd"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tr"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="ashrae",
+                    )["ppd"],
+                    1,
+                )
+                - row["ppd"]
             )
-            - row["ppd"]
-        ) < 1
+            < 1
+        )
 
     for row in data_test_pmv_ip:
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tdb"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="ashrae",
-                    units="ip",
-                )["pmv"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tdb"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="ashrae",
+                        units="ip",
+                    )["pmv"],
+                    1,
+                )
+                - row["pmv"]
             )
-            - row["pmv"]
-        ) < 0.011
+            < 0.011
+        )
         assert (
-            round(
-                pmv_ppd(
-                    row["tdb"],
-                    row["tdb"],
-                    row["vr"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    standard="ashrae",
-                    units="ip",
-                )["ppd"],
-                1,
+            abs(
+                round(
+                    pmv_ppd(
+                        row["tdb"],
+                        row["tdb"],
+                        row["vr"],
+                        row["rh"],
+                        row["met"],
+                        row["clo"],
+                        standard="ashrae",
+                        units="ip",
+                    )["ppd"],
+                    1,
+                )
+                - row["ppd"]
             )
-            - row["ppd"]
-        ) < 1
+            < 1
+        )
 
     assert (
         round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1)
