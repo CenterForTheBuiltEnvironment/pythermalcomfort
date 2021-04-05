@@ -22,6 +22,7 @@ jobs:
         pip install setuptools wheel twine
     - name: Publish distribution 📦 to Test PyPI
       env:
+        TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
       run: |
         python setup.py sdist bdist_wheel
