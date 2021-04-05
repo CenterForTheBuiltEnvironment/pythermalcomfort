@@ -1,5 +1,4 @@
 import math
-from pythermalcomfort.utilities import *
 
 c_to_k = 273.15
 cp_vapour = 1805.0
@@ -10,7 +9,7 @@ r_air = 287.055
 
 
 def f_svv(w, h, d):
-    """ Calculates the sky-vault view fraction
+    """Calculates the sky-vault view fraction
 
     Parameters
     ----------
@@ -35,7 +34,7 @@ def f_svv(w, h, d):
 
 
 def p_sat_torr(tdb):
-    """ Estimates the saturation vapor pressure in [torr]
+    """Estimates the saturation vapor pressure in [torr]
 
     Parameters
     ----------
@@ -51,7 +50,7 @@ def p_sat_torr(tdb):
 
 
 def v_relative(v, met):
-    """ Estimates the relative air speed which combines the average air speed of
+    """Estimates the relative air speed which combines the average air speed of
     the space plus the relative air speed caused by the body movement.
 
     Parameters
@@ -74,7 +73,7 @@ def v_relative(v, met):
 
 
 def clo_dynamic(clo, met, standard="ASHRAE"):
-    """ Estimates the dynamic clothing insulation of a moving occupant. The activity as
+    """Estimates the dynamic clothing insulation of a moving occupant. The activity as
     well as the air speed modify the insulation characteristics of the clothing and the
     adjacent air layer. Consequently the ISO 7730 states that the clothing insulation
     shall be corrected [2]_. The ASHRAE 55 Standard, instead, only corrects for the effect
@@ -108,7 +107,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
 
 
 def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
-    """ Estimates the running mean temperature
+    """Estimates the running mean temperature
 
     Parameters
     ----------
@@ -148,7 +147,7 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
 
 
 def units_converter(from_units="ip", **kwargs):
-    """ Converts IP values to SI units
+    """Converts IP values to SI units
 
     Parameters
     ----------
@@ -187,7 +186,7 @@ def units_converter(from_units="ip", **kwargs):
 
 
 def t_o(tdb, tr, v):
-    """ Calculates operative temperature in accordance with ISO 7726:1998 [5]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
     ----------
@@ -208,7 +207,7 @@ def t_o(tdb, tr, v):
 
 
 def enthalpy(tdb, hr):
-    """ Calculates air enthalpy
+    """Calculates air enthalpy
 
     Parameters
     ----------
@@ -231,7 +230,7 @@ def enthalpy(tdb, hr):
 
 
 def p_sat(tdb):
-    """ Calculates vapour pressure of water at different temperatures
+    """Calculates vapour pressure of water at different temperatures
 
     Parameters
     ----------
@@ -278,7 +277,7 @@ def p_sat(tdb):
 
 
 def psy_ta_rh(tdb, rh, patm=101325):
-    """ Calculates psychrometric values of air based on dry bulb air temperature and
+    """Calculates psychrometric values of air based on dry bulb air temperature and
     relative humidity.
     For more accurate results we recommend the use of the the Python package
     `psychrolib`_.
@@ -307,18 +306,25 @@ def psy_ta_rh(tdb, rh, patm=101325):
     h: float
         enthalpy [J/kg dry air]
     """
-    psat = p_sat(tdb)
-    pvap = rh / 100 * psat
-    hr = 0.62198 * pvap / (patm - pvap)
+    p_saturation = p_sat(tdb)
+    p_vap = rh / 100 * p_saturation
+    hr = 0.62198 * p_vap / (patm - p_vap)
     tdp = t_dp(tdb, rh)
     twb = t_wb(tdb, rh)
     h = enthalpy(tdb, hr)
 
-    return {"p_sat": psat, "p_vap": pvap, "hr": hr, "t_wb": twb, "t_dp": tdp, "h": h}
+    return {
+        "p_sat": p_saturation,
+        "p_vap": p_vap,
+        "hr": hr,
+        "t_wb": twb,
+        "t_dp": tdp,
+        "h": h,
+    }
 
 
 def t_wb(tdb, rh):
-    """ Calculates the wet-bulb temperature using the Stull equation [6]_
+    """Calculates the wet-bulb temperature using the Stull equation [6]_
 
     Parameters
     ----------
@@ -344,7 +350,7 @@ def t_wb(tdb, rh):
 
 
 def t_dp(tdb, rh):
-    """ Calculates the dew point temperature.
+    """Calculates the dew point temperature.
 
     Parameters
     ----------
@@ -369,7 +375,7 @@ def t_dp(tdb, rh):
 
 
 def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9):
-    """ Converts globe temperature reading into mean radiant temperature in accordance
+    """Converts globe temperature reading into mean radiant temperature in accordance
     with ISO 7726:1998 [5]_
 
     Parameters

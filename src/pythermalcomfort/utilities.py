@@ -5,12 +5,16 @@ warnings.simplefilter("always")
 
 
 def transpose_sharp_altitude(sharp, altitude):
-    altitude_new = math.degrees(math.asin(
-        math.sin(math.radians(abs(sharp - 90))) * math.cos(math.radians(altitude))))
-    sharp = math.degrees(math.atan(
-        math.sin(math.radians(sharp)) * math.tan(math.radians(90 - altitude))))
+    altitude_new = math.degrees(
+        math.asin(
+            math.sin(math.radians(abs(sharp - 90))) * math.cos(math.radians(altitude))
+        )
+    )
+    sharp = math.degrees(
+        math.atan(math.sin(math.radians(sharp)) * math.tan(math.radians(90 - altitude)))
+    )
     sol_altitude = altitude_new
-    return round(sharp,3), round(sol_altitude,3)
+    return round(sharp, 3), round(sol_altitude, 3)
 
 
 def check_standard_compliance(standard, **kwargs):
@@ -31,11 +35,13 @@ def check_standard_compliance(standard, **kwargs):
         for key, value in params.items():
             if key == "met" and value > 1.3:
                 warnings.warn(
-                    "The ankle draft model is only valid for met <= 1.3", UserWarning,
+                    "The ankle draft model is only valid for met <= 1.3",
+                    UserWarning,
                 )
             if key == "clo" and value > 0.7:
                 warnings.warn(
-                    "The ankle draft model is only valid for clo <= 0.7", UserWarning,
+                    "The ankle draft model is only valid for clo <= 0.7",
+                    UserWarning,
                 )
 
     elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2017
@@ -89,11 +95,13 @@ def check_standard_compliance(standard, **kwargs):
                 )
             if key == "met" and (value > 4 or value < 0.8):
                 warnings.warn(
-                    "ISO met applicability limits between 0.8 and 4.0 met", UserWarning,
+                    "ISO met applicability limits between 0.8 and 4.0 met",
+                    UserWarning,
                 )
             if key == "clo" and (value > 2 or value < 0):
                 warnings.warn(
-                    "ISO clo applicability limits between 0.0 and 2 clo", UserWarning,
+                    "ISO clo applicability limits between 0.0 and 2 clo",
+                    UserWarning,
                 )
 
 
@@ -145,7 +153,7 @@ clo_typical_ensembles = {
     "Typical winter indoor clothing": 1.0,
 }
 
-#: This dictionary contains the clo values of individual clothing elements. To calculate the total clothing insulation you need to add these values together.
+# This dictionary contains the clo values of individual clothing elements. To calculate the total clothing insulation you need to add these values together.
 clo_individual_garments = {
     "Metal chair": 0.00,
     "Bra": 0.01,
