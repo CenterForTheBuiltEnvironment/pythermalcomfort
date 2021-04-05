@@ -3,9 +3,11 @@ from pythermalcomfort.psychrometrics import (
     units_converter,
     t_o,
     p_sat_torr,
+)
+from pythermalcomfort.utilities import (
+    transpose_sharp_altitude,
     check_standard_compliance,
 )
-from pythermalcomfort.utilities import transpose_sharp_altitude
 import math
 from scipy import optimize
 from numba import jit

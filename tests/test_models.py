@@ -23,7 +23,9 @@ from pythermalcomfort.psychrometrics import (
     t_mrt,
     f_svv,
 )
-from pythermalcomfort.utilities import transpose_sharp_altitude
+from pythermalcomfort.utilities import (
+    transpose_sharp_altitude,
+)
 
 # fmt: off
 data_test_set = [
