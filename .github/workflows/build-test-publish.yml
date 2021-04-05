@@ -7,7 +7,7 @@ on: push
 
 jobs:
 
-  build:
+  test:
 
     # I am only testing with py37 but travis is Testing the other versions of Python
     runs-on: ubuntu-latest
