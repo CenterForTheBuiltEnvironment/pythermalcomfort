@@ -15,7 +15,7 @@ PMV PPD
 PMV
 ---
 
-.. autofunction:: PYTHERMALCOMFORT.models.pmv
+.. autofunction:: pythermalcomfort.models.pmv
 
 Standard Effective Temperature (SET)
 ------------------------------------
