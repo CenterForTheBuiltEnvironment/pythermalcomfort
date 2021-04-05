@@ -9,9 +9,8 @@ jobs:
 
   build:
 
-    if: "contains(github.event.head_commit.message, 'Bump version')"
-
     runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, 'Bump version')"
 
     # I am only testing with py37 but travis is Testing the other versions of Python
     steps:
