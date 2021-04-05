@@ -12,7 +12,7 @@ Overview
     * - downloads
       - |downloads|
     * - tests
-      - | |codecov| |requires|
+      - | |travis| |codecov| |requires|
     * - package
       - | |version| |wheel|
         | |supported-versions|
