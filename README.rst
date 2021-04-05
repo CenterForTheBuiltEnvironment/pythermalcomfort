@@ -12,11 +12,11 @@ Overview
     * - downloads
       - |downloads|
     * - tests
-      - | |travis| |codecov| |requires|
+      - | |travis| |codecov|
+      - | |requires|
     * - package
       - | |version| |wheel|
         | |supported-versions|
-        | |supported-implementations|
 
 .. |docs| image:: https://readthedocs.org/projects/pythermalcomfort/badge/?style=flat
     :target: https://readthedocs.org/projects/pythermalcomfort
