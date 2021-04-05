@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.4.5 (2021-03-30)
+1.4.6 (2021-03-30)
 ------------------
 
 * changed equation to calculate convective heat transfer coefficient in set_tmp() as per Gagge's 1986

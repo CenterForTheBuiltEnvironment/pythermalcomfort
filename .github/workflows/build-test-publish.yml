@@ -9,6 +9,8 @@ jobs:
 
   build:
 
+    if: "contains(github.event.head_commit.message, 'Bump version')"
+
     runs-on: ubuntu-latest
 
     # I am only testing with py37 but travis is Testing the other versions of Python
@@ -41,7 +43,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
     - name: Publish pythermalcomfort 📦 to PyPI
-      if: "! contains(github.event.head_commit.message, 'Bump version')"
       env:
         TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
