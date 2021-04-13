@@ -12,7 +12,9 @@ activity = "Typing"  # participant's activity description
 garments = ["Sweatpants", "T-shirt", "Shoes or sandals"]
 
 met = met_typical_tasks[activity]  # activity met, [met]
-icl = sum([clo_individual_garments[item] for item in garments])  # calculate total clothing insulation
+icl = sum(
+    [clo_individual_garments[item] for item in garments]
+)  # calculate total clothing insulation
 
 # calculate the relative air velocity
 vr = v_relative(v=v, met=met)
@@ -39,16 +41,25 @@ import os
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
 import time
+
 start = time.time()
 
-df['PMV'] = None
-df['PPD'] = None
+df["PMV"] = None
+df["PPD"] = None
 
 for index, row in df.iterrows():
-    vr = v_relative(v=row['v'], met=row['met'])
-    results = pmv_ppd(tdb=row['tdb'], tr=row['tr'], vr=vr, rh=row['rh'], met=row['met'], clo=row['clo'], standard="ashrae")
-    df.loc[index, 'PMV'] = results['pmv']
-    df.loc[index, 'PPD'] = results['ppd']
+    vr = v_relative(v=row["v"], met=row["met"])
+    results = pmv_ppd(
+        tdb=row["tdb"],
+        tr=row["tr"],
+        vr=vr,
+        rh=row["rh"],
+        met=row["met"],
+        clo=row["clo"],
+        standard="ashrae",
+    )
+    df.loc[index, "PMV"] = results["pmv"]
+    df.loc[index, "PPD"] = results["ppd"]
 
 print(df)
 
@@ -99,7 +110,7 @@ for ix in range(df.shape[0]):
             clo[ix],
             standard="ashrae",
             units="SI",
-            )
+        )
         _pmv = _pmv_ppd["pmv"]
         _ppd = _pmv_ppd["ppd"]
     except:
@@ -116,15 +127,17 @@ end = time.time()
 print(end - start)
 
 # Finally one other alternative to improve the speed of the code above is to use numpy vectorize as shown below
-# Please note that this code will break if the PMV value cannot be calcualted
+# Please note that this code will break if the PMV value cannot be calculated
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
 from pythermalcomfort.psychrometrics import v_relative
 import numpy as np
+import os
 
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
 import time
+
 start = time.time()
 
 ta = df["tdb"].values
@@ -134,8 +147,8 @@ rh = df["rh"].values
 met = df["met"].values
 clo = df["clo"].values
 
-v_rel=np.vectorize(v_relative)(vel,met)
-results=np.vectorize(pmv_ppd)(ta,tr,v_rel,rh,met,clo,0,"ashrae","SI")
+v_rel = np.vectorize(v_relative)(vel, met)
+results = np.vectorize(pmv_ppd)(ta, tr, v_rel, rh, met, clo, 0, "ashrae", "SI")
 
 # split the pmv column in two since currently contains both pmv and ppd values
 df_ = pd.DataFrame(results)
