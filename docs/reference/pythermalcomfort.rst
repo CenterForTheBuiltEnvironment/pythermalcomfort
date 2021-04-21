@@ -62,8 +62,8 @@ Ankle draft
 
 .. autofunction:: pythermalcomfort.models.ankle_draft
 
-Predicted Heat Strain (PHS) index
----------------------------
+Predicted Heat Strain (PHS) Index
+---------------------------------
 
 .. autofunction:: pythermalcomfort.models.phs
 
