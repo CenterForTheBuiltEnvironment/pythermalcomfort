@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.5.0 (2021-04-21)
+------------------
+
+* added Predicted Heat Strain (PHS) index from ISO 7933:2004
+
 1.4.6 (2021-03-30)
 ------------------
 
