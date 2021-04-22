@@ -2018,6 +2018,10 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
 
     p_a = p_sat(tdb) / 1000 * rh / 100
 
+    check_standard_compliance(
+        standard="ISO7933", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
+
     if not t_re:
         t_re = t_cr
     if not t_cr_eq:

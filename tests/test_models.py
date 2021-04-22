@@ -1,4 +1,5 @@
 import pytest
+import warnings
 from pythermalcomfort.models import (
     solar_gain,
     pmv_ppd,
@@ -791,3 +792,59 @@ def test_phs():
         "d_lim_loss_50": 480,
         "d_lim_loss_95": 339,
     }
+
+
+def test_check_standard_compliance():
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 air temperature applicability limits between 15 and 50 °C",
+    ):
+        warnings.warn(
+            phs(tdb=70, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2),
+            UserWarning,
+        )
+
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 t_r - t_db applicability limits between 0 and 60 °C",
+    ):
+        warnings.warn(
+            phs(tdb=20, tr=0, rh=33.85, v=0.3, met=150, clo=0.5, posture=2),
+            UserWarning,
+        )
+
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 air speed applicability limits between 0 and 3 m/s",
+    ):
+        warnings.warn(
+            phs(tdb=40, tr=40, rh=33.85, v=5, met=150, clo=0.5, posture=2),
+            UserWarning,
+        )
+
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 met applicability limits between 100 and 450 met",
+    ):
+        warnings.warn(
+            phs(tdb=40, tr=40, rh=33.85, v=2, met=1, clo=0.5, posture=2),
+            UserWarning,
+        )
+
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 clo applicability limits between 0.1 and 1 clo",
+    ):
+        warnings.warn(
+            phs(tdb=40, tr=40, rh=33.85, v=2, met=150, clo=2, posture=2),
+            UserWarning,
+        )
+
+    with pytest.warns(
+        UserWarning,
+        match="ISO 7933:2004 t_r - t_db applicability limits between 0 and",
+    ):
+        warnings.warn(
+            phs(tdb=40, tr=40, rh=61, v=2, met=150, clo=2, posture=2),
+            UserWarning,
+        )

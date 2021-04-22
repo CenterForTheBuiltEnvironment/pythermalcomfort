@@ -1,5 +1,6 @@
 import warnings
 import math
+from pythermalcomfort.psychrometrics import p_sat
 
 warnings.simplefilter("always")
 
@@ -103,6 +104,40 @@ def check_standard_compliance(standard, **kwargs):
                     "ISO clo applicability limits between 0.0 and 2 clo",
                     UserWarning,
                 )
+
+    elif params["standard"] == "ISO7933":  # based on ISO 7933:2004 Annex A
+        if params["tdb"] > 50 or params["tdb"] < 15:
+            warnings.warn(
+                "ISO 7933:2004 air temperature applicability limits between 15 and 50 °C",
+                UserWarning,
+            )
+        p_a = p_sat(params["tdb"]) / 1000 * params["rh"] / 100
+        rh_max = 4.5 * 100 * 1000 / p_sat(params["tdb"])
+        if p_a > 4.5 or p_a < 0:
+            warnings.warn(
+                f"ISO 7933:2004 t_r - t_db applicability limits between 0 and {rh_max} %",
+                UserWarning,
+            )
+        if params["tr"] - params["tdb"] > 50 or params["tr"] - params["tdb"] < 0:
+            warnings.warn(
+                "ISO 7933:2004 t_r - t_db applicability limits between 0 and 60 °C",
+                UserWarning,
+            )
+        if params["v"] > 3 or params["v"] < 0:
+            warnings.warn(
+                "ISO 7933:2004 air speed applicability limits between 0 and 3 m/s",
+                UserWarning,
+            )
+        if params["met"] > 450 or params["met"] < 100:
+            warnings.warn(
+                "ISO 7933:2004 met applicability limits between 100 and 450 met",
+                UserWarning,
+            )
+        if params["clo"] > 1 or params["clo"] < 0.1:
+            warnings.warn(
+                "ISO 7933:2004 clo applicability limits between 0.1 and 1 clo",
+                UserWarning,
+            )
 
 
 #: This dictionary contains the met values of typical tasks.
