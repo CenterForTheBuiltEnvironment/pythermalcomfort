@@ -247,3 +247,17 @@ clo_individual_garments = {
     "Double-breasted coat (thin)": 0.42,
     "Double-breasted coat (thick)": 0.48,
 }
+
+# This dictionary contains the reflection coefficients, Fr, for different special materials
+f_r_garments = {
+    "Cotton with aluminium paint": 0.42,
+    "Viscose with glossy aluminium foil": 0.19,
+    "Aramid (Kevlar) with glossy aluminium foil": 0.14,
+    "Wool with glossy aluminium foil": 0.12,
+    "Cotton with glossy aluminium foil": 0.04,
+    "Viscose vacuum metallized with aluminium": 0.06,
+    "Aramid vacuum metallized with aluminium": 0.04,
+    "Wool vacuum metallized with aluminium": 0.05,
+    "Cotton vacuum metallized with aluminium": 0.05,
+    "Glass fiber vacuum metallized with aluminium": 0.07,
+}

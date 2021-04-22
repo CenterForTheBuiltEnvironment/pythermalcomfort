@@ -1948,6 +1948,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         duration of the work sequence, [minutes]
     f_r : float, default 0.97
         emissivity of the reflective clothing, [dimensionless]
+        Some reference values :py:meth:`pythermalcomfort.utilities.f_r_garments`.
     t_sk : float, default 34.1
         mean skin temperature when worker starts working, [°C]
     t_cr : float, default 36.8
