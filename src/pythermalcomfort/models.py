@@ -2028,6 +2028,69 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     if not t_cr_eq:
         t_cr_eq = t_cr
 
+    t_re, d_lim_loss_50, d_lim_loss_95, d_lim_t_re, sw_tot_g = phs_optimized(
+        tdb,
+        tr,
+        v,
+        p_a,
+        met,
+        clo,
+        posture,
+        wme,
+        i_mst,
+        a_p,
+        drink,
+        weight,
+        height,
+        walk_sp,
+        theta,
+        acclimatized,
+        duration,
+        f_r,
+        t_sk,
+        t_cr,
+        t_re,
+        t_cr_eq,
+        sweat_rate,
+    )
+
+    return {
+        "t_re": round(t_re, 1),
+        "d_lim_loss_50": d_lim_loss_50,
+        "d_lim_loss_95": d_lim_loss_95,
+        "d_lim_t_re": d_lim_t_re,
+        "water_loss": round(sw_tot_g, 0),
+    }
+
+
+@jit(nopython=True)
+def phs_optimized(*args):
+    (
+        tdb,
+        tr,
+        v,
+        p_a,
+        met,
+        clo,
+        posture,
+        wme,
+        i_mst,
+        a_p,
+        drink,
+        weight,
+        height,
+        walk_sp,
+        theta,
+        acclimatized,
+        duration,
+        f_r,
+        t_sk,
+        t_cr,
+        t_re,
+        t_cr_eq,
+        sweat_rate,
+    ) = args
+
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight ** 0.425) * (height ** 0.725)
     sp_heat = 57.83 * weight / a_dubois  # specific heat of the body
@@ -2268,13 +2331,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     if d_lim_t_re == 0:
         d_lim_t_re = duration
 
-    return {
-        "t_re": round(t_re, 1),
-        "d_lim_loss_50": d_lim_loss_50,
-        "d_lim_loss_95": d_lim_loss_95,
-        "d_lim_t_re": d_lim_t_re,
-        "water_loss": round(sw_tot_g, 0),
-    }
+    return [t_re, d_lim_loss_50, d_lim_loss_95, d_lim_t_re, sw_tot_g]
 
 
 # add the following models:
