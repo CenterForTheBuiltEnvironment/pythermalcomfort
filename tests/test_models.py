@@ -692,11 +692,11 @@ def test_utci():
         ]
     )
     for row in data_test_adaptive_ashrae:
-        assert (utci(row["tdb"], row["tr"], row["v"], row["rh"])) == row["return"][
+        assert (utci(row["tdb"], row["tr"], row["v"], row["rh"])["utci"]) == row["return"][
             list(row["return"].keys())[0]
         ]
 
-    assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")) == 76.4
+    assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")["utci"]) == 76.4
 
 
 def test_clo_dynamic():
