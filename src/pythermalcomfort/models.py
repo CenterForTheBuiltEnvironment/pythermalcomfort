@@ -1096,6 +1096,8 @@ def utci(tdb, tr, v, rh, units="SI"):
     -------
     utci : float
          Universal Thermal Climate Index, [°C] or in [°F]
+    Stress Category : str
+         UTCI categorized in terms of thermal stress.
 
     Notes
     -----
@@ -1521,11 +1523,31 @@ def utci(tdb, tr, v, rh, units="SI"):
         + 0.00148348065 * pa * pa * pa * pa * pa * pa
     )
 
+    if utci_approx < -40:
+        stress_category = 'extreme cold stress'
+    elif utci_approx < -27:
+        stress_category = 'very strong cold stress'
+    elif utci_approx < -13:
+        stress_category = 'strong cold stress'
+    elif utci_approx < 0:
+        stress_category = 'moderate cold stress'
+    elif utci_approx < 9:
+        stress_category = 'slight cold stress'
+    elif utci_approx < 26:
+        stress_category = 'no thermal stress'
+    elif utci_approx < 32:
+        stress_category = 'moderate heat stress'
+    elif utci_approx < 38:
+        stress_category = 'strong heat stress'
+    elif utci_approx < 46:
+        stress_category = 'very strong heat stress'
+    else:
+        stress_category = 'extreme heat stress'
+
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
-    return round(utci_approx, 1)
-
+    return {"utci": round(utci_approx, 1), "Stress Category": stress_category}
 
 def clo_tout(tout, units="SI"):
     """Representative clothing insulation Icl as a function of outdoor air temperature
