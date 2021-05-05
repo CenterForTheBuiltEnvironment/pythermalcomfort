@@ -698,6 +698,13 @@ def test_utci():
 
     assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")) == 76.4
 
+    assert (
+        utci(tdb=25, tr=27, v=1, rh=50, units="si", return_stress_category=True)
+    ) == {"utci": 25.2, "stress_category": "no thermal stress"}
+    assert (
+        utci(tdb=25, tr=25, v=1, rh=50, units="si", return_stress_category=True)
+    ) == {"utci": 24.6, "stress_category": "no thermal stress"}
+
 
 def test_clo_dynamic():
     assert (clo_dynamic(clo=1, met=1, standard="ASHRAE")) == 1

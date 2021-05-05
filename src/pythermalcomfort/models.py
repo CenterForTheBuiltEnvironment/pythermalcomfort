@@ -1098,7 +1098,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     -------
     utci : float
          Universal Thermal Climate Index, [°C] or in [°F]
-    Stress Category : str
+    stress_category : str
          UTCI categorized in terms of thermal stress.
 
     Notes
@@ -1119,6 +1119,10 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
         >>> # for users who wants to use the IP system
         >>> utci(tdb=77, tr=77, v=3.28, rh=50, units='ip')
         76.4
+
+        >>> # for users who wants to get stress category
+        >>> utci(tdb=25, tr=25, v=1.0, rh=50, return_stress_category=True)
+        {"utci": 24.6, "stress_category": "no thermal stress"}
 
     Raises
     ------
@@ -1526,31 +1530,31 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     )
 
     if utci_approx < -40:
-        stress_category = 'extreme cold stress'
+        stress_category = "extreme cold stress"
     elif utci_approx < -27:
-        stress_category = 'very strong cold stress'
+        stress_category = "very strong cold stress"
     elif utci_approx < -13:
-        stress_category = 'strong cold stress'
+        stress_category = "strong cold stress"
     elif utci_approx < 0:
-        stress_category = 'moderate cold stress'
+        stress_category = "moderate cold stress"
     elif utci_approx < 9:
-        stress_category = 'slight cold stress'
+        stress_category = "slight cold stress"
     elif utci_approx < 26:
-        stress_category = 'no thermal stress'
+        stress_category = "no thermal stress"
     elif utci_approx < 32:
-        stress_category = 'moderate heat stress'
+        stress_category = "moderate heat stress"
     elif utci_approx < 38:
-        stress_category = 'strong heat stress'
+        stress_category = "strong heat stress"
     elif utci_approx < 46:
-        stress_category = 'very strong heat stress'
+        stress_category = "very strong heat stress"
     else:
-        stress_category = 'extreme heat stress'
+        stress_category = "extreme heat stress"
 
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
     if return_stress_category:
-        return {"utci": round(utci_approx, 1), "Stress Category": stress_category}
+        return {"utci": round(utci_approx, 1), "stress_category": stress_category}
     else:
         return round(utci_approx, 1)
 
