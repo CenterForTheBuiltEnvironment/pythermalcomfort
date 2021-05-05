@@ -1099,7 +1099,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     utci : float
          Universal Thermal Climate Index, [°C] or in [°F]
     stress_category : str
-         UTCI categorized in terms of thermal stress.
+         UTCI categorized in terms of thermal stress [9]_.
 
     Notes
     -----
