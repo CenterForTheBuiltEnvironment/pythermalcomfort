@@ -1066,7 +1066,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     return results
 
 
-def utci(tdb, tr, v, rh, units="SI"):
+def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1091,6 +1091,8 @@ def utci(tdb, tr, v, rh, units="SI"):
         relative humidity, [%]
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    return_stress_category : boolean default False
+        if True returns the UTCI categorized in terms of thermal stress.
 
     Returns
     -------
@@ -1547,7 +1549,11 @@ def utci(tdb, tr, v, rh, units="SI"):
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
-    return {"utci": round(utci_approx, 1), "Stress Category": stress_category}
+    if return_stress_category:
+        return {"utci": round(utci_approx, 1), "Stress Category": stress_category}
+    else:
+        return round(utci_approx, 1)
+
 
 def clo_tout(tout, units="SI"):
     """Representative clothing insulation Icl as a function of outdoor air temperature
