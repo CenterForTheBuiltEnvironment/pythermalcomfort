@@ -1066,7 +1066,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     return results
 
 
-def utci(tdb, tr, v, rh, units="SI"):
+def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1091,11 +1091,15 @@ def utci(tdb, tr, v, rh, units="SI"):
         relative humidity, [%]
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    return_stress_category : boolean default False
+        if True returns the UTCI categorized in terms of thermal stress.
 
     Returns
     -------
     utci : float
          Universal Thermal Climate Index, [°C] or in [°F]
+    Stress Category : str
+         UTCI categorized in terms of thermal stress.
 
     Notes
     -----
@@ -1521,10 +1525,34 @@ def utci(tdb, tr, v, rh, units="SI"):
         + 0.00148348065 * pa * pa * pa * pa * pa * pa
     )
 
+    if utci_approx < -40:
+        stress_category = 'extreme cold stress'
+    elif utci_approx < -27:
+        stress_category = 'very strong cold stress'
+    elif utci_approx < -13:
+        stress_category = 'strong cold stress'
+    elif utci_approx < 0:
+        stress_category = 'moderate cold stress'
+    elif utci_approx < 9:
+        stress_category = 'slight cold stress'
+    elif utci_approx < 26:
+        stress_category = 'no thermal stress'
+    elif utci_approx < 32:
+        stress_category = 'moderate heat stress'
+    elif utci_approx < 38:
+        stress_category = 'strong heat stress'
+    elif utci_approx < 46:
+        stress_category = 'very strong heat stress'
+    else:
+        stress_category = 'extreme heat stress'
+
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
-    return round(utci_approx, 1)
+    if return_stress_category:
+        return {"utci": round(utci_approx, 1), "Stress Category": stress_category}
+    else:
+        return round(utci_approx, 1)
 
 
 def clo_tout(tout, units="SI"):
