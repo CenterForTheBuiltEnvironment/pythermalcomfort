@@ -18,15 +18,16 @@ from pythermalcomfort.psychrometrics import (
     t_wb,
     enthalpy,
     psy_ta_rh,
-    running_mean_outdoor_temperature,
-    units_converter,
     p_sat,
-    clo_dynamic,
     t_mrt,
-    f_svv,
 )
 from pythermalcomfort.utilities import (
     transpose_sharp_altitude,
+    f_svv,
+    clo_dynamic,
+    running_mean_outdoor_temperature,
+    units_converter,
+    body_surface_area,
 )
 
 # fmt: off
@@ -855,3 +856,7 @@ def test_check_standard_compliance():
             phs(tdb=40, tr=40, rh=61, v=2, met=150, clo=2, posture=2),
             UserWarning,
         )
+
+
+def test_body_surface_area():
+    assert body_surface_area(weight=80, height=1.8) == 1.9917607971689137

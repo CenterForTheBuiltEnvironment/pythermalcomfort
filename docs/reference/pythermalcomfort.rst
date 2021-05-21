@@ -94,6 +94,31 @@ Predicted Heat Strain (PHS) Index
 
 .. autofunction:: pythermalcomfort.utilities.body_surface_area
 
+Relative air speed
+------------------
+
+.. autofunction:: pythermalcomfort.utilities.v_relative
+
+Dynamic clothing
+----------------
+
+.. autofunction:: pythermalcomfort.utilities.clo_dynamic
+
+Running mean outdoor temperature
+--------------------------------
+
+.. autofunction:: pythermalcomfort.utilities.running_mean_outdoor_temperature
+
+Units converter
+---------------
+
+.. autofunction:: pythermalcomfort.utilities.units_converter
+
+Sky-vault view fraction
+-----------------------
+
+.. autofunction:: pythermalcomfort.utilities.f_svv
+
 Reference values clo and met
 ============================
 

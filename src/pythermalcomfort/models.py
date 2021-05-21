@@ -1,6 +1,7 @@
 import warnings
-from pythermalcomfort.psychrometrics import units_converter, t_o, p_sat_torr, p_sat
+from pythermalcomfort.psychrometrics import t_o, p_sat_torr, p_sat
 from pythermalcomfort.utilities import (
+    units_converter,
     transpose_sharp_altitude,
     check_standard_compliance,
 )
@@ -32,7 +33,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         Note: vr is the relative air speed caused by body movement and not the air
         speed measured by the air speed sensor.
         It can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
@@ -150,7 +151,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         Note: vr is the relative air speed caused by body movement and not the air
         speed measured by the air speed sensor.
         The relative air speed can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
@@ -161,7 +162,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is
         used as input in the PMV model.
         The dynamic clothing insulation can be calculated using the function
-        :py:meth:`pythermalcomfort.psychrometrics.clo_dynamic`.
+        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
     standard: str (default="ISO")
@@ -198,7 +199,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> from pythermalcomfort.psychrometrics import v_relative
+        >>> from pythermalcomfort.utilities import v_relative
         >>> # calculate relative air speed
         >>> v_r = v_relative(v=0.1, met=1.2)
         >>> # as you can see the relative air speed is 0.16 m/s which is
@@ -345,7 +346,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         Note: vr is the relative air speed caused by body movement and not the air
         speed measured by the air speed sensor.
         It can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
@@ -356,7 +357,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is
         used as input in the PMV model.
         The dynamic clothing insulation can be calculated using the function
-        :py:meth:`pythermalcomfort.psychrometrics.clo_dynamic`.
+        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
     standard: str (default="ISO")
@@ -390,7 +391,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv
-        >>> from pythermalcomfort.psychrometrics import v_relative
+        >>> from pythermalcomfort.utilities import v_relative
         >>> # calculate relative air speed
         >>> v_r = v_relative(v=0.1, met=1.2)
         >>> # as you can see the relative air speed is 0.16 m/s which is
@@ -444,6 +445,9 @@ def set_tmp(
         external work, [met] default 0
     body_surface_area : float
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
     p_atm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     units: str default="SI"
@@ -767,6 +771,9 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     t_running_mean: float
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
+
+        The running mean temperature can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
     v : float
         air speed, default in [m/s] in [fps] if `units` = 'IP'
     units: str default="SI"
@@ -916,6 +923,9 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
     t_running_mean: float
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
+
+        The running mean temperature can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
     v : float
         air speed, default in [m/s] in [fps] if `units` = 'IP'
 
@@ -1625,7 +1635,7 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
         Note: vr is the relative air speed caused by body movement and not the air
         speed measured by the air speed sensor.
         It can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
@@ -1694,7 +1704,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
         Note: vr is the relative air speed caused by body movement and not the air
         speed measured by the air speed sensor.
         It can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.v_relative`.
+        :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
     met : float
@@ -1791,7 +1801,7 @@ def solar_gain(
     f_svv : float
         Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
         It can be calculate using the function
-        :py:meth:`pythermalcomfort.psychrometrics.f_svv`.
+        :py:meth:`pythermalcomfort.utilities.f_svv`.
     f_bes : float
         Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
         See Table C2-2 and equation C-7 ASHRAE 55 2017 [1]_.
