@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.6.0 (2021-05-21)
+------------------
+
+* (BREAKING CHANGE) moved some of the functions from psychrometrics to utilities
+* added equation to calculate body surface area
+
 1.5.2 (2021-05-05)
 ------------------
 
