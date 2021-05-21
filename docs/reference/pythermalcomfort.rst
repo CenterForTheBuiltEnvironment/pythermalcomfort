@@ -86,13 +86,16 @@ Psychrometrics functions
 .. automodule:: pythermalcomfort.psychrometrics
     :members:
 
-Reference values clo and met
-============================
+Utilities functions
+===================
 
 Predicted Heat Strain (PHS) Index
 ---------------------------------
 
 .. autofunction:: pythermalcomfort.utilities.body_surface_area
+
+Reference values clo and met
+============================
 
 Met typical tasks, [met]
 ------------------------
