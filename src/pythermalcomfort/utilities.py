@@ -140,6 +140,30 @@ def check_standard_compliance(standard, **kwargs):
             )
 
 
+def body_surface_area(weight, height, formula="dubois"):
+    """
+    Returns the body surface area in square meters.
+
+    Parameters
+    ----------
+    weight : float
+        body weight, [kg]
+    height : float
+        height, [m]
+    formula : {"dubois"}, default="dubois"
+        formula used to calculate the body surface area
+
+    Returns
+    -------
+    body_surface_area : float
+        body surface area, [m2]
+
+    """
+
+    if formula == "dubois":
+        return 0.202 * (weight ** 0.425) * (height ** 0.725)
+
+
 #: This dictionary contains the met values of typical tasks.
 met_typical_tasks = {
     "Sleeping": 0.7,

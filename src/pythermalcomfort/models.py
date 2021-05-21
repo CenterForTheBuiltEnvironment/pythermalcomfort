@@ -46,7 +46,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
     Returns
     -------
-    ce
+    ce : float
         Cooling Effect, default in [°C] in [°F] if `units` = 'IP'
 
     Examples
@@ -376,7 +376,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
     Returns
     -------
-    PMV : float
+    pmv : float
         Predicted Mean Vote
 
     Notes
