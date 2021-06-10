@@ -1,5 +1,5 @@
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.psychrometrics import v_relative
+from pythermalcomfort.utilities import v_relative, clo_dynamic
 from pythermalcomfort.utilities import met_typical_tasks
 from pythermalcomfort.utilities import clo_individual_garments
 
@@ -32,10 +32,10 @@ print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
 print(results_ip)
 
-# the following code can be used to iterate over a Pandas DataFrame and calculate the reults
+# the following code can be used to iterate over a Pandas DataFrame and calculate the results
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.psychrometrics import v_relative
+from pythermalcomfort.utilities import v_relative
 import os
 
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
@@ -79,7 +79,7 @@ print(end - start)
 # A possible solution to the above mentioned problems is presented below:
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.psychrometrics import v_relative
+from pythermalcomfort.utilities import v_relative
 import os
 import time
 
@@ -130,7 +130,7 @@ print(end - start)
 # Please note that this code will break if the PMV value cannot be calculated
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.psychrometrics import v_relative
+from pythermalcomfort.utilities import v_relative
 import numpy as np
 import os
 
