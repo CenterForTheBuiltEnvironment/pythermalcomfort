@@ -191,7 +191,9 @@ def f_svv(w, h, d):
 
 def v_relative(v, met):
     """Estimates the relative air speed which combines the average air speed of
-    the space plus the relative air speed caused by the body movement.
+    the space plus the relative air speed caused by the body movement. Vag is assumed to
+    be 0 for metabolic rates equal and lower than 1 met and otherwise equal to
+    Vag = 0.3 (M – 1) (m/s)
 
     Parameters
     ----------
@@ -216,8 +218,9 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     """Estimates the dynamic clothing insulation of a moving occupant. The activity as
     well as the air speed modify the insulation characteristics of the clothing and the
     adjacent air layer. Consequently the ISO 7730 states that the clothing insulation
-    shall be corrected [2]_. The ASHRAE 55 Standard, instead, only corrects for the effect
-    of the body movement, and states that the correction is permitted but not required.
+    shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect
+    of the body movement for met equal or higher than 1.2 met using the equation
+    clo = Icl × (0.6 + 0.4/met)
 
     Parameters
     ----------

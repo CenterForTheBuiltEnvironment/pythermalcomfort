@@ -31,8 +31,10 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor.
-        It can be calculate using the function
+        speed measured by the air speed sensor. The relative air speed is the sum of the
+        average air speed measured by the sensor plus the activity-generated air speed
+        (Vag). Where Vag is the activity-generated air speed caused by motion of
+        individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
@@ -40,6 +42,14 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+
+        Note: The activity as well as the air speed modify the insulation characteristics
+        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+        for the effect of the body movement for met equal or higher than 1.2 met using
+        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+        can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
     units: str default="SI"
@@ -149,8 +159,10 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor.
-        The relative air speed can be calculate using the function
+        speed measured by the air speed sensor. The relative air speed is the sum of the
+        average air speed measured by the sensor plus the activity-generated air speed
+        (Vag). Where Vag is the activity-generated air speed caused by motion of
+        individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
@@ -159,9 +171,12 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     clo : float
         clothing insulation, [clo]
 
-        Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is
-        used as input in the PMV model.
-        The dynamic clothing insulation can be calculated using the function
+        Note: The activity as well as the air speed modify the insulation characteristics
+        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+        for the effect of the body movement for met equal or higher than 1.2 met using
+        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+        can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
@@ -344,8 +359,10 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor.
-        It can be calculate using the function
+        speed measured by the air speed sensor. The relative air speed is the sum of the
+        average air speed measured by the sensor plus the activity-generated air speed
+        (Vag). Where Vag is the activity-generated air speed caused by motion of
+        individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
@@ -354,9 +371,12 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     clo : float
         clothing insulation, [clo]
 
-        Note: The ASHRAE 55 Standard suggests that the dynamic clothing insulation is
-        used as input in the PMV model.
-        The dynamic clothing insulation can be calculated using the function
+        Note: The activity as well as the air speed modify the insulation characteristics
+        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+        for the effect of the body movement for met equal or higher than 1.2 met using
+        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+        can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
@@ -1638,8 +1658,10 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor.
-        It can be calculate using the function
+        speed measured by the air speed sensor. The relative air speed is the sum of the
+        average air speed measured by the sensor plus the activity-generated air speed
+        (Vag). Where Vag is the activity-generated air speed caused by motion of
+        individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
@@ -1647,6 +1669,14 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+
+        Note: The activity as well as the air speed modify the insulation characteristics
+        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+        for the effect of the body movement for met equal or higher than 1.2 met using
+        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+        can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     vertical_tmp_grad : float
         vertical temperature gradient between the feet and the head, default in [°C/m]
         in [°F/ft] if `units` = 'IP'
@@ -1707,8 +1737,10 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor.
-        It can be calculate using the function
+        speed measured by the air speed sensor. The relative air speed is the sum of the
+        average air speed measured by the sensor plus the activity-generated air speed
+        (Vag). Where Vag is the activity-generated air speed caused by motion of
+        individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float
         relative humidity, [%]
@@ -1716,6 +1748,14 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
         metabolic rate, [met]
     clo : float
         clothing insulation, [clo]
+
+        Note: The activity as well as the air speed modify the insulation characteristics
+        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+        for the effect of the body movement for met equal or higher than 1.2 met using
+        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+        can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     v_ankle : float
         air speed at the 0.1 m (4 in.) above the floor, default in [m/s] in [fps] if
         `units` = 'IP'
@@ -1805,7 +1845,7 @@ def solar_gain(
         software or Lawrence Berkeley National Lab Complex Glazing Database.
     f_svv : float
         Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
-        It can be calculate using the function
+        It can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.f_svv`.
     f_bes : float
         Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
