@@ -1181,7 +1181,41 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     delta_t_tr = tr - tdb
     pa = eh_pa / 10.0  # convert vapour pressure to kPa
 
-    utci_approx = (
+    utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
+
+    if utci_approx < -40:
+        stress_category = "extreme cold stress"
+    elif utci_approx < -27:
+        stress_category = "very strong cold stress"
+    elif utci_approx < -13:
+        stress_category = "strong cold stress"
+    elif utci_approx < 0:
+        stress_category = "moderate cold stress"
+    elif utci_approx < 9:
+        stress_category = "slight cold stress"
+    elif utci_approx < 26:
+        stress_category = "no thermal stress"
+    elif utci_approx < 32:
+        stress_category = "moderate heat stress"
+    elif utci_approx < 38:
+        stress_category = "strong heat stress"
+    elif utci_approx < 46:
+        stress_category = "very strong heat stress"
+    else:
+        stress_category = "extreme heat stress"
+
+    if units.lower() == "ip":
+        utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
+
+    if return_stress_category:
+        return {"utci": round(utci_approx, 1), "stress_category": stress_category}
+    else:
+        return round(utci_approx, 1)
+
+
+@jit(nopython=True)
+def utci_optimized(tdb, v, delta_t_tr, pa):
+    return (
         tdb
         + 0.607562052
         + (-0.0227712343) * tdb
@@ -1538,35 +1572,6 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
         + (2.47090539 * (10 ** (-4))) * delta_t_tr * pa * pa * pa * pa * pa
         + 0.00148348065 * pa * pa * pa * pa * pa * pa
     )
-
-    if utci_approx < -40:
-        stress_category = "extreme cold stress"
-    elif utci_approx < -27:
-        stress_category = "very strong cold stress"
-    elif utci_approx < -13:
-        stress_category = "strong cold stress"
-    elif utci_approx < 0:
-        stress_category = "moderate cold stress"
-    elif utci_approx < 9:
-        stress_category = "slight cold stress"
-    elif utci_approx < 26:
-        stress_category = "no thermal stress"
-    elif utci_approx < 32:
-        stress_category = "moderate heat stress"
-    elif utci_approx < 38:
-        stress_category = "strong heat stress"
-    elif utci_approx < 46:
-        stress_category = "very strong heat stress"
-    else:
-        stress_category = "extreme heat stress"
-
-    if units.lower() == "ip":
-        utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
-
-    if return_stress_category:
-        return {"utci": round(utci_approx, 1), "stress_category": stress_category}
-    else:
-        return round(utci_approx, 1)
 
 
 def clo_tout(tout, units="SI"):
