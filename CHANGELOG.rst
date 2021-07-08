@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.6.2 (2021-07-08)
+------------------
+
+* Updated equation clo_dynamic based on ANSI/ASHRAE Addendum f to ANSI/ASHRAE Standard 55-2020
+* Fixed import errors in examples
+
 1.6.1 (2021-07-05)
 ------------------
 

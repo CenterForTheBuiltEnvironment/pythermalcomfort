@@ -239,11 +239,10 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
 
     if standard.lower() not in ["ashrae"]:
         raise ValueError(
-            "PMV calculations can only be performed in compliance with ISO or ASHRAE "
-            "Standards"
+            "clo dynamic calculation can only be performed in compliance ASHRAE Standard"
         )
 
-    if 1.2 < met < 2:
+    if met > 1.2:
         return round(clo * (0.6 + 0.4 / met), 3)
     else:
         return clo
