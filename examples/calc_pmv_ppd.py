@@ -18,9 +18,11 @@ icl = sum(
 
 # calculate the relative air velocity
 vr = v_relative(v=v, met=met)
+# calculate the dynamic clothing insulation
+clo = clo_dynamic(clo=icl, met=met)
 
 # calculate PMV in accordance with the ASHRAE 55 2017
-results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=icl, standard="ASHRAE")
+results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, standard="ASHRAE")
 
 # print the results
 print(results)
@@ -29,13 +31,13 @@ print(results)
 print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
 # for users who wants to use the IP system
-results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5, units="IP")
+results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=met, clo=clo, units="IP")
 print(results_ip)
 
 # the following code can be used to iterate over a Pandas DataFrame and calculate the results
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import v_relative
+from pythermalcomfort.utilities import v_relative, clo_dynamic
 import os
 
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
@@ -49,6 +51,7 @@ df["PPD"] = None
 
 for index, row in df.iterrows():
     vr = v_relative(v=row["v"], met=row["met"])
+    clo = clo_dynamic(clo=row["clo"], met=row["met"])
     results = pmv_ppd(
         tdb=row["tdb"],
         tr=row["tr"],
@@ -79,7 +82,7 @@ print(end - start)
 # A possible solution to the above mentioned problems is presented below:
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import v_relative
+from pythermalcomfort.utilities import v_relative, clo_dynamic
 import os
 import time
 
@@ -99,6 +102,7 @@ results = []
 for ix in range(df.shape[0]):
 
     _vr = v_relative(vel[ix], met[ix])
+    _clo = clo_dynamic(clo[ix], met[ix])
 
     try:
         _pmv_ppd = pmv_ppd(
@@ -130,7 +134,7 @@ print(end - start)
 # Please note that this code will break if the PMV value cannot be calculated
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import v_relative
+from pythermalcomfort.utilities import v_relative, clo_dynamic
 import numpy as np
 import os
 
@@ -148,7 +152,8 @@ met = df["met"].values
 clo = df["clo"].values
 
 v_rel = np.vectorize(v_relative)(vel, met)
-results = np.vectorize(pmv_ppd)(ta, tr, v_rel, rh, met, clo, 0, "ashrae", "SI")
+clo_d = np.vectorize(clo_dynamic)(clo, met)
+results = np.vectorize(pmv_ppd)(ta, tr, v_rel, rh, met, clo_d, 0, "ashrae", "SI")
 
 # split the pmv column in two since currently contains both pmv and ppd values
 df_ = pd.DataFrame(results)
