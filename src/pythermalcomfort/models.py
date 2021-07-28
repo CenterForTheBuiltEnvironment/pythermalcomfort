@@ -373,6 +373,7 @@ def set_tmp(
     wme=0,
     body_surface_area=1.8258,
     p_atm=101325,
+    body_position="standing",
     units="SI",
     **kwargs
 ):
@@ -407,6 +408,8 @@ def set_tmp(
         :py:meth:`pythermalcomfort.utilities.body_surface_area`.
     p_atm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    body_position: str default="standing"
+        select either "sitting" or "standing"
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -469,7 +472,8 @@ def set_tmp(
         vapor_pressure=vapor_pressure,
         wme=wme,
         body_surface_area=body_surface_area,
-        p_atm=p_atm,
+        p_atmospheric=p_atm,
+        body_position=body_position,
         calculate_ce=kwargs["calculate_ce"],
     )
 

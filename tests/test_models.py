@@ -34,45 +34,45 @@ from pythermalcomfort.utilities import (
 data_test_set = [
     # Table D-1 Validation Table for SET Computer Model
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
-    {'tdb': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.3},
-    {'tdb': 10, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 17},
-    {'tdb': 15, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 19.3},
-    {'tdb': 20, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.6},
+    {'tdb': 0, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 12.1},
+    {'tdb': 10, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 16.8},
+    {'tdb': 15, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 19.2},
+    {'tdb': 20, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.5},
     {'tdb': 30, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 26.4},
-    {'tdb': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.1},
+    {'tdb': 40, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 34.2},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 23.3},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.8},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 24.9},
     {'tdb': 25, 'tr': 25, 'v': 0.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 24.0},
-    {'tdb': 25, 'tr': 25, 'v': 0.6, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.4},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.3},
-    {'tdb': 25, 'tr': 25, 'v': 3, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 18.8},
-    {'tdb': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.2},
-    {'tdb': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.8},
+    {'tdb': 25, 'tr': 25, 'v': 0.6, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 21.3},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 20.2},
+    {'tdb': 25, 'tr': 25, 'v': 3, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 18.7},
+    {'tdb': 25, 'tr': 10, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 15.3},
+    {'tdb': 25, 'tr': 40, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 31.6},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 20.7},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.3},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 2, 'set': 32.5},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 1, 'set': 27.2},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 2, 'set': 32.4},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 4, 'set': 37.8},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 23.3},
-    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 26},
+    {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 26.0},
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 30.5},
     # other tests
     {'tdb': 25, 'tr': 25, 'v': 0.15, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 23.8},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 24.1},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 24.0},
     # the test belows are test Federico has implemented to check that both the pythermalcomfort and CBE TCT gives same results
     {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 3, 'clo': 0.5, 'set': 27.5},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 30.4},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.4},
-    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 25.0},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 30.3},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.3},
+    {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 24.9},
     {'tdb': 25, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.1, 'set': 17.6},
-    {'tdb': 29, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 25.1},
-    {'tdb': 27, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 26.3},
-    {'tdb': 20, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.1, 'set': 13.5},
-    {'tdb': 25, 'tr': 27, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.0},
-    {'tdb': 25, 'tr': 29, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.6},
-    {'tdb': 25, 'tr': 31, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 24.2},
-    {'tdb': 25, 'tr': 27, 'v': 1.3, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.7},
-    {'tdb': 25, 'tr': 29, 'v': 1.5, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.9},
-    {'tdb': 25, 'tr': 31, 'v': 1.7, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.2},
+    {'tdb': 29, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 25.0},
+    {'tdb': 27, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.75, 'set': 26.2},
+    {'tdb': 20, 'tr': 25, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.1, 'set': 13.4},
+    {'tdb': 25, 'tr': 27, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.9},
+    {'tdb': 25, 'tr': 29, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.5},
+    {'tdb': 25, 'tr': 31, 'v': 1.1, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 24.0},
+    {'tdb': 25, 'tr': 27, 'v': 1.3, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.6},
+    {'tdb': 25, 'tr': 29, 'v': 1.5, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 22.8},
+    {'tdb': 25, 'tr': 31, 'v': 1.7, 'rh': 50, 'met': 1.5, 'clo': 0.5, 'set': 23.1},
 ]
 
 data_test_pmv_iso = [  # I have commented the lines of code that don't pass the test
@@ -93,27 +93,27 @@ data_test_pmv_iso = [  # I have commented the lines of code that don't pass the 
 
 data_test_set_ip = [  # I have commented the lines of code that don't pass the test
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 74.9},
-    {'tdb': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.7},
-    {'tdb': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.8},
+    {'tdb': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.5},
+    {'tdb': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.7},
     {'tdb': 86, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 79.6},
-    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.5},
+    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.6},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 74.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 76.8},
     {'tdb': 77, 'tr': 77, 'v': 19.7 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 75.2},
-    {'tdb': 77, 'tr': 77, 'v': 118.1 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.5},
-    {'tdb': 77, 'tr': 77, 'v': 216.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 68.6},
-    {'tdb': 77, 'tr': 77, 'v': 590.6 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 65.8},
-    {'tdb': 77, 'tr': 50, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 59.3},
-    {'tdb': 77, 'tr': 104, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 89.2},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 1, 'set': 81.1},
+    {'tdb': 77, 'tr': 77, 'v': 118.1 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.4},
+    {'tdb': 77, 'tr': 77, 'v': 216.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 68.4},
+    {'tdb': 77, 'tr': 77, 'v': 590.6 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 65.6},
+    {'tdb': 77, 'tr': 50, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 59.6},
+    {'tdb': 77, 'tr': 104, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 88.9},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 1, 'set': 81.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.4},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 100.1},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 100.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 73.9},
     # {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 85.5},
     # {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 96.7},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
-    {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.5},
-    {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 54.1},
+    {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.3},
+    {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 53.7},
 ]
 
 data_test_pmv = [  # I have commented the lines of code that don't pass the test
@@ -284,26 +284,26 @@ def test_solar_gain():
 
 def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.05, rh=50, met=1, clo=0.6)) == 0
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.11
-    assert (cooling_effect(tdb=27, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.78
-    assert (cooling_effect(tdb=29, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.57
-    assert (cooling_effect(tdb=31, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.36
-    assert (cooling_effect(tdb=25, tr=27, vr=0.5, rh=50, met=1, clo=0.6)) == 2.38
-    assert (cooling_effect(tdb=25, tr=29, vr=0.5, rh=50, met=1, clo=0.6)) == 2.74
-    assert (cooling_effect(tdb=25, tr=25, vr=0.2, rh=50, met=1, clo=0.6)) == 0.64
-    assert (cooling_effect(tdb=25, tr=25, vr=0.8, rh=50, met=1, clo=0.6)) == 2.85
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.17
+    assert (cooling_effect(tdb=27, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.85
+    assert (cooling_effect(tdb=29, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.63
+    assert (cooling_effect(tdb=31, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.42
+    assert (cooling_effect(tdb=25, tr=27, vr=0.5, rh=50, met=1, clo=0.6)) == 2.44
+    assert (cooling_effect(tdb=25, tr=29, vr=0.5, rh=50, met=1, clo=0.6)) == 2.81
+    assert (cooling_effect(tdb=25, tr=25, vr=0.2, rh=50, met=1, clo=0.6)) == 0.67
+    assert (cooling_effect(tdb=25, tr=25, vr=0.8, rh=50, met=1, clo=0.6)) == 2.93
     assert (cooling_effect(tdb=25, tr=25, vr=0.0, rh=50, met=1, clo=0.6)) == 0
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.6)) == 2.07
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=80, met=1, clo=0.6)) == 2.0
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=20, met=1, clo=0.6)) == 2.23
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.3, clo=0.6)) == 2.76
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.6, clo=0.6)) == 3.42
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.34
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.0
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.6)) == 2.13
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=80, met=1, clo=0.6)) == 2.06
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=20, met=1, clo=0.6)) == 2.29
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.3, clo=0.6)) == 2.83
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.6, clo=0.6)) == 3.5
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.41
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.05
 
     assert (
         cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
-    ) == 3.84
+    ) == 3.95
 
 
 def test_running_mean_outdoor_temperature():
@@ -365,20 +365,20 @@ def test_set_tmp():
         )
 
     # testing SET equation to calculate cooling effect
-    assert (set_tmp(25, 25, 1.1, 50, 2, 0.5, calculate_ce=True)) == 20.8
-    assert (set_tmp(25, 25, 1.1, 50, 3, 0.5, calculate_ce=True)) == 21.3
-    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 20.6
-    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 23.3
-    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 15.8
-    assert (set_tmp(29, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 23.4
-    assert (set_tmp(27, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 24.7
-    assert (set_tmp(20, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 11.4
-    assert (set_tmp(25, 27, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.3
-    assert (set_tmp(25, 29, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.9
-    assert (set_tmp(25, 31, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 22.5
-    assert (set_tmp(25, 27, 1.3, 50, 1.5, 0.5, calculate_ce=True)) == 20.9
-    assert (set_tmp(25, 29, 1.5, 50, 1.5, 0.5, calculate_ce=True)) == 21.3
-    assert (set_tmp(25, 31, 1.7, 50, 1.5, 0.5, calculate_ce=True)) == 21.6
+    assert (set_tmp(25, 25, 1.1, 50, 2, 0.5, calculate_ce=True)) == 20.5
+    assert (set_tmp(25, 25, 1.1, 50, 3, 0.5, calculate_ce=True)) == 20.9
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 20.5
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 23.1
+    assert (set_tmp(25, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 15.6
+    assert (set_tmp(29, 25, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 23.3
+    assert (set_tmp(27, 25, 1.1, 50, 1.5, 0.75, calculate_ce=True)) == 24.5
+    assert (set_tmp(20, 25, 1.1, 50, 1.5, 0.1, calculate_ce=True)) == 11.2
+    assert (set_tmp(25, 27, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.1
+    assert (set_tmp(25, 29, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.7
+    assert (set_tmp(25, 31, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 22.3
+    assert (set_tmp(25, 27, 1.3, 50, 1.5, 0.5, calculate_ce=True)) == 20.8
+    assert (set_tmp(25, 29, 1.5, 50, 1.5, 0.5, calculate_ce=True)) == 21.1
+    assert (set_tmp(25, 31, 1.7, 50, 1.5, 0.5, calculate_ce=True)) == 21.4
 
     assert (
         set_tmp(
@@ -680,7 +680,7 @@ def test_vertical_tmp_grad_ppd():
 def test_ankle_draft():
     assert (
         ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]
-    ) == 23.3
+    ) == 23.5
 
     with pytest.raises(ValueError):
         ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)

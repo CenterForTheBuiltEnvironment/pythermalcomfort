@@ -85,8 +85,13 @@ def set_optimized(
 
         while not tc_converged:
 
-            # 0.72 in the following equation is the ratio of A_r/A_body see eq 35 ASHRAE fund 2017
-            h_r = 4.0 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.72
+            # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
+            if body_position == "sitting":
+                # 0.7 ratio between radiation area of the body and the body area
+                h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.7
+            else:  # if standing
+                # 0.73 ratio between radiation area of the body and the body area
+                h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.73
             h_t = h_r + h_cc
             r_a = 1.0 / (f_a_cl * h_t)
             t_op = (h_r * tr + h_cc * tdb) / h_t
