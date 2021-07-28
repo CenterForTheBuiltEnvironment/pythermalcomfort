@@ -474,7 +474,7 @@ def set_tmp(
         p_atmospheric=p_atm,
         body_position=body_position,
         calculate_ce=kwargs["calculate_ce"],
-    )
+    )[0]
 
     if units.lower() == "ip":
         _set = units_converter(tmp=_set, from_units="si")[0]
@@ -483,6 +483,165 @@ def set_tmp(
         return round(_set, 1)
     else:
         return _set
+
+
+def use_fans_heatwaves(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    wme=0,
+    body_surface_area=1.8258,
+    p_atm=101325,
+    body_position="standing",
+    units="SI",
+    max_skin_blood_flow=80,
+    **kwargs
+):
+    """
+    Calculates whether the use of fans is beneficial during heatwaves.
+
+    Parameters
+    ----------
+    tdb : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    v : float
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+    body_surface_area : float
+        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
+    p_atm : float
+        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    body_position: str default="standing"
+        select either "sitting" or "standing"
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+    max_skin_blood_flow : float
+        maximum blood flow from the core to the skin, [L/(hm2)] default 80
+
+    Other Parameters
+    ----------------
+    round: boolean, default True
+        if True rounds the SET temperature value, if False it does not round it
+
+    Returns
+    -------
+    e_skin : float
+        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff
+    e_rsw : float
+        Rate of evaporative heat loss from sweat evaporation, [W/m2]
+    e_diff : float
+        Rate of evaporative heat loss from moisture diffused through the skin, [W/m2]
+    e_max : float
+        Maximum rate of evaporative heat loss from skin, [W/m2]
+    q_sensible : float
+        Sensible heat loss from skin, [W/m2]
+    q_skin : float
+        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin
+    q_res : float
+        Total rate of heat loss through respiration, [W/m2]
+    t_core : float
+        Core temperature, [°C]
+    t_skin : float
+        Skin temperature, [°C]
+    m_bl : float
+        Skin blood flow, [L/(hm2)]
+    m_rsw : float
+        Rate at which regulatory sweat is generated, [mL/h2]
+    w : float
+        Skin wettedness, adimensional. Ranges from 0 and 1.
+    w_max : float
+        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
+    heat_strain_blood_flow : bool
+        True if heat strain is caused by skin blood flow (m_bl) reaching its maximum value
+    heat_strain_w : bool
+        True if heat strain is caused by skin wettedness (w) reaching its maximum value
+    heat_strain_sweating : bool
+        True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value
+    """
+    # todo add an example
+
+    # If the SET function is used to calculate the cooling effect then the h_c is
+    # calculated in a slightly different way
+    default_kwargs = {"round": True}
+    kwargs = {**default_kwargs, **kwargs}
+
+    if units.lower() == "ip":
+        if body_surface_area == 1.8258:
+            body_surface_area = 19.65
+        if p_atm == 101325:
+            p_atm = 1
+        tdb, tr, v, body_surface_area, p_atm = units_converter(
+            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
+        )
+
+    check_standard_compliance(
+        standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
+
+    vapor_pressure = rh * p_sat_torr(tdb) / 100
+
+    results = set_optimized(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atmospheric=p_atm,
+        body_position=body_position,
+        calculate_ce=False,
+        max_skin_blood_flow=max_skin_blood_flow,
+    )
+
+    output = {
+        "e_skin": results[1],
+        "e_rsw": results[2],
+        "e_diff": results[3],
+        "e_max": results[4],
+        "q_sensible": results[5],
+        "q_skin": results[6],
+        "q_res": results[7],
+        "t_core": results[8],
+        "t_skin": results[9],
+        "m_bl": results[10],
+        "m_rsw": results[11],
+        "w": results[12],
+        "w_max": results[13],
+        "heat_strain_blood_flow": results[14],
+        "heat_strain_w": results[15],
+        "heat_strain_sweating": results[16],
+    }
+
+    for key in output.keys():
+        # convert heat strain keys to bool
+        if "strain" in key:
+            if output[key] == 1:
+                output[key] = True
+            else:
+                output[key] = False
+
+        # round the results if needed
+        if kwargs["round"]:
+            output[key] = round(output[key], 1)
+
+    return output
 
 
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):

@@ -209,6 +209,11 @@ def test_transpose_sharp_altitude():
     assert transpose_sharp_altitude(sharp=150, altitude=30) == (40.893, 48.590)
 
 
+def test_use_fans_heatwaves():
+    # todo write test for this function
+    pass
+
+
 def test_f_svv():
     assert round(f_svv(30, 10, 3.3), 2) == 0.27
     assert round(f_svv(150, 10, 3.3), 2) == 0.31

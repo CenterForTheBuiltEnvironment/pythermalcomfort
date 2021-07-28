@@ -77,6 +77,34 @@ def check_standard_compliance(standard, **kwargs):
                     "This equation is only applicable for air speed lower than 0.2 m/s"
                 )
 
+    elif params["standard"] == "fan_heatwaves":  # based on table 7.3.4 ashrae 55 2017
+        for key, value in params.items():
+            if key in ["tdb", "tr"]:
+                if key == "tdb":
+                    parameter = "dry-bulb"
+                else:
+                    parameter = "mean radiant"
+                if value > 50 or value < 30:
+                    warnings.warn(
+                        f"{parameter} temperature applicability limits between 30 and 50 °C",
+                        UserWarning,
+                    )
+            if key in ["v", "vr"] and (value > 4.5 or value < 0.1):
+                warnings.warn(
+                    "Air speed applicability limits between 0.4 and 4.5 m/s",
+                    UserWarning,
+                )
+            if key == "met" and (value > 2 or value < 0.7):
+                warnings.warn(
+                    "Met applicability limits between 0.7 and 2.0 met",
+                    UserWarning,
+                )
+            if key == "clo" and (value > 1.0 or value < 0):
+                warnings.warn(
+                    "Clo applicability limits between 0.0 and 1.0 clo",
+                    UserWarning,
+                )
+
     elif params["standard"] == "iso":  # based on ISO 7730:2005 page 3
         for key, value in params.items():
             if key == "tdb" and (value > 30 or value < 10):
