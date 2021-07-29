@@ -595,7 +595,25 @@ def use_fans_heatwaves(
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
-    results = set_optimized(
+    (
+        _set,
+        e_skin,
+        e_rsw,
+        e_diff,
+        e_max,
+        q_sensible,
+        q_skin,
+        q_res,
+        t_core,
+        t_skin,
+        m_bl,
+        m_rsw,
+        w,
+        w_max,
+        heat_strain_blood_flow,
+        heat_strain_w,
+        heat_strain_sweating,
+    ) = set_optimized(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -611,22 +629,22 @@ def use_fans_heatwaves(
     )
 
     output = {
-        "e_skin": results[1],
-        "e_rsw": results[2],
-        "e_diff": results[3],
-        "e_max": results[4],
-        "q_sensible": results[5],
-        "q_skin": results[6],
-        "q_res": results[7],
-        "t_core": results[8],
-        "t_skin": results[9],
-        "m_bl": results[10],
-        "m_rsw": results[11],
-        "w": results[12],
-        "w_max": results[13],
-        "heat_strain_blood_flow": results[14],
-        "heat_strain_w": results[15],
-        "heat_strain_sweating": results[16],
+        "e_skin": e_skin,
+        "e_rsw": e_rsw,
+        "e_diff": e_diff,
+        "e_max": e_max,
+        "q_sensible": q_sensible,
+        "q_skin": q_skin,
+        "q_res": q_res,
+        "t_core": t_core,
+        "t_skin": t_skin,
+        "m_bl": m_bl,
+        "m_rsw": m_rsw,
+        "w": w,
+        "w_max": w_max,
+        "heat_strain_blood_flow": heat_strain_blood_flow,
+        "heat_strain_w": heat_strain_w,
+        "heat_strain_sweating": heat_strain_sweating,
     }
 
     for key in output.keys():
