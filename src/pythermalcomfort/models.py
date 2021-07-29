@@ -566,6 +566,8 @@ def use_fans_heatwaves(
         Skin wettedness, adimensional. Ranges from 0 and 1.
     w_max : float
         Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
+    heat_strain : bool
+        True if the model predict that the person may be experiencing heat strain
     heat_strain_blood_flow : bool
         True if heat strain is caused by skin blood flow (m_bl) reaching its maximum value
     heat_strain_w : bool
@@ -645,6 +647,9 @@ def use_fans_heatwaves(
         "heat_strain_blood_flow": heat_strain_blood_flow,
         "heat_strain_w": heat_strain_w,
         "heat_strain_sweating": heat_strain_sweating,
+        "heat_strain": any(
+            [heat_strain_blood_flow, heat_strain_w, heat_strain_sweating]
+        ),
     }
 
     for key in output.keys():
