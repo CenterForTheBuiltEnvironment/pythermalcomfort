@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.7.0 (2021-07-29)
+------------------
+
+* Implemented function to calculate the if fans are beneficial during heatwaves
+* Fixed error in the SET equation to calculated radiative heat transfer coefficient
+* Fixed error in SET definition
+* Moved functions optimized with Numba to new file
+
 1.6.2 (2021-07-08)
 ------------------
 

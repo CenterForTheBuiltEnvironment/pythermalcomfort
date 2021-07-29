@@ -37,6 +37,11 @@ Adaptive EN
 
 .. autofunction:: pythermalcomfort.models.adaptive_en
 
+Use Fans During Heatwaves
+-------------------------
+
+.. autofunction:: pythermalcomfort.models.use_fans_heatwaves
+
 Solar gain on people
 --------------------
 
