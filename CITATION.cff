@@ -21,5 +21,6 @@ preferred-citation:
   doi: "https://doi.org/10.1016/j.softx.2020.100578"
   journal: "SoftwareX"
   title: "pythermalcomfort: A Python package for thermal comfort research"
+  issue: 100578
   volume: 12
   year: 2020
