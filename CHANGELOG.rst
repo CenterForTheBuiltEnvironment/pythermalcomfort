@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.7.1 (2021-09-08)
+------------------
+
+* Added ASHRAE equation to calculate operative temperature
+
 1.7.0 (2021-07-29)
 ------------------
 

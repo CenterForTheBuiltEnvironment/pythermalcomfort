@@ -21,6 +21,7 @@ from pythermalcomfort.psychrometrics import (
     psy_ta_rh,
     p_sat,
     t_mrt,
+    t_o,
 )
 from pythermalcomfort.utilities import (
     transpose_sharp_altitude,
@@ -1515,3 +1516,13 @@ def test_check_standard_compliance():
 
 def test_body_surface_area():
     assert body_surface_area(weight=80, height=1.8) == 1.9917607971689137
+
+
+def test_t_o():
+    assert t_o(25, 25, 0.1) == 25
+    assert round(t_o(25, 30, 0.3), 2) == 26.83
+    assert round(t_o(20, 30, 0.3), 2) == 23.66
+    assert t_o(25, 25, 0.1, standard="ASHRAE") == 25
+    assert t_o(20, 30, 0.1, standard="ASHRAE") == 25
+    assert t_o(20, 30, 0.3, standard="ASHRAE") == 24
+    assert t_o(20, 30, 0.7, standard="ASHRAE") == 23

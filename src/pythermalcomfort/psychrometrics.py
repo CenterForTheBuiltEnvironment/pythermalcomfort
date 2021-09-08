@@ -24,7 +24,7 @@ def p_sat_torr(tdb):
     return math.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
-def t_o(tdb, tr, v):
+def t_o(tdb, tr, v, standard="ISO"):
     """Calculates operative temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
@@ -35,6 +35,9 @@ def t_o(tdb, tr, v):
         mean radiant temperature temperature, [°C]
     v: float
         air speed, [m/s]
+    standard: str (default="ISO")
+        either choose between ISO and ASHRAE
+
 
     Returns
     -------
@@ -42,7 +45,15 @@ def t_o(tdb, tr, v):
         operative temperature, [°C]
     """
 
-    return (tdb * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
+    if standard == "ISO":
+        return (tdb * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
+    elif standard == "ASHRAE":
+        a = 0.7
+        if v < 0.2:
+            a = 0.5
+        elif v < 0.6:
+            a = 0.6
+        return a * tdb + (1 - a) * tr
 
 
 def enthalpy(tdb, hr):
