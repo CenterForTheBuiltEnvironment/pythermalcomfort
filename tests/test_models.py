@@ -214,7 +214,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=0.7, clo=0.3, body_position="sitting"
         )["heat_strain_w"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -250,7 +250,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=2, clo=0.3, body_position="sitting"
         )["heat_strain_w"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -268,7 +268,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=40, met=0.7, clo=0.3, body_position="sitting"
         )["heat_strain_blood_flow"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -328,7 +328,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=1, rh=20, met=0.7, clo=0.5, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -340,7 +340,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=1, rh=20, met=1.3, clo=0.3, body_position="sitting"
         )["heat_strain_blood_flow"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -538,7 +538,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=0.2, rh=20, met=0.7, clo=0.3, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -550,7 +550,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=0.2, rh=20, met=0.7, clo=0.7, body_position="sitting"
         )["heat_strain_blood_flow"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -598,7 +598,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=0.2, rh=40, met=0.7, clo=0.5, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -616,7 +616,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=0.2, rh=40, met=1.3, clo=0.5, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -664,7 +664,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=1, rh=20, met=1.3, clo=0.3, body_position="sitting"
         )["heat_strain_w"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -682,7 +682,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=1, rh=20, met=2, clo=0.3, body_position="sitting"
         )["heat_strain_w"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -694,13 +694,13 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=1, rh=20, met=2, clo=0.7, body_position="sitting"
         )["heat_strain_blood_flow"]
-        == 1.0
+        == True
     )
     assert (
         use_fans_heatwaves(
             tdb=45, tr=45, v=1, rh=40, met=0.7, clo=0.3, body_position="sitting"
         )["heat_strain_w"]
-        == 1.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -712,7 +712,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=1, rh=40, met=0.7, clo=0.7, body_position="sitting"
         )["heat_strain_blood_flow"]
-        == 1.0
+        == True
     )
     assert (
         use_fans_heatwaves(
@@ -754,7 +754,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=20, met=0.7, clo=0.3, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -838,7 +838,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=40, met=1.3, clo=0.7, body_position="sitting"
         )["heat_strain_sweating"]
-        == 0.0
+        == False
     )
     assert (
         use_fans_heatwaves(
@@ -850,7 +850,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=40, met=2, clo=0.5, body_position="sitting"
         )["heat_strain_w"]
-        == 1.0
+        == True
     )
     assert (
         use_fans_heatwaves(
@@ -1329,6 +1329,7 @@ def test_vertical_tmp_grad_ppd():
 
 
 def test_ankle_draft():
+    assert (ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")["PPD_ad"]) == 18.5
     assert (
         ankle_draft(77, 77, 0.2 * 3.28, 50, 1.2, 0.5, 0.4 * 3.28, units="IP")["PPD_ad"]
     ) == 23.5

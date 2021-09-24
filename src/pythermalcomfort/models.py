@@ -8,7 +8,7 @@ from pythermalcomfort.utilities import (
 import math
 from scipy import optimize
 from pythermalcomfort.optimized_functions import (
-    set_optimized,
+    two_nodes_optimized,
     phs_optimized,
     pmv_ppd_optimized,
     utci_optimized,
@@ -460,21 +460,21 @@ def set_tmp(
         standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
     )
 
-    vapor_pressure = rh * p_sat_torr(tdb) / 100
-
-    _set = set_optimized(
+    _set = two_nodes(
         tdb=tdb,
         tr=tr,
         v=v,
+        rh=rh,
         met=met,
         clo=clo,
-        vapor_pressure=vapor_pressure,
         wme=wme,
         body_surface_area=body_surface_area,
         p_atmospheric=p_atm,
         body_position=body_position,
         calculate_ce=kwargs["calculate_ce"],
-    )[0]
+        round=False,
+        output="all",
+    )["_set"]
 
     if units.lower() == "ip":
         _set = units_converter(tmp=_set, from_units="si")[0]
@@ -535,6 +535,8 @@ def use_fans_heatwaves(
 
     Other Parameters
     ----------------
+    max_sweating: float, default 500 mL/h
+        max sweating
     round: boolean, default True
         if True rounds the SET temperature value, if False it does not round it
 
@@ -579,7 +581,7 @@ def use_fans_heatwaves(
 
     # If the SET function is used to calculate the cooling effect then the h_c is
     # calculated in a slightly different way
-    default_kwargs = {"round": True}
+    default_kwargs = {"round": True, "max_sweating": 500}
     kwargs = {**default_kwargs, **kwargs}
 
     if units.lower() == "ip":
@@ -595,71 +597,66 @@ def use_fans_heatwaves(
         standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
     )
 
-    vapor_pressure = rh * p_sat_torr(tdb) / 100
-
-    (
-        _set,
-        e_skin,
-        e_rsw,
-        e_diff,
-        e_max,
-        q_sensible,
-        q_skin,
-        q_res,
-        t_core,
-        t_skin,
-        m_bl,
-        m_rsw,
-        w,
-        w_max,
-        heat_strain_blood_flow,
-        heat_strain_w,
-        heat_strain_sweating,
-    ) = set_optimized(
-        tdb=tdb,
-        tr=tr,
-        v=v,
-        met=met,
-        clo=clo,
-        vapor_pressure=vapor_pressure,
+    output = two_nodes(
+        tdb,
+        tr,
+        v,
+        rh,
+        met,
+        clo,
         wme=wme,
         body_surface_area=body_surface_area,
         p_atmospheric=p_atm,
         body_position=body_position,
-        calculate_ce=False,
         max_skin_blood_flow=max_skin_blood_flow,
+        round=False,
+        output="all",
+        max_sweating=kwargs["max_sweating"],
     )
 
-    output = {
-        "e_skin": e_skin,
-        "e_rsw": e_rsw,
-        "e_diff": e_diff,
-        "e_max": e_max,
-        "q_sensible": q_sensible,
-        "q_skin": q_skin,
-        "q_res": q_res,
-        "t_core": t_core,
-        "t_skin": t_skin,
-        "m_bl": m_bl,
-        "m_rsw": m_rsw,
-        "w": w,
-        "w_max": w_max,
-        "heat_strain_blood_flow": heat_strain_blood_flow,
-        "heat_strain_w": heat_strain_w,
-        "heat_strain_sweating": heat_strain_sweating,
-        "heat_strain": any(
-            [heat_strain_blood_flow, heat_strain_w, heat_strain_sweating]
-        ),
-    }
+    output_vars = [
+        "e_skin",
+        "e_rsw",
+        "e_diff",
+        "e_max",
+        "q_sensible",
+        "q_skin",
+        "q_res",
+        "t_core",
+        "t_skin",
+        "m_bl",
+        "m_rsw",
+        "w",
+        "w_max",
+        "heat_strain_blood_flow",
+        "heat_strain_w",
+        "heat_strain_sweating",
+        "heat_strain",
+    ]
+
+    output["heat_strain_blood_flow"] = False
+    if output["m_bl"] == max_skin_blood_flow:
+        output["heat_strain_blood_flow"] = True
+
+    output["heat_strain_w"] = False
+    if output["w"] == output["w_max"]:
+        output["heat_strain_w"] = True
+
+    output["heat_strain_sweating"] = False
+    if output["m_rsw"] == 500:
+        output["heat_strain_sweating"] = True
+
+    output["heat_strain"] = any(
+        [
+            output["heat_strain_blood_flow"],
+            output["heat_strain_w"],
+            output["heat_strain_sweating"],
+        ]
+    )
+
+    output = {key: output[key] for key in output_vars}
 
     for key in output.keys():
-        # convert heat strain keys to bool
-        if "strain" in key:
-            if output[key] == 1:
-                output[key] = True
-            else:
-                output[key] = False
-
         # round the results if needed
         if kwargs["round"]:
             output[key] = round(output[key], 1)
@@ -1307,7 +1304,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
         >>> from pythermalcomfort.models import ankle_draft
         >>> results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
         >>> print(results)
-        {'PPD_ad': 18.6, 'Acceptability': True}
+        {'PPD_ad': 18.5, 'Acceptability': True}
 
     """
     if units.lower() == "ip":
@@ -1680,9 +1677,205 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     }
 
 
-# add the following models:
-# todo radiant_tmp_asymmetry
-# todo draft
-# todo floor_surface_tmp
+def two_nodes(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    wme=0,
+    body_surface_area=1.8258,
+    p_atmospheric=101325,
+    body_position="standing",
+    units="SI",
+    max_skin_blood_flow=90,
+    **kwargs
+):
+    """
+    Two-node model of human temperature regulation Gagge, A.P., et al. (1986).
+
+    Parameters
+    ----------
+    tdb : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    v : float
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+    body_surface_area : float
+        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
+    p_atmospheric : float
+        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    body_position: str default="standing"
+        select either "sitting" or "standing"
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units)
+        system.
+    max_skin_blood_flow : float
+        maximum blood flow from the core to the skin, [L/(hm2)] default 80
+
+    Other Parameters
+    ----------------
+    round: boolean, default True
+        if True rounds the SET temperature value, if False it does not round it
+
+    Returns
+    -------
+    e_skin : float
+        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff
+    e_rsw : float
+        Rate of evaporative heat loss from sweat evaporation, [W/m2]
+    e_diff : float
+        Rate of evaporative heat loss from moisture diffused through the skin, [W/m2]
+    e_max : float
+        Maximum rate of evaporative heat loss from skin, [W/m2]
+    q_sensible : float
+        Sensible heat loss from skin, [W/m2]
+    q_skin : float
+        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin
+    q_res : float
+        Total rate of heat loss through respiration, [W/m2]
+    t_core : float
+        Core temperature, [°C]
+    t_skin : float
+        Skin temperature, [°C]
+    m_bl : float
+        Skin blood flow, [L/(hm2)]
+    m_rsw : float
+        Rate at which regulatory sweat is generated, [mL/h2]
+    w : float
+        Skin wettedness, adimensional. Ranges from 0 and 1.
+    w_max : float
+        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
+    """
+    # todo add an example
+    default_kwargs = {
+        "round": True,
+        "calculate_ce": False,
+        "output": "two_node",
+        "max_sweating": 500,
+    }
+    kwargs = {**default_kwargs, **kwargs}
+
+    if units.lower() == "ip":
+        if body_surface_area == 1.8258:
+            body_surface_area = 19.65
+        if p_atmospheric == 101325:
+            p_atmospheric = 1
+        tdb, tr, v, body_surface_area, p_atmospheric = units_converter(
+            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atmospheric
+        )
+
+    check_standard_compliance(
+        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
+
+    vapor_pressure = rh * p_sat_torr(tdb) / 100
+
+    (
+        _set,
+        e_skin,
+        e_rsw,
+        e_diff,
+        e_max,
+        q_sensible,
+        q_skin,
+        q_res,
+        t_core,
+        t_skin,
+        m_bl,
+        m_rsw,
+        w,
+        w_max,
+        et,
+        pmv_gagge,
+        pmv_set,
+        pt_set,
+        pd,
+        ps,
+        disc,
+        t_sens,
+    ) = two_nodes_optimized(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atmospheric=p_atmospheric,
+        body_position=body_position,
+        calculate_ce=kwargs["calculate_ce"],
+        max_skin_blood_flow=max_skin_blood_flow,
+    )
+
+    output = {
+        "_set": _set,
+        "e_skin": e_skin,
+        "e_rsw": e_rsw,
+        "e_diff": e_diff,
+        "e_max": e_max,
+        "q_sensible": q_sensible,
+        "q_skin": q_skin,
+        "q_res": q_res,
+        "t_core": t_core,
+        "t_skin": t_skin,
+        "m_bl": m_bl,
+        "m_rsw": m_rsw,
+        "w": w,
+        "w_max": w_max,
+        "et": et,
+        "pmv_gagge": pmv_gagge,
+        "pmv_set": pmv_set,
+        "pt_set": pt_set,
+        "pd": pd,
+        "ps": ps,
+        "disc": disc,
+        "t_sens": t_sens,
+    }
+
+    if kwargs["output"] == "two_node":
+        output_vars = [
+            "e_skin",
+            "e_rsw",
+            "e_diff",
+            "e_max",
+            "q_sensible",
+            "q_skin",
+            "q_res",
+            "t_core",
+            "t_skin",
+            "m_bl",
+            "m_rsw",
+            "w",
+            "w_max",
+        ]
+        output = {key: output[key] for key in output_vars}
+
+    for key in output.keys():
+        # round the results if needed
+        if kwargs["round"]:
+            output[key] = round(output[key], 1)
+
+    return output
+
+
+# todo add the following models:
+# radiant_tmp_asymmetry
+# draft
+# floor_surface_tmp
 # more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 # more info here: https://rdrr.io/cran/comf/man/

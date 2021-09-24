@@ -3,7 +3,7 @@ import math
 
 
 @jit(nopython=True)
-def set_optimized(
+def two_nodes_optimized(
     tdb,
     tr,
     v,
@@ -16,12 +16,9 @@ def set_optimized(
     body_position,
     calculate_ce=False,
     max_skin_blood_flow=90,
+    turbulence=40,
+    max_sweating=500,
 ):
-    # variables to check if person is experiencing heat strain
-    heat_strain_blood_flow = False  # reached max blood flow
-    heat_strain_sweating = False  # reached max regulatory sweating
-    heat_strain_w = False  # reached max skin wettedness
-
     # Initial variables as defined in the ASHRAE 55-2017
     air_speed = max(v, 0.1)
     k_clo = 0.25
@@ -52,6 +49,11 @@ def set_optimized(
     e_max = 0  # maximum evaporative capacity
     m_rsw = 0  # regulatory sweating
     q_res = 0  # heat loss due to respiration
+    et = 0  # effective temperature
+    e_req = 0  # evaporative heat loss required for tmp regulation
+    r_ea = 0
+    r_ecl = 0
+    c_res = 0  # convective heat loss respiration
 
     pressure_in_atmospheres = p_atmospheric / 101325
     length_time_simulation = 60  # length time simulation
@@ -62,6 +64,10 @@ def set_optimized(
     lr = 2.2 / pressure_in_atmospheres  # Lewis ratio
     rm = met * met_factor  # metabolic rate
     m = met * met_factor  # metabolic rate
+
+    e_comfort = 0.42 * (rm - met_factor)  # evaporative heat loss during comfort
+    if e_comfort < 0:
+        e_comfort = 0
 
     if clo <= 0:
         w_max = 0.38 * pow(air_speed, -0.29)  # critical skin wettedness
@@ -83,6 +89,8 @@ def set_optimized(
     h_t = h_r + h_cc  # sum of convective and radiant heat transfer coefficient W/(m2*K)
     r_a = 1.0 / (f_a_cl * h_t)  # resistance of air layer to dry heat
     t_op = (h_r * tr + h_cc * tdb) / h_t  # operative temperature
+
+    t_body = alfa * t_skin + (1 - alfa) * t_core  # mean body temperature, °C
 
     while n_simulation < length_time_simulation:
 
@@ -134,7 +142,7 @@ def set_optimized(
         )  # rate of change core temperature °C per minute
         t_skin = t_skin + d_t_sk
         t_core = t_core + d_t_cr
-        t_body = alfa * t_skin + (1 - alfa) * t_core  # mean body temperature, °C
+        t_body = alfa * t_skin + (1 - alfa) * t_core
         # sk_sig thermoregulatory control signal from the skin
         sk_sig = t_skin - temp_skin_neutral
         warm_sk = (sk_sig > 0) * sk_sig  # vasodilation signal
@@ -151,16 +159,17 @@ def set_optimized(
         m_bl = (skin_blood_flow_neutral + c_dil * c_warm) / (1 + c_str * colds)
         if m_bl > max_skin_blood_flow:
             m_bl = max_skin_blood_flow
-            heat_strain_blood_flow = True
         if m_bl < 0.5:
             m_bl = 0.5
         m_rsw = c_sw * warm_b * math.exp(warm_sk / 10.7)  # regulatory sweating
-        if m_rsw > 500.0:
-            m_rsw = 500.0
-            heat_strain_sweating = True
+        if m_rsw > max_sweating:
+            m_rsw = max_sweating
         e_rsw = 0.68 * m_rsw  # heat lost by vaporization sweat
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
+        e_req = (
+            rm - q_res - c_res - q_sensible
+        )  # evaporative heat loss required for tmp regulation
         e_max = (math.exp(18.6686 - 4030.183 / (t_skin + 235.0)) - vapor_pressure) / (
             r_ea + r_ecl
         )
@@ -172,7 +181,6 @@ def set_optimized(
             p_rsw = w_max / 0.94
             e_rsw = p_rsw * e_max
             e_diff = 0.06 * (1.0 - p_rsw) * e_max
-            heat_strain_w = True
         if e_max < 0:
             e_diff = 0
             e_rsw = 0
@@ -219,6 +227,7 @@ def set_optimized(
     h_d_s = 1.0 / (r_a_s + r_cl_s)
     h_e_s = 1.0 / (r_ea_s + r_ecl_s)
 
+    # calculate Standard Effective Temperature (SET)
     delta = 0.0001
     dx = 100.0
     set_old = round(t_skin - q_skin / h_d_s, 2)
@@ -244,6 +253,63 @@ def set_optimized(
         dx = _set - set_old
         set_old = _set
 
+    # calculate Effective Temperature (ET)
+    h_d = 1 / (r_a + r_clo)
+    h_e = 1 / (r_ea + r_ecl)
+    et_old = t_skin - q_skin / h_d
+    delta = 0.0001
+    dx = 100.0
+    while abs(dx) > 0.01:
+        err_1 = (
+            q_skin
+            - h_d * (t_skin - et_old)
+            - w
+            * h_e
+            * (p_s_sk - 0.5 * (math.exp(18.6686 - 4030.183 / (et_old + 235.0))))
+        )
+        err_2 = (
+            q_skin
+            - h_d * (t_skin - (et_old + delta))
+            - w
+            * h_e
+            * (p_s_sk - 0.5 * (math.exp(18.6686 - 4030.183 / (et_old + delta + 235.0))))
+        )
+        et = et_old - delta * err_1 / (err_2 - err_1)
+        dx = et - et_old
+        et_old = et
+
+    tbm_l = (0.194 / 58.15) * rm + 36.301  # lower limit for evaporative regulation
+    tbm_h = (0.347 / 58.15) * rm + 36.669  # upper limit for evaporative regulation
+
+    t_sens = 0.4685 * (t_body - tbm_l)  # predicted thermal sensation
+    if (t_body >= tbm_l) & (t_body < tbm_h):
+        t_sens = w_max * 4.7 * (t_body - tbm_l) / (tbm_h - tbm_l)
+    elif t_body >= tbm_h:
+        t_sens = w_max * 4.7 + 0.4685 * (t_body - tbm_h)
+
+    disc = (
+        4.7 * (e_rsw - e_comfort) / (e_max - e_comfort - e_diff)
+    )  # predicted thermal discomfort
+    if disc < 0:
+        disc = t_sens
+
+    # PMV Gagge
+    pmv_gagge = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req - e_comfort - e_diff)
+
+    # PMV SET
+    dry_set = h_d_s * (t_skin - _set)
+    e_req_set = rm - c_res - q_res - dry_set
+    pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
+
+    # predicted thermal sensation based on SET
+    pt_set = 0.25 * _set - 6.03
+
+    # predicted dissatisfied due to draft
+    pd = (34 - tdb) * (v - 0.05) ** 0.6223 * (3.143 + 0.3696 * v * turbulence)
+
+    # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"
+    ps = 100 * (1.13 * (t_op ** 0.5) - 0.24 * t_op + 2.7 * (v ** 0.5) - 0.99 * v)
+
     return [
         _set,
         e_skin,
@@ -259,9 +325,14 @@ def set_optimized(
         m_rsw,
         w,
         w_max,
-        heat_strain_blood_flow,
-        heat_strain_w,
-        heat_strain_sweating,
+        et,
+        pmv_gagge,
+        pmv_set,
+        pt_set,
+        pd,
+        ps,
+        disc,
+        t_sens,
     ]
 
 

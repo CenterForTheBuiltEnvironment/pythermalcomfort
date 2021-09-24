@@ -356,7 +356,7 @@ def units_converter(from_units="ip", **kwargs):
     return results
 
 
-#: This dictionary contains the met values of typical tasks.
+#: Met values of typical tasks.
 met_typical_tasks = {
     "Sleeping": 0.7,
     "Reclining": 0.8,
@@ -391,7 +391,7 @@ met_typical_tasks = {
     "Wrestling": 7.8,
 }
 
-#: This dictionary contains the total clothing insulation of typical typical ensembles.
+#: Total clothing insulation of typical typical ensembles.
 clo_typical_ensembles = {
     "Walking shorts, short-sleeve shirt": 0.36,
     "Typical summer indoor clothing": 0.5,
@@ -404,7 +404,7 @@ clo_typical_ensembles = {
     "Typical winter indoor clothing": 1.0,
 }
 
-# This dictionary contains the clo values of individual clothing elements. To calculate the total clothing insulation you need to add these values together.
+# Clo values of individual clothing elements. To calculate the total clothing insulation you need to add these values together.
 clo_individual_garments = {
     "Metal chair": 0.00,
     "Bra": 0.01,
