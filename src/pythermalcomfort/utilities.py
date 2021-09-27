@@ -45,7 +45,7 @@ def check_standard_compliance(standard, **kwargs):
                     UserWarning,
                 )
 
-    elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2017
+    elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2020
         for key, value in params.items():
             if key in ["tdb", "tr"]:
                 if key == "tdb":
@@ -77,7 +77,7 @@ def check_standard_compliance(standard, **kwargs):
                     "This equation is only applicable for air speed lower than 0.2 m/s"
                 )
 
-    elif params["standard"] == "fan_heatwaves":  # based on table 7.3.4 ashrae 55 2017
+    elif params["standard"] == "fan_heatwaves":  # based on table 7.3.4 ashrae 55 2020
         for key, value in params.items():
             if key in ["tdb", "tr"]:
                 if key == "tdb":
@@ -257,7 +257,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     met : float
         metabolic rate, [met]
     standard: str (default="ASHRAE")
-        - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2017
+        - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
 
     Returns
     -------
@@ -290,7 +290,7 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         16798-1 2019 [3]_ states that n should be equal to 7
     alpha : float
         constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
-        while the ASHRAE 55 2017 recommends to choose values between 0.9 and 0.6,
+        while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
         0.9) could be more appropriate for climates in which synoptic-scale (day-to-

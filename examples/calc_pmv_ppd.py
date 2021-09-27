@@ -4,7 +4,7 @@ from pythermalcomfort.utilities import met_typical_tasks
 from pythermalcomfort.utilities import clo_individual_garments
 
 # input variables
-tdb = 27  # dry-bulb air temperature, [$^{\circ}$C]
+tdb = 27  # dry bulb air temperature, [$^{\circ}$C]
 tr = 25  # mean radiant temperature, [$^{\circ}$C]
 v = 0.1  # average air speed, [m/s]
 rh = 50  # relative humidity, [%]
@@ -21,7 +21,7 @@ vr = v_relative(v=v, met=met)
 # calculate the dynamic clothing insulation
 clo = clo_dynamic(clo=icl, met=met)
 
-# calculate PMV in accordance with the ASHRAE 55 2017
+# calculate PMV in accordance with the ASHRAE 55 2020
 results = pmv_ppd(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, standard="ASHRAE")
 
 # print the results

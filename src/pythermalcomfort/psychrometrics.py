@@ -205,7 +205,7 @@ def t_dp(tdb, rh):
     Parameters
     ----------
     tdb: float
-        dry-bulb air temperature, [°C]
+        dry bulb air temperature, [°C]
     rh: float
         relative humidity, [%]
 

@@ -13,6 +13,7 @@ from pythermalcomfort.models import (
     ankle_draft,
     phs,
     use_fans_heatwaves,
+    wbgt,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -997,7 +998,7 @@ def test_t_globe():
 
 
 def test_set_tmp():
-    """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
+    """ Test the PMV function using the reference table from the ASHRAE 55 2020"""
     for row in data_test_set:
         assert (
             abs(
@@ -1062,7 +1063,7 @@ def test_set_tmp():
 
 
 def test_pmv():
-    """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
+    """ Test the PMV function using the reference table from the ASHRAE 55 2020"""
     for row in data_test_pmv:
         assert (
             round(
@@ -1075,7 +1076,7 @@ def test_pmv():
 
 
 def test_pmv_ppd():
-    """ Test the PMV function using the reference table from the ASHRAE 55 2017"""
+    """ Test the PMV function using the reference table from the ASHRAE 55 2020"""
     for row in data_test_pmv:
         assert (
             abs(

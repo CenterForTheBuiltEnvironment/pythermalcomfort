@@ -18,7 +18,7 @@ from pythermalcomfort.optimized_functions import (
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     """
     Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the
-    ASHRAE 55 2017 Standard [1]_. The `CE`_ of the elevated air speed is the value that,
+    ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed is the value that,
     when subtracted equally from both the average air temperature and the mean radiant
     temperature, yields the same `SET`_ under still air as in the first `SET`_ calculation
     under elevated air speed. The cooling effect is calculated only for air speed
@@ -209,7 +209,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     Notes
     -----
     You can use this function to calculate the `PMV`_ and `PPD`_ in accordance with
-    either the ASHRAE 55 2017 Standard [1]_ or the ISO 7730 Standard [2]_.
+    either the ASHRAE 55 2020 Standard [1]_ or the ISO 7730 Standard [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
     .. _PPD: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
@@ -328,7 +328,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         m/s (40 fpm).
         When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
-        See ASHRAE 55 2017 Appendix H for more information [1]_.
+        See ASHRAE 55 2020 Appendix H for more information [1]_.
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -425,7 +425,7 @@ def set_tmp(
     Notes
     -----
     You can use this function to calculate the `SET`_ temperature in accordance with
-    the ASHRAE 55 2017 Standard [1]_.
+    the ASHRAE 55 2020 Standard [1]_.
 
     .. _SET: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
 
@@ -709,7 +709,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     -----
     You can use this function to calculate if your conditions are within the `adaptive
     thermal comfort region`.
-    Calculations with comply with the ASHRAE 55 2017 Standard [1]_.
+    Calculations with comply with the ASHRAE 55 2020 Standard [1]_.
 
     Examples
     --------
@@ -874,7 +874,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     -----
     You can use this function to calculate if your conditions are within the EN
     adaptive thermal comfort region.
-    Calculations with comply with the EN 16798-1 2019 [1]_.
+    Calculations with comply with the EN 16798-1 2019 [3]_.
 
     Examples
     --------
@@ -993,7 +993,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     environment. It is regarded as one of the most comprehensive indices for
     calculating heat stress in outdoor spaces. The parameters that are taken into
     account for calculating
-    UTCI involve dry-bulb temperature, mean radiation temperature, the pressure of
+    UTCI involve dry bulb temperature, mean radiation temperature, the pressure of
     water vapor or relative humidity, and wind speed (at the elevation of 10 m above the
     ground) [7]_.
 
@@ -1139,7 +1139,7 @@ def clo_tout(tout, units="SI"):
 
     Notes
     -----
-    The ASHRAE 55 2017 states that it is acceptable to determine the clothing
+    The ASHRAE 55 2020 states that it is acceptable to determine the clothing
     insulation Icl using this equation in mechanically conditioned buildings [1]_.
 
     Examples
@@ -1216,7 +1216,7 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
         Predicted Percentage of Dissatisfied occupants with vertical temperature
         gradient, [%]
     Acceptability: bol
-        The ASHRAE 55 2017 standard defines that the value of air speed at the ankle
+        The ASHRAE 55 2020 standard defines that the value of air speed at the ankle
         level is acceptable if PPD_ad is lower or equal than 5 %
 
     Examples
@@ -1294,7 +1294,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
     PPD_ad: float
         Predicted Percentage of Dissatisfied occupants with ankle draft, [%]
     Acceptability: bol
-        The ASHRAE 55 2017 standard defines that the value of air speed at the ankle
+        The ASHRAE 55 2020 standard defines that the value of air speed at the ankle
         level is acceptable if PPD_ad is lower or equal than 20 %
 
     Examples
@@ -1359,7 +1359,7 @@ def solar_gain(
         Default 'seated' list of available options 'standing', 'supine' or 'seated'
     sol_radiation_dir : float
         Direct-beam solar radiation, [W/m2]. Ranges between 200 and 1000. See Table
-        C2-3 of ASHRAE 55 2017 [1]_.
+        C2-3 of ASHRAE 55 2020 [1]_.
     sol_transmittance : float
         Total solar transmittance, ranges from 0 to 1. The total solar
         transmittance of window systems, including glazing unit, blinds, and other
@@ -1376,7 +1376,7 @@ def solar_gain(
         :py:meth:`pythermalcomfort.utilities.f_svv`.
     f_bes : float
         Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
-        See Table C2-2 and equation C-7 ASHRAE 55 2017 [1]_.
+        See Table C2-2 and equation C-7 ASHRAE 55 2020 [1]_.
     asw: float
         The average short-wave absorptivity of the occupant. It will range widely,
         depending on the color of the occupant’s skin as well as the color and
@@ -1693,7 +1693,7 @@ def two_nodes(
     **kwargs
 ):
     """
-    Two-node model of human temperature regulation Gagge, A.P., et al. (1986).
+    Two-node model of human temperature regulation Gagge et al. (1986) [10]_
 
     Parameters
     ----------
@@ -1874,8 +1874,22 @@ def two_nodes(
 
 
 # todo add the following models:
-# radiant_tmp_asymmetry
-# draft
-# floor_surface_tmp
-# more info here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
-# more info here: https://rdrr.io/cran/comf/man/
+#  radiant_tmp_asymmetry
+#  draft
+#  floor_surface_tmp
+#  pmv gagge SET (already implemented in two_nodes)
+#  effective temperature (already implemented in two_nodes)
+#  pmv set (already implemented in two_nodes)
+#  pt set (already implemented in two_nodes)
+#  pd (already implemented in two_nodes)
+#  ps (already implemented in two_nodes)
+#  disc (already implemented in two_nodes)
+#  t_sens (already implemented in two_nodes)
+#  t_sens (already implemented in two_nodes)
+#  wbgt (see issue #16)
+#  net (see issue #16)
+#  bet (see issue #16)
+#  cet (see issue #16)
+#  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
+#  more models here: https://rdrr.io/cran/comf/man/
+#  to print the R source code use comf::pmv

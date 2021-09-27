@@ -19,7 +19,7 @@ def two_nodes_optimized(
     turbulence=40,
     max_sweating=500,
 ):
-    # Initial variables as defined in the ASHRAE 55-2017
+    # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
     k_clo = 0.25
     body_weight = 69.9  # body weight in kg
