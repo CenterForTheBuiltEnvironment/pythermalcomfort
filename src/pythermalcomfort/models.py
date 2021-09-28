@@ -1873,6 +1873,64 @@ def two_nodes(
     return output
 
 
+def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
+    """
+    The Wet Bulb Globe Temperature Index (WBGT) calculated in compliance with the
+    ISO 7243 [11]_. The WBGT is a heat stress index that measures the thermal
+    environment to which a person is exposed. In most situations, this index is simple
+    to calculate. It should be used as a screening tool to determine whether or not
+    heat stress is present. The PHS model allows a more accurate estimation of stress.
+    PHS can be calculated using the function :py:meth:`pythermalcomfort.models.phs`.
+
+    The WBGT determines the impact of heat on a person throughout the course of a working
+    day (up to 8 h). It does not apply to very brief heat exposures. It pertains to
+    the evaluation of male and female people who are fit for work in both indoor
+    and outdoor occupational environments, as well as other sorts of surroundings [11]_.
+
+    The WBGT is defined as a function of only twb and tg if the person is not exposed to
+    direct radiant heat from the sun. When a person is exposed to direct radiant heat,
+    tdb must also be specified.
+
+    Parameters
+    ----------
+    twb : float,
+        natural (no forced air flow) wet bulb temperature, [°C]
+    tg : float
+        globe temperature, [°C]
+    tdb : float
+        dry bulb air temperature, [°C]. This value is needed as input if the person is
+        exposed to direct solar radiation
+    with_solar_load: bool
+        True if the globe sensor is exposed to direct solar radiation
+
+    Other Parameters
+    ----------------
+    round: boolean, default True
+        if True rounds the SET temperature value, if False it does not round it
+
+    Returns
+    -------
+    wbgt : float
+        Wet Bulb Globe Temperature Index, [°C]
+    """
+    default_kwargs = {
+        "round": True,
+    }
+    kwargs = {**default_kwargs, **kwargs}
+    if with_solar_load:
+        if tdb:
+            t_wbg = 0.7 * twb + 0.2 * tg + 0.1 * tdb
+        else:
+            raise ValueError("Please enter the dry bulb air temperature")
+    else:
+        t_wbg = 0.7 * twb + 0.3 * tg
+
+    if kwargs["round"]:
+        return round(t_wbg, 1)
+    else:
+        return t_wbg
+
+
 # todo add the following models:
 #  radiant_tmp_asymmetry
 #  draft
@@ -1886,7 +1944,6 @@ def two_nodes(
 #  disc (already implemented in two_nodes)
 #  t_sens (already implemented in two_nodes)
 #  t_sens (already implemented in two_nodes)
-#  wbgt (see issue #16)
 #  net (see issue #16)
 #  bet (see issue #16)
 #  cet (see issue #16)
