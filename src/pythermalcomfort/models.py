@@ -154,6 +154,12 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     prediction of the percentage of thermally dissatisfied people determined from
     `PMV`_ [1]_.
 
+    While the PMV equation is the same for both the ISO and ASHRAE standards, in the
+    ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
+    this is then subtracted from both the air and mean radiant temperatures, and the
+    differences are used as input to the PMV model, while the airspeed is set to 0.1m/s.
+    Please read more in the Note below.
+
     Parameters
     ----------
     tdb : float
@@ -192,9 +198,9 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         - If "ASHRAE", then the ASHRAE Equation is used
 
         Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
-        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20
-        m/s (40 fpm).
-        When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are
+        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.10
+        m/s (20 fpm).
+        When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -286,6 +292,12 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     \" \"slightly cool,\"
     \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
 
+    While the PMV equation is the same for both the ISO and ASHRAE standards, in the
+    ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
+    this is then subtracted from both the air and mean radiant temperatures, and the
+    differences are used as input to the PMV model, while the airspeed is set to 0.1m/s.
+    Please read more in the Note below.
+
     Parameters
     ----------
     tdb : float
@@ -324,9 +336,9 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         - If "ASHRAE", then the ASHRAE Equation is used
 
         Note: While the PMV equation is the same for both the ISO and ASHRAE standards,
-        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.20
-        m/s (40 fpm).
-        When air speeds exceed 0.20 m/s (40 fpm), the comfort zone boundaries are
+        the ASHRAE Standard Use of the PMV model is limited to air speeds below 0.10
+        m/s (20 fpm).
+        When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         See ASHRAE 55 2020 Appendix H for more information [1]_.
     units: str default="SI"
