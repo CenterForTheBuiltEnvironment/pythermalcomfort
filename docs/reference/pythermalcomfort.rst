@@ -17,6 +17,11 @@ Predicted Mean Vote (PMV)
 
 .. autofunction:: pythermalcomfort.models.pmv
 
+Gagge's Predicted Mean Vote (PMV)
+---------------------------------
+
+.. autofunction:: pythermalcomfort.models.pmv_gagge
+
 Standard Effective Temperature (SET)
 ------------------------------------
 

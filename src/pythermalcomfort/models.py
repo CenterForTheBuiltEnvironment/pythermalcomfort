@@ -2139,6 +2139,99 @@ def disc(
     )["disc"]
 
 
+def pmv_gagge(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    wme=0,
+    body_surface_area=1.8258,
+    p_atm=101325,
+    body_position="standing",
+    units="SI",
+):
+    """
+    Calculates Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses
+    the Fanger's PMV equations but it replaces the heat loss and gain terms with those
+    caculated by the two node model developed by Gagge et al. (1986) [10]_.
+
+    tdb : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    v : float
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+    body_surface_area : float
+        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
+    p_atm : float
+        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    body_position: str default="standing"
+        select either "sitting" or "standing"
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    pvm: float
+        Gagge's PMV
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import pmv_gagge
+        >>> pmv_gagge(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
+        0.2
+
+        >>> # for users who wants to use the IP system
+        >>> pmv_gagge(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
+        0.2
+
+    """
+
+    if units.lower() == "ip":
+        if body_surface_area == 1.8258:
+            body_surface_area = 19.65
+        if p_atm == 101325:
+            p_atm = 1
+        tdb, tr, v, body_surface_area, p_atm = units_converter(
+            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
+        )
+
+    check_standard_compliance(
+        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
+
+    return two_nodes(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atmospheric=p_atm,
+        body_position=body_position,
+        calculate_ce=False,
+        round=True,
+        output="all",
+    )["pmv_gagge"]
+
+
 # todo add the following models:
 #  radiant_tmp_asymmetry
 #  draft

@@ -17,6 +17,7 @@ from pythermalcomfort.models import (
     heat_index,
     humidex,
     disc,
+    pmv_gagge,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1571,3 +1572,9 @@ def test_disc():
     assert disc(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 1.0
     assert disc(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == 1.5
     assert disc(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == 0.7
+
+
+def test_pmv_gagge():
+    assert pmv_gagge(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 0.9
+    assert pmv_gagge(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == 1.5
+    assert pmv_gagge(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == 0.7
