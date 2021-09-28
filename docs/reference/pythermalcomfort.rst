@@ -7,13 +7,13 @@ Comfort models
     from pythermalcomfort.models import *
 
 
-PMV PPD
--------
+Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+------------------------------------------------------------------------
 
 .. autofunction:: pythermalcomfort.models.pmv_ppd
 
-PMV
----
+Predicted Mean Vote (PMV)
+-------------------------
 
 .. autofunction:: pythermalcomfort.models.pmv
 
@@ -22,8 +22,8 @@ Standard Effective Temperature (SET)
 
 .. autofunction:: pythermalcomfort.models.set_tmp
 
-Cooling Effect
---------------
+Cooling Effect (CE)
+-------------------
 
 .. autofunction:: pythermalcomfort.models.cooling_effect
 
