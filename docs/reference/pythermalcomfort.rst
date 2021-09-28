@@ -77,6 +77,11 @@ Wet Bulb Globe Temperature Index (WBGT)
 
 .. autofunction:: pythermalcomfort.models.wbgt
 
+Heat Index (HI)
+---------------
+
+.. autofunction:: pythermalcomfort.models.heat_index
+
 
 **References**
 
@@ -91,6 +96,8 @@ Wet Bulb Globe Temperature Index (WBGT)
 .. [9] Błażejczyk, K., Jendritzky, G., Bröde, P., Fiala, D., Havenith, G., Epstein, Y., Psikuta, A. and Kampmann, B., 2013. An introduction to the universal thermal climate index (UTCI). Geographia Polonica, 86(1), pp.5-10. https://www.researchgate.net/publication/239525964_An_introduction_to_the_Universal_Thermal_Climate_Index_UTCI
 .. [10] Gagge, A.P., Fobelets, A.P., and Berglund, L.G., 1986. A standard predictive Index of human reponse to thermal enviroment. Am. Soc. Heating, Refrig. Air-Conditioning Eng. 709–731.
 .. [11] ISO, 2017. ISO 7243 - Ergonomics of the thermal environment — Assessment of heat stress using the WBGT (wet bulb globe temperature) index.
+.. [12] Rothfusz LP (1990) The heat index equation. NWS Southern Region Technical Attachment, SR/SSD 90–23, Fort Worth, Texas
+.. [13] Steadman RG (1979) The assessment of sultriness. Part I: A temperature-humidity index based on human physiology and clothing science. J Appl Meteorol 18:861–873
 
 Psychrometrics functions
 ========================

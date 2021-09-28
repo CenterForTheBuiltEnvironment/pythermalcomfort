@@ -14,6 +14,7 @@ from pythermalcomfort.models import (
     phs,
     use_fans_heatwaves,
     wbgt,
+    heat_index,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1541,3 +1542,10 @@ def test_wbgt():
     assert wbgt(twb=17.3, tg=40, round=True) == 24.1
     assert wbgt(twb=21.1, tg=55, round=True) == 31.3
     assert wbgt(twb=16.7, tg=40, round=True) == 23.7
+
+
+def test_heat_index():
+    assert heat_index(25, 50) == 25.9
+    assert heat_index(77, 50, units="IP") == 78.6
+    assert heat_index(30, 80) == 37.7
+    assert heat_index(86, 80, units="IP") == 99.8
