@@ -16,6 +16,7 @@ from pythermalcomfort.models import (
     wbgt,
     heat_index,
     humidex,
+    disc,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1562,3 +1563,11 @@ def test_humidex():
         "humidex": 40.8,
         "discomfort": "Intense discomfort; avoid exertion",
     }
+
+
+def test_disc():
+    assert disc(25, 25, 1.1, 50, 2, 0.5) == 0.3
+    assert disc(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 0.2
+    assert disc(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 1.0
+    assert disc(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == 1.5
+    assert disc(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == 0.7

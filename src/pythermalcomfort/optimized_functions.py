@@ -62,7 +62,7 @@ def two_nodes_optimized(
     r_clo = 0.155 * clo  # thermal resistance of clothing, C M^2 /W
     f_a_cl = 1.0 + 0.15 * clo  # increase in body surface area due to clothing
     lr = 2.2 / pressure_in_atmospheres  # Lewis ratio
-    rm = met * met_factor  # metabolic rate
+    rm = (met - wme) * met_factor  # metabolic rate
     m = met * met_factor  # metabolic rate
 
     e_comfort = 0.42 * (rm - met_factor)  # evaporative heat loss during comfort
@@ -288,7 +288,7 @@ def two_nodes_optimized(
         t_sens = w_max * 4.7 + 0.4685 * (t_body - tbm_h)
 
     disc = (
-        4.7 * (e_rsw - e_comfort) / (e_max - e_comfort - e_diff)
+        4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
     )  # predicted thermal discomfort
     if disc < 0:
         disc = t_sens

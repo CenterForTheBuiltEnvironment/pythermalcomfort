@@ -87,6 +87,11 @@ Humidex
 
 .. autofunction:: pythermalcomfort.models.humidex
 
+Thermal Discomfort (DISC) index
+-------------------------------
+
+.. autofunction:: pythermalcomfort.models.disc
+
 
 **References**
 

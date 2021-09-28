@@ -1805,7 +1805,7 @@ def two_nodes(
         pt_set,
         pd,
         ps,
-        disc,
+        _disc,
         t_sens,
     ) = two_nodes_optimized(
         tdb=tdb,
@@ -1843,7 +1843,7 @@ def two_nodes(
         "pt_set": pt_set,
         "pd": pd,
         "ps": ps,
-        "disc": disc,
+        "disc": _disc,
         "t_sens": t_sens,
     }
 
@@ -2039,6 +2039,106 @@ def humidex(tdb, rh, **kwargs):
     return {"humidex": hi, "discomfort": stress_category}
 
 
+def disc(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    wme=0,
+    body_surface_area=1.8258,
+    p_atm=101325,
+    body_position="standing",
+    units="SI",
+):
+    """
+    Calculates thermal discomfort (DISC) as the relative thermoregulatory strain necessary
+    to restore a state of comfort and thermal equilibrium by sweating [10]_.
+
+    DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable
+    but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3),
+    limited tolerance (4), and intolerable (S). The range of each category is ± 0.5
+    numerically. In the cold, the classical negative category descriptions used for
+    Fanger's PMV apply [10]_.
+
+    tdb : float
+        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+    tr : float
+        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+    v : float
+        air speed, default in [m/s] in [fps] if `units` = 'IP'
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    wme : float
+        external work, [met] default 0
+    body_surface_area : float
+        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
+    p_atm : float
+        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
+    body_position: str default="standing"
+        select either "sitting" or "standing"
+    units: str default="SI"
+        select the SI (International System of Units) or the IP (Imperial Units) system.
+
+    Returns
+    -------
+    disc: float
+        thermal discomfort (DISC)
+    discomfort: str
+        Degree of Comfort or Discomfort as defined in Havenith and Fiala (2016) [15]_
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import disc
+        >>> disc(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
+        0.2
+
+        >>> # for users who wants to use the IP system
+        >>> disc(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
+        0.2
+
+    """
+
+    if units.lower() == "ip":
+        if body_surface_area == 1.8258:
+            body_surface_area = 19.65
+        if p_atm == 101325:
+            p_atm = 1
+        tdb, tr, v, body_surface_area, p_atm = units_converter(
+            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
+        )
+
+    check_standard_compliance(
+        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+    )
+
+    return two_nodes(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atmospheric=p_atm,
+        body_position=body_position,
+        calculate_ce=False,
+        round=True,
+        output="all",
+    )["disc"]
+
+
 # todo add the following models:
 #  radiant_tmp_asymmetry
 #  draft
@@ -2049,8 +2149,6 @@ def humidex(tdb, rh, **kwargs):
 #  pt set (already implemented in two_nodes)
 #  pd (already implemented in two_nodes)
 #  ps (already implemented in two_nodes)
-#  disc (already implemented in two_nodes)
-#  t_sens (already implemented in two_nodes)
 #  t_sens (already implemented in two_nodes)
 #  net (see issue #16)
 #  bet (see issue #16)
