@@ -82,6 +82,11 @@ Heat Index (HI)
 
 .. autofunction:: pythermalcomfort.models.heat_index
 
+Humidex
+-------
+
+.. autofunction:: pythermalcomfort.models.humidex
+
 
 **References**
 
@@ -98,6 +103,8 @@ Heat Index (HI)
 .. [11] ISO, 2017. ISO 7243 - Ergonomics of the thermal environment — Assessment of heat stress using the WBGT (wet bulb globe temperature) index.
 .. [12] Rothfusz LP (1990) The heat index equation. NWS Southern Region Technical Attachment, SR/SSD 90–23, Fort Worth, Texas
 .. [13] Steadman RG (1979) The assessment of sultriness. Part I: A temperature-humidity index based on human physiology and clothing science. J Appl Meteorol 18:861–873
+.. [14] Masterton JM, Richardson FA. Humidex, a method of quantifying human discomfort due to excessive heat and humidity. Downsview, Ontario: CLI 1-79, Environment Canada, Atmospheric Environment Service, 1979
+.. [15] Havenith, G., Fiala, D., 2016. Thermal indices and thermophysiological modeling for heat stress. Compr. Physiol. 6, 255–302. https://doi.org/10.1002/cphy.c140051
 
 Psychrometrics functions
 ========================
