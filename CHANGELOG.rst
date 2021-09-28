@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.8.0 (2021-09-28)
+------------------
+
+* Gagge's two-node model
+* Added WBGT equation
+* Added Heat index (HI)
+* Added humidex index
+
 1.7.1 (2021-09-08)
 ------------------
 
