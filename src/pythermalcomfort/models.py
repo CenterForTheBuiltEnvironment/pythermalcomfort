@@ -391,7 +391,8 @@ def set_tmp(
 ):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
-    a hypothetical isothermal environment at 50% (rh), <0.1 m/s (20 fpm) average air speed (v),
+    a hypothetical isothermal environment at 50% (rh), <0.1 m/s (20 fpm) average air
+    speed (v),
     and tr = tdb, in which the total heat loss from the skin of an imaginary occupant
     wearing clothing, standardized for the activity concerned. is the same as that
     from a person in the actual environment with actual clothing and activity level.
@@ -587,7 +588,8 @@ def use_fans_heatwaves(
     heat_strain_w : bool
         True if heat strain is caused by skin wettedness (w) reaching its maximum value
     heat_strain_sweating : bool
-        True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value
+        True if heat strain is caused by regulatory sweating (m_rsw) reaching its
+        maximum value
     """
     # todo add an example
 
@@ -1592,7 +1594,8 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     d_lim_loss_50 : float
         maximum allowable exposure time for water loss, mean subject, [minutes]
     d_lim_loss_95 : float
-        maximum allowable exposure time for water loss, 95% of the working population, [minutes]
+        maximum allowable exposure time for water loss, 95% of the working population,
+        [minutes]
     d_lim_t_re : float
         maximum allowable exposure time for heat storage, [minutes]
     water_loss : float
@@ -1605,7 +1608,8 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         >>> from pythermalcomfort.models import phs
         >>> results = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2)
         >>> print(results)
-        {'t_re': 37.5, 'd_lim_loss_50': 440, 'd_lim_loss_95': 298, 'd_lim_t_re': 480, 'water_loss': 6166.0}
+        {'t_re': 37.5, 'd_lim_loss_50': 440, 'd_lim_loss_95': 298, 'd_lim_t_re': 480,
+        'water_loss': 6166.0}
 
     """
     default_kwargs = {
@@ -1707,9 +1711,23 @@ def two_nodes(
     """
     Two-node model of human temperature regulation Gagge et al. (1986) [10]_ This model
     it can be used to calculate a variety of indices, including:
-    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those caculated by the two node model developed by Gagge et al. (1986) [10]_.
-    * The PMV SET and the predicted thermal sensation [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection .
-    * Calculates thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
+
+    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the
+    Fanger's PMV equations but it replaces the heat loss and gain terms with those
+    caculated by the two node model developed by Gagge et al. (1986) [10]_.
+
+    * The PMV SET and the predicted thermal sensation [10]_. This function is similar
+    in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however,
+    it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry
+    heat loss by convection .
+
+    * Calculates thermal discomfort (DISC) as the relative thermoregulatory strain
+    necessary to restore a state of comfort and thermal equilibrium by sweating [10]_.
+    DISC is described numerically as: comfortable and pleasant (0), slightly
+    uncomfortable but acceptable (1), uncomfortable and unpleasant (2),
+    very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of
+    each category is ± 0.5 numerically. In the cold, the classical negative category
+    descriptions used for Fanger's PMV apply [10]_.
 
     Parameters
     ----------
