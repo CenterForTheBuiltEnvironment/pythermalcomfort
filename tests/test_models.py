@@ -16,6 +16,7 @@ from pythermalcomfort.models import (
     wbgt,
     heat_index,
     humidex,
+    two_nodes,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1429,13 +1430,6 @@ def test_phs():
         "d_lim_loss_50": 372,
         "d_lim_loss_95": 247,
     }
-    # assert phs(tdb=34, tr=34, rh=56.3, v=0.3, met=150, clo=1, posture=2) == {
-    #     "t_re": 41.0,
-    #     "water_loss": 5548,
-    #     "d_lim_t_re": 67,
-    #     "d_lim_loss_50": 480,
-    #     "d_lim_loss_95": 318,
-    # }
     assert phs(tdb=40, tr=40, rh=40.63, v=0.3, met=150, clo=0.4, posture=2) == {
         "t_re": 37.5,
         "water_loss": 6683.0,
@@ -1564,30 +1558,24 @@ def test_humidex():
     }
 
 
-# def test_disc():
-#     assert disc(25, 25, 1.1, 50, 2, 0.5) == 0.3
-#     assert disc(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 0.2
-#     assert disc(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 1.0
-#     assert disc(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == 1.5
-#     assert disc(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == 0.7
-#
-#
-# def test_pmv_gagge():
-#     assert pmv_gagge(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == 0.9
-#     assert pmv_gagge(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == 1.5
-#     assert pmv_gagge(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == 0.7
-#
-#
-# def test_pmv_set():
-#     assert pmv_set(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5) == {
-#         "pmv_set": 0.9,
-#         "pt_set": 0.7,
-#     }
-#     assert pmv_set(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5) == {
-#         "pmv_set": 1.4,
-#         "pt_set": 1.3,
-#     }
-#     assert pmv_set(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5) == {
-#         "pmv_set": 0.5,
-#         "pt_set": 0.5,
-#     }
+def test_two_nodes():
+    # todo write more tests to validate all the following
+    #  effective temperature (already implemented in two_nodes)
+    #  pt set (already implemented in two_nodes)
+    #  pd (already implemented in two_nodes)
+    #  ps (already implemented in two_nodes)
+    #  t_sens (already implemented in two_nodes)
+
+    assert two_nodes(25, 25, 1.1, 50, 2, 0.5)["disc"] == 0.3
+    assert two_nodes(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 0.2
+    assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 1.0
+    assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 1.5
+    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["disc"] == 0.7
+
+    assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 0.9
+    assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 1.5
+    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 0.7
+
+    assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.9
+    assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 1.4
+    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.5

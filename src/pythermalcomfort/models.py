@@ -1704,7 +1704,6 @@ def two_nodes(
     body_surface_area=1.8258,
     p_atmospheric=101325,
     body_position="standing",
-    units="SI",
     max_skin_blood_flow=90,
     **kwargs
 ):
@@ -1712,22 +1711,23 @@ def two_nodes(
     Two-node model of human temperature regulation Gagge et al. (1986) [10]_ This model
     it can be used to calculate a variety of indices, including:
 
-    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the
-    Fanger's PMV equations but it replaces the heat loss and gain terms with those
-    caculated by the two node model developed by Gagge et al. (1986) [10]_.
+    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two node model developed by Gagge et al. (1986) [10]_.
 
-    * The PMV SET and the predicted thermal sensation [10]_. This function is similar
-    in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however,
-    it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry
-    heat loss by convection .
+    * PMV SET and the predicted thermal sensation based on SET [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
 
-    * Calculates thermal discomfort (DISC) as the relative thermoregulatory strain
-    necessary to restore a state of comfort and thermal equilibrium by sweating [10]_.
-    DISC is described numerically as: comfortable and pleasant (0), slightly
-    uncomfortable but acceptable (1), uncomfortable and unpleasant (2),
-    very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of
-    each category is ± 0.5 numerically. In the cold, the classical negative category
-    descriptions used for Fanger's PMV apply [10]_.
+    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
+
+    * Heat gains and losses via convection, radiation and conduction.
+
+    * The Standard Effective Temperature (SET)
+
+    * The New Effective Temperature (ET)
+
+    * The Predicted  Thermal  Sensation  (TSENS)
+
+    * The Predicted  Percent  Dissatisfied  Due  to  Draft  (PD)
+
+    * Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"   (PS)
 
     Parameters
     ----------
@@ -1754,9 +1754,6 @@ def two_nodes(
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     body_position: str default="standing"
         select either "sitting" or "standing"
-    units: str default="SI"
-        select the SI (International System of Units) or the IP (Imperial Units)
-        system.
     max_skin_blood_flow : float
         maximum blood flow from the core to the skin, [L/(hm2)] default 80
 
@@ -1793,24 +1790,37 @@ def two_nodes(
         Skin wettedness, adimensional. Ranges from 0 and 1.
     w_max : float
         Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
+    set : float
+        Standard Effective Temperature (SET)
+    et : float
+        New Effective Temperature (SET)
+    pmv_gagge : float
+        PMV Gagge
+    pmv_set : float
+        PMV SET
+    pd : float
+        Predicted  Percent  Dissatisfied  Due  to  Draft"
+    ps : float
+        Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
+    disc : float
+        Thermal discomfort
+    t_sens : float
+        Predicted  Thermal  Sensation
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import two_nodes
+        >>> print(two_nodes(tdb=25, tr=25, v=0.3, rh=50, met=1.2, clo=0.5))
+        {'e_skin': 15.8, 'e_rsw': 6.5, 'e_diff': 9.3, ... }
     """
-    # todo add an example
     default_kwargs = {
         "round": True,
         "calculate_ce": False,
-        "output": "two_node",
         "max_sweating": 500,
     }
     kwargs = {**default_kwargs, **kwargs}
-
-    if units.lower() == "ip":
-        if body_surface_area == 1.8258:
-            body_surface_area = 19.65
-        if p_atmospheric == 101325:
-            p_atmospheric = 1
-        tdb, tr, v, body_surface_area, p_atmospheric = units_converter(
-            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atmospheric
-        )
 
     check_standard_compliance(
         standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
@@ -1839,7 +1849,7 @@ def two_nodes(
         pt_set,
         pd,
         ps,
-        _disc,
+        disc,
         t_sens,
     ) = two_nodes_optimized(
         tdb=tdb,
@@ -1857,7 +1867,6 @@ def two_nodes(
     )
 
     output = {
-        "_set": _set,
         "e_skin": e_skin,
         "e_rsw": e_rsw,
         "e_diff": e_diff,
@@ -1871,33 +1880,16 @@ def two_nodes(
         "m_rsw": m_rsw,
         "w": w,
         "w_max": w_max,
+        "_set": _set,
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
         "pt_set": pt_set,
         "pd": pd,
         "ps": ps,
-        "disc": _disc,
+        "disc": disc,
         "t_sens": t_sens,
     }
-
-    if kwargs["output"] == "two_node":
-        output_vars = [
-            "e_skin",
-            "e_rsw",
-            "e_diff",
-            "e_max",
-            "q_sensible",
-            "q_skin",
-            "q_res",
-            "t_core",
-            "t_skin",
-            "m_bl",
-            "m_rsw",
-            "w",
-            "w_max",
-        ]
-        output = {key: output[key] for key in output_vars}
 
     for key in output.keys():
         # round the results if needed
@@ -2077,13 +2069,6 @@ def humidex(tdb, rh, **kwargs):
 #  radiant_tmp_asymmetry
 #  draft
 #  floor_surface_tmp
-#  pmv gagge SET (already implemented in two_nodes)
-#  effective temperature (already implemented in two_nodes)
-#  pmv set (already implemented in two_nodes)
-#  pt set (already implemented in two_nodes)
-#  pd (already implemented in two_nodes)
-#  ps (already implemented in two_nodes)
-#  t_sens (already implemented in two_nodes)
 #  net (see issue #16)
 #  bet (see issue #16)
 #  cet (see issue #16)
