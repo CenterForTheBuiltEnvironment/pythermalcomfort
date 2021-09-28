@@ -72,6 +72,11 @@ Predicted Heat Strain (PHS) Index
 
 .. autofunction:: pythermalcomfort.models.phs
 
+Wet Bulb Globe Temperature Index (WBGT)
+---------------------------------------
+
+.. autofunction:: pythermalcomfort.models.wbgt
+
 
 **References**
 
