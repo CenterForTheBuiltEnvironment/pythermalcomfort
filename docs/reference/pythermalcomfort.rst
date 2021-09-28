@@ -17,10 +17,10 @@ Predicted Mean Vote (PMV)
 
 .. autofunction:: pythermalcomfort.models.pmv
 
-Gagge's Predicted Mean Vote (PMV)
----------------------------------
+Gagge et al. two-node model
+---------------------------
 
-.. autofunction:: pythermalcomfort.models.pmv_gagge
+.. autofunction:: pythermalcomfort.models.two_nodes
 
 Standard Effective Temperature (SET)
 ------------------------------------
@@ -91,11 +91,6 @@ Humidex
 -------
 
 .. autofunction:: pythermalcomfort.models.humidex
-
-Thermal Discomfort (DISC) index
--------------------------------
-
-.. autofunction:: pythermalcomfort.models.disc
 
 
 **References**
