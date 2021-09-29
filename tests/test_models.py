@@ -17,6 +17,7 @@ from pythermalcomfort.models import (
     heat_index,
     humidex,
     two_nodes,
+    net,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1556,6 +1557,15 @@ def test_humidex():
         "humidex": 40.8,
         "discomfort": "Intense discomfort; avoid exertion",
     }
+
+
+def test_net():
+    assert net(37, 100, 0.1) == 37
+    assert net(37, 100, 4.5) == 37
+    assert net(25, 100, 4.5) == 20
+    assert net(25, 100, 0.1) == 25.4
+    assert net(40, 48.77, 0.1) == 25.4
+    assert net(36, 50.196, 0.1) == 30.9
 
 
 def test_two_nodes():

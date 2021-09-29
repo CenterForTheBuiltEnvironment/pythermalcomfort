@@ -92,6 +92,11 @@ Humidex
 
 .. autofunction:: pythermalcomfort.models.humidex
 
+Normal Effective Temperature (NET)
+----------------------------------
+
+.. autofunction:: pythermalcomfort.models.net
+
 
 **References**
 
@@ -110,6 +115,7 @@ Humidex
 .. [13] Steadman RG (1979) The assessment of sultriness. Part I: A temperature-humidity index based on human physiology and clothing science. J Appl Meteorol 18:861–873
 .. [14] Masterton JM, Richardson FA. Humidex, a method of quantifying human discomfort due to excessive heat and humidity. Downsview, Ontario: CLI 1-79, Environment Canada, Atmospheric Environment Service, 1979
 .. [15] Havenith, G., Fiala, D., 2016. Thermal indices and thermophysiological modeling for heat stress. Compr. Physiol. 6, 255–302. https://doi.org/10.1002/cphy.c140051
+.. [16] Blazejczyk, K., Epstein, Y., Jendritzky, G., Staiger, H., Tinz, B., 2012. Comparison of UTCI to selected thermal indices. Int. J. Biometeorol. 56, 515–535. https://doi.org/10.1007/s00484-011-0453-2
 
 Psychrometrics functions
 ========================
