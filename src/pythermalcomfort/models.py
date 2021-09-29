@@ -428,7 +428,7 @@ def set_tmp(
     Other Parameters
     ----------------
     round: boolean, deafult True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
 
     Returns
     -------
@@ -551,7 +551,7 @@ def use_fans_heatwaves(
     max_sweating: float, default 500 mL/h
         max sweating
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
 
     Returns
     -------
@@ -1760,7 +1760,7 @@ def two_nodes(
     Other Parameters
     ----------------
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output values, if False it does not round them
 
     Returns
     -------
@@ -1932,7 +1932,7 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
     Other Parameters
     ----------------
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
 
     Returns
     -------
@@ -1987,7 +1987,7 @@ def net(tdb, rh, v, **kwargs):
     Other Parameters
     ----------------
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
 
     Returns
     -------
@@ -2027,7 +2027,7 @@ def heat_index(tdb, rh, **kwargs):
     Other Parameters
     ----------------
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
     units: str, default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -2082,7 +2082,7 @@ def humidex(tdb, rh, **kwargs):
     Other Parameters
     ----------------
     round: boolean, default True
-        if True rounds the SET temperature value, if False it does not round it
+        if True rounds output value, if False it does not round it
 
     Returns
     -------
