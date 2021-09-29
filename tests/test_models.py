@@ -18,6 +18,7 @@ from pythermalcomfort.models import (
     humidex,
     two_nodes,
     net,
+    at,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1538,6 +1539,12 @@ def test_wbgt():
     assert wbgt(twb=17.3, tg=40, round=True) == 24.1
     assert wbgt(twb=21.1, tg=55, round=True) == 31.3
     assert wbgt(twb=16.7, tg=40, round=True) == 23.7
+
+
+def test_at():
+    assert at(tdb=25, rh=30, v=0.1) == 24.1
+    assert at(tdb=23, rh=70, v=1) == 24.8
+    assert at(tdb=23, rh=70, v=1, q=50) == 28.1
 
 
 def test_heat_index():
