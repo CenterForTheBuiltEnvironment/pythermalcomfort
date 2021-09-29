@@ -19,6 +19,7 @@ from pythermalcomfort.models import (
     two_nodes,
     net,
     at,
+    wc,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1552,6 +1553,14 @@ def test_heat_index():
     assert heat_index(77, 50, units="IP") == 78.6
     assert heat_index(30, 80) == 37.7
     assert heat_index(86, 80, units="IP") == 99.8
+
+
+def test_wc():
+    assert wc(tdb=0, v=0.1) == {"wci": 518.6}
+    assert wc(tdb=0, v=1.5) == {"wci": 813.5}
+    assert wc(tdb=-5, v=5.5) == {"wci": 1255.2}
+    assert wc(tdb=-10, v=11) == {"wci": 1631.1}
+    assert wc(tdb=-5, v=11) == {"wci": 1441.4}
 
 
 def test_humidex():

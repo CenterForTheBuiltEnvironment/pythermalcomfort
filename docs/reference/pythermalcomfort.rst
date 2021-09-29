@@ -97,6 +97,11 @@ Normal Effective Temperature (NET)
 
 .. autofunction:: pythermalcomfort.models.net
 
+Wind chill index
+----------------
+
+.. autofunction:: pythermalcomfort.models.wc
+
 Apparent Temperature (AT)
 -------------------------
 
@@ -208,4 +213,6 @@ Insulation of individual garments, [clo]
 .. [15] Havenith, G., Fiala, D., 2016. Thermal indices and thermophysiological modeling for heat stress. Compr. Physiol. 6, 255–302. https://doi.org/10.1002/cphy.c140051
 .. [16] Blazejczyk, K., Epstein, Y., Jendritzky, G., Staiger, H., Tinz, B., 2012. Comparison of UTCI to selected thermal indices. Int. J. Biometeorol. 56, 515–535. https://doi.org/10.1007/s00484-011-0453-2
 .. [17] Steadman RG (1984) A universal scale of apparent temperature. J Appl Meteorol Climatol 23:1674–1687
+.. [18] ASHRAE, 2017. 2017 ASHRAE Handbook Fundamentals. Atlanta.
+.. [19] Bernard, T.E., Pourmoghani, M., 1999. Prediction of workplace wet bulb global temperature. Appl. Occup. Environ. Hyg. 14, 126–134. https://doi.org/10.1080/104732299303296
 
