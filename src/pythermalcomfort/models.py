@@ -1969,11 +1969,11 @@ def net(tdb, rh, v, **kwargs):
     a person. Missenard original equation was then used to calculate the Normal Effective
     Temperature (NET), by considering normal atmospheric pressure and a normal human body
     temperature (37°C). The NET is still in use in Germany, where medical check-ups for
-     subjects working in the heat are decided on by prevailing levels of ET, depending
-     on metabolic rates. The NET is also constantly monitored by the Hong Kong
-     Observatory [16]_. In central Europe the following thresholds are in use:
-     <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
-     23–27 = warm; >27°C = hot [16]_.
+    subjects working in the heat are decided on by prevailing levels of ET, depending
+    on metabolic rates. The NET is also constantly monitored by the Hong Kong
+    Observatory [16]_. In central Europe the following thresholds are in use:
+    <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
+    23–27 = warm; >27°C = hot [16]_.
 
     Parameters
     ----------
