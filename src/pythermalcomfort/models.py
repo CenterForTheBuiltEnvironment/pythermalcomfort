@@ -2225,6 +2225,56 @@ def wc(tdb, v, **kwargs):
     return {"wci": wci}
 
 
+def t_awb(tdb, rh, tg, **kwargs):
+    # todo write tests and add to documentation
+    """
+    Calculates the Aspirated we bulb temperature based on the formula provided by
+     Bernard and Pourmoghani (1999) [19]_.
+
+    Parameters
+    ----------
+    tdb : float
+        dry bulb air temperature,[°C]
+    rh : float
+        wind speed 10m above ground level, [m/s]
+    tg : float
+        globe temperature, [°C]
+
+    Other Parameters
+    ----------------
+    round: boolean, default True
+        if True rounds output value, if False it does not round it
+
+    Returns
+    -------
+    t_awb: float
+        aspirated we bulb temperature, [W/m2)]
+    """
+    # todo add example
+    default_kwargs = {
+        "round": True,
+    }
+    kwargs = {**default_kwargs, **kwargs}
+
+    p_vap = psy_ta_rh(tdb, rh)["p_vap"] / 1000
+
+    if tg - tdb <= 4:
+        t = 0.376 + 5.79 * p_vap + (0.388 - 0.0465 * p_vap) * tdb + 1.0
+    else:
+        t = (
+            0.376
+            + 5.79 * p_vap
+            + (0.388 - 0.0465 * p_vap) * tdb
+            + 0.25 * (tg - tdb)
+            - 0.1
+        )
+
+    if kwargs["round"]:
+        t = round(t, 1)
+
+    return t
+
+
 # todo add the following models:
 #  radiant_tmp_asymmetry
 #  draft
@@ -2234,7 +2284,7 @@ def wc(tdb, v, **kwargs):
 #  Physiological equivalent temperature (Blazejczyk2012)
 #  Perceived temperature (Blazejczyk2012)
 #  Physiological subjective temperature and physiological strain (Blazejczyk2012)
-#  Aspirated (psychrometric) wet bulb temperature (Foster2021)
+#  Aspirated (psychrometric) wet bulb temperature (Foster2021) !!! t_awb() but not sure about the equation
 #  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 #  more models here: https://rdrr.io/cran/comf/man/
 #  to print the R source code use comf::pmv
