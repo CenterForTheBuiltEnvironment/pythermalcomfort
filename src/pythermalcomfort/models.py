@@ -387,7 +387,7 @@ def set_tmp(
     p_atm=101325,
     body_position="standing",
     units="SI",
-    **kwargs
+    **kwargs,
 ):
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
@@ -511,7 +511,7 @@ def use_fans_heatwaves(
     body_position="standing",
     units="SI",
     max_skin_blood_flow=80,
-    **kwargs
+    **kwargs,
 ):
     """
     Calculates whether the use of fans is beneficial during heatwaves.
@@ -1705,7 +1705,7 @@ def two_nodes(
     p_atmospheric=101325,
     body_position="standing",
     max_skin_blood_flow=90,
-    **kwargs
+    **kwargs,
 ):
     """
     Two-node model of human temperature regulation Gagge et al. (1986) [10]_ This model
@@ -1938,8 +1938,19 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
     -------
     wbgt : float
         Wet Bulb Globe Temperature Index, [°C]
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import wbgt
+        >>> wbgt(twb=25, tg=32)
+        27.1
+
+        >>> # if the persion is exposed to direct solar radiation
+        >>> wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
+        25.9
     """
-    # todo add example
     default_kwargs = {
         "round": True,
     }
@@ -1993,8 +2004,15 @@ def net(tdb, rh, v, **kwargs):
     -------
     net : float
         Normal Effective Temperature, [°C]
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import net
+        >>> net(tdb=37, rh=100, v=0.1)
+        37
     """
-    # todo add example
     default_kwargs = {
         "round": True,
     }
@@ -2035,8 +2053,15 @@ def heat_index(tdb, rh, **kwargs):
     -------
     hi : float
         Heat Index, default in [°C] in [°F] if `units` = 'IP'
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import heat_index
+        >>> heat_index(tdb=25, rh=50)
+        25.9
     """
-    # todo add example
     default_kwargs = {
         "round": True,
         "units": "SI",
@@ -2090,8 +2115,15 @@ def humidex(tdb, rh, **kwargs):
         Heat Index, default in [°C] in [°F] if `units` = 'IP'
     discomfort: str
         Degree of Comfort or Discomfort as defined in Havenith and Fiala (2016) [15]_
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import humidex
+        >>> humidex(tdb=25, rh=50)
+        {"humidex": 28.2, "discomfort": "Little or no discomfort"}
     """
-    # todo add example
     default_kwargs = {
         "round": True,
     }
@@ -2150,8 +2182,15 @@ def at(tdb, rh, v, q=None, **kwargs):
     -------
     at: float
         apparent temperature, [°C]
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import at
+        >>> at(tdb=25, rh=30, v=0.1)
+        24.1
     """
-    # todo add example
     default_kwargs = {
         "round": True,
     }
@@ -2207,8 +2246,15 @@ def wc(tdb, v, **kwargs):
     -------
     wci: float
         wind chill index, [W/m2)]
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import wc
+        >>> wc(tdb=-5, v=5.5)
+        {"wci": 1255.2}
     """
-    # todo add example
     default_kwargs = {
         "round": True,
     }
@@ -2225,66 +2271,188 @@ def wc(tdb, v, **kwargs):
     return {"wci": wci}
 
 
-def t_awb(tdb, rh, tg, **kwargs):
-    # todo write tests and add to documentation
+def use_fans_morris(
+    tdb,
+    v,
+    rh,
+    met,
+    wme=0,
+    body_surface_area=1.8258,
+    target_person="young",
+    p_atm=101325,
+    body_position="standing",
+    units="SI",
+    **kwargs,
+):
     """
-    Calculates the Aspirated we bulb temperature based on the formula provided by
-     Bernard and Pourmoghani (1999) [19]_.
 
-    Parameters
-    ----------
-    tdb : float
-        dry bulb air temperature,[°C]
-    rh : float
-        wind speed 10m above ground level, [m/s]
-    tg : float
-        globe temperature, [°C]
+    met = 70/58.2
+    body_surface_area=1.8
+    clo = 0.23
+    v = 3.5
+    tdb = 30
+    rh = 5
 
-    Other Parameters
-    ----------------
-    round: boolean, default True
-        if True rounds output value, if False it does not round it
-
-    Returns
-    -------
-    t_awb: float
-        aspirated we bulb temperature, [W/m2)]
     """
-    # todo add example
-    default_kwargs = {
-        "round": True,
-    }
-    kwargs = {**default_kwargs, **kwargs}
+    # constants
+    met = 70  # todo change this
+    v_still = 0.2
+    r_cl_back = 0.0844
+    r_cl_front = 0.0497
+    r_cl_off = 0.1291
+    r_e_cl_fan = 0.01  # todo should not this be higher than for fan off?
+    r_e_cl_off = 0.01
+    t_skin = 35.5
+    min_sw_eff = 0.55
+    h_r = 4.7
+
+    # personal variables based on participant type
+    w_c_on = 0.65
+    w_c_off = 0.85
+    max_rs = 660
+    if target_person == "old":
+        w_c_on = 0.5
+        w_c_off = 0.65
+        max_rs = 440
+    if target_person == "meds":
+        w_c_on = 0.38
+        w_c_off = 0.49
+        max_rs = 330
+
+    f_cl_back = 1 + ((0.31 * r_cl_back) / 1.55)
+    f_cl_front = 1 + ((0.31 * r_cl_front) / 1.55)
+    h_c_back = 8.3 * (v ** 0.6) / 1.5  # todo why divided by 1.5?
+    h_c_front = 8.3 * (v ** 0.6)
+    h_c_off = 8.3 * (v_still ** 0.6)
+    h_e_on = (16.5 * h_c_front * 0.5) + (16.5 * h_c_back * 0.5)
+    h_e_off = 16.5 * h_c_off
+
+    p_skin = p_sat(t_skin) / 1000
 
     p_vap = psy_ta_rh(tdb, rh)["p_vap"] / 1000
 
-    if tg - tdb <= 4:
-        t = 0.376 + 5.79 * p_vap + (0.388 - 0.0465 * p_vap) * tdb + 1.0
-    else:
-        t = (
-            0.376
-            + 5.79 * p_vap
-            + (0.388 - 0.0465 * p_vap) * tdb
-            + 0.25 * (tg - tdb)
-            - 0.1
+    e_req_on = (
+        met * body_surface_area
+        - (
+            (
+                (t_skin - tdb)
+                / (r_cl_front + (1 / (f_cl_front * (h_r + h_c_front))))
+                * (body_surface_area * 0.5)
+            )
+            + (
+                (t_skin - tdb)
+                / (
+                    r_cl_back + (1 / (f_cl_back * (h_r + h_c_back)))
+                )  # todo check if morris uses f_cl_back
+                * (body_surface_area * 0.5)
+            )
         )
+        - (
+            body_surface_area
+            * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
+        )
+    )
 
-    if kwargs["round"]:
-        t = round(t, 1)
+    # print(f"{e_req_on=}")
 
-    return t
+    e_req_off = (
+        met * body_surface_area
+        - (
+            (
+                (t_skin - tdb)
+                / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
+                * (body_surface_area * 0.5)
+            )
+            + (
+                (t_skin - tdb)
+                / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
+                * (body_surface_area * 0.5)
+            )
+        )
+        - (
+            body_surface_area
+            * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
+        )
+    )
+    e_max_on = (p_skin - p_vap) / (r_e_cl_fan + (1 / (f_cl_front * h_e_on)))
+    e_max_off = (p_skin - p_vap) / (r_e_cl_off + (1 / (f_cl_front * h_e_off)))
+
+    e_max_on_young = e_max_on * w_c_on
+    e_max_off_young = e_max_off * w_c_off
+    if e_max_on_young < 0:
+        e_max_on_young = 0
+    if e_max_off_young < 0:
+        e_max_off_young = 0
+
+    sweat_eff_on = 1
+    if e_req_on > 0:
+        sweat_eff_on = 1 - (((e_req_on / e_max_on) ** 2) / 2)
+
+    val_on = min_sw_eff
+    if sweat_eff_on > min_sw_eff:
+        val_on = sweat_eff_on
+
+    person_e_max_on = ((max_rs * 2426) / 3600) * (val_on / body_surface_area)
+
+    sweat_eff_off = 1
+    if e_req_off > 0:
+        sweat_eff_off = 1 - (((e_req_off / e_max_off) ** 2) / 2)
+
+    val_off = min_sw_eff
+    if sweat_eff_off > min_sw_eff:
+        val_off = sweat_eff_off
+
+    person_e_max_off = ((max_rs * 2426) / 3600) * (val_off / body_surface_area)
+
+    combined_e_max_on = e_max_on_young
+    if person_e_max_on < e_max_on_young:
+        combined_e_max_on = person_e_max_on
+
+    combined_e_max_off = e_max_off_young
+    if person_e_max_off < e_max_off_young:
+        combined_e_max_off = person_e_max_off
+
+    tipping_point = (e_req_off - e_req_on) - (combined_e_max_off - combined_e_max_on)
+
+    return tipping_point
+
+
+# # testing morris equation
+# from scipy import optimize
+# import matplotlib.pyplot as plt
+# import numpy as np
+# f, ax = plt.subplots()
+# for person in ["young", "old", "meds"]:
+#     t_lim = []
+#     rh_array = list(range(5, 100))
+#     for rh in rh_array:
+#
+#         def function(x):
+#             return use_fans_morris(x, 3.5, rh, 70, target_person=person)
+#
+#         t_lim.append(optimize.brentq(function, 30, 70))
+#
+#     z = np.polyfit(rh_array, t_lim, 4)
+#     p = np.poly1d(z)
+#     y_new = p(rh_array)
+#     # plt.plot(rh_array, t_lim, "o")
+#     plt.plot(rh_array, y_new, "-", label=person)
+# ax.set(
+#     ylabel="Temperature [°C]",
+#     xlabel="Relative Humidity [RH]",
+#     ylim=(24, 52),
+#     xlim=(5, 70),
+# )
+# plt.legend()
 
 
 # todo add the following models:
 #  radiant_tmp_asymmetry
 #  draft
 #  floor_surface_tmp
-#  bet (see issue #16)
-#  cet (see issue #16)
 #  Physiological equivalent temperature (Blazejczyk2012)
 #  Perceived temperature (Blazejczyk2012)
 #  Physiological subjective temperature and physiological strain (Blazejczyk2012)
-#  Aspirated (psychrometric) wet bulb temperature (Foster2021) !!! t_awb() but not sure about the equation
 #  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
 #  more models here: https://rdrr.io/cran/comf/man/
 #  to print the R source code use comf::pmv
