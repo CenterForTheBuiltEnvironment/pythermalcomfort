@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.9.0 (2021-10-07)
+------------------
+
+* Added Normal Effective Temperature (NET)
+* Added Apparent Temperature (AT)
+* Added Wind Chill Index (WCI)
+
 1.8.0 (2021-09-28)
 ------------------
 
