@@ -31,10 +31,6 @@ Overview
     :alt: AppVeyor Build Status
     :target: https://ci.appveyor.com/project/CenterForTheBuiltEnvironment/pythermalcomfort
 
-.. |requires| image:: https://requires.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/requirements.svg?branch=master
-    :alt: Requirements Status
-    :target: https://requires.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/requirements/?branch=master
-
 .. |codecov| image:: https://codecov.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/coverage.svg?branch=master
     :alt: Coverage Status
     :target: https://codecov.io/github/CenterForTheBuiltEnvironment/pythermalcomfort
@@ -54,10 +50,6 @@ Overview
 .. |supported-implementations| image:: https://img.shields.io/pypi/implementation/pythermalcomfort.svg
     :alt: Supported implementations
     :target: https://pypi.org/project/pythermalcomfort
-
-.. |commits-since| image:: https://img.shields.io/github/commits-since/CenterForTheBuiltEnvironment/pythermalcomfort/v1.9.0.svg
-    :alt: Commits since latest release
-    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/compare/v1.9.0...master
 
 
 
