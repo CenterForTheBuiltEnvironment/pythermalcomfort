@@ -77,11 +77,7 @@ setup(
         "buit environment",
     ],
     python_requires=">=3.6.*",
-    install_requires=[
-        "scipy",
-        "numba"
-        # eg: 'aspectlib==1.1.1', 'six>=1.7',
-    ],
+    install_requires=["scipy", "numba", "jos3"],  # eg: 'aspectlib==1.1.1', 'six>=1.7',
     extras_require={
         # eg:
         #   'rst': ['docutils>=0.11'],

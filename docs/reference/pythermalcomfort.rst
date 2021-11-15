@@ -32,6 +32,47 @@ Cooling Effect (CE)
 
 .. autofunction:: pythermalcomfort.models.cooling_effect
 
+Joint system thermoregulation model (JOS-3)
+-------------------------------------------
+
+    The thermoregulation JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method. JOS-3 uses brown adipose tissue activity, aging effects, and heat gain by shortwave solar radiation at the skin to predict human physiological responses. It also considers personal characteristics in transient and non-uniform thermal environments. The JOS-3 was validated by comparing the results with those of human subject tests conducted under stable and transient conditions [19]_.
+
+    Please note that we are actively working on the documentation of the JOS-3 model and we are planning to update it soon.
+
+    :Parameters:    * **height** (float) - Body height [m]. The default is 1.72
+                    * **weight** (float) - Body weight [kg]. The default is 74.43
+                    * **fat** (float) - Fat percentage [%]. The default is 15
+                    * **age** (int) - Age [years]. The default is 20
+                    * **sex** (str) - Sex ("male" or "female"). The default is "male".
+                    * **ci** (float) - Cardiac index [L/min/m2]. The default is 2.6432.
+                    * **bmr_equation** (str) - Choose a BMR equation. The default is "harris-benedict".
+                    * **bsa_equation** (str) - Choose a BSA equation. The default is "dubois".
+                    * **ex_output** (None), list or "all" - Extra output parameters. If "all", all parameters are output.
+
+    :Returns:       None
+
+    .. code-block:: python
+
+        >>> import pandas as pd
+        >>> import jos3
+
+        >>> model = jos3.JOS3(height=1.7, weight=60, age=30)  # Builds a model
+
+        >>> # Set the first condition
+        >>> model.To = 28  # Operative temperature [oC]
+        >>> model.RH = 40  # Relative humidity [%]
+        >>> model.Va = 0.2  # Air velocity [m/s]
+        >>> model.PAR = 1.2  # Physical activity ratio [-]
+        >>> model.simulate(60)  # Exposre time = 60 [min]
+
+        >>> # Set the next condition
+        >>> model.To = 20  # Changes only operative temperature
+        >>> model.simulate(60)  # Additional exposre time = 60 [min]
+
+        >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
+        >>> df.TskMean.plot()  # Show the graph of mean skin temp.
+
+
 Adaptive ASHRAE
 ---------------
 
@@ -214,4 +255,5 @@ Insulation of individual garments, [clo]
 .. [16] Blazejczyk, K., Epstein, Y., Jendritzky, G., Staiger, H., Tinz, B., 2012. Comparison of UTCI to selected thermal indices. Int. J. Biometeorol. 56, 515–535. https://doi.org/10.1007/s00484-011-0453-2
 .. [17] Steadman RG (1984) A universal scale of apparent temperature. J Appl Meteorol Climatol 23:1674–1687
 .. [18] ASHRAE, 2017. 2017 ASHRAE Handbook Fundamentals. Atlanta.
+.. [19] Takahashi, Y., Nomoto, A., Yoda, S., Hisayama, R., Ogata, M., Ozeki, Y., & Tanabe, S. ichi. (2021). Thermoregulation model JOS-3 with new open source code. Energy and Buildings, 231, 110575. https://doi.org/10.1016/j.enbuild.2020.110575
 
