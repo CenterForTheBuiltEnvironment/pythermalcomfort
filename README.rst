@@ -4,19 +4,16 @@ Overview
 
 .. start-badges
 
-.. list-table::
-    :stub-columns: 1
-
-    * - docs
-      - |docs|
-    * - downloads
-      - |downloads|
-    * - tests
-      - | |travis|
-      - | |requires|
-    * - package
-      - | |version|
-        | |supported-versions|
++---------------+---------------------+
+| docs          | |docs|              |
++---------------+---------------------+
+| downloads     | |downloads|         |
++---------------+---------------------+
+| tests         | |travis| |codecov|  |
++---------------+---------------------+
+| package       | |version| |wheel|   |
+|               | |supported-versions||
++---------------+---------------------+
 
 .. |docs| image:: https://readthedocs.org/projects/pythermalcomfort/badge/?style=flat
     :target: https://readthedocs.org/projects/pythermalcomfort
