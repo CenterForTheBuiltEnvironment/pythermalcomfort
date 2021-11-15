@@ -4,20 +4,27 @@ Overview
 
 .. start-badges
 
-+---------------+---------------------+
-| docs          | |docs|              |
-+---------------+---------------------+
-| license       | |license|           |
-+---------------+---------------------+
-| downloads     | |downloads|         |
-+---------------+---------------------+
-| tests         | |travis| |codecov|  |
-+---------------+---------------------+
-| package       | |version| |wheel|   |
-|               | |supported-versions||
-+---------------+---------------------+
+.. list-table::
+    :stub-columns: 1
 
-.. |license| image:: https://img.shields.io/pypi/l/pythermalcomfort
+    * - docs
+      - |docs|
+    * - license
+      - |license|
+    * - downloads
+      - |downloads|
+    * - tests
+      - |travis| |codecov|
+    * - package
+      - | |version| |wheel|
+        | |supported-ver|
+        | |package-health|
+
+.. |package-health| image:: https://snyk.io/advisor/python/pythermalcomfort/badge.svg
+    :target: https://snyk.io/advisor/python/pythermalcomfort
+    :alt: pythermalcomfort
+
+.. |license| image:: https://img.shields.io/pypi/l/pythermalcomfort?color=brightgreen
     :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/blob/master/LICENSE
     :alt: pythermalcomfort license
 
@@ -25,9 +32,8 @@ Overview
     :target: https://readthedocs.org/projects/pythermalcomfort
     :alt: Documentation Status
 
-.. |downloads| image:: https://pepy.tech/badge/pythermalcomfort
-    :target: https://pepy.tech/project/pythermalcomfort
-    :alt: Total downloads
+.. |downloads| image:: https://img.shields.io/pypi/dm/pythermalcomfort?color=brightgreen
+    :alt: PyPI - Downloads
 
 .. |travis| image:: https://api.travis-ci.org/CenterForTheBuiltEnvironment/pythermalcomfort.svg?branch=master
     :alt: Travis-CI Build Status
@@ -49,7 +55,7 @@ Overview
     :alt: PyPI Wheel
     :target: https://pypi.org/project/pythermalcomfort
 
-.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/pythermalcomfort.svg
+.. |supported-ver| image:: https://img.shields.io/pypi/pyversions/pythermalcomfort.svg
     :alt: Supported versions
     :target: https://pypi.org/project/pythermalcomfort
 
