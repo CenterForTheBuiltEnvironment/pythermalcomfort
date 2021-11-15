@@ -32,11 +32,6 @@ Cooling Effect (CE)
 
 .. autofunction:: pythermalcomfort.models.cooling_effect
 
-Joint system thermoregulation model (JOS-3)
--------------------------------------------
-
-The thermoregulation JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method.
-
 Adaptive ASHRAE
 ---------------
 
