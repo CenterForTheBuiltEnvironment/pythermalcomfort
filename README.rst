@@ -7,6 +7,8 @@ Overview
 +---------------+---------------------+
 | docs          | |docs|              |
 +---------------+---------------------+
+| license       | |license|           |
++---------------+---------------------+
 | downloads     | |downloads|         |
 +---------------+---------------------+
 | tests         | |travis| |codecov|  |
@@ -14,6 +16,10 @@ Overview
 | package       | |version| |wheel|   |
 |               | |supported-versions||
 +---------------+---------------------+
+
+.. |license| image:: https://img.shields.io/pypi/l/pythermalcomfort
+    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/blob/master/LICENSE
+    :alt: pythermalcomfort license
 
 .. |docs| image:: https://readthedocs.org/projects/pythermalcomfort/badge/?style=flat
     :target: https://readthedocs.org/projects/pythermalcomfort
