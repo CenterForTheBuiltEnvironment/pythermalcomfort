@@ -157,8 +157,8 @@ Psychrometrics functions
 Utilities functions
 ===================
 
-Predicted Heat Strain (PHS) Index
----------------------------------
+Body Surface Area
+-----------------
 
 .. autofunction:: pythermalcomfort.utilities.body_surface_area
 
