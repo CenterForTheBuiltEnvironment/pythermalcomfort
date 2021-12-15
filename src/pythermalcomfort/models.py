@@ -1793,7 +1793,7 @@ def two_nodes(
     set : float
         Standard Effective Temperature (SET)
     et : float
-        New Effective Temperature (SET)
+        New Effective Temperature (ET)
     pmv_gagge : float
         PMV Gagge
     pmv_set : float
