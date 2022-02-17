@@ -202,6 +202,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         m/s (20 fpm).
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
+        This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -219,6 +220,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
     .. _PPD: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
+    .. _Addendum C to Standard 55-2020: https://www.ashrae.org/file%20library/technical%20resources/standards%20and%20guidelines/standards%20addenda/55_2020_c_20210430.pdf
 
     Examples
     --------
@@ -340,7 +342,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         m/s (20 fpm).
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
-        See ASHRAE 55 2020 Appendix H for more information [1]_.
+        This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
@@ -354,6 +356,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     You can use this function to calculate the `PMV`_ [1]_ [2]_.
 
     .. _PMV: https://en.wikipedia.org/wiki/Thermal_comfort#PMV/PPD_method
+    .. _Addendum C to Standard 55-2020: https://www.ashrae.org/file%20library/technical%20resources/standards%20and%20guidelines/standards%20addenda/55_2020_c_20210430.pdf
 
     Examples
     --------
