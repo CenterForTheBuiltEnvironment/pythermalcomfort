@@ -156,7 +156,8 @@ clo_d = np.vectorize(clo_dynamic)(clo, met)
 results = np.vectorize(pmv_ppd)(ta, tr, v_rel, rh, met, clo_d, 0, "ashrae", "SI")
 
 # split the pmv column in two since currently contains both pmv and ppd values
-df_ = pd.DataFrame(results)
+#results is an np.array and should be cast into a list before converted to a dataframe 
+df_ = pd.DataFrame(list(results))
 df = pd.concat([df, df_], axis=1, sort=False)
 
 end = time.time()
