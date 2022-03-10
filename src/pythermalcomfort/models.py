@@ -1018,13 +1018,13 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float, array_like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float, array_like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float
+    v : float, array_like
         wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float
+    rh : float, array_like
         relative humidity, [%]
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -1033,9 +1033,9 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
 
     Returns
     -------
-    utci : float
+    utci : float, array_like
          Universal Thermal Climate Index, [°C] or in [°F]
-    stress_category : str
+    stress_category : str, array_like
          UTCI categorized in terms of thermal stress [9]_.
 
     Notes
