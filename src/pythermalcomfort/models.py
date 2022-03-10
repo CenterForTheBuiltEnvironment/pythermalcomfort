@@ -1105,35 +1105,13 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
 
     utci_approx = np.where(all_valid, utci_approx, np.nan)
 
-    return np.round_(utci_approx, 1)
-    #if utci_approx < -40:
-    #    stress_category = "extreme cold stress"
-    #elif utci_approx < -27:
-    #    stress_category = "very strong cold stress"
-    #elif utci_approx < -13:
-    #    stress_category = "strong cold stress"
-    #elif utci_approx < 0:
-    #    stress_category = "moderate cold stress"
-    #elif utci_approx < 9:
-    #    stress_category = "slight cold stress"
-    #elif utci_approx < 26:
-    #    stress_category = "no thermal stress"
-    #elif utci_approx < 32:
-    #    stress_category = "moderate heat stress"
-    #elif utci_approx < 38:
-    #    stress_category = "strong heat stress"
-    #elif utci_approx < 46:
-    #    stress_category = "very strong heat stress"
-    #else:
-    #    stress_category = "extreme heat stress"
+    if units.lower() == "ip":
+        utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
-    #if units.lower() == "ip":
-    #    utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
-
-    #if return_stress_category:
-    #    return {"utci": round(utci_approx, 1), "stress_category": stress_category}
-    #else:
-    #    return round(utci_approx, 1)
+    if return_stress_category:
+        return {"utci": np.round_(utci_approx, 1), "stress_category": map_stress_category(utci_approx)}
+    else:
+        return np.round_(utci_approx, 1)
 
 
 def clo_tout(tout, units="SI"):
@@ -2417,6 +2395,25 @@ def use_fans_morris(
 
     return tipping_point
 
+
+def map_stress_category(t):
+    """Maps a temperature array to stress categories."""
+
+    thresholds = {-40.:'extreme cold stress',
+                   -27.:'very strong cold stress',
+                   -13.:'strong cold stress',
+                     0.: 'moderate cold stress',
+                    9.: 'slight cold stress',
+                    26.: 'no thermal stress', 
+                    32.: 'moderate heat stress',
+                    38.: 'strong heat stress',
+                    46.: 'very strong heat stress',
+                   1000.: 'extreme heat stress'}
+    
+    bins = np.array(list(thresholds.keys()))
+    words = np.append(np.array(list(thresholds.values())), 'unknown')
+    return words[np.digitize(t, bins, right=True)]
+    
 
 # # testing morris equation
 # from scipy import optimize
