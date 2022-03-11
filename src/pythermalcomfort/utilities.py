@@ -367,6 +367,36 @@ def units_converter(from_units="ip", **kwargs):
     return results
 
 
+def map_stress_category(t):
+    """Maps a temperature array to stress categories.
+
+    Parameters
+    ----------
+    t: float, array_like
+        Temperature to map.
+
+    Returns
+    -------
+    Stress category for each input temperature.
+    """
+    thresholds = {
+        -40.0: "extreme cold stress",
+        -27.0: "very strong cold stress",
+        -13.0: "strong cold stress",
+        0.0: "moderate cold stress",
+        9.0: "slight cold stress",
+        26.0: "no thermal stress",
+        32.0: "moderate heat stress",
+        38.0: "strong heat stress",
+        46.0: "very strong heat stress",
+        1000.0: "extreme heat stress",
+    }
+
+    bins = np.array(list(thresholds.keys()))
+    words = np.append(np.array(list(thresholds.values())), "unknown")
+    return words[np.digitize(t, bins, right=True)]
+
+
 #: Met values of typical tasks.
 met_typical_tasks = {
     "Sleeping": 0.7,
