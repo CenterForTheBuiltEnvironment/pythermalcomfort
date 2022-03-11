@@ -1347,7 +1347,7 @@ def test_ankle_draft():
 
 
 @pytest.fixture
-def data_test_adaptive_ashrae():
+def data_test_utci():
     return [  # I have commented the lines of code that don't pass the test
         {"tdb": 25, "tr": 27, "rh": 50, "v": 1, "return": {"utci": 25.2}},
         {"tdb": 19, "tr": 24, "rh": 50, "v": 1, "return": {"utci": 20.0}},
@@ -1358,8 +1358,8 @@ def data_test_adaptive_ashrae():
     ]
 
 
-def test_utci(data_test_adaptive_ashrae):
-    for row in data_test_adaptive_ashrae:
+def test_utci(data_test_utci):
+    for row in data_test_utci:
         assert (utci(row["tdb"], row["tr"], row["v"], row["rh"])) == row["return"][
             list(row["return"].keys())[0]
         ]
@@ -1374,12 +1374,12 @@ def test_utci(data_test_adaptive_ashrae):
     ) == {"utci": 24.6, "stress_category": "no thermal stress"}
 
 
-def test_utci_numpy(data_test_adaptive_ashrae):
-    tdb = np.array([d["tdb"] for d in data_test_adaptive_ashrae])
-    tr = np.array([d["tr"] for d in data_test_adaptive_ashrae])
-    rh = np.array([d["rh"] for d in data_test_adaptive_ashrae])
-    v = np.array([d["v"] for d in data_test_adaptive_ashrae])
-    expect = np.array([d["return"]["utci"] for d in data_test_adaptive_ashrae])
+def test_utci_numpy(data_test_utci):
+    tdb = np.array([d["tdb"] for d in data_test_utci])
+    tr = np.array([d["tr"] for d in data_test_utci])
+    rh = np.array([d["rh"] for d in data_test_utci])
+    v = np.array([d["v"] for d in data_test_utci])
+    expect = np.array([d["return"]["utci"] for d in data_test_utci])
 
     np.testing.assert_equal(utci(tdb, tr, v, rh), expect)
 
