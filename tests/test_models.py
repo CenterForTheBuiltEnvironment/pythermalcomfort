@@ -1355,14 +1355,17 @@ def data_test_utci():
         {"tdb": 27, "tr": 22, "rh": 50, "v": 1, "return": {"utci": 25.5}},
         {"tdb": 27, "tr": 22, "rh": 50, "v": 10, "return": {"utci": 20.0}},
         {"tdb": 27, "tr": 22, "rh": 50, "v": 16, "return": {"utci": 15.8}},
+        {"tdb": 51, "tr": 22, "rh": 50, "v": 16, "return": {"utci": np.nan}},
+        {"tdb": 27, "tr": 22, "rh": 50, "v": 0, "return": {"utci": np.nan}},
     ]
 
 
 def test_utci(data_test_utci):
     for row in data_test_utci:
-        assert (utci(row["tdb"], row["tr"], row["v"], row["rh"])) == row["return"][
-            list(row["return"].keys())[0]
-        ]
+        np.testing.assert_equal(
+            utci(row["tdb"], row["tr"], row["v"], row["rh"]),
+            row["return"][list(row["return"].keys())[0]],
+        )
 
     assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")) == 76.4
 
