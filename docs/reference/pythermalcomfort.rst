@@ -35,21 +35,24 @@ Cooling Effect (CE)
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-    The thermoregulation JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method. JOS-3 uses brown adipose tissue activity, aging effects, and heat gain by shortwave solar radiation at the skin to predict human physiological responses. It also considers personal characteristics in transient and non-uniform thermal environments. The JOS-3 was validated by comparing the results with those of human subject tests conducted under stable and transient conditions [19]_.
+    JOS-3 is a numeric model to simulate a human thermoregulation [19]_.
+    The JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method. JOS-3 uses brown adipose tissue activity, aging effects, and heat gain by shortwave solar radiation at the skin to predict human physiological responses. It also considers personal characteristics in transient and non-uniform thermal environments. The JOS-3 was validated by comparing the results with those of human subject tests conducted under stable and transient conditions [19]_.
 
-    Please note that we are actively working on the documentation of the JOS-3 model and we are planning to update it soon.
+    To read the JOS-3 official documentation please use the following commands:
 
-    :Parameters:    * **height** (float) - Body height [m]. The default is 1.72
-                    * **weight** (float) - Body weight [kg]. The default is 74.43
-                    * **fat** (float) - Fat percentage [%]. The default is 15
-                    * **age** (int) - Age [years]. The default is 20
-                    * **sex** (str) - Sex ("male" or "female"). The default is "male".
-                    * **ci** (float) - Cardiac index [L/min/m2]. The default is 2.6432.
-                    * **bmr_equation** (str) - Choose a BMR equation. The default is "harris-benedict".
-                    * **bsa_equation** (str) - Choose a BSA equation. The default is "dubois".
-                    * **ex_output** (None), list or "all" - Extra output parameters. If "all", all parameters are output.
+    .. code-block:: python
 
-    :Returns:       None
+        >>> import jos3
+        >>> model = jos3.JOS3()
+
+        >>> # Print documentation:
+        >>> print(model.__doc__)
+
+        >>> # Show the documentation of the output parameters:
+        >>> print(jos3.show_outparam_docs())
+
+
+    Below an example on how to use the JOS-3 model
 
     .. code-block:: python
 
@@ -63,12 +66,13 @@ Joint system thermoregulation model (JOS-3)
         >>> model.RH = 40  # Relative humidity [%]
         >>> model.Va = 0.2  # Air velocity [m/s]
         >>> model.PAR = 1.2  # Physical activity ratio [-]
-        >>> model.simulate(60)  # Exposre time = 60 [min]
+        >>> model.simulate(60)  # Exposure time = 60 [min]
 
         >>> # Set the next condition
         >>> model.To = 20  # Changes only operative temperature
-        >>> model.simulate(60)  # Additional exposre time = 60 [min]
+        >>> model.simulate(60)  # Additional exposure time = 60 [min]
 
+        >>> # Show the results
         >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
         >>> df.TskMean.plot()  # Show the graph of mean skin temp.
 
