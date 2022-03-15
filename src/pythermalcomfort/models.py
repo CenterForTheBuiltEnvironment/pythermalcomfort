@@ -1034,7 +1034,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, return_invali
     return_invald : boolean default False
         if True returns UTCI values also if input values are outside of the applicability 
         limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50), 
-        for radiant temperature tr [°C]: (tdb - 30, tdb + 70) and for wind spped v [m/s]: (0.5, 17.0).
+        for radiant temperature tr [°C]: (tdb - 70, tdb + 30) and for wind spped v [m/s]: (0.5, 17.0).
         By default, invalid input ranges will return nan.
 
     Returns
