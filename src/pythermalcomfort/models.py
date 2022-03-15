@@ -227,24 +227,23 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv_ppd
-        >>> from pythermalcomfort.utilities import v_relative
+        >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
+        >>> tdb = 25
+        >>> tr = 25
+        >>> rh = 50
+        >>> v = 0.1
+        >>> met = 1.4
+        >>> clo = 0.5
         >>> # calculate relative air speed
-        >>> v_r = v_relative(v=0.1, met=1.2)
-        >>> # as you can see the relative air speed is 0.16 m/s which is
-        significantly higher than v
-        >>> results = pmv_ppd(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5, wme=0,
-        standard="ISO")
+        >>> v_r = v_relative(v=v, met=met)
+        >>> # calculate dynamic clothing
+        >>> clo_d = clo_dynamic(clo=clo, met=met)
+        >>> results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
-        {'pmv': -0.09, 'ppd': 5.2}
+        {'pmv': 0.06, 'ppd': 5.1}
 
         >>> print(results['pmv'])
-        -0.09
-
-        >>> # for users who wants to use the IP system
-        >>> results_ip = pmv_ppd(tdb=77, tr=77, vr=0.4, rh=50, met=1.2, clo=0.5,
-        units="IP")
-        >>> print(results_ip)
-        {'pmv': 0.01, 'ppd': 5.0}
+        -0.06
 
     Raises
     ------
@@ -363,14 +362,20 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import pmv
-        >>> from pythermalcomfort.utilities import v_relative
+        >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
+        >>> tdb = 25
+        >>> tr = 25
+        >>> rh = 50
+        >>> v = 0.1
+        >>> met = 1.4
+        >>> clo = 0.5
         >>> # calculate relative air speed
-        >>> v_r = v_relative(v=0.1, met=1.2)
-        >>> # as you can see the relative air speed is 0.16 m/s which is
-        significantly higher than v
-        >>> results = pmv(tdb=25, tr=25, vr=v_r, rh=50, met=1.2, clo=0.5)
+        >>> v_r = v_relative(v=v, met=met)
+        >>> # calculate dynamic clothing
+        >>> clo_d = clo_dynamic(clo=clo, met=met)
+        >>> results = pmv(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
-        -0.09
+        'pmv': 0.06
     """
 
     return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard=standard, units=units)[
