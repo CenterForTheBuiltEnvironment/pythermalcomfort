@@ -1004,7 +1004,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     return results
 
 
-def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
+def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, return_invalid=False):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1031,6 +1031,11 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
+    return_invald : boolean default False
+        if True returns UTCI values also if input values are outside of the applicability 
+        limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50), 
+        for radiant temperature tr [°C]: (tdb - 30, tdb + 70) and for wind spped v [m/s]: (0.5, 17.0).
+        By default, invalid input ranges will return nan.
 
     Returns
     -------
@@ -1091,20 +1096,20 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
         es = np.exp(es) * 0.01  # convert Pa to hPa
         return es
 
-    # Do a series of checks to be sure that the input values are within the bounds
-    # accepted by the model.
-    tdb_valid = valid_range(tdb, (-50.0, 50.0))
-    diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
-    v_valid = valid_range(v, (0.5, 17.0))
-    all_valid = ~(np.isnan(tdb_valid) | np.isnan(diff_valid) | np.isnan(v_valid))
-
     eh_pa = exponential(tdb) * (rh / 100.0)
     delta_t_tr = tr - tdb
     pa = eh_pa / 10.0  # convert vapour pressure to kPa
 
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
-    utci_approx = np.where(all_valid, utci_approx, np.nan)
+    # Do a series of checks to be sure that the input values are within the bounds
+    # accepted by the model if not return invalid.
+    if return_invalid is False:
+        tdb_valid = valid_range(tdb, (-50.0, 50.0))
+        diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
+        v_valid = valid_range(v, (0.5, 17.0))
+        all_valid = ~(np.isnan(tdb_valid) | np.isnan(diff_valid) | np.isnan(v_valid))
+        utci_approx = np.where(all_valid, utci_approx, np.nan)
 
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
