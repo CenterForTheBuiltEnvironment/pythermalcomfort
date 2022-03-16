@@ -1,9 +1,12 @@
+import numpy as np
 import warnings
 from pythermalcomfort.psychrometrics import t_o, p_sat_torr, p_sat, psy_ta_rh
 from pythermalcomfort.utilities import (
     units_converter,
     transpose_sharp_altitude,
     check_standard_compliance,
+    valid_range,
+    map_stress_category,
 )
 import math
 from scipy import optimize
@@ -1006,7 +1009,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     return results
 
 
-def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
+def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, return_invalid=False):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1021,24 +1024,29 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float, array_like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float, array_like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float
+    v : float, array_like
         wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float
+    rh : float, array_like
         relative humidity, [%]
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
+    return_invald : boolean default False
+        if True returns UTCI values also if input values are outside of the applicability 
+        limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50), 
+        for radiant temperature tr [°C]: (tdb - 70, tdb + 30) and for wind spped v [m/s]: (0.5, 17.0).
+        By default, invalid input ranges will return nan.
 
     Returns
     -------
-    utci : float
+    utci : float, array_like
          Universal Thermal Climate Index, [°C] or in [°F]
-    stress_category : str
+    stress_category : str, array_like
          UTCI categorized in terms of thermal stress [9]_.
 
     Notes
@@ -1074,7 +1082,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
     if units.lower() == "ip":
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
-    check_standard_compliance(standard="utci", tdb=tdb, tr=tr, v=v)
+    # check_standard_compliance(standard="utci", tdb=tdb, tr=tr, v=v)
 
     def exponential(t_db):
         g = [
@@ -1087,25 +1095,11 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
             (-1.8680009 * (10 ** (-13))),
         ]
         tk = t_db + 273.15  # air temp in K
-        es = 2.7150305 * math.log1p(tk)
+        es = 2.7150305 * np.log1p(tk)
         for count, i in enumerate(g):
             es = es + (i * (tk ** (count - 2)))
-        es = math.exp(es) * 0.01  # convert Pa to hPa
+        es = np.exp(es) * 0.01  # convert Pa to hPa
         return es
-
-    # Do a series of checks to be sure that the input values are within the bounds
-    # accepted by the model.
-    if (
-        (tdb < -50.0)
-        or (tdb > 50.0)
-        or (tr - tdb < -30.0)
-        or (tr - tdb > 70.0)
-        or (v < 0.5)
-        or (v > 17)
-    ):
-        raise ValueError(
-            "The value you entered are outside the equation applicability limits"
-        )
 
     eh_pa = exponential(tdb) * (rh / 100.0)
     delta_t_tr = tr - tdb
@@ -1113,34 +1107,25 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False):
 
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
-    if utci_approx < -40:
-        stress_category = "extreme cold stress"
-    elif utci_approx < -27:
-        stress_category = "very strong cold stress"
-    elif utci_approx < -13:
-        stress_category = "strong cold stress"
-    elif utci_approx < 0:
-        stress_category = "moderate cold stress"
-    elif utci_approx < 9:
-        stress_category = "slight cold stress"
-    elif utci_approx < 26:
-        stress_category = "no thermal stress"
-    elif utci_approx < 32:
-        stress_category = "moderate heat stress"
-    elif utci_approx < 38:
-        stress_category = "strong heat stress"
-    elif utci_approx < 46:
-        stress_category = "very strong heat stress"
-    else:
-        stress_category = "extreme heat stress"
+    # Do a series of checks to be sure that the input values are within the bounds
+    # accepted by the model if not return invalid.
+    if return_invalid is False:
+        tdb_valid = valid_range(tdb, (-50.0, 50.0))
+        diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
+        v_valid = valid_range(v, (0.5, 17.0))
+        all_valid = ~(np.isnan(tdb_valid) | np.isnan(diff_valid) | np.isnan(v_valid))
+        utci_approx = np.where(all_valid, utci_approx, np.nan)
 
     if units.lower() == "ip":
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
     if return_stress_category:
-        return {"utci": round(utci_approx, 1), "stress_category": stress_category}
+        return {
+            "utci": np.round_(utci_approx, 1),
+            "stress_category": map_stress_category(utci_approx),
+        }
     else:
-        return round(utci_approx, 1)
+        return np.round_(utci_approx, 1)
 
 
 def clo_tout(tout, units="SI"):
