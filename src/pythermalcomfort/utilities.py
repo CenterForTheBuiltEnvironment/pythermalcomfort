@@ -1,8 +1,19 @@
+import numpy as np
 import warnings
 import math
 from pythermalcomfort.psychrometrics import p_sat
 
 warnings.simplefilter("always")
+
+
+def valid_range(x, valid):
+    """Filter values based on a valid range."""
+    return np.where((x > valid[0]) & (x < valid[1]), x, np.nan)
+
+
+def is_valid(x, valid):
+    """Return a mask based on a valid range."""
+    return (x > valid[0]) & (x < valid[1])
 
 
 def transpose_sharp_altitude(sharp, altitude):
@@ -354,6 +365,36 @@ def units_converter(from_units="ip", **kwargs):
                 results.append(value / 101325)
 
     return results
+
+
+def map_stress_category(t):
+    """Maps a temperature array to stress categories.
+
+    Parameters
+    ----------
+    t: float, array_like
+        Temperature to map.
+
+    Returns
+    -------
+    Stress category for each input temperature.
+    """
+    thresholds = {
+        -40.0: "extreme cold stress",
+        -27.0: "very strong cold stress",
+        -13.0: "strong cold stress",
+        0.0: "moderate cold stress",
+        9.0: "slight cold stress",
+        26.0: "no thermal stress",
+        32.0: "moderate heat stress",
+        38.0: "strong heat stress",
+        46.0: "very strong heat stress",
+        1000.0: "extreme heat stress",
+    }
+
+    bins = np.array(list(thresholds.keys()))
+    words = np.append(np.array(list(thresholds.values())), "unknown")
+    return words[np.digitize(t, bins, right=True)]
 
 
 #: Met values of typical tasks.
