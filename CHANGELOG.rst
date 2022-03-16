@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.11.0 (2022-03-16)
+-------------------
+
+* Allowing users to pass a Numpy array as input into the UTCI function
+* Numpy is now a requirement of pythermalcomfort
+* Improved PMV, JOS-3, and UTCI documentation
+* Testing PMV, SET, and solar gains models using online reference tables
+
 1.10.0 (2021-11-15)
 -------------------
 

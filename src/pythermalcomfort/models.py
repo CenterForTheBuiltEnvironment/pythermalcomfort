@@ -1009,7 +1009,9 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     return results
 
 
-def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, return_invalid=False):
+def utci(
+    tdb, tr, v, rh, units="SI", return_stress_category=False, return_invalid=False
+):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1037,8 +1039,8 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, return_invali
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
     return_invald : boolean default False
-        if True returns UTCI values also if input values are outside of the applicability 
-        limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50), 
+        if True returns UTCI values also if input values are outside of the applicability
+        limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50),
         for radiant temperature tr [°C]: (tdb - 70, tdb + 30) and for wind spped v [m/s]: (0.5, 17.0).
         By default, invalid input ranges will return nan.
 
@@ -2268,7 +2270,7 @@ def use_fans_morris(
     tdb,
     v,
     rh,
-    met,
+    met=70,
     wme=0,
     body_surface_area=1.8258,
     target_person="young",
@@ -2288,7 +2290,6 @@ def use_fans_morris(
 
     """
     # constants
-    met = 70  # todo change this
     v_still = 0.2
     r_cl_back = 0.0844
     r_cl_front = 0.0497
