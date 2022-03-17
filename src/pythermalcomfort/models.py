@@ -1038,11 +1038,11 @@ def utci(
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
-    return_invald : boolean default False
-        if True returns UTCI values also if input values are outside of the applicability
-        limits of the model. The valid input ranges are for air temperature tdb [°C]: (-50, 50),
-        for radiant temperature tr [°C]: (tdb - 70, tdb + 30) and for wind spped v [m/s]: (0.5, 17.0).
-        By default, invalid input ranges will return nan.
+    return_invalid : boolean default False
+        if True returns UTCI values even if input values are outside the applicability
+        limits of the model. The valid input ranges are -50 < tdb [°C] < 50,
+        tdb - 70 < tr [°C] < tdb + 30, and for 0.5 < v [m/s] < 17.0.
+        By default, inputs outsude the standard applicability limits nan.
 
     Returns
     -------
@@ -1084,8 +1084,6 @@ def utci(
     if units.lower() == "ip":
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
-    # check_standard_compliance(standard="utci", tdb=tdb, tr=tr, v=v)
-
     def exponential(t_db):
         g = [
             -2836.5744,
@@ -1109,8 +1107,7 @@ def utci(
 
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
-    # Do a series of checks to be sure that the input values are within the bounds
-    # accepted by the model if not return invalid.
+    # Checks that inputs are within the bounds accepted by the model if not return nan
     if return_invalid is False:
         tdb_valid = valid_range(tdb, (-50.0, 50.0))
         diff_valid = valid_range(tr - tdb, (-30.0, 70.0))

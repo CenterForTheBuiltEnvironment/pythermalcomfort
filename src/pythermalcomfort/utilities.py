@@ -35,14 +35,6 @@ def check_standard_compliance(standard, **kwargs):
     for key, value in kwargs.items():
         params[key] = value
 
-    if params["standard"] == "utci":
-        for key, value in params.items():
-            if key == "v" and (value > 17 or value < 0.5):
-                warnings.warn(
-                    "UTCI wind speed applicability limits between 0.5 and 17 m/s",
-                    UserWarning,
-                )
-
     if params["standard"] == "ankle_draft":
         for key, value in params.items():
             if key == "met" and value > 1.3:
