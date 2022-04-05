@@ -186,7 +186,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
-        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
         the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
         for the effect of the body movement for met equal or higher than 1.2 met using
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
@@ -466,8 +466,7 @@ def set_tmp(
         77.6
 
     """
-    # If the SET function is used to calculate the cooling effect then the h_c is
-    # calculated in a slightly different way
+    # When SET is used to calculate CE then h_c is calculated in a slightly different way
     default_kwargs = {"round": True, "calculate_ce": False}
     kwargs = {**default_kwargs, **kwargs}
 
