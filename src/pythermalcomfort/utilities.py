@@ -65,9 +65,9 @@ def check_standard_compliance(standard, **kwargs):
                     "ASHRAE air speed applicability limits between 0 and 2 m/s",
                     UserWarning,
                 )
-            if key == "met" and (value > 2 or value < 1):
+            if key == "met" and (value > 4 or value < 1):
                 warnings.warn(
-                    "ASHRAE met applicability limits between 1.0 and 2.0 met",
+                    "ASHRAE met applicability limits between 1.0 and 4.0 met",
                     UserWarning,
                 )
             if key == "clo" and (value > 1.5 or value < 0):
