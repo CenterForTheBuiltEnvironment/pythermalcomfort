@@ -1115,7 +1115,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
 
 
 def utci(
-    tdb, tr, v, rh, units="SI", return_stress_category=False, compliance_check=False
+    tdb, tr, v, rh, units="SI", return_stress_category=False, compliance_check=True
 ):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
@@ -1213,7 +1213,7 @@ def utci(
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if compliance_check is False:
+    if compliance_check:
         tdb_valid = valid_range(tdb, (-50.0, 50.0))
         diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
         v_valid = valid_range(v, (0.5, 17.0))
