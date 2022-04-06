@@ -1009,7 +1009,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
 
 
 def utci(
-    tdb, tr, v, rh, units="SI", return_stress_category=False, return_invalid=False
+    tdb, tr, v, rh, units="SI", return_stress_category=False, compliance_check=False
 ):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
@@ -1037,11 +1037,11 @@ def utci(
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
-    return_invalid : boolean default False
-        if True returns UTCI values even if input values are outside the applicability
-        limits of the model. The valid input ranges are -50 < tdb [°C] < 50,
-        tdb - 70 < tr [°C] < tdb + 30, and for 0.5 < v [m/s] < 17.0.
-        By default, inputs outsude the standard applicability limits nan.
+    compliance_check : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns UTCI values even if input values are
+        outside the applicability limits of the model. The valid input ranges are
+        -50 < tdb [°C] < 50, tdb - 70 < tr [°C] < tdb + 30, and for 0.5 < v [m/s] < 17.0.
 
     Returns
     -------
@@ -1107,7 +1107,7 @@ def utci(
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if return_invalid is False:
+    if compliance_check is False:
         tdb_valid = valid_range(tdb, (-50.0, 50.0))
         diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
         v_valid = valid_range(v, (0.5, 17.0))
