@@ -284,18 +284,15 @@ def pmv_ppd(
     wme = np.array(wme)
 
     if compliance_check:
-        if standard == "ashrae":
-            tdb_valid = valid_range(tdb, (10.0, 40.0))
-            tr_valid = valid_range(tr, (10.0, 40.0))
-            v_valid = valid_range(vr, (0.0, 2.0))
-            met_valid = valid_range(met, (1.0, 4.0))
-            clo_valid = valid_range(clo, (0.0, 1.5))
-        elif standard == "iso":
-            tdb_valid = valid_range(tdb, (10.0, 30.0))
-            tr_valid = valid_range(tr, (10.0, 40.0))
-            v_valid = valid_range(vr, (0.0, 1.0))
-            met_valid = valid_range(met, (0.8, 4.0))
-            clo_valid = valid_range(clo, (0.0, 2))
+        (
+            tdb_valid,
+            tr_valid,
+            v_valid,
+            met_valid,
+            clo_valid,
+        ) = check_standard_compliance_array(
+            standard, tdb=tdb, tr=tr, v=vr, met=met, clo=clo
+        )
 
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
     ce = np.where(

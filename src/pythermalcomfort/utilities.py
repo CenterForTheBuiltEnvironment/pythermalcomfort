@@ -171,6 +171,29 @@ def check_standard_compliance(standard, **kwargs):
             )
 
 
+def check_standard_compliance_array(standard, **kwargs):
+    params = {}
+    for key, value in kwargs.items():
+        params[key] = value
+    if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
+        tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
+        tr_valid = valid_range(params["tr"], (10.0, 40.0))
+        v_valid = valid_range(params["v"], (0.0, 2.0))
+        met_valid = valid_range(params["met"], (1.0, 4.0))
+        clo_valid = valid_range(params["clo"], (0.0, 1.5))
+
+        return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+
+    if standard == "iso":  # based on ISO 7730:2005 page 3
+        tdb_valid = valid_range(params["tdb"], (10.0, 30.0))
+        tr_valid = valid_range(params["tr"], (10.0, 40.0))
+        v_valid = valid_range(params["v"], (0.0, 1.0))
+        met_valid = valid_range(params["met"], (0.8, 4.0))
+        clo_valid = valid_range(params["clo"], (0.0, 2))
+
+        return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+
+
 def body_surface_area(weight, height, formula="dubois"):
     """
     Returns the body surface area in square meters.
