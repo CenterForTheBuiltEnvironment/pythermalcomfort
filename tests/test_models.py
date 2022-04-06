@@ -224,21 +224,31 @@ def test_pmv():
                 standard = "ASHRAE"
             inputs = entry["inputs"]
             outputs = entry["outputs"]
-            assert (
-                round(
-                    pmv(
-                        inputs["ta"],
-                        inputs["tr"],
-                        inputs["v"],
-                        inputs["rh"],
-                        inputs["met"],
-                        inputs["clo"],
-                        standard=standard,
-                    ),
-                    1,
-                )
-                == outputs["pmv"]
+            r = pmv(
+                inputs["ta"],
+                inputs["tr"],
+                inputs["v"],
+                inputs["rh"],
+                inputs["met"],
+                inputs["clo"],
+                standard=standard,
             )
+            # asserting with this strange code otherwise face issues with rounding fund
+            assert float("%.1f" % r) == outputs["pmv"]
+
+    # testing array-like input
+    np.testing.assert_equal(
+        pmv(
+            [41, 20, 20, 20, 20, 20],
+            [20, 41, 20, 20, 20, 20],
+            [0.1, 0.1, 2.1, 0.1, 0.1, 0.1],
+            50,
+            [1.1, 1.1, 1.1, 0.7, 1.1, 1.1],
+            [0.5, 0.5, 0.5, 0.5, 2.1, 0.5],
+            standard="ashrae",
+        ),
+        [np.nan, np.nan, np.nan, np.nan, np.nan, -1.81],
+    )
 
 
 def test_set():

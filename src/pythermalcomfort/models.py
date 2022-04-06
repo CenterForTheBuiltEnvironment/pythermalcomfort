@@ -149,15 +149,11 @@ def pmv_ppd(
 ):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (
-    `PPD`_) calculated in accordance to main thermal comfort Standards. The `PMV`_ is
-    an index that
-    predicts the mean value of the thermal sensation votes (self-reported perceptions)
-    of a large group of people on a sensation scale expressed from –3 to +3
-    corresponding to
-    the categories \"cold,\" \"cool,\" \"slightly cool,\" \"neutral,\" \"slightly warm,
-    \" \"warm,\" and \"hot.\"[1]_. The `PPD`_ is an index that establishes a quantitative
-    prediction of the percentage of thermally dissatisfied people determined from
-    `PMV`_ [1]_.
+    `PPD`_) calculated in accordance to main thermal comfort Standards. The PMV is an
+    index that predicts the mean value of the thermal sensation votes (self-reported
+    perceptions) of a large group of people on a sensation scale expressed from –3 to +3
+    corresponding to the categories \"cold,\" \"cool, \" \"slightly cool,\" \"neutral,\"
+    \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
     ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
@@ -255,9 +251,12 @@ def pmv_ppd(
         >>> results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
         {'pmv': 0.06, 'ppd': 5.1}
-
         >>> print(results['pmv'])
         -0.06
+        >>> # you can also pass an array-like of inputs
+        >>> results = pmv_ppd(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
+        >>> print(results)
+        {'pmv': array([-0.47,  0.06]), 'ppd': array([9.6, 5.1])}
 
     Raises
     ------
@@ -337,15 +336,15 @@ def pmv_ppd(
     }
 
 
-def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
+def pmv(
+    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", compliance_check=True
+):
     """
     Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal
     comfort Standards. The PMV is an index that predicts the mean value of the thermal
-    sensation votes
-    (self-reported perceptions) of a large group of people on a sensation scale
-    expressed from –3 to +3 corresponding to the categories \"cold,\" \"cool,
-    \" \"slightly cool,\"
-    \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
+    sensation votes (self-reported perceptions) of a large group of people on a sensation
+    scale expressed from –3 to +3 corresponding to the categories \"cold,\" \"cool,
+    \" \"slightly cool,\" \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
     ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
@@ -355,11 +354,11 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float
+    vr : float or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -368,21 +367,21 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
-        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+        of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
         the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
         for the effect of the body movement for met equal or higher than 1.2 met using
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
         can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float
+    wme : float or array-like
         external work, [met] default 0
     standard: str (default="ISO")
         comfort standard used for calculation
@@ -398,10 +397,19 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    compliance_check : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns pmv and ppd values even if input values are
+        outside the applicability limits of the model.
+
+        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
+        The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
 
     Returns
     -------
-    pmv : float
+    pmv : float or array-like
         Predicted Mean Vote
 
     Notes
@@ -429,12 +437,25 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         >>> clo_d = clo_dynamic(clo=clo, met=met)
         >>> results = pmv(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
-        'pmv': 0.06
+        0.06
+        >>> # you can also pass an array-like of inputs
+        >>> results = pmv(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
+        >>> print(results)
+        array([-0.47,  0.06])
     """
 
-    return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard=standard, units=units)[
-        "pmv"
-    ]
+    return pmv_ppd(
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        wme,
+        standard=standard,
+        units=units,
+        compliance_check=compliance_check,
+    )["pmv"]
 
 
 def set_tmp(
