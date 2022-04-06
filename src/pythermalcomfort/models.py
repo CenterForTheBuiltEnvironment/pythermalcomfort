@@ -144,7 +144,9 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     return round(ce, 2)
 
 
-def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
+def pmv_ppd(
+    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", compliance_check=True
+):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (
     `PPD`_) calculated in accordance to main thermal comfort Standards. The `PMV`_ is
@@ -165,11 +167,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float
+    vr : float or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -178,11 +180,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
@@ -192,7 +194,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
         can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float
+    wme : float or array-like
         external work, [met] default 0
     standard: str (default="ISO")
         comfort standard used for calculation
@@ -208,12 +210,21 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
         This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    compliance_check : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns pmv and ppd values even if input values are
+        outside the applicability limits of the model.
+
+        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
+        The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
 
     Returns
     -------
-    pmv
+    pmv : float or array-like
         Predicted Mean Vote
-    ppd
+    ppd : float or array-like
         Predicted Percentage of Dissatisfied occupants, [%]
 
     Notes
@@ -265,25 +276,65 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
             "Standards"
         )
 
-    check_standard_compliance(
-        standard=standard, tdb=tdb, tr=tr, v=vr, rh=rh, met=met, clo=clo
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    vr = np.array(vr)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
+
+    if compliance_check:
+        if standard == "ashrae":
+            tdb_valid = valid_range(tdb, (10.0, 40.0))
+            tr_valid = valid_range(tr, (10.0, 40.0))
+            v_valid = valid_range(vr, (0.0, 2.0))
+            met_valid = valid_range(met, (1.0, 4.0))
+            clo_valid = valid_range(clo, (0.0, 1.5))
+        elif standard == "iso":
+            tdb_valid = valid_range(tdb, (10.0, 30.0))
+            tr_valid = valid_range(tr, (10.0, 40.0))
+            v_valid = valid_range(vr, (0.0, 1.0))
+            met_valid = valid_range(met, (0.8, 4.0))
+            clo_valid = valid_range(clo, (0.0, 2))
+
+    # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
+    ce = np.where(
+        (vr >= 0.1) & (standard == "ashrae"),
+        np.vectorize(cooling_effect)(tdb, tr, vr, rh, met, clo, wme),
+        0,
     )
 
-    # if the relative air speed is higher than 0.1 then follow methodology ASHRAE
-    # Appendix H, H3
-    if standard == "ashrae" and vr >= 0.1:
-        # calculate the cooling effect
-        ce = cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme)
+    tdb = tdb - ce
+    tr = tr - ce
+    vr = np.where(ce > 0, 0.1, vr)
 
-        tdb = tdb - ce
-        tr = tr - ce
-        vr = 0.1
+    pmv_array = np.vectorize(pmv_ppd_optimized)(tdb, tr, vr, rh, met, clo, wme)
 
-    _pmv = pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
+    ppd_array = 100.0 - 95.0 * np.exp(
+        -0.03353 * np.power(pmv_array, 4.0) - 0.2179 * np.power(pmv_array, 2.0)
+    )
 
-    _ppd = 100.0 - 95.0 * math.exp(-0.03353 * pow(_pmv, 4.0) - 0.2179 * pow(_pmv, 2.0))
+    # Checks that inputs are within the bounds accepted by the model if not return nan
+    if compliance_check:
+        if standard == "ashrae":
+            pmv_valid = valid_range(pmv_array, (-100, 100))
+        elif standard == "iso":
+            pmv_valid = valid_range(pmv_array, (-2, 2))
+        all_valid = ~(
+            np.isnan(tdb_valid)
+            | np.isnan(tr_valid)
+            | np.isnan(v_valid)
+            | np.isnan(met_valid)
+            | np.isnan(clo_valid)
+            | np.isnan(pmv_valid)
+        )
+        pmv_array = np.where(all_valid, pmv_array, np.nan)
+        ppd_array = np.where(all_valid, ppd_array, np.nan)
 
-    return {"pmv": round(_pmv, 2), "ppd": round(_ppd, 1)}
+    return {
+        "pmv": np.around(pmv_array, 2),
+        "ppd": np.around(ppd_array, 1),
+    }
 
 
 def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI"):
@@ -1025,13 +1076,13 @@ def utci(
 
     Parameters
     ----------
-    tdb : float, array_like
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float, array_like
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float, array_like
+    v : float or array-like
         wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float, array_like
+    rh : float or array-like
         relative humidity, [%]
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -1045,9 +1096,9 @@ def utci(
 
     Returns
     -------
-    utci : float, array_like
+    utci : float or array-like
          Universal Thermal Climate Index, [°C] or in [°F]
-    stress_category : str, array_like
+    stress_category : str or array-like
          UTCI categorized in terms of thermal stress [9]_.
 
     Notes

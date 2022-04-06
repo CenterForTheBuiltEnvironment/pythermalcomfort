@@ -8,7 +8,7 @@ warnings.simplefilter("always")
 
 def valid_range(x, valid):
     """Filter values based on a valid range."""
-    return np.where((x > valid[0]) & (x < valid[1]), x, np.nan)
+    return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
 
 
 def is_valid(x, valid):
@@ -364,7 +364,7 @@ def map_stress_category(t):
 
     Parameters
     ----------
-    t: float, array_like
+    t : float, array-like
         Temperature to map.
 
     Returns

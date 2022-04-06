@@ -102,8 +102,9 @@ def test_pmv_ppd():
                 inputs["clo"],
                 standard=standard,
             )
-            assert round(r["pmv"], 1) == outputs["pmv"]
-            assert round(r["ppd"], 1) == outputs["ppd"]
+            # asserting with this strange code otherwise face issues with rounding fund
+            assert float("%.1f" % r["pmv"]) == outputs["pmv"]
+            assert np.round(r["ppd"], 1) == outputs["ppd"]
 
     for row in data_test_pmv_ip:
         assert (
@@ -151,6 +152,68 @@ def test_pmv_ppd():
 
     with pytest.raises(ValueError):
         pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard="random")
+
+    # checking that returns np.nan when outside standard applicability limits
+    np.testing.assert_equal(
+        pmv_ppd(
+            [31, 20, 20, 20, 20, 30],
+            [20, 41, 20, 20, 20, 20],
+            [0.1, 0.1, 2, 0.1, 0.1, 0.1],
+            50,
+            [1.1, 1.1, 1.1, 0.7, 1.1, 4.1],
+            [0.5, 0.5, 0.5, 0.5, 2.1, 0.1],
+            standard="iso",
+        ),
+        {
+            "pmv": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            "ppd": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+        },
+    )
+
+    np.testing.assert_equal(
+        pmv_ppd(
+            [41, 20, 20, 20, 20, 39],
+            [20, 41, 20, 20, 20, 39],
+            [0.1, 0.1, 2.1, 0.1, 0.1, 0.1],
+            50,
+            [1.1, 1.1, 1.1, 0.7, 1.1, 3.9],
+            [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
+            standard="ashrae",
+        ),
+        {
+            "pmv": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+            "ppd": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+        },
+    )
+
+    # check results with compliance_check disabled
+    np.testing.assert_equal(
+        pmv_ppd(31, 41, 2, 50, 0.7, 2.1, standard="iso", compliance_check=False),
+        {"pmv": 2.4, "ppd": 91.0},
+    )
+
+    np.testing.assert_equal(
+        pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", compliance_check=False),
+        {"pmv": 4.46, "ppd": 100.0},
+    )
+
+    for table in reference_tables["reference_data"]["pmv_ppd"]:
+        standard = "ISO"
+        if "ASHRAE" in table["source"]:
+            standard = "ASHRAE"
+        tdb = np.array([d["inputs"]["ta"] for d in table["data"]])
+        tr = np.array([d["inputs"]["tr"] for d in table["data"]])
+        v = np.array([d["inputs"]["v"] for d in table["data"]])
+        rh = np.array([d["inputs"]["rh"] for d in table["data"]])
+        met = np.array([d["inputs"]["met"] for d in table["data"]])
+        clo = np.array([d["inputs"]["clo"] for d in table["data"]])
+        pmv_exp = np.array([d["outputs"]["pmv"] for d in table["data"]])
+        ppd_exp = np.array([d["outputs"]["ppd"] for d in table["data"]])
+        results = pmv_ppd(tdb, tr, v, rh, met, clo, standard=standard)
+        pmv_r = [float("%.1f" % x) for x in results["pmv"]]
+
+        np.testing.assert_equal(pmv_r, pmv_exp)
+        np.testing.assert_equal(results["ppd"], ppd_exp)
 
 
 def test_pmv():
