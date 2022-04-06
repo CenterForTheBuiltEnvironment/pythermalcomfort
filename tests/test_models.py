@@ -265,6 +265,7 @@ def test_set():
                     inputs["met"],
                     inputs["clo"],
                     round=True,
+                    compliance_check=False,
                 )
                 == outputs["set"]
             )
@@ -308,11 +309,37 @@ def test_set():
                     row["met"],
                     row["clo"],
                     units="IP",
+                    compliance_check=False,
                 )
                 - row["set"]
             )
             < 0.11
         )
+
+    # checking that returns np.nan when outside standard applicability limits
+    np.testing.assert_equal(
+        set_tmp(
+            [41, 20, 20, 20, 20, 39],
+            [20, 41, 20, 20, 20, 39],
+            [0.1, 0.1, 2.1, 0.1, 0.1, 0.1],
+            50,
+            [1.1, 1.1, 1.1, 0.7, 1.1, 3.9],
+            [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
+        ),
+        [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+    )
+
+    for table in reference_tables["reference_data"]["set"]:
+        tdb = np.array([d["inputs"]["ta"] for d in table["data"]])
+        tr = np.array([d["inputs"]["tr"] for d in table["data"]])
+        v = np.array([d["inputs"]["v"] for d in table["data"]])
+        rh = np.array([d["inputs"]["rh"] for d in table["data"]])
+        met = np.array([d["inputs"]["met"] for d in table["data"]])
+        clo = np.array([d["inputs"]["clo"] for d in table["data"]])
+        set_exp = np.array([d["outputs"]["set"] for d in table["data"]])
+        results = set_tmp(tdb, tr, v, rh, met, clo, compliance_check=False)
+
+        np.testing.assert_equal(set_exp, results)
 
 
 def test_solar_gain():

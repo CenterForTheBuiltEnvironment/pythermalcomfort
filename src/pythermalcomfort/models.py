@@ -7,6 +7,7 @@ from pythermalcomfort.utilities import (
     check_standard_compliance,
     valid_range,
     map_stress_category,
+    check_standard_compliance_array,
 )
 import math
 from scipy import optimize
@@ -470,6 +471,7 @@ def set_tmp(
     p_atm=101325,
     body_position="standing",
     units="SI",
+    compliance_check=True,
     **kwargs,
 ):
     """
@@ -482,19 +484,19 @@ def set_tmp(
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float
+    v : float or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
-    wme : float
+    wme : float or array-like
         external work, [met] default 0
     body_surface_area : float
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
@@ -503,19 +505,25 @@ def set_tmp(
         :py:meth:`pythermalcomfort.utilities.body_surface_area`.
     p_atm : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
-    body_position: str default="standing"
+    body_position: str default="standing" or array-like
         select either "sitting" or "standing"
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    compliance_check : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns values even if input values are
+        outside the applicability limits of the model.
+        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
 
     Other Parameters
     ----------------
-    round: boolean, deafult True
+    round : boolean, deafult True
         if True rounds output value, if False it does not round it
 
     Returns
     -------
-    SET : float
+    SET : float or array-like
         Standard effective temperature, [°C]
 
     Notes
@@ -531,11 +539,13 @@ def set_tmp(
 
         >>> from pythermalcomfort.models import set_tmp
         >>> set_tmp(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=.5)
-        25.3
+        24.3
+        >>> set_tmp(tdb=[25, 25], tr=25, v=0.1, rh=50, met=1.2, clo=.5)
+        array([24.3, 24.3])
 
         >>> # for users who wants to use the IP system
         >>> set_tmp(tdb=77, tr=77, v=0.328, rh=50, met=1.2, clo=.5, units='IP')
-        77.6
+        75.8
 
     """
     # When SET is used to calculate CE then h_c is calculated in a slightly different way
@@ -551,11 +561,16 @@ def set_tmp(
             tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
         )
 
-    check_standard_compliance(
-        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
-    )
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
 
-    _set = two_nodes(
+    # todo pass directly the vectors to two_nodes once it has been vectorized
+    set_array = np.vectorize(two_nodes)(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -569,15 +584,37 @@ def set_tmp(
         calculate_ce=kwargs["calculate_ce"],
         round=False,
         output="all",
-    )["_set"]
+    )
+
+    set_array = [x.item()["_set"] for x in np.nditer(set_array, ["refs_ok"])]
+    set_array = np.array(set_array)
 
     if units.lower() == "ip":
-        _set = units_converter(tmp=_set, from_units="si")[0]
+        set_array = units_converter(tmp=set_array, from_units="si")[0]
+
+    if compliance_check:
+        (
+            tdb_valid,
+            tr_valid,
+            v_valid,
+            met_valid,
+            clo_valid,
+        ) = check_standard_compliance_array(
+            "ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
+        )
+        all_valid = ~(
+            np.isnan(tdb_valid)
+            | np.isnan(tr_valid)
+            | np.isnan(v_valid)
+            | np.isnan(met_valid)
+            | np.isnan(clo_valid)
+        )
+        set_array = np.where(all_valid, set_array, np.nan)
 
     if kwargs["round"]:
-        return round(_set, 1)
+        return np.around(set_array, 1)
     else:
-        return _set
+        return set_array
 
 
 def use_fans_heatwaves(
