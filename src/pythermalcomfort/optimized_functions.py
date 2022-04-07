@@ -1,4 +1,4 @@
-from numba import jit
+from numba import jit, vectorize, float64, boolean
 import math
 
 
@@ -336,7 +336,19 @@ def two_nodes_optimized(
     )
 
 
-@jit(nopython=True)
+@vectorize(
+    [
+        float64(
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+        )
+    ]
+)
 def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
 
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))

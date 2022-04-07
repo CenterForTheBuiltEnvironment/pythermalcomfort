@@ -308,9 +308,7 @@ def pmv_ppd(
     tr = tr - ce
     vr = np.where(ce > 0, 0.1, vr)
 
-    pmv_array = np.vectorize(pmv_ppd_optimized, cache=True)(
-        tdb, tr, vr, rh, met, clo, wme
-    )
+    pmv_array = pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
 
     ppd_array = 100.0 - 95.0 * np.exp(
         -0.03353 * np.power(pmv_array, 4.0) - 0.2179 * np.power(pmv_array, 2.0)
@@ -571,7 +569,6 @@ def set_tmp(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    # todo pass directly the vectors to two_nodes once it has been vectorized
     set_array = two_nodes(
         tdb=tdb,
         tr=tr,
