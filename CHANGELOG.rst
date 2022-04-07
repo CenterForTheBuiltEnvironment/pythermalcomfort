@@ -2,6 +2,24 @@
 Changelog
 =========
 
+2.0.0 (2022-04-07)
+-------------------
+
+.. warning::
+    Version 2.0.0 introduces some breaking changes. Now the default behaviour of most of the function is that they return a ``np.nan`` if the inputs are outside the model applicability limits.
+
+    For most functions we are no longer printing ``Warnings``. If you want the function to return a value even if your inputs are outside the model applicability limits then you can set the variable ``limit_input = False``. Please note that you should refrain from doing this.
+
+
+.. note::
+    Starting from Version 2.0.0 of pythermalcomfort now most of the functions (see detailed list below) accept Numpy arrays or lists as inputs. This allows you to write more concise and faster code since we optimized vectorization, where possible using Numba.
+
+* Allowing users to pass Numpy arrays or lists as input to the pmv_ppd, pmv, clo_tout, both adaptive models, utci, set_tmp, two_nodes
+* Changed the input variable from return_invalid to limit_input
+* Increased speed by using Numba @vectorize decorator
+* Changed ASHRAE 55 2020 limits to match new addenda
+* Improved documentation
+
 1.11.0 (2022-03-16)
 -------------------
 
