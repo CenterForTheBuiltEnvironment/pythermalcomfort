@@ -109,6 +109,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         wme=wme,
         round=False,
         calculate_ce=True,
+        compliance_check=False,
     )
 
     def function(x):
@@ -123,6 +124,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
                 wme=wme,
                 round=False,
                 calculate_ce=True,
+                compliance_check=False,
             )
             - initial_set_tmp
         )
@@ -266,6 +268,14 @@ def pmv_ppd(
     ValueError
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
     """
+
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    vr = np.array(vr)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
+
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
@@ -275,13 +285,6 @@ def pmv_ppd(
             "PMV calculations can only be performed in compliance with ISO or ASHRAE "
             "Standards"
         )
-
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
 
     if compliance_check:
         (
@@ -297,7 +300,7 @@ def pmv_ppd(
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
     ce = np.where(
         (vr >= 0.1) & (standard == "ashrae"),
-        np.vectorize(cooling_effect)(tdb, tr, vr, rh, met, clo, wme),
+        np.vectorize(cooling_effect, cache=True)(tdb, tr, vr, rh, met, clo, wme),
         0,
     )
 
@@ -305,7 +308,9 @@ def pmv_ppd(
     tr = tr - ce
     vr = np.where(ce > 0, 0.1, vr)
 
-    pmv_array = np.vectorize(pmv_ppd_optimized)(tdb, tr, vr, rh, met, clo, wme)
+    pmv_array = np.vectorize(pmv_ppd_optimized, cache=True)(
+        tdb, tr, vr, rh, met, clo, wme
+    )
 
     ppd_array = 100.0 - 95.0 * np.exp(
         -0.03353 * np.power(pmv_array, 4.0) - 0.2179 * np.power(pmv_array, 2.0)

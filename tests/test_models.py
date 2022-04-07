@@ -150,6 +150,11 @@ def test_pmv_ppd():
         round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1)
     ) == -0.5
 
+    np.testing.assert_equal(
+        np.around(pmv_ppd([70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1),
+        [-0.3, -0.3],
+    )
+
     with pytest.raises(ValueError):
         pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard="random")
 
