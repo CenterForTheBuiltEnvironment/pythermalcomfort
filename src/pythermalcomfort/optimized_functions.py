@@ -1,5 +1,48 @@
-from numba import jit, vectorize, float64, boolean
+from numba import jit, vectorize, float64
 import math
+
+
+@vectorize(
+    [
+        float64(
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+            float64,
+        )
+    ],
+)
+def two_nodes_optimized_return_set(
+    tdb,
+    tr,
+    v,
+    met,
+    clo,
+    vapor_pressure,
+    wme,
+    body_surface_area,
+    p_atmospheric,
+    body_position,
+):
+    return two_nodes_optimized(
+        tdb,
+        tr,
+        v,
+        met,
+        clo,
+        vapor_pressure,
+        wme,
+        body_surface_area,
+        p_atmospheric,
+        body_position,
+        True,
+    )[0]
 
 
 @jit(nopython=True)
@@ -347,7 +390,7 @@ def two_nodes_optimized(
             float64,
             float64,
         )
-    ]
+    ],
 )
 def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
 

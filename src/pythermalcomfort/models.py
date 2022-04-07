@@ -16,6 +16,7 @@ from pythermalcomfort.optimized_functions import (
     phs_optimized,
     pmv_ppd_optimized,
     utci_optimized,
+    two_nodes_optimized_return_set,
 )
 
 
@@ -1931,6 +1932,21 @@ def two_nodes(
     body_position = np.array(body_position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
+
+    if kwargs["calculate_ce"]:
+        result = two_nodes_optimized_return_set(
+            tdb,
+            tr,
+            v,
+            met,
+            clo,
+            vapor_pressure,
+            wme,
+            body_surface_area,
+            p_atmospheric,
+            1,
+        )
+        return {"_set": result}
 
     (
         _set,
