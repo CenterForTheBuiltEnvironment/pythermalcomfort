@@ -4,6 +4,7 @@ import json
 import warnings
 import requests
 
+from pythermalcomfort.optimized_functions import pmv_ppd_optimized, utci_optimized
 from pythermalcomfort.models import (
     solar_gain,
     pmv_ppd,
@@ -220,6 +221,15 @@ def test_pmv_ppd():
 
         np.testing.assert_equal(pmv_r, pmv_exp)
         np.testing.assert_equal(results["ppd"], ppd_exp)
+
+
+def test_pmv_ppd_optimized():
+    assert (round(pmv_ppd_optimized(25, 25, 0.3, 50, 1.5, 0.7, 0), 2)) == 0.55
+
+    np.testing.assert_equal(
+        np.around(pmv_ppd_optimized([25, 25], 25, 0.3, 50, 1.5, 0.7, 0), 2),
+        [0.55, 0.55],
+    )
 
 
 def test_pmv():
@@ -1326,11 +1336,12 @@ def test_utci(data_test_utci):
     assert (utci(tdb=77, tr=77, v=3.28, rh=50, units="ip")) == 76.4
 
     assert (
-        utci(tdb=25, tr=27, v=1, rh=50, units="si", return_stress_category=True)
-    ) == {"utci": 25.2, "stress_category": "no thermal stress"}
-    assert (
-        utci(tdb=25, tr=25, v=1, rh=50, units="si", return_stress_category=True)
-    ) == {"utci": 24.6, "stress_category": "no thermal stress"}
+        utci(tdb=30, tr=27, v=1, rh=50, units="si", return_stress_category=True)
+    ) == {"utci": 29.6, "stress_category": "moderate heat stress"}
+    assert (utci(tdb=9, tr=9, v=1, rh=50, units="si", return_stress_category=True)) == {
+        "utci": 8.7,
+        "stress_category": "slight cold stress",
+    }
 
 
 def test_utci_numpy(data_test_utci):
@@ -1354,6 +1365,12 @@ def test_utci_numpy(data_test_utci):
     result = utci(tdb, tr, v, rh, units="si", return_stress_category=True)
     np.testing.assert_equal(result["utci"], expect["utci"])
     np.testing.assert_equal(result["stress_category"], expect["stress_category"])
+
+
+def test_utci_optimized():
+    np.testing.assert_equal(
+        np.around(utci_optimized([25, 27], 1, 1, 1.5), 2), [24.73, 26.57]
+    )
 
 
 def test_clo_dynamic():
