@@ -110,7 +110,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         wme=wme,
         round=False,
         calculate_ce=True,
-        compliance_check=False,
+        limit_inputs=False,
     )
 
     def function(x):
@@ -125,7 +125,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
                 wme=wme,
                 round=False,
                 calculate_ce=True,
-                compliance_check=False,
+                limit_inputs=False,
             )
             - initial_set_tmp
         )
@@ -149,7 +149,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
 
 def pmv_ppd(
-    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", compliance_check=True
+    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", limit_inputs=True
 ):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (
@@ -210,7 +210,7 @@ def pmv_ppd(
         This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
@@ -287,7 +287,7 @@ def pmv_ppd(
             "Standards"
         )
 
-    if compliance_check:
+    if limit_inputs:
         (
             tdb_valid,
             tr_valid,
@@ -316,7 +316,7 @@ def pmv_ppd(
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if compliance_check:
+    if limit_inputs:
         if standard == "ashrae":
             pmv_valid = valid_range(pmv_array, (-100, 100))
         elif standard == "iso":
@@ -339,7 +339,7 @@ def pmv_ppd(
 
 
 def pmv(
-    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", compliance_check=True
+    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", limit_inputs=True
 ):
     """
     Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal
@@ -399,7 +399,7 @@ def pmv(
         This change was indroduced by the `Addendum C to Standard 55-2020`_
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
@@ -456,7 +456,7 @@ def pmv(
         wme,
         standard=standard,
         units=units,
-        compliance_check=compliance_check,
+        limit_inputs=limit_inputs,
     )["pmv"]
 
 
@@ -472,7 +472,7 @@ def set_tmp(
     p_atm=101325,
     body_position="standing",
     units="SI",
-    compliance_check=True,
+    limit_inputs=True,
     **kwargs,
 ):
     """
@@ -510,7 +510,7 @@ def set_tmp(
         select either "sitting" or "standing"
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns values even if input values are
         outside the applicability limits of the model.
@@ -589,7 +589,7 @@ def set_tmp(
     if units.lower() == "ip":
         set_array = units_converter(tmp=set_array, from_units="si")[0]
 
-    if compliance_check:
+    if limit_inputs:
         (
             tdb_valid,
             tr_valid,
@@ -794,7 +794,7 @@ def use_fans_heatwaves(
     return output
 
 
-def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
+def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
     """
     Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model
     relates indoor design temperatures or acceptable temperature ranges to outdoor
@@ -815,7 +815,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=Tru
         air speed, default in [m/s] in [fps] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
@@ -888,7 +888,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=Tru
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    if compliance_check:
+    if limit_inputs:
         (
             tdb_valid,
             tr_valid,
@@ -907,7 +907,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=Tru
     # Relation between comfort and outdoor temperature
     t_cmf = 0.31 * t_running_mean + 17.8
 
-    if compliance_check:
+    if limit_inputs:
         all_valid = ~(
             np.isnan(tdb_valid)
             | np.isnan(tr_valid)
@@ -957,7 +957,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=Tru
     }
 
 
-def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
+def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
     """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
@@ -982,7 +982,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
         > 1.2 m/s)
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
@@ -1053,7 +1053,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    if compliance_check:
+    if limit_inputs:
         trm_valid = valid_range(t_running_mean, (10.0, 35.5))
 
     to = t_o(tdb, tr, v, standard=standard)
@@ -1066,7 +1066,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
 
     t_cmf = 0.33 * t_running_mean + 18.8
 
-    if compliance_check:
+    if limit_inputs:
         all_valid = ~(np.isnan(trm_valid))
         t_cmf = np.where(all_valid, t_cmf, np.nan)
 
@@ -1118,9 +1118,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
     return results
 
 
-def utci(
-    tdb, tr, v, rh, units="SI", return_stress_category=False, compliance_check=True
-):
+def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=True):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
     equivalent temperature for the environment derived from a reference environment.
     It is defined as the air temperature of the reference environment which produces
@@ -1147,7 +1145,7 @@ def utci(
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
-    compliance_check : boolean default True
+    limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns UTCI values even if input values are
         outside the applicability limits of the model. The valid input ranges are
@@ -1217,7 +1215,7 @@ def utci(
     utci_approx = utci_optimized(tdb, v, delta_t_tr, pa)
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if compliance_check:
+    if limit_inputs:
         tdb_valid = valid_range(tdb, (-50.0, 50.0))
         diff_valid = valid_range(tr - tdb, (-30.0, 70.0))
         v_valid = valid_range(v, (0.5, 17.0))
@@ -1969,9 +1967,7 @@ def two_nodes(
         et,
         pmv_gagge,
         pmv_set,
-        # pt_set,
-        # pd,
-        # ps,
+        ps,
         disc,
         t_sens,
     ) = np.vectorize(two_nodes_optimized, cache=True)(
@@ -2007,9 +2003,7 @@ def two_nodes(
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
-        # "pt_set": pt_set,
-        # "pd": pd,
-        # "ps": ps,
+        "ps": ps,
         "disc": disc,
         "t_sens": t_sens,
     }

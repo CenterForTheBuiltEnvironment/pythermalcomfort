@@ -16,7 +16,6 @@ def two_nodes_optimized(
     body_position,
     calculate_ce=False,
     max_skin_blood_flow=90,
-    turbulence=40,
     max_sweating=500,
 ):
     # Initial variables as defined in the ASHRAE 55-2020
@@ -301,14 +300,8 @@ def two_nodes_optimized(
     e_req_set = rm - c_res - q_res - dry_set
     pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
 
-    # # predicted thermal sensation based on SET
-    # pt_set = 0.25 * _set - 6.03
-    #
-    # # predicted dissatisfied due to draft
-    # pd = (34 - tdb) * (v - 0.05) ** 0.6223 * (3.143 + 0.3696 * v * turbulence)
-    #
-    # # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"
-    # ps = 100 * (1.13 * (t_op ** 0.5) - 0.24 * t_op + 2.7 * (v ** 0.5) - 0.99 * v)
+    # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"
+    ps = 100 * (1.13 * (t_op ** 0.5) - 0.24 * t_op + 2.7 * (v ** 0.5) - 0.99 * v)
 
     return (
         _set,
@@ -328,9 +321,7 @@ def two_nodes_optimized(
         et,
         pmv_gagge,
         pmv_set,
-        # pt_set,
-        # pd,
-        # ps,
+        ps,
         disc,
         t_sens,
     )

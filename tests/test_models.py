@@ -192,14 +192,14 @@ def test_pmv_ppd():
         },
     )
 
-    # check results with compliance_check disabled
+    # check results with limit_inputs disabled
     np.testing.assert_equal(
-        pmv_ppd(31, 41, 2, 50, 0.7, 2.1, standard="iso", compliance_check=False),
+        pmv_ppd(31, 41, 2, 50, 0.7, 2.1, standard="iso", limit_inputs=False),
         {"pmv": 2.4, "ppd": 91.0},
     )
 
     np.testing.assert_equal(
-        pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", compliance_check=False),
+        pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", limit_inputs=False),
         {"pmv": 4.46, "ppd": 100.0},
     )
 
@@ -271,7 +271,7 @@ def test_set():
                     inputs["met"],
                     inputs["clo"],
                     round=True,
-                    compliance_check=False,
+                    limit_inputs=False,
                 )
                 == outputs["set"]
             )
@@ -315,7 +315,7 @@ def test_set():
                     row["met"],
                     row["clo"],
                     units="IP",
-                    compliance_check=False,
+                    limit_inputs=False,
                 )
                 - row["set"]
             )
@@ -343,7 +343,7 @@ def test_set():
         met = np.array([d["inputs"]["met"] for d in table["data"]])
         clo = np.array([d["inputs"]["clo"] for d in table["data"]])
         set_exp = np.array([d["outputs"]["set"] for d in table["data"]])
-        results = set_tmp(tdb, tr, v, rh, met, clo, compliance_check=False)
+        results = set_tmp(tdb, tr, v, rh, met, clo, limit_inputs=False)
 
         np.testing.assert_equal(set_exp, results)
 
@@ -1215,7 +1215,7 @@ def test_adaptive_ashrae():
 
     assert (adaptive_ashrae(77, 77, 68, 0.3, units="ip")["tmp_cmf"]) == 75.2
 
-    # test compliance_check and array input
+    # test limit_inputs and array input
     np.testing.assert_equal(
         adaptive_ashrae(tdb=25, tr=25, t_running_mean=[9, 10], v=0.1),
         {
