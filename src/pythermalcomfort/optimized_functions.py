@@ -459,7 +459,16 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     return _pmv
 
 
-@jit(nopython=True)
+@vectorize(
+    [
+        float64(
+            float64,
+            float64,
+            float64,
+            float64,
+        )
+    ],
+)
 def utci_optimized(tdb, v, delta_t_tr, pa):
     return (
         tdb
