@@ -71,6 +71,7 @@ print(end - start)
 # df.to_csv('results.csv')
 
 # This method is extremely fast and can perform a lot of calculations in very little time
+from pythermalcomfort.models import pmv_ppd
 import numpy as np
 import time
 
