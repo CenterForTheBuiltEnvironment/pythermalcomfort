@@ -179,10 +179,15 @@ def check_standard_compliance_array(standard, **kwargs):
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
         v_valid = valid_range(params["v"], (0.0, 2.0))
-        met_valid = valid_range(params["met"], (1.0, 4.0))
-        clo_valid = valid_range(params["clo"], (0.0, 1.5))
 
-        return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+        if "met" in params.keys():
+            met_valid = valid_range(params["met"], (1.0, 4.0))
+            clo_valid = valid_range(params["clo"], (0.0, 1.5))
+
+            return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+
+        else:
+            return tdb_valid, tr_valid, v_valid
 
     if standard == "iso":  # based on ISO 7730:2005 page 3
         tdb_valid = valid_range(params["tdb"], (10.0, 30.0))

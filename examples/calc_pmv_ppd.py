@@ -74,7 +74,8 @@ print(end - start)
 import numpy as np
 import time
 
-tdb = np.empty(10000)
+iterations = 10000
+tdb = np.empty(iterations)
 tdb.fill(25)
 
 start = time.time()

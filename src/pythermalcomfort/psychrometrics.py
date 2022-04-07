@@ -46,14 +46,11 @@ def t_o(tdb, tr, v, standard="ISO"):
         operative temperature, [°C]
     """
 
-    if standard == "ISO":
-        return (tdb * math.sqrt(10 * v) + tr) / (1 + math.sqrt(10 * v))
-    elif standard == "ASHRAE":
-        a = 0.7
-        if v < 0.2:
-            a = 0.5
-        elif v < 0.6:
-            a = 0.6
+    if standard.lower() == "iso":
+        return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
+    elif standard.lower() == "ashrae":
+        a = np.where(v < 0.6, 0.6, 0.7)
+        a = np.where(v < 0.2, 0.5, a)
         return a * tdb + (1 - a) * tr
 
 

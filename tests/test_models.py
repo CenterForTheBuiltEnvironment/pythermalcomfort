@@ -1205,6 +1205,7 @@ def test_adaptive_ashrae():
         ]
     )
     for row in data_test_adaptive_ashrae:
+        print(row)
         assert (
             adaptive_ashrae(row["tdb"], row["tr"], row["t_running_mean"], row["v"])[
                 list(row["return"].keys())[0]
@@ -1213,11 +1214,33 @@ def test_adaptive_ashrae():
 
     assert (adaptive_ashrae(77, 77, 68, 0.3, units="ip")["tmp_cmf"]) == 75.2
 
-    with pytest.raises(ValueError):
-        adaptive_ashrae(20, 20, 9, 0.1)
-
-    with pytest.raises(ValueError):
-        adaptive_ashrae(20, 20, 34, 0.1)
+    # test compliance_check and array input
+    np.testing.assert_equal(
+        adaptive_ashrae(tdb=25, tr=25, t_running_mean=[9, 10], v=0.1),
+        {
+            "tmp_cmf": [np.nan, 20.9],
+            "tmp_cmf_80_low": [np.nan, 17.4],
+            "tmp_cmf_80_up": [np.nan, 24.4],
+            "tmp_cmf_90_low": [np.nan, 18.4],
+            "tmp_cmf_90_up": [np.nan, 23.4],
+            "acceptability_80": [False, False],
+            "acceptability_90": [False, False],
+        },
+    )
+    np.testing.assert_equal(
+        adaptive_ashrae(
+            tdb=[77, 74], tr=77, t_running_mean=[48, 68], v=0.3, units="ip"
+        ),
+        {
+            "tmp_cmf": [np.nan, 75.2],
+            "tmp_cmf_80_low": [np.nan, 68.9],
+            "tmp_cmf_80_up": [np.nan, 81.5],
+            "tmp_cmf_90_low": [np.nan, 70.7],
+            "tmp_cmf_90_up": [np.nan, 79.7],
+            "acceptability_80": [False, True],
+            "acceptability_90": [False, True],
+        },
+    )
 
 
 # todo implement test for adaptive_en()

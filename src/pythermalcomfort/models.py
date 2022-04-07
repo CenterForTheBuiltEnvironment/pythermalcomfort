@@ -788,14 +788,13 @@ def use_fans_heatwaves(
 
     for key in output.keys():
         # round the results if needed
-        if kwargs["round"]:
-            if type(output[key]) is not bool:
-                output[key] = np.around(output[key], 1)
+        if (kwargs["round"]) and (type(output[key]) is not bool):
+            output[key] = np.around(output[key], 1)
 
     return output
 
 
-def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
+def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
     """
     Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model
     relates indoor design temperatures or acceptable temperature ranges to outdoor
@@ -804,36 +803,43 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    t_running_mean: float
+    t_running_mean: float or array-like
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
 
         The running mean temperature can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
-    v : float
+    v : float or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
+    compliance_check : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns pmv and ppd values even if input values are
+        outside the applicability limits of the model.
+
+        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
+        0 < vr [m/s] < 2, 10 < tr [°C] < 35.5
 
     Returns
     -------
-    tmp_cmf : float
+    tmp_cmf : float or array-like
         Comfort temperature a that specific running mean temperature, default in [°C]
         or in [°F]
-    tmp_cmf_80_low : float
+    tmp_cmf_80_low : float or array-like
         Lower acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
-    tmp_cmf_80_up : float
+    tmp_cmf_80_up : float or array-like
         Upper acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
-    tmp_cmf_90_low : float
+    tmp_cmf_90_low : float or array-like
         Lower acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
-    tmp_cmf_90_up : float
+    tmp_cmf_90_up : float or array-like
         Upper acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
-    acceptability_80 : bol
+    acceptability_80 : bol or array-like
         Acceptability for 80% occupants
-    acceptability_90 : bol
+    acceptability_90 : bol or array-like
         Acceptability for 90% occupants
 
     Notes
@@ -847,25 +853,25 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_ashrae
-        >>> Results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(Results)
+        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(results)
         {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5,
         'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': True,
         'acceptability_90': False}
 
-        >>> print(Results['acceptability_80'])
+        >>> print(results['acceptability_80'])
         True
         # The conditions you entered are considered to be comfortable for by 80% of the
         occupants
 
         >>> # for users who wants to use the IP system
-        >>> Results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(Results)
+        >>> results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(results)
         {'tmp_cmf': 75.2, 'tmp_cmf_80_low': 68.9, 'tmp_cmf_80_up': 81.5,
         'tmp_cmf_90_low': 70.7, 'tmp_cmf_90_up': 79.7, 'acceptability_80': True,
         'acceptability_90': False}
 
-        >>> Results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is higher than 10°C
@@ -876,79 +882,86 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI"):
         Raised if the input are outside the Standard's applicability limits
 
     """
+
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    t_running_mean = np.array(t_running_mean)
+    v = np.array(v)
+    standard = "ashrae"
+
     if units.lower() == "ip":
-        tdb, tr, t_running_mean, vr = units_converter(
+        tdb, tr, t_running_mean, v = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    check_standard_compliance(standard="ashrae", tdb=tdb, tr=tr, v=v)
+    if compliance_check:
+        (
+            tdb_valid,
+            tr_valid,
+            v_valid,
+        ) = check_standard_compliance_array(standard, tdb=tdb, tr=tr, v=v)
+        trm_valid = valid_range(t_running_mean, (10.0, 35.5))
 
-    to = t_o(tdb, tr, v)
+    to = t_o(tdb, tr, v, standard=standard)
 
-    # See if the running mean temperature is between 10 °C and 33.5 °C (the range where
-    # the adaptive model is supposed to be used)
-    if 10.0 <= t_running_mean <= 33.5:
+    # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
+    ce = np.where((v >= 0.6) & (to >= 25.0), 999, 0)
+    ce = np.where((v < 0.9) & (ce == 999), 1.2, ce)
+    ce = np.where((v < 1.2) & (ce == 999), 1.8, ce)
+    ce = np.where(ce == 999, 2.2, ce)
 
-        ce = 0
-        # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
-        if v >= 0.6 and to >= 25:
-            if v < 0.9:
-                ce = 1.2
-            elif v < 1.2:
-                ce = 1.8
-            else:
-                ce = 2.2
+    # Figure out the relation between comfort and outdoor temperature depending on
+    # the level of conditioning.
+    t_cmf = 0.31 * t_running_mean + 17.8
 
-        # Figure out the relation between comfort and outdoor temperature depending on
-        # the level of conditioning.
-        t_cmf = 0.31 * t_running_mean + 17.8
-        tmp_cmf_80_low = t_cmf - 3.5
-        tmp_cmf_90_low = t_cmf - 2.5
-        tmp_cmf_80_up = t_cmf + 3.5 + ce
-        tmp_cmf_90_up = t_cmf + 2.5 + ce
+    if compliance_check:
+        all_valid = ~(
+            np.isnan(tdb_valid)
+            | np.isnan(tr_valid)
+            | np.isnan(v_valid)
+            | np.isnan(trm_valid)
+        )
+        t_cmf = np.where(all_valid, t_cmf, np.nan)
 
-        def acceptability(t_cmf_lower, t_cmf_upper):
-            # See if the conditions are comfortable.
-            if t_cmf_lower < to < t_cmf_upper:
-                return True
-            else:
-                return False
+    t_cmf = np.around(t_cmf, 1)
 
-        acceptability_80 = acceptability(tmp_cmf_80_low, tmp_cmf_80_up)
-        acceptability_90 = acceptability(tmp_cmf_90_low, tmp_cmf_90_up)
+    tmp_cmf_80_low = t_cmf - 3.5
+    tmp_cmf_90_low = t_cmf - 2.5
+    tmp_cmf_80_up = t_cmf + 3.5 + ce
+    tmp_cmf_90_up = t_cmf + 2.5 + ce
 
-        if units.lower() == "ip":
-            (
-                t_cmf,
-                tmp_cmf_80_low,
-                tmp_cmf_80_up,
-                tmp_cmf_90_low,
-                tmp_cmf_90_up,
-            ) = units_converter(
-                from_units="si",
-                tmp_cmf=t_cmf,
-                tmp_cmf_80_low=tmp_cmf_80_low,
-                tmp_cmf_80_up=tmp_cmf_80_up,
-                tmp_cmf_90_low=tmp_cmf_90_low,
-                tmp_cmf_90_up=tmp_cmf_90_up,
-            )
+    acceptability_80 = np.where(
+        (tmp_cmf_80_low <= to) & (to <= tmp_cmf_80_up), True, False
+    )
+    acceptability_90 = np.where(
+        (tmp_cmf_90_low <= to) & (to <= tmp_cmf_90_up), True, False
+    )
 
-        results = {
-            "tmp_cmf": t_cmf,
-            "tmp_cmf_80_low": tmp_cmf_80_low,
-            "tmp_cmf_80_up": tmp_cmf_80_up,
-            "tmp_cmf_90_low": tmp_cmf_90_low,
-            "tmp_cmf_90_up": tmp_cmf_90_up,
-            "acceptability_80": acceptability_80,
-            "acceptability_90": acceptability_90,
-        }
-
-    else:
-        raise ValueError(
-            "The running mean is outside the standards applicability limits"
+    if units.lower() == "ip":
+        (
+            t_cmf,
+            tmp_cmf_80_low,
+            tmp_cmf_80_up,
+            tmp_cmf_90_low,
+            tmp_cmf_90_up,
+        ) = units_converter(
+            from_units="si",
+            tmp_cmf=t_cmf,
+            tmp_cmf_80_low=tmp_cmf_80_low,
+            tmp_cmf_80_up=tmp_cmf_80_up,
+            tmp_cmf_90_low=tmp_cmf_90_low,
+            tmp_cmf_90_up=tmp_cmf_90_up,
         )
 
-    return results
+    return {
+        "tmp_cmf": t_cmf,
+        "tmp_cmf_80_low": tmp_cmf_80_low,
+        "tmp_cmf_80_up": tmp_cmf_80_up,
+        "tmp_cmf_90_low": tmp_cmf_90_low,
+        "tmp_cmf_90_up": tmp_cmf_90_up,
+        "acceptability_80": acceptability_80,
+        "acceptability_90": acceptability_90,
+    }
 
 
 def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
@@ -1012,22 +1025,22 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI"):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import adaptive_en
-        >>> Results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(Results)
+        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        >>> print(results)
         {'tmp_cmf': 25.4, 'acceptability_cat_i': True, 'acceptability_cat_ii': True,
         'acceptability_cat_iii': True, ... }
 
-        >>> print(Results['acceptability_cat_i'])
+        >>> print(results['acceptability_cat_i'])
         True
         # The conditions you entered are considered to comply with Category I
 
         >>> # for users who wants to use the IP system
-        >>> Results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(Results)
+        >>> results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        >>> print(results)
         {'tmp_cmf': 77.7, 'acceptability_cat_i': True, 'acceptability_cat_ii': True,
         'acceptability_cat_iii': True, ... }
 
-        >>> Results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
         ValueError: The running mean is outside the standards applicability limits
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C
