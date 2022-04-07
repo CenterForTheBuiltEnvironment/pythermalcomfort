@@ -1077,9 +1077,6 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", compliance_check=True):
     t_cmf_ii_upper = t_cmf + 3.0 + ce
     t_cmf_iii_upper = t_cmf + 4.0 + ce
 
-    def between(val, low, high):
-        return low < val < high
-
     acceptability_i = np.where(
         (t_cmf_i_lower <= to) & (to <= t_cmf_i_upper), True, False
     )
@@ -1245,14 +1242,14 @@ def clo_tout(tout, units="SI"):
 
     Parameters
     ----------
-    tout : float
+    tout : float or array-like
         outdoor air temperature at 06:00 a.m., default in [°C] in [°F] if `units` = 'IP'
     units: str default="SI"
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
-    clo : float
+    clo : float or array-like
          Representative clothing insulation Icl, [clo]
 
     Notes
@@ -1267,21 +1264,21 @@ def clo_tout(tout, units="SI"):
         >>> from pythermalcomfort.models import clo_tout
         >>> clo_tout(tout=27)
         0.46
+        >>> clo_tout(tout=[27, 25])
+        array([0.46, 0.47])
 
     """
+
+    tout = np.array(tout)
+
     if units.lower() == "ip":
         tout = units_converter(tmp=tout)[0]
 
-    if tout < -5:
-        clo = 1
-    elif tout < 5:
-        clo = 0.818 - 0.0364 * tout
-    elif tout < 26:
-        clo = 10 ** (-0.1635 - 0.0066 * tout)
-    else:
-        clo = 0.46
+    clo = np.where(tout < 26, np.power(10, -0.1635 - 0.0066 * tout), 0.46)
+    clo = np.where(tout < 5, 0.818 - 0.0364 * tout, clo)
+    clo = np.where(tout < -5, 1, clo)
 
-    return round(clo, 2)
+    return np.around(clo, 2)
 
 
 def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="SI"):
