@@ -194,7 +194,7 @@ def test_pmv_ppd():
 
     np.testing.assert_equal(
         pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", compliance_check=False),
-        {"pmv": 5.18, "ppd": 100.0},
+        {"pmv": 4.46, "ppd": 100.0},
     )
 
     for table in reference_tables["reference_data"]["pmv_ppd"]:

@@ -567,7 +567,7 @@ def set_tmp(
     wme = np.array(wme)
 
     # todo pass directly the vectors to two_nodes once it has been vectorized
-    set_array = np.vectorize(two_nodes)(
+    set_array = two_nodes(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -581,10 +581,7 @@ def set_tmp(
         calculate_ce=kwargs["calculate_ce"],
         round=False,
         output="all",
-    )
-
-    set_array = [x.item()["_set"] for x in np.nditer(set_array, ["refs_ok"])]
-    set_array = np.array(set_array)
+    )["_set"]
 
     if units.lower() == "ip":
         set_array = units_converter(tmp=set_array, from_units="si")[0]
@@ -789,7 +786,8 @@ def use_fans_heatwaves(
     for key in output.keys():
         # round the results if needed
         if kwargs["round"]:
-            output[key] = round(output[key], 1)
+            if type(output[key]) is not bool:
+                output[key] = np.around(output[key], 1)
 
     return output
 
@@ -1828,19 +1826,19 @@ def two_nodes(
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float
+    v : float or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
-    wme : float
+    wme : float or array-like
         external work, [met] default 0
     body_surface_area : float
         body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
@@ -1849,7 +1847,7 @@ def two_nodes(
         :py:meth:`pythermalcomfort.utilities.body_surface_area`.
     p_atmospheric : float
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
-    body_position: str default="standing"
+    body_position: str default="standing" or array-like
         select either "sitting" or "standing"
     max_skin_blood_flow : float
         maximum blood flow from the core to the skin, [L/(hm2)] default 80
@@ -1861,47 +1859,47 @@ def two_nodes(
 
     Returns
     -------
-    e_skin : float
+    e_skin : float or array-like
         Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff
-    e_rsw : float
+    e_rsw : float or array-like
         Rate of evaporative heat loss from sweat evaporation, [W/m2]
-    e_diff : float
+    e_diff : float or array-like
         Rate of evaporative heat loss from moisture diffused through the skin, [W/m2]
-    e_max : float
+    e_max : float or array-like
         Maximum rate of evaporative heat loss from skin, [W/m2]
-    q_sensible : float
+    q_sensible : float or array-like
         Sensible heat loss from skin, [W/m2]
-    q_skin : float
+    q_skin : float or array-like
         Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin
-    q_res : float
+    q_res : float or array-like
         Total rate of heat loss through respiration, [W/m2]
-    t_core : float
+    t_core : float or array-like
         Core temperature, [°C]
-    t_skin : float
+    t_skin : float or array-like
         Skin temperature, [°C]
-    m_bl : float
+    m_bl : float or array-like
         Skin blood flow, [L/(hm2)]
-    m_rsw : float
+    m_rsw : float or array-like
         Rate at which regulatory sweat is generated, [mL/h2]
-    w : float
+    w : float or array-like
         Skin wettedness, adimensional. Ranges from 0 and 1.
-    w_max : float
+    w_max : float or array-like
         Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
-    set : float
+    set : float or array-like
         Standard Effective Temperature (SET)
-    et : float
+    et : float or array-like
         New Effective Temperature (ET)
-    pmv_gagge : float
+    pmv_gagge : float or array-like
         PMV Gagge
-    pmv_set : float
+    pmv_set : float or array-like
         PMV SET
-    pd : float
+    pd : float or array-like
         Predicted  Percent  Dissatisfied  Due  to  Draft"
-    ps : float
+    ps : float or array-like
         Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
-    disc : float
+    disc : float or array-like
         Thermal discomfort
-    t_sens : float
+    t_sens : float or array-like
         Predicted  Thermal  Sensation
 
     Examples
@@ -1911,6 +1909,8 @@ def two_nodes(
         >>> from pythermalcomfort.models import two_nodes
         >>> print(two_nodes(tdb=25, tr=25, v=0.3, rh=50, met=1.2, clo=0.5))
         {'e_skin': 15.8, 'e_rsw': 6.5, 'e_diff': 9.3, ... }
+        >>> print(two_nodes(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5))
+        {'e_skin': array([15.8, 15.8]), 'e_rsw': array([6.5, 6.5]), ... }
     """
     default_kwargs = {
         "round": True,
@@ -1919,9 +1919,14 @@ def two_nodes(
     }
     kwargs = {**default_kwargs, **kwargs}
 
-    check_standard_compliance(
-        standard="ashrae", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
-    )
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
+    body_position = np.array(body_position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
@@ -1943,12 +1948,12 @@ def two_nodes(
         et,
         pmv_gagge,
         pmv_set,
-        pt_set,
-        pd,
-        ps,
+        # pt_set,
+        # pd,
+        # ps,
         disc,
         t_sens,
-    ) = two_nodes_optimized(
+    ) = np.vectorize(two_nodes_optimized, cache=True)(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -1981,9 +1986,9 @@ def two_nodes(
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
-        "pt_set": pt_set,
-        "pd": pd,
-        "ps": ps,
+        # "pt_set": pt_set,
+        # "pd": pd,
+        # "ps": ps,
         "disc": disc,
         "t_sens": t_sens,
     }
@@ -1991,7 +1996,7 @@ def two_nodes(
     for key in output.keys():
         # round the results if needed
         if kwargs["round"]:
-            output[key] = round(output[key], 1)
+            output[key] = np.around(output[key], 1)
 
     return output
 

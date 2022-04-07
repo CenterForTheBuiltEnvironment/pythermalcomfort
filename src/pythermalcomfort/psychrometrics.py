@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 c_to_k = 273.15
 cp_vapour = 1805.0
@@ -21,7 +22,7 @@ def p_sat_torr(tdb):
     p_sat  : float
         saturation vapor pressure [torr]
     """
-    return math.exp(18.6686 - 4030.183 / (tdb + 235.0))
+    return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
 def t_o(tdb, tr, v, standard="ISO"):
