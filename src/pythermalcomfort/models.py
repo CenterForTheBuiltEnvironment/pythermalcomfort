@@ -299,11 +299,13 @@ def pmv_ppd(
         )
 
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
-    ce = np.where(
-        (vr >= 0.1) & (standard == "ashrae"),
-        np.vectorize(cooling_effect, cache=True)(tdb, tr, vr, rh, met, clo, wme),
-        0,
-    )
+    ce = 0.0
+    if standard == "ashrae":
+        ce = np.where(
+            vr >= 0.1,
+            np.vectorize(cooling_effect, cache=True)(tdb, tr, vr, rh, met, clo, wme),
+            0.0,
+        )
 
     tdb = tdb - ce
     tr = tr - ce
