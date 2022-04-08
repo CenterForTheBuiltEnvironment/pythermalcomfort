@@ -256,55 +256,54 @@ def v_relative(v, met):
 
     Parameters
     ----------
-    v : float
+    v : float or array-like
         air speed measured by the sensor, [m/s]
     met : float
         metabolic rate, [met]
 
     Returns
     -------
-    vr  : float
+    vr  : float or array-like
         relative air speed, [m/s]
     """
 
-    if met > 1:
-        return round(v + 0.3 * (met - 1), 3)
-    else:
-        return v
+    return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
 def clo_dynamic(clo, met, standard="ASHRAE"):
     """Estimates the dynamic clothing insulation of a moving occupant. The activity as
     well as the air speed modify the insulation characteristics of the clothing and the
-    adjacent air layer. Consequently the ISO 7730 states that the clothing insulation
+    adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
     shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect
     of the body movement for met equal or higher than 1.2 met using the equation
     clo = Icl × (0.6 + 0.4/met)
 
     Parameters
     ----------
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
     standard: str (default="ASHRAE")
         - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
 
     Returns
     -------
-    clo : float
+    clo : float or array-like
         dynamic clothing insulation, [clo]
     """
 
-    if standard.lower() not in ["ashrae"]:
+    standard = standard.lower()
+
+    if standard not in ["ashrae", "iso"]:
         raise ValueError(
-            "clo dynamic calculation can only be performed in compliance ASHRAE Standard"
+            "only the ISO 7730 and ASHRAE 55 2020 models have been implemented"
         )
 
-    if met > 1.2:
-        return round(clo * (0.6 + 0.4 / met), 3)
+    if standard == "ashrae":
+        return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
     else:
-        return clo
+        return np.where(met > 1, np.around(clo * (0.6 + 0.4 / met), 3), clo)
 
 
 def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
