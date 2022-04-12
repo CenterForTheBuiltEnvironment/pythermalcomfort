@@ -29,6 +29,8 @@ utci_val = utci(
     return_stress_category=True,
 )
 print(utci_val)
+print(utci_val["utci"])
+print(utci_val["stress_category"])
 
 iterations = 100000
 tdb = np.empty(iterations)
