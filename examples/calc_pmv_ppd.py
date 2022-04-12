@@ -30,7 +30,7 @@ print(results)
 # print PMV value
 print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
-# for users who wants to use the IP system
+# for users who want to use the IP system
 results_ip = pmv_ppd(tdb=77, tr=77, vr=0.6, rh=50, met=met, clo=clo, units="IP")
 print(results_ip)
 

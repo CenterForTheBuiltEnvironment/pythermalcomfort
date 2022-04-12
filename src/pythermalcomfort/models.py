@@ -1190,6 +1190,11 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
 
     """
 
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+
     if units.lower() == "ip":
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
@@ -1200,13 +1205,13 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
             19.54263612,
             -0.02737830188,
             0.000016261698,
-            (7.0229056 * (10 ** (-10))),
-            (-1.8680009 * (10 ** (-13))),
+            (7.0229056 * np.power(10.0, -10)),
+            (-1.8680009 * np.power(10.0, -13)),
         ]
         tk = t_db + 273.15  # air temp in K
         es = 2.7150305 * np.log1p(tk)
         for count, i in enumerate(g):
-            es = es + (i * (tk ** (count - 2)))
+            es = es + (i * np.power(tk, count - 2))
         es = np.exp(es) * 0.01  # convert Pa to hPa
         return es
 
