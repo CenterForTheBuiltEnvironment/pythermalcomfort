@@ -2,11 +2,6 @@ version: '{branch}-{build}'
 build: off
 environment:
   matrix:
-    - TOXENV: check
-      TOXPYTHON: C:\Python36\python.exe
-      PYTHON_HOME: C:\Python36
-      PYTHON_VERSION: '3.7'
-      PYTHON_ARCH: '32'
     - TOXENV: py36,codecov
       TOXPYTHON: C:\Python36\python.exe
       PYTHON_HOME: C:\Python36
@@ -18,24 +13,24 @@ environment:
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
     - TOXENV: py37,codecov
-      TOXPYTHON: C:\Python37\python.exe
-      PYTHON_HOME: C:\Python37
-      PYTHON_VERSION: '3.7'
-      PYTHON_ARCH: '32'
-    - TOXENV: py37,codecov
       TOXPYTHON: C:\Python37-x64\python.exe
       PYTHON_HOME: C:\Python37-x64
       PYTHON_VERSION: '3.7'
       PYTHON_ARCH: '64'
     - TOXENV: py38,codecov
-      TOXPYTHON: C:\Python38\python.exe
-      PYTHON_HOME: C:\Python38
-      PYTHON_VERSION: '3.8'
-      PYTHON_ARCH: '32'
-    - TOXENV: py38,codecov
       TOXPYTHON: C:\Python38-x64\python.exe
       PYTHON_HOME: C:\Python38-x64
       PYTHON_VERSION: '3.8'
+      PYTHON_ARCH: '64'
+    - TOXENV: py39,codecov
+      TOXPYTHON: C:\Python39-x64\python.exe
+      PYTHON_HOME: C:\Python39-x64
+      PYTHON_VERSION: '3.9'
+      PYTHON_ARCH: '64'
+    - TOXENV: py310,codecov
+      TOXPYTHON: C:\Python310-x64\python.exe
+      PYTHON_HOME: C:\Python310-x64
+      PYTHON_VERSION: '3.10'
       PYTHON_ARCH: '64'
 init:
   - ps: echo $env:TOXENV
@@ -43,7 +38,6 @@ init:
 install:
   - '%PYTHON_HOME%\python -mpip install --progress-bar=off tox -rci/requirements.txt'
   - '%PYTHON_HOME%\Scripts\virtualenv --version'
-  - '%PYTHON_HOME%\Scripts\easy_install --version'
   - '%PYTHON_HOME%\Scripts\pip --version'
   - '%PYTHON_HOME%\Scripts\tox --version'
 test_script:
