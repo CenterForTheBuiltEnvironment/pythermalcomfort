@@ -62,8 +62,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float
         external work, [met] default 0
-    units: str default="SI"
-        select the SI (International System of Units) or the IP (Imperial Units) system.
+    units : {'SI', 'IP'}     select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
     -------
@@ -196,7 +195,7 @@ def pmv_ppd(
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float or array-like
         external work, [met] default 0
-    standard: str (default="ISO")
+    standard : {"ISO", "ASHRAE"}
         comfort standard used for calculation
 
         - If "ISO", then the ISO Equation is used
@@ -208,7 +207,7 @@ def pmv_ppd(
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
@@ -387,7 +386,7 @@ def pmv(
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     wme : float or array-like
         external work, [met] default 0
-    standard: str (default="ISO")
+    standard : {"ISO", "ASHRAE"}
         comfort standard used for calculation
 
         - If "ISO", then the ISO Equation is used
@@ -399,7 +398,7 @@ def pmv(
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
@@ -510,7 +509,7 @@ def set_tmp(
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     body_position: str default="standing" or array-like
         select either "sitting" or "standing"
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
@@ -659,7 +658,7 @@ def use_fans_heatwaves(
         atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
     body_position: str default="standing"
         select either "sitting" or "standing"
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     max_skin_blood_flow : float
         maximum blood flow from the core to the skin, [L/(hm2)] default 80
@@ -815,7 +814,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
     v : float or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
@@ -982,7 +981,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         For operative temperatures above 25°C the comfort zone upper limit can be
         increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C ( v
         > 1.2 m/s)
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
@@ -1143,7 +1142,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
         wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
     rh : float or array-like
         relative humidity, [%]
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     return_stress_category : boolean default False
         if True returns the UTCI categorized in terms of thermal stress.
@@ -1249,7 +1248,7 @@ def clo_tout(tout, units="SI"):
     ----------
     tout : float or array-like
         outdoor air temperature at 06:00 a.m., default in [°C] in [°F] if `units` = 'IP'
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -1327,7 +1326,7 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
     vertical_tmp_grad : float
         vertical temperature gradient between the feet and the head, default in [°C/m]
         in [°F/ft] if `units` = 'IP'
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -1406,7 +1405,7 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
     v_ankle : float
         air speed at the 0.1 m (4 in.) above the floor, default in [m/s] in [fps] if
         `units` = 'IP'
-    units: str default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -2170,7 +2169,7 @@ def heat_index(tdb, rh, **kwargs):
     ----------------
     round: boolean, default True
         if True rounds output value, if False it does not round it
-    units: str, default="SI"
+    units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -2224,7 +2223,7 @@ def humidex(tdb, rh, **kwargs):
     Parameters
     ----------
     tdb : float
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        dry bulb air temperature, [°C]
     rh : float
         relative humidity, [%]
 
@@ -2236,7 +2235,7 @@ def humidex(tdb, rh, **kwargs):
     Returns
     -------
     humidex: float
-        Heat Index, default in [°C] in [°F] if `units` = 'IP'
+        Heat Index, [°C]
     discomfort: str
         Degree of Comfort or Discomfort as defined in Havenith and Fiala (2016) [15]_
 
