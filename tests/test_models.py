@@ -26,6 +26,7 @@ from pythermalcomfort.models import (
     at,
     wc,
     adaptive_en,
+    pet,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1607,3 +1608,68 @@ def test_two_nodes():
     assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.9
     assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 1.4
     assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.5
+
+
+def test_pet():
+    assert (
+        round(
+            pet(
+                tdb=20,
+                tr=20,
+                rh=50,
+                v=0.15,
+                met=80,
+                clo=0.5463,
+                p_atm=1013.25,
+                position=1,
+                age=23,
+                sex=1,
+                weight=75,
+                height=1.8,
+            )[0],
+            2,
+        )
+        == 18.9
+    )
+    # compute
+    assert (
+        round(
+            pet(
+                tdb=30,
+                tr=30,
+                rh=50,
+                v=0.15,
+                met=80,
+                clo=0.5463,
+                p_atm=1013.25,
+                position=1,
+                age=23,
+                sex=1,
+                weight=75,
+                height=1.8,
+            )[0],
+            2,
+        )
+        == 30.68
+    )
+    # compute
+    assert (
+        round(
+            pet(
+                tdb=20,
+                tr=20,
+                rh=50,
+                v=0.5,
+                met=80,
+                clo=0.5463,
+                p_atm=1013.25,
+                position=1,
+                age=23,
+                sex=1,
+                weight=75,
+                height=1.8,
+            )[0],
+            2,
+        )
+        == 17.25
+    )

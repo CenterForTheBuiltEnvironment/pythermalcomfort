@@ -8,6 +8,7 @@ from pythermalcomfort.utilities import (
     valid_range,
     map_stress_category,
     check_standard_compliance_array,
+    body_surface_area,
 )
 import math
 from scipy import optimize
@@ -2539,6 +2540,454 @@ def use_fans_morris(
     return tipping_point
 
 
+def pet(
+    tdb, tr, v, rh, met, clo, p_atm, position, age=23, sex=1, weight=75, height=1.8
+):
+    """
+    The physiological equivalent temperature (PET) is calculated using the Munich
+    Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
+    circumstances in a medically realistic manner. PET is defined as the air temperature
+    at which, in a typical indoor setting (without wind and solar radiation), the heat
+    budget of the human body is balanced with the same core and skin temperature as under
+    the complex outdoor conditions to be assessed [20]_. PET allows a layperson to compare the
+    total effects of complex thermal circumstances outside with his or her own personal
+    experience indoors in this way.
+
+    The PET was originally proposed by Hoppe [20]_. In 2018, Walter and Goestchel [21]_
+    proposed a simplification of the original model and  corrected the errors in the
+    PET calculation routine. Walter and Goestchel (2018) model is therefore used to
+    calculate the PET.
+
+    Parameters
+    ----------
+    tdb : float
+        dry bulb air temperature, [°C]
+    tr : float
+        mean radiant temperature, [°C]
+    v : float
+        air speed, [m/s]
+    rh : float
+        relative humidity, [%]
+    met : float
+        metabolic rate, [met]
+    clo : float
+        clothing insulation, [clo]
+    p_atm : float
+        atmospheric pressure, default value 1013.25 [hPa]
+    position : int
+        position of the individual (1=sitting, 2=standing, 3=crouching)
+    age : int
+        age in years
+    sex : int
+        male (1) or female (2).
+    weight : float
+        body mass, [kg]
+    height: float
+        height, [m]
+
+    Returns
+    -------
+    PET
+        Steady-state PET under the given ambient conditions
+    """
+
+    def solve_pet(
+        t_arr, tdb, tr, v, rh, met, clo, age, sex, ht, weight, position, mode, p, eff=0
+    ):
+        """
+        This function allows solving for the PET : either it solves the vectorial balance
+        of the 3 unknown temperatures (T_core, T_sk, T_clo) or it solves for the
+        environment operative temperature that would yield the same energy balance as the
+        actual environment.
+
+        Parameters
+        ----------
+        t_arr : list or array-like
+            [T_core, T_sk, T_clo], [°C]
+        tdb : float
+            dry bulb air temperature, [°C]
+        tr : float
+            mean radiant temperature, [°C]
+        v : float
+            air speed, [m/s]
+        rh : float
+            relative humidity, [%]
+        met : float
+            metabolic rate, [met]
+        clo : float
+            clothing insulation, [clo]
+        age : float
+            age
+        sex : int
+            male (1) or female (2).
+        ht : float
+            body height (m).
+        weight : float
+            body mass (kg).
+        position : int
+            position.
+        mode : boolean
+            True=solve 3eqs/3unknowns, False=solve for PET.
+        p : float
+            Atmospheric pressure (hPa).
+        eff
+
+        Returns
+        -------
+        float
+            PET or energy balance.
+        """
+
+        def vasomotricity(t_cr, t_sk):
+            """
+            Defines the vasomotricity (blood flow) in function of the core and skin
+            temperatures.
+
+            Parameters
+            ----------
+            t_cr : float
+                The body core temperature, [°C]
+            t_sk : float
+                The body skin temperature, [°C]
+
+            Returns
+            -------
+            dict
+                "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
+                mass
+                between core and skin [].
+            """
+            # skin and core temperatures set values
+            tc_set = 36.6  # 36.8
+            tsk_set = 34  # 33.7
+            # Set value signals
+            sig_skin = tsk_set - t_sk
+            sig_core = t_cr - tc_set
+            if sig_core < 0:
+                # In this case, T_core<Tc_set --> the blood flow is reduced
+                sig_core = 0.0
+            if sig_skin < 0:
+                # In this case, Tsk>Tsk_set --> the blood flow is increased
+                sig_skin = 0.0
+            # 6.3 L/m^2/h is the set value of the blood flow
+            m_blood = (6.3 + 75.0 * sig_core) / (1.0 + 0.5 * sig_skin)
+            # 90 L/m^2/h is the blood flow upper limit
+            if m_blood > 90:
+                m_blood = 90.0
+            # in other models, alpha is used to update tbody
+            alpha = 0.0417737 + 0.7451833 / (m_blood + 0.585417)
+
+            return {"m_blood": m_blood, "alpha": alpha}
+
+        def suda(t_body):
+            """
+            Defines the sweating mechanism depending on the body and core temperatures.
+
+            Parameters
+            ----------
+            t_body : float
+                weighted average between skin and core temperatures, [°C]
+
+            Returns
+            -------
+            m_rsw : float
+                The sweating flow rate, [g/m2/h].
+            """
+            tc_set = 36.6  # 36.8
+            tsk_set = 34  # 33.7
+            tbody_set = 0.1 * tsk_set + 0.9 * tc_set  # Calculation of the body
+            # temperature
+            # through a weighted average
+            sig_body = t_body - tbody_set
+            if sig_body < 0:
+                # In this case, Tbody<Tbody_set --> The sweat flow is 0
+                sig_body = 0.0
+            # from Gagge's model
+            m_rsw = 304.94 * 10 ** -3 * sig_body
+            # 500 g/m^2/h is the upper sweat rate limit
+            if m_rsw > 500:
+                m_rsw = 500
+
+            return m_rsw
+
+        e_skin = 0.99  # Skin emissivity
+        e_clo = 0.95  # Clothing emissivity
+        h_vap = 2.42 * 10 ** 6  # Latent heat of evaporation [J/Kg]
+        sbc = 5.67 * 10 ** -8  # Stefan-Boltzmann constant [W/(m2*K^(-4))]
+        cb = 3640  # Blood specific heat [J/kg/k]
+
+        t_arr = np.reshape(t_arr, (3, 1))  # reshape to proper dimensions for fsolve
+        e_bal_vec = np.zeros(
+            (3, 1)
+        )  # required for the vectorial expression of the balance
+        # Area parameters of the body:
+        a_dubois = body_surface_area(weight, ht)
+        # Base metabolism for men and women in [W]
+        met_female = (
+            3.19
+            * weight ** 0.75
+            * (
+                1.0
+                + 0.004 * (30.0 - age)
+                + 0.018 * (ht * 100.0 / weight ** (1.0 / 3.0) - 42.1)
+            )
+        )
+        met_male = (
+            3.45
+            * weight ** 0.75
+            * (
+                1.0
+                + 0.004 * (30.0 - age)
+                + 0.01 * (ht * 100.0 / weight ** (1.0 / 3.0) - 43.4)
+            )
+        )
+        # Attribution of internal energy depending on the sex of the subject
+        if sex == 1:
+            met_correction = met_male
+        else:
+            met_correction = met_female
+        # Source term : metabolic activity
+        if mode:  # = actual environment
+            he = (met + met_correction) / a_dubois
+        else:  # False=reference environment
+            he = (80 + met_correction) / a_dubois
+        # impact of efficiency
+        h = he * (1.0 - eff)  # [W/m2]
+
+        # correction for wind
+        i_m = 0.38  # Woodcock ratio for vapour transfer through clothing [-]
+
+        # Calculation of the Burton surface increase coefficient, k = 0.31 for Hoeppe:
+        fcl = (
+            1 + 0.31 * clo
+        )  # Increase heat exchange surface depending on clothing level
+        f_a_cl = (173.51 * clo - 2.36 - 100.76 * clo * clo + 19.28 * clo ** 3.0) / 100
+        a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
+
+        f_eff = 0.725  # effective radiation factor
+        if position == 1 or position == 3:
+            f_eff = 0.725
+        if position == 2:
+            f_eff = 0.696
+
+        a_r_eff = (
+            a_dubois * f_eff
+        )  # Effective radiative area depending on the position of the subject
+
+        # Partial pressure of water in the air
+        if mode:  # mode=True is the calculation of the actual environment
+            vpa = rh / 100.0 * p_sat(tdb) / 100  # [hPa]
+        else:  # mode=False means we are calculating the PET
+            vpa = 12  # [hPa] vapour pressure of the standard environment
+
+        # Convection coefficient depending on wind velocity and subject position
+        hc = 2.67 + 6.5 * v ** 0.67  # sitting
+        if position == 2:  # standing
+            hc = 2.26 + 7.42 * v ** 0.67
+        if position == 3:  # crouching
+            hc = 8.6 * v ** 0.513
+        # modification of hc with the total pressure
+        hc = hc * (p / 1013.25) ** 0.55
+
+        # Respiratory energy losses
+        t_exp = 0.47 * tdb + 21.0  # Expired air temperature calculation [degC]
+        d_vent_pulm = he * 1.44 * 10.0 ** (-6.0)  # breathing flow rate
+        c_res = 1010 * (tdb - t_exp) * d_vent_pulm  # Sensible heat energy loss [W/m2]
+        vpexp = p_sat(t_exp) / 100  # Latent heat energy loss [hPa]
+        q_res = 0.623 * h_vap / p * (vpa - vpexp) * d_vent_pulm  # [W/m2]
+        ere = c_res + q_res  # [W/m2]
+
+        # Calculation of the equivalent thermal resistance of body tissues
+        alpha = vasomotricity(t_arr[0, 0], t_arr[1, 0])["alpha"]
+        tbody = alpha * t_arr[1, 0] + (1 - alpha) * t_arr[0, 0]
+
+        # Clothed fraction of the body approximation
+        r_cl = clo / 6.45  # Conversion in [m2.K/W]
+        y = 0
+        if f_a_cl > 1.0:
+            f_a_cl = 1.0
+        if clo >= 2.0:
+            y = 1.0
+        if 0.6 < clo < 2.0:
+            y = (ht - 0.2) / ht
+        if 0.6 >= clo > 0.3:
+            y = 0.5
+        if 0.3 >= clo > 0.0:
+            y = 0.1
+        # calculation of the clothing radius depending on the clothing level (6.28 = 2*
+        # pi !)
+        r2 = a_dubois * (fcl - 1.0 + f_a_cl) / (6.28 * ht * y)  # External radius
+        r1 = f_a_cl * a_dubois / (6.28 * ht * y)  # Internal radius
+        di = r2 - r1
+        # Calculation of the equivalent thermal resistance of body tissues
+        htcl = 6.28 * ht * y * di / (r_cl * np.log(r2 / r1) * a_clo)  # [W/(m2.K)]
+
+        # Calculation of sweat losses
+        qmsw = suda(tbody)
+        # h_vap/1000 = 2400 000[J/kg] divided by 1000 = [J/g] // qwsw/3600 for [g/m2/h]
+        # to [
+        # g/m2/s]
+        esw = h_vap / 1000 * qmsw / 3600  # [W/m2]
+        # Saturation vapor pressure at temperature Tsk
+        p_v_sk = p_sat(t_arr[1, 0]) / 100  # hPa
+        # Calculation of vapour transfer
+        lr = 16.7 * 10 ** (-1)  # [K/hPa] Lewis ratio
+        he_diff = hc * lr  # diffusion coefficient of air layer
+        fecl = 1 / (1 + 0.92 * hc * r_cl)  # Burton efficiency factor
+        emax = he_diff * fecl * (p_v_sk - vpa)  # maximum diffusion at skin surface
+        w = esw / emax  # skin wettedness
+        if w > 1:
+            w = 1
+            delta = esw - emax
+            if delta < 0:
+                esw = emax
+        if esw < 0:
+            esw = 0
+        # i_m= Woodcock's ratio (see above)
+        r_ecl = (1 / (fcl * hc) + r_cl) / (
+            lr * i_m
+        )  # clothing vapour transfer resistance after Woodcock's method
+        ediff = (1 - w) * (p_v_sk - vpa) / r_ecl  # diffusion heat transfer
+        evap = -(ediff + esw)  # [W/m2]
+
+        # Radiation losses bare skin
+        r_bare = (
+            a_r_eff
+            * (1.0 - f_a_cl)
+            * e_skin
+            * sbc
+            * ((tr + 273.15) ** 4.0 - (t_arr[1, 0] + 273.15) ** 4.0)
+            / a_dubois
+        )
+        # ... for clothed area
+        r_clo = (
+            f_eff
+            * a_clo
+            * e_clo
+            * sbc
+            * ((tr + 273.15) ** 4.0 - (t_arr[2, 0] + 273.15) ** 4.0)
+            / a_dubois
+        )
+        r_sum = r_clo + r_bare  # radiation total
+
+        # Convection losses for bare skin
+        c_bare = (
+            hc * (tdb - t_arr[1, 0]) * a_dubois * (1.0 - f_a_cl) / a_dubois
+        )  # [W/m^2]
+        # ... for clothed area
+        c_clo = hc * (tdb - t_arr[2, 0]) * a_clo / a_dubois  # [W/m^2]
+        csum = c_clo + c_bare  # convection total
+
+        # Balance equations of the 3-nodes model
+        e_bal_vec[0, 0] = (
+            h
+            + ere
+            - (vasomotricity(t_arr[0, 0], t_arr[1, 0])["m_blood"] / 3600 * cb + 5.28)
+            * (t_arr[0, 0] - t_arr[1, 0])
+        )  # Core balance [W/m^2]
+        e_bal_vec[1, 0] = (
+            r_bare
+            + c_bare
+            + evap
+            + (vasomotricity(t_arr[0, 0], t_arr[1, 0])["m_blood"] / 3600 * cb + 5.28)
+            * (t_arr[0, 0] - t_arr[1, 0])
+            - htcl * (t_arr[1, 0] - t_arr[2, 0])
+        )  # Skin balance [W/m^2]
+        e_bal_vec[2, 0] = (
+            c_clo + r_clo + htcl * (t_arr[1, 0] - t_arr[2, 0])
+        )  # Clothes balance [W/m^2]
+        e_bal_scal = h + ere + r_sum + csum + evap
+
+        # returning either the calculated core,skin,clo temperatures or the PET
+        if mode:
+            # if we solve for the system we need to return 3 temperatures
+            return [e_bal_vec[0, 0], e_bal_vec[1, 0], e_bal_vec[2, 0]]
+        else:
+            # solving for the PET requires the scalar balance only
+            return e_bal_scal
+
+    def pet_fc(age, sex, ht, weight, pos, met, clo, t_stable, p):
+        """
+        Function to fint the solution
+
+        Parameters
+        ----------
+        age : float
+            age of individual.
+        sex : int
+            sex of individual (1=male, 2=female).
+        ht : float
+            individual height (m).
+        weight : float
+            individual mass (kg).
+        pos : int
+            body position (1,2,3=sitting, standing, crouching).
+        met : float
+            metabolic heat (W).
+        clo : float
+            clothing insulation level (clo).
+        t_stable : list or array-like
+            3 temperatures obtained from the actual environment (T_core,T_skin,T_clo).
+        p : float
+            atmospheric pressure (hPa).
+
+        Returns
+        -------
+        float
+            The PET comfort index.
+        """
+
+        # Definition of a function with the input variables of the PET reference situation
+        def f(tx):
+            return solve_pet(
+                # todo values in reference situation should be inputs
+                t_stable,
+                tx,
+                tx,
+                0.1,
+                50,
+                met,
+                0.9,
+                age,
+                sex,
+                ht,
+                weight,
+                pos,
+                False,
+                p,
+            )
+
+        # solving for PET
+        pet_guess = t_stable[2]  # start with the clothing temperature
+
+        return optimize.fsolve(f, pet_guess)
+
+    # initial guess
+    t_guess = np.array([36.7, 34, 0.5 * (tdb + tr)])
+    # solve for Tc, Tsk, Tcl temperatures
+    t_stable = optimize.fsolve(
+        solve_pet,
+        t_guess,
+        args=(
+            tdb,
+            tr,
+            v,
+            rh,
+            met,
+            clo,
+            age,
+            sex,
+            height,
+            weight,
+            position,
+            True,
+            p_atm,
+        ),
+    )
+    # compute PET
+    return pet_fc(age, sex, height, weight, position, met, clo, t_stable, p_atm)
+
+
 # # testing morris equation
 # from scipy import optimize
 # import matplotlib.pyplot as plt
@@ -2572,7 +3021,6 @@ def use_fans_morris(
 #  radiant_tmp_asymmetry
 #  draft
 #  floor_surface_tmp
-#  Physiological equivalent temperature (Blazejczyk2012)
 #  Perceived temperature (Blazejczyk2012)
 #  Physiological subjective temperature and physiological strain (Blazejczyk2012)
 #  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
