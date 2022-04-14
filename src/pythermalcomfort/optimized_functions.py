@@ -91,6 +91,10 @@ def two_nodes_optimized(
 
     t_body = alfa * t_skin + (1 - alfa) * t_core  # mean body temperature, °C
 
+    # respiration
+    q_res = 0.0023 * m * (44.0 - vapor_pressure)  # latent heat loss due to respiration
+    c_res = 0.0014 * m * (34.0 - tdb)  # sensible convective heat loss respiration
+
     while n_simulation < length_time_simulation:
 
         n_simulation += 1
@@ -127,8 +131,6 @@ def two_nodes_optimized(
         # 5.28 is the average body tissue conductance in W/(m2 C)
         # 1.163 is the thermal capacity of blood in Wh/(L C)
         hf_cs = (t_core - t_skin) * (5.28 + 1.163 * m_bl)
-        q_res = 0.0023 * m * (44.0 - vapor_pressure)  # heat loss due to respiration
-        c_res = 0.0014 * m * (34.0 - tdb)  # convective heat loss respiration
         s_core = m - hf_cs - q_res - c_res - wme  # rate of energy storage in the core
         s_skin = hf_cs - q_sensible - e_skin  # rate of energy storage in the skin
         tc_sk = 0.97 * alfa * body_weight  # thermal capacity skin
