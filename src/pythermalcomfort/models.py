@@ -2540,23 +2540,24 @@ def use_fans_morris(
     return tipping_point
 
 
-def pet(
+def pet_steady(
     tdb, tr, v, rh, met, clo, p_atm, position, age=23, sex=1, weight=75, height=1.8
 ):
     """
-    The physiological equivalent temperature (PET) is calculated using the Munich
+    The steady physiological equivalent temperature (PET) is calculated using the Munich
     Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
     circumstances in a medically realistic manner. PET is defined as the air temperature
-    at which, in a typical indoor setting (without wind and solar radiation), the heat
-    budget of the human body is balanced with the same core and skin temperature as under
-    the complex outdoor conditions to be assessed [20]_. PET allows a layperson to compare the
-    total effects of complex thermal circumstances outside with his or her own personal
-    experience indoors in this way.
+    at which, in a typical indoor setting (without wind and solar radiation and with a
+    humidity of ~50%), the heat budget of the human body is balanced with the same core
+    and skin temperature as under the complex outdoor conditions to be assessed [20]_.
+    PET allows a layperson to compare the total effects of complex thermal circumstances
+    outside with his or her own personal experience indoors in this way. This function
+    solves the heat balances without accounting for heat storage in the human body.
 
-    The PET was originally proposed by Hoppe [20]_. In 2018, Walter and Goestchel [21]_
-    proposed a simplification of the original model and  corrected the errors in the
-    PET calculation routine. Walter and Goestchel (2018) model is therefore used to
-    calculate the PET.
+    The PET was originally proposed by Hoppe [20]_. In 2018, Walther and Goestchel [21]_
+    proposed a correction of the original model, purging the errors in the
+    PET calculation routine, and implementing a state-of-the-art vapour diffusion model.
+    Walther and Goestchel (2018) model is therefore used to calculate the PET.
 
     Parameters
     ----------
@@ -2575,7 +2576,7 @@ def pet(
     p_atm : float
         atmospheric pressure, default value 1013.25 [hPa]
     position : int
-        position of the individual (1=sitting, 2=standing, 3=crouching)
+        position of the individual (1=sitting, 2=standing, 3=standing, forced convection)
     age : int
         age in years
     sex : int
@@ -2592,7 +2593,7 @@ def pet(
     """
 
     def solve_pet(
-        t_arr, tdb, tr, v, rh, met, clo, age, sex, ht, weight, position, mode, p, eff=0
+        t_arr, tdb, tr, v, rh, met, clo, age, sex, ht, weight, position, mode, p, wme=0
     ):
         """
         This function allows solving for the PET : either it solves the vectorial balance
@@ -2630,7 +2631,8 @@ def pet(
             True=solve 3eqs/3unknowns, False=solve for PET.
         p : float
             Atmospheric pressure (hPa).
-        eff
+        wme : float
+            external work, [met] default 0
 
         Returns
         -------
@@ -2752,7 +2754,7 @@ def pet(
         else:  # False=reference environment
             he = (80 + met_correction) / a_dubois
         # impact of efficiency
-        h = he * (1.0 - eff)  # [W/m2]
+        h = he * (1.0 - wme)  # [W/m2]
 
         # correction for wind
         i_m = 0.38  # Woodcock ratio for vapour transfer through clothing [-]
@@ -2784,7 +2786,7 @@ def pet(
         hc = 2.67 + 6.5 * v ** 0.67  # sitting
         if position == 2:  # standing
             hc = 2.26 + 7.42 * v ** 0.67
-        if position == 3:  # crouching
+        if position == 3:  # standing, forced convection
             hc = 8.6 * v ** 0.513
         # modification of hc with the total pressure
         hc = hc * (p / 1013.25) ** 0.55
@@ -2908,7 +2910,7 @@ def pet(
 
     def pet_fc(age, sex, ht, weight, pos, met, clo, t_stable, p):
         """
-        Function to fint the solution
+        Function to find the solution
 
         Parameters
         ----------
@@ -2947,7 +2949,7 @@ def pet(
                 0.1,
                 50,
                 met,
-                0.9,
+                clo,
                 age,
                 sex,
                 ht,
