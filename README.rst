@@ -76,12 +76,6 @@ Please cite us if you use this package: `Tartarini, F., Schiavon, S., 2020. pyth
 
 * Free software: MIT license
 
-.. raw:: html
-
-    <div style="margin-bottom:2rem">
-        <iframe width="100%" height="360" src="https://www.youtube.com/embed/OPz0GZxNsuw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-
 Installation
 ============
 
