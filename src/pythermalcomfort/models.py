@@ -2562,8 +2562,8 @@ def pet_steady(
     rh,
     met,
     clo,
-    p_atm,
-    position,
+    p_atm=1013.25,
+    position=1,
     age=23,
     sex=1,
     weight=75,
@@ -2958,7 +2958,7 @@ def pet_steady(
         # solving for PET
         pet_guess = _t_stable[2]  # start with the clothing temperature
 
-        return optimize.fsolve(f, pet_guess)
+        return round(optimize.fsolve(f, pet_guess)[0], 2)
 
     # initial guess
     t_guess = np.array([36.7, 34, 0.5 * (tdb + tr)])

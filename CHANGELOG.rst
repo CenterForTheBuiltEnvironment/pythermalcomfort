@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.1.0 (2022-04-20)
+-------------------
+
+* Added Physiological Equivalent Temperature (PET) model
+* In PMV and PPD function you can specify if occupants has control over airspeed
+
 2.0.2 (2022-04-12)
 -------------------
 
