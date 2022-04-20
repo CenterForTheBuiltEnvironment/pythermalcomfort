@@ -148,9 +148,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     return round(ce, 2)
 
 
-def pmv_ppd(
-    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", limit_inputs=True
-):
+def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     """
     Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (
     `PPD`_) calculated in accordance to main thermal comfort Standards. The PMV is an
@@ -208,6 +206,9 @@ def pmv_ppd(
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
+
+    Other Parameters
+    ----------------
     units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
@@ -219,6 +220,13 @@ def pmv_ppd(
         0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
         The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
         0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
+    airspeed_control : boolean default True
+        This only applies if standard = "ASHRAE". By default it is assumed that the
+        occupant has control over the airspeed. In this case the ASHRAE 55 Standard does
+        not imposes any airspeed limits. On the other hand, if the occupant has no control
+        over the airspeed the ASHRAE 55 imposes an upper limit for v which varies as a
+        function of the operative temperature, for more information please consult the
+        Standard.
 
     Returns
     -------
@@ -269,6 +277,8 @@ def pmv_ppd(
     ValueError
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
     """
+    default_kwargs = {"units": "SI", "limit_inputs": True, "airspeed_control": True}
+    kwargs = {**default_kwargs, **kwargs}
 
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -277,7 +287,7 @@ def pmv_ppd(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if kwargs["units"].lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     standard = standard.lower()
@@ -287,7 +297,7 @@ def pmv_ppd(
             "Standards"
         )
 
-    if limit_inputs:
+    if kwargs["limit_inputs"]:
         (
             tdb_valid,
             tr_valid,
@@ -295,7 +305,13 @@ def pmv_ppd(
             met_valid,
             clo_valid,
         ) = check_standard_compliance_array(
-            standard, tdb=tdb, tr=tr, v=vr, met=met, clo=clo
+            standard,
+            tdb=tdb,
+            tr=tr,
+            v=vr,
+            met=met,
+            clo=clo,
+            airspeed_control=kwargs["airspeed_control"],
         )
 
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
@@ -318,7 +334,7 @@ def pmv_ppd(
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if limit_inputs:
+    if kwargs["limit_inputs"]:
         if standard == "ashrae":
             pmv_valid = valid_range(pmv_array, (-100, 100))
         elif standard == "iso":
@@ -340,9 +356,7 @@ def pmv_ppd(
     }
 
 
-def pmv(
-    tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", units="SI", limit_inputs=True
-):
+def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     """
     Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal
     comfort Standards. The PMV is an index that predicts the mean value of the thermal
@@ -399,6 +413,9 @@ def pmv(
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
+
+    Other Parameters
+    ----------------
     units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
@@ -410,6 +427,13 @@ def pmv(
         0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
         The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
         0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
+    airspeed_control : boolean default True
+        This only applies if standard = "ASHRAE". By default it is assumed that the
+        occupant has control over the airspeed. In this case the ASHRAE 55 Standard does
+        not imposes any airspeed limits. On the other hand, if the occupant has no control
+        over the airspeed the ASHRAE 55 imposes an upper limit for v which varies as a
+        function of the operative temperature, for more information please consult the
+        Standard.
 
     Returns
     -------
@@ -447,19 +471,10 @@ def pmv(
         >>> print(results)
         array([-0.47,  0.06])
     """
+    default_kwargs = {"units": "SI", "limit_inputs": True, "airspeed_control": True}
+    kwargs = {**default_kwargs, **kwargs}
 
-    return pmv_ppd(
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        wme,
-        standard=standard,
-        units=units,
-        limit_inputs=limit_inputs,
-    )["pmv"]
+    return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard, **kwargs)["pmv"]
 
 
 def set_tmp(

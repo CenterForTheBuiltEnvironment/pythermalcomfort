@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 import math
-from pythermalcomfort.psychrometrics import p_sat
+from pythermalcomfort.psychrometrics import p_sat, t_o
 
 warnings.simplefilter("always")
 
@@ -172,13 +172,39 @@ def check_standard_compliance(standard, **kwargs):
 
 
 def check_standard_compliance_array(standard, **kwargs):
-    params = {}
-    for key, value in kwargs.items():
-        params[key] = value
+    default_kwargs = {"airspeed_control": True}
+    params = {**default_kwargs, **kwargs}
+
     if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
         v_valid = valid_range(params["v"], (0.0, 2.0))
+
+        if not params["airspeed_control"]:
+            v_valid = np.where(
+                (params["v"] > 0.8) & (params["clo"] < 0.7) & (params["met"] < 1.3),
+                np.nan,
+                v_valid,
+            )
+            to = t_o(params["tdb"], params["tr"], params["v"])
+            v_limit = 50.49 - 4.4047 * to + 0.096425 * to * to
+            v_valid = np.where(
+                (23 < to)
+                & (to < 25.5)
+                & (params["v"] > v_limit)
+                & (params["clo"] < 0.7)
+                & (params["met"] < 1.3),
+                np.nan,
+                v_valid,
+            )
+            v_valid = np.where(
+                (to <= 23)
+                & (params["v"] > 0.2)
+                & (params["clo"] < 0.7)
+                & (params["met"] < 1.3),
+                np.nan,
+                v_valid,
+            )
 
         if "met" in params.keys():
             met_valid = valid_range(params["met"], (1.0, 4.0))

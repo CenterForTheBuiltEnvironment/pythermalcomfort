@@ -26,7 +26,7 @@ from pythermalcomfort.models import (
     at,
     wc,
     adaptive_en,
-    pet,
+    pet_steady,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -156,6 +156,21 @@ def test_pmv_ppd():
     np.testing.assert_equal(
         np.around(pmv_ppd([70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1),
         [-0.3, -0.3],
+    )
+
+    # test airspeed limits
+    np.testing.assert_equal(
+        pmv_ppd(
+            [26, 24, 22, 26, 24, 22],
+            [26, 24, 22, 26, 24, 22],
+            [0.9, 0.6, 0.3, 0.9, 0.6, 0.3],
+            50,
+            [1.1, 1.1, 1.1, 1.3, 1.3, 1.3],
+            [0.5, 0.5, 0.5, 0.7, 0.7, 0.7],
+            standard="ashrae",
+            airspeed_control=False,
+        )["pmv"],
+        [np.nan, np.nan, np.nan, -0.14, -0.43, -0.57],
     )
 
     with pytest.raises(ValueError):
@@ -1613,7 +1628,7 @@ def test_two_nodes():
 def test_pet():
     assert (
         round(
-            pet(
+            pet_steady(
                 tdb=20,
                 tr=20,
                 rh=50,
@@ -1634,7 +1649,7 @@ def test_pet():
     # compute
     assert (
         round(
-            pet(
+            pet_steady(
                 tdb=30,
                 tr=30,
                 rh=50,
@@ -1655,7 +1670,7 @@ def test_pet():
     # compute
     assert (
         round(
-            pet(
+            pet_steady(
                 tdb=20,
                 tr=20,
                 rh=50,
