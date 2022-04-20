@@ -1090,7 +1090,7 @@ def test_enthalpy():
 
 
 def test_psy_ta_rh():
-    assert psy_ta_rh(25, 50, patm=101325) == {
+    assert psy_ta_rh(25, 50, p_atm=101325) == {
         "p_sat": 3169.2,
         "p_vap": 1584.6,
         "hr": 0.009881547577511219,
@@ -1633,7 +1633,7 @@ def test_pet():
                 tr=20,
                 rh=50,
                 v=0.15,
-                met=80,
+                met=1.37,
                 clo=0.5463,
                 p_atm=1013.25,
                 position=1,
@@ -1644,7 +1644,7 @@ def test_pet():
             )[0],
             2,
         )
-        == 18.9
+        == 18.89
     )
     # compute
     assert (
@@ -1654,7 +1654,7 @@ def test_pet():
                 tr=30,
                 rh=50,
                 v=0.15,
-                met=80,
+                met=1.37,
                 clo=0.5463,
                 p_atm=1013.25,
                 position=1,
@@ -1665,7 +1665,7 @@ def test_pet():
             )[0],
             2,
         )
-        == 30.68
+        == 30.67
     )
     # compute
     assert (
@@ -1675,7 +1675,7 @@ def test_pet():
                 tr=20,
                 rh=50,
                 v=0.5,
-                met=80,
+                met=1.37,
                 clo=0.5463,
                 p_atm=1013.25,
                 position=1,
@@ -1686,5 +1686,5 @@ def test_pet():
             )[0],
             2,
         )
-        == 17.25
+        == 17.24
     )

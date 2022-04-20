@@ -61,8 +61,8 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
         can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float
-        external work, [met] default 0
+    wme : float, default 0
+        external work, [met]
     units : {'SI', 'IP'}     select the SI (International System of Units) or the IP (Imperial Units) system.
 
     Returns
@@ -2556,15 +2556,30 @@ def use_fans_morris(
 
 
 def pet_steady(
-    tdb, tr, v, rh, met, clo, p_atm, position, age=23, sex=1, weight=75, height=1.8
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    p_atm,
+    position,
+    age=23,
+    sex=1,
+    weight=75,
+    height=1.8,
+    wme=0,
 ):
     """
     The steady physiological equivalent temperature (PET) is calculated using the Munich
     Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
     circumstances in a medically realistic manner. PET is defined as the air temperature
-    at which, in a typical indoor setting (without wind and solar radiation and with a
-    humidity of ~50%), the heat budget of the human body is balanced with the same core
-    and skin temperature as under the complex outdoor conditions to be assessed [20]_.
+    at which, in a typical indoor setting the heat budget of the human body is balanced
+    with the same core and skin temperature as under the complex outdoor conditions to be
+    assessed [20]_.
+    The following assumptions are made for the indoor reference climate: tdb = tr, v = 0.1
+    m/s, water vapour pressure = 12 hPa, clo = 0.9 clo, and met = 1.37 met + basic
+    metabolism.
     PET allows a layperson to compare the total effects of complex thermal circumstances
     outside with his or her own personal experience indoors in this way. This function
     solves the heat balances without accounting for heat storage in the human body.
@@ -2592,14 +2607,16 @@ def pet_steady(
         atmospheric pressure, default value 1013.25 [hPa]
     position : int
         position of the individual (1=sitting, 2=standing, 3=standing, forced convection)
-    age : int
+    age : int, default 23
         age in years
-    sex : int
+    sex : int, default 1
         male (1) or female (2).
-    weight : float
+    weight : float, default 75
         body mass, [kg]
-    height: float
+    height: float, default 1.8
         height, [m]
+    wme : float, default 0
+        external work, [W/(m2)] default 0
 
     Returns
     -------
@@ -2607,8 +2624,18 @@ def pet_steady(
         Steady-state PET under the given ambient conditions
     """
 
+    met_factor = 58.2  # met conversion factor
+    met = met * met_factor  # metabolic rate
+
     def solve_pet(
-        t_arr, tdb, tr, v, rh, met, clo, age, sex, ht, weight, position, mode, p, wme=0
+        t_arr,
+        _tdb,
+        _tr,
+        _v=0.1,
+        _rh=50,
+        _met=80,
+        _clo=0.9,
+        actual_environment=False,
     ):
         """
         This function allows solving for the PET : either it solves the vectorial balance
@@ -2620,34 +2647,20 @@ def pet_steady(
         ----------
         t_arr : list or array-like
             [T_core, T_sk, T_clo], [°C]
-        tdb : float
+        _tdb : float
             dry bulb air temperature, [°C]
-        tr : float
+        _tr : float
             mean radiant temperature, [°C]
-        v : float
+        _v : float, default 0.1 m/s for the reference environment
             air speed, [m/s]
-        rh : float
+        _rh : float, default 50 % for the reference environment
             relative humidity, [%]
-        met : float
-            metabolic rate, [met]
-        clo : float
+        _met : float, default 80 W for the reference environment
+            metabolic rate, [W/m2]
+        _clo : float, default 0.9 clo for the reference environment
             clothing insulation, [clo]
-        age : float
-            age
-        sex : int
-            male (1) or female (2).
-        ht : float
-            body height (m).
-        weight : float
-            body mass (kg).
-        position : int
-            position.
-        mode : boolean
-            True=solve 3eqs/3unknowns, False=solve for PET.
-        p : float
-            Atmospheric pressure (hPa).
-        wme : float
-            external work, [met] default 0
+        actual_environment : boolean
+            True=solve 3eqs/3unknowns, False=solve for PET
 
         Returns
         -------
@@ -2696,7 +2709,7 @@ def pet_steady(
 
             return {"m_blood": m_blood, "alpha": alpha}
 
-        def suda(t_body):
+        def sweat_rate(t_body):
             """
             Defines the sweating mechanism depending on the body and core temperatures.
 
@@ -2738,7 +2751,7 @@ def pet_steady(
             (3, 1)
         )  # required for the vectorial expression of the balance
         # Area parameters of the body:
-        a_dubois = body_surface_area(weight, ht)
+        a_dubois = body_surface_area(weight, height)
         # Base metabolism for men and women in [W]
         met_female = (
             3.19
@@ -2746,7 +2759,7 @@ def pet_steady(
             * (
                 1.0
                 + 0.004 * (30.0 - age)
-                + 0.018 * (ht * 100.0 / weight ** (1.0 / 3.0) - 42.1)
+                + 0.018 * (height * 100.0 / weight ** (1.0 / 3.0) - 42.1)
             )
         )
         met_male = (
@@ -2755,19 +2768,14 @@ def pet_steady(
             * (
                 1.0
                 + 0.004 * (30.0 - age)
-                + 0.01 * (ht * 100.0 / weight ** (1.0 / 3.0) - 43.4)
+                + 0.01 * (height * 100.0 / weight ** (1.0 / 3.0) - 43.4)
             )
         )
         # Attribution of internal energy depending on the sex of the subject
-        if sex == 1:
-            met_correction = met_male
-        else:
-            met_correction = met_female
+        met_correction = met_male if sex == 1 else met_female
+
         # Source term : metabolic activity
-        if mode:  # = actual environment
-            he = (met + met_correction) / a_dubois
-        else:  # False=reference environment
-            he = (80 + met_correction) / a_dubois
+        he = (_met + met_correction) / a_dubois
         # impact of efficiency
         h = he * (1.0 - wme)  # [W/m2]
 
@@ -2776,42 +2784,42 @@ def pet_steady(
 
         # Calculation of the Burton surface increase coefficient, k = 0.31 for Hoeppe:
         fcl = (
-            1 + 0.31 * clo
+            1 + 0.31 * _clo
         )  # Increase heat exchange surface depending on clothing level
-        f_a_cl = (173.51 * clo - 2.36 - 100.76 * clo * clo + 19.28 * clo ** 3.0) / 100
+        f_a_cl = (
+            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo ** 3.0
+        ) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
-        f_eff = 0.725  # effective radiation factor
-        if position == 1 or position == 3:
-            f_eff = 0.725
-        if position == 2:
-            f_eff = 0.696
+        f_eff = 0.696 if position == 2 else 0.725  # effective radiation factor
 
         a_r_eff = (
             a_dubois * f_eff
         )  # Effective radiative area depending on the position of the subject
 
         # Partial pressure of water in the air
-        if mode:  # mode=True is the calculation of the actual environment
-            vpa = rh / 100.0 * p_sat(tdb) / 100  # [hPa]
-        else:  # mode=False means we are calculating the PET
+        vpa = _rh / 100.0 * p_sat(_tdb) / 100  # [hPa]
+        if not actual_environment:  # mode=False means we are calculating the PET
             vpa = 12  # [hPa] vapour pressure of the standard environment
 
         # Convection coefficient depending on wind velocity and subject position
-        hc = 2.67 + 6.5 * v ** 0.67  # sitting
+        hc = 2.67 + 6.5 * _v ** 0.67  # sitting
         if position == 2:  # standing
-            hc = 2.26 + 7.42 * v ** 0.67
+            hc = 2.26 + 7.42 * _v ** 0.67
         if position == 3:  # standing, forced convection
-            hc = 8.6 * v ** 0.513
+            hc = 8.6 * _v ** 0.513
+        # h_cc corrected convective heat transfer coefficient
+        h_cc = 3.0 * pow(p_atm / 1013.25, 0.53)
+        hc = max(h_cc, hc)
         # modification of hc with the total pressure
-        hc = hc * (p / 1013.25) ** 0.55
+        hc = hc * (p_atm / 1013.25) ** 0.55
 
         # Respiratory energy losses
-        t_exp = 0.47 * tdb + 21.0  # Expired air temperature calculation [degC]
+        t_exp = 0.47 * _tdb + 21.0  # Expired air temperature calculation [degC]
         d_vent_pulm = he * 1.44 * 10.0 ** (-6.0)  # breathing flow rate
-        c_res = 1010 * (tdb - t_exp) * d_vent_pulm  # Sensible heat energy loss [W/m2]
+        c_res = 1010 * (_tdb - t_exp) * d_vent_pulm  # Sensible heat energy loss [W/m2]
         vpexp = p_sat(t_exp) / 100  # Latent heat energy loss [hPa]
-        q_res = 0.623 * h_vap / p * (vpa - vpexp) * d_vent_pulm  # [W/m2]
+        q_res = 0.623 * h_vap / p_atm * (vpa - vpexp) * d_vent_pulm  # [W/m2]
         ere = c_res + q_res  # [W/m2]
 
         # Calculation of the equivalent thermal resistance of body tissues
@@ -2819,28 +2827,28 @@ def pet_steady(
         tbody = alpha * t_arr[1, 0] + (1 - alpha) * t_arr[0, 0]
 
         # Clothed fraction of the body approximation
-        r_cl = clo / 6.45  # Conversion in [m2.K/W]
+        r_cl = _clo / 6.45  # Conversion in [m2.K/W]
         y = 0
         if f_a_cl > 1.0:
             f_a_cl = 1.0
-        if clo >= 2.0:
+        if _clo >= 2.0:
             y = 1.0
-        if 0.6 < clo < 2.0:
-            y = (ht - 0.2) / ht
-        if 0.6 >= clo > 0.3:
+        if 0.6 < _clo < 2.0:
+            y = (height - 0.2) / height
+        if 0.6 >= _clo > 0.3:
             y = 0.5
-        if 0.3 >= clo > 0.0:
+        if 0.3 >= _clo > 0.0:
             y = 0.1
         # calculation of the clothing radius depending on the clothing level (6.28 = 2*
         # pi !)
-        r2 = a_dubois * (fcl - 1.0 + f_a_cl) / (6.28 * ht * y)  # External radius
-        r1 = f_a_cl * a_dubois / (6.28 * ht * y)  # Internal radius
+        r2 = a_dubois * (fcl - 1.0 + f_a_cl) / (6.28 * height * y)  # External radius
+        r1 = f_a_cl * a_dubois / (6.28 * height * y)  # Internal radius
         di = r2 - r1
         # Calculation of the equivalent thermal resistance of body tissues
-        htcl = 6.28 * ht * y * di / (r_cl * np.log(r2 / r1) * a_clo)  # [W/(m2.K)]
+        htcl = 6.28 * height * y * di / (r_cl * np.log(r2 / r1) * a_clo)  # [W/(m2.K)]
 
         # Calculation of sweat losses
-        qmsw = suda(tbody)
+        qmsw = sweat_rate(tbody)
         # h_vap/1000 = 2400 000[J/kg] divided by 1000 = [J/g] // qwsw/3600 for [g/m2/h]
         # to [
         # g/m2/s]
@@ -2873,7 +2881,7 @@ def pet_steady(
             * (1.0 - f_a_cl)
             * e_skin
             * sbc
-            * ((tr + 273.15) ** 4.0 - (t_arr[1, 0] + 273.15) ** 4.0)
+            * ((_tr + 273.15) ** 4.0 - (t_arr[1, 0] + 273.15) ** 4.0)
             / a_dubois
         )
         # ... for clothed area
@@ -2882,17 +2890,17 @@ def pet_steady(
             * a_clo
             * e_clo
             * sbc
-            * ((tr + 273.15) ** 4.0 - (t_arr[2, 0] + 273.15) ** 4.0)
+            * ((_tr + 273.15) ** 4.0 - (t_arr[2, 0] + 273.15) ** 4.0)
             / a_dubois
         )
         r_sum = r_clo + r_bare  # radiation total
 
         # Convection losses for bare skin
         c_bare = (
-            hc * (tdb - t_arr[1, 0]) * a_dubois * (1.0 - f_a_cl) / a_dubois
+            hc * (_tdb - t_arr[1, 0]) * a_dubois * (1.0 - f_a_cl) / a_dubois
         )  # [W/m^2]
         # ... for clothed area
-        c_clo = hc * (tdb - t_arr[2, 0]) * a_clo / a_dubois  # [W/m^2]
+        c_clo = hc * (_tdb - t_arr[2, 0]) * a_clo / a_dubois  # [W/m^2]
         csum = c_clo + c_bare  # convection total
 
         # Balance equations of the 3-nodes model
@@ -2916,37 +2924,21 @@ def pet_steady(
         e_bal_scal = h + ere + r_sum + csum + evap
 
         # returning either the calculated core,skin,clo temperatures or the PET
-        if mode:
+        if actual_environment:
             # if we solve for the system we need to return 3 temperatures
             return [e_bal_vec[0, 0], e_bal_vec[1, 0], e_bal_vec[2, 0]]
         else:
             # solving for the PET requires the scalar balance only
             return e_bal_scal
 
-    def pet_fc(age, sex, ht, weight, pos, met, clo, t_stable, p):
+    def pet_fc(_t_stable):
         """
         Function to find the solution
 
         Parameters
         ----------
-        age : float
-            age of individual.
-        sex : int
-            sex of individual (1=male, 2=female).
-        ht : float
-            individual height (m).
-        weight : float
-            individual mass (kg).
-        pos : int
-            body position (1,2,3=sitting, standing, crouching).
-        met : float
-            metabolic heat (W).
-        clo : float
-            clothing insulation level (clo).
-        t_stable : list or array-like
+        _t_stable : list or array-like
             3 temperatures obtained from the actual environment (T_core,T_skin,T_clo).
-        p : float
-            atmospheric pressure (hPa).
 
         Returns
         -------
@@ -2957,25 +2949,14 @@ def pet_steady(
         # Definition of a function with the input variables of the PET reference situation
         def f(tx):
             return solve_pet(
-                # todo values in reference situation should be inputs
-                t_stable,
-                tx,
-                tx,
-                0.1,
-                50,
-                met,
-                clo,
-                age,
-                sex,
-                ht,
-                weight,
-                pos,
-                False,
-                p,
+                _t_stable,
+                _tdb=tx,
+                _tr=tx,
+                actual_environment=False,
             )
 
         # solving for PET
-        pet_guess = t_stable[2]  # start with the clothing temperature
+        pet_guess = _t_stable[2]  # start with the clothing temperature
 
         return optimize.fsolve(f, pet_guess)
 
@@ -2992,17 +2973,11 @@ def pet_steady(
             rh,
             met,
             clo,
-            age,
-            sex,
-            height,
-            weight,
-            position,
             True,
-            p_atm,
         ),
     )
     # compute PET
-    return pet_fc(age, sex, height, weight, position, met, clo, t_stable, p_atm)
+    return pet_fc(t_stable)
 
 
 # # testing morris equation
