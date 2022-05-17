@@ -291,7 +291,7 @@ def two_nodes_optimized(
     disc = (
         4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
     )  # predicted thermal discomfort
-    if disc < 0:
+    if disc <= 0:
         disc = t_sens
 
     # PMV Gagge
