@@ -2,10 +2,11 @@
 Changelog
 =========
 
-2.0.2 (2022-04-12)
+2.0.3 (2022-04-12)
 -------------------
 
 * UTCI accepts lists as inputs
+* Fixed how DISC is calculated
 
 2.0.0 (2022-04-07)
 -------------------
