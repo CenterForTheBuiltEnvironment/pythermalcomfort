@@ -2,11 +2,21 @@
 Changelog
 =========
 
-2.0.3 (2022-04-12)
+2.1.1 (2022-05-17)
+-------------------
+
+* Fixed how DISC is calculated
+
+2.1.0 (2022-04-20)
+-------------------
+
+* Added Physiological Equivalent Temperature (PET) model
+* In PMV and PPD function you can specify if occupants has control over airspeed
+
+2.0.2 (2022-04-12)
 -------------------
 
 * UTCI accepts lists as inputs
-* Fixed how DISC is calculated
 
 2.0.0 (2022-04-07)
 -------------------

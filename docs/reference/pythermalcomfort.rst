@@ -30,7 +30,7 @@ Standard Effective Temperature (SET)
 Physiological Equivalent Temperature (PET)
 ------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.pet
+.. autofunction:: pythermalcomfort.models.pet_steady
 
 Cooling Effect (CE)
 -------------------

@@ -26,7 +26,7 @@ from pythermalcomfort.models import (
     at,
     wc,
     adaptive_en,
-    pet,
+    pet_steady,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -156,6 +156,21 @@ def test_pmv_ppd():
     np.testing.assert_equal(
         np.around(pmv_ppd([70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1),
         [-0.3, -0.3],
+    )
+
+    # test airspeed limits
+    np.testing.assert_equal(
+        pmv_ppd(
+            [26, 24, 22, 26, 24, 22],
+            [26, 24, 22, 26, 24, 22],
+            [0.9, 0.6, 0.3, 0.9, 0.6, 0.3],
+            50,
+            [1.1, 1.1, 1.1, 1.3, 1.3, 1.3],
+            [0.5, 0.5, 0.5, 0.7, 0.7, 0.7],
+            standard="ashrae",
+            airspeed_control=False,
+        )["pmv"],
+        [np.nan, np.nan, np.nan, -0.14, -0.43, -0.57],
     )
 
     with pytest.raises(ValueError):
@@ -1075,7 +1090,7 @@ def test_enthalpy():
 
 
 def test_psy_ta_rh():
-    assert psy_ta_rh(25, 50, patm=101325) == {
+    assert psy_ta_rh(25, 50, p_atm=101325) == {
         "p_sat": 3169.2,
         "p_vap": 1584.6,
         "hr": 0.009881547577511219,
@@ -1611,65 +1626,12 @@ def test_two_nodes():
 
 
 def test_pet():
-    assert (
-        round(
-            pet(
-                tdb=20,
-                tr=20,
-                rh=50,
-                v=0.15,
-                met=80,
-                clo=0.5463,
-                p_atm=1013.25,
-                position=1,
-                age=23,
-                sex=1,
-                weight=75,
-                height=1.8,
-            )[0],
-            2,
-        )
-        == 18.9
-    )
-    # compute
-    assert (
-        round(
-            pet(
-                tdb=30,
-                tr=30,
-                rh=50,
-                v=0.15,
-                met=80,
-                clo=0.5463,
-                p_atm=1013.25,
-                position=1,
-                age=23,
-                sex=1,
-                weight=75,
-                height=1.8,
-            )[0],
-            2,
-        )
-        == 30.68
-    )
-    # compute
-    assert (
-        round(
-            pet(
-                tdb=20,
-                tr=20,
-                rh=50,
-                v=0.5,
-                met=80,
-                clo=0.5463,
-                p_atm=1013.25,
-                position=1,
-                age=23,
-                sex=1,
-                weight=75,
-                height=1.8,
-            )[0],
-            2,
-        )
-        == 17.25
-    )
+    assert pet_steady(tdb=20, tr=20, rh=50, v=0.15, met=1.37, clo=0.5) == 18.85
+    assert pet_steady(tdb=30, tr=30, rh=50, v=0.15, met=1.37, clo=0.5) == 30.59
+    assert pet_steady(tdb=20, tr=20, rh=50, v=0.5, met=1.37, clo=0.5) == 17.16
+    assert pet_steady(tdb=21, tr=21, rh=50, v=0.1, met=1.37, clo=0.9) == 21.08
+    assert pet_steady(tdb=20, tr=20, rh=50, v=0.1, met=1.37, clo=0.9) == 19.92
+    assert pet_steady(tdb=-5, tr=40, rh=2, v=0.5, met=1.37, clo=0.9) == 7.82
+    assert pet_steady(tdb=-5, tr=-5, rh=50, v=5.0, met=1.37, clo=0.9) == -13.38
+    assert pet_steady(tdb=30, tr=60, rh=80, v=1.0, met=1.37, clo=0.9) == 43.05
+    assert pet_steady(tdb=30, tr=30, rh=80, v=1.0, met=1.37, clo=0.9) == 31.69

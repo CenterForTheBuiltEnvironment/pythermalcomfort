@@ -124,7 +124,7 @@ def p_sat(tdb):
     return round(pascals, 1)
 
 
-def psy_ta_rh(tdb, rh, patm=101325):
+def psy_ta_rh(tdb, rh, p_atm=101325):
     """Calculates psychrometric values of air based on dry bulb air temperature and
     relative humidity.
     For more accurate results we recommend the use of the the Python package
@@ -138,7 +138,7 @@ def psy_ta_rh(tdb, rh, patm=101325):
         air temperature, [°C]
     rh: float
         relative humidity, [%]
-    patm: float
+    p_atm: float
         atmospheric pressure, [Pa]
 
     Returns
@@ -156,7 +156,7 @@ def psy_ta_rh(tdb, rh, patm=101325):
     """
     p_saturation = p_sat(tdb)
     p_vap = rh / 100 * p_saturation
-    hr = 0.62198 * p_vap / (patm - p_vap)
+    hr = 0.62198 * p_vap / (p_atm - p_vap)
     tdp = t_dp(tdb, rh)
     twb = t_wb(tdb, rh)
     h = enthalpy(tdb, hr)
