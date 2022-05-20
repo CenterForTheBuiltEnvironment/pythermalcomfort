@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.2.0 (2022-05-17)
+-------------------
+
+* Implemented a better equation to calculate the mean radiant temperature
+
 2.1.1 (2022-05-17)
 -------------------
 

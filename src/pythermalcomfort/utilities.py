@@ -2,18 +2,9 @@ import numpy as np
 import warnings
 import math
 from pythermalcomfort.psychrometrics import p_sat, t_o
+from pythermalcomfort.shared_functions import valid_range
 
 warnings.simplefilter("always")
-
-
-def valid_range(x, valid):
-    """Filter values based on a valid range."""
-    return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
-
-
-def is_valid(x, valid):
-    """Return a mask based on a valid range."""
-    return (x > valid[0]) & (x < valid[1])
 
 
 def transpose_sharp_altitude(sharp, altitude):

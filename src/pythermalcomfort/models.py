@@ -5,11 +5,11 @@ from pythermalcomfort.utilities import (
     units_converter,
     transpose_sharp_altitude,
     check_standard_compliance,
-    valid_range,
     map_stress_category,
     check_standard_compliance_array,
     body_surface_area,
 )
+from pythermalcomfort.shared_functions import valid_range
 import math
 from scipy import optimize
 from pythermalcomfort.optimized_functions import (

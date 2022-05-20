@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from pythermalcomfort.shared_functions import valid_range
 
 c_to_k = 273.15
 cp_vapour = 1805.0
@@ -7,6 +8,7 @@ cp_water = 4186
 cp_air = 1004
 h_fg = 2501000
 r_air = 287.055
+g = 9.81  # m/s2
 
 
 def p_sat_torr(tdb):
@@ -33,7 +35,7 @@ def t_o(tdb, tr, v, standard="ISO"):
     tdb: float
         air temperature, [°C]
     tr: float
-        mean radiant temperature temperature, [°C]
+        mean radiant temperature, [°C]
     v: float
         air speed, [m/s]
     standard: str (default="ISO")
@@ -222,39 +224,113 @@ def t_dp(tdb, rh):
     return round(c * gamma_m / (b - gamma_m), 1)
 
 
-def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9):
+def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9, standard="Mixed Convection"):
     """Converts globe temperature reading into mean radiant temperature in accordance
-    with ISO 7726:1998 [5]_
+    with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
+    7726:1998 Standard [5]_.
 
     Parameters
     ----------
-    tg: float
+    tg : float or array-like
         globe temperature, [°C]
-    tdb: float
+    tdb : float or array-like
         air temperature, [°C]
-    v: float
+    v : float or array-like
         air speed, [m/s]
-    d: float
+    d : float or array-like
         diameter of the globe, [m] default 0.15 m
-    emissivity: float
+    emissivity : float or array-like
         emissivity of the globe temperature sensor, default 0.9
+    standard : {"Mixed Convection", "ISO"}
+        either choose between the Mixed Convection and ISO formulations.
+        The Mixed Convection formulation has been proposed by Teitelbaum E. et al. (2022)
+        to better determine the free and forced convection coefficient used in the
+        calculation of the mean radiant temperature. They also showed that mean radiant
+        temperature measured with ping-pong ball-sized globe thermometers is not reliable
+        due to a stochastic convective bias [22]_. The Mixed Convection model is only
+        applicable to globe sensors with a diameter between 0.04 and 0.15 m.
 
     Returns
     -------
-    tr: float
+    tr: float or array-like
         mean radiant temperature, [°C]
     """
-    tg += c_to_k
-    tdb += c_to_k
+    standard = standard.lower()
 
-    # calculate heat transfer coefficient
-    h_n = 1.4 * (abs(tg - tdb) / d) ** 0.25  # natural convection
-    h_f = 6.3 * v ** 0.6 / d ** 0.4  # forced convection
+    tdb = np.array(tdb)
+    tg = np.array(tg)
+    v = np.array(v)
+    d = np.array(d)
 
-    # get the biggest between the tow coefficients
-    h = max(h_f, h_n)
-    print(h_n, h_f, h)
+    if standard == "mixed convection":
+        mu = 0.0000181  # Pa s
+        k_air = 0.02662  # W/m-K
+        beta = 0.0034  # 1/K
+        nu = 0.0000148  # m2/s
+        alpha = 0.00002591  # m2/s
+        pr = cp_air * mu / k_air  # Prandtl constants
 
-    tr = (tg ** 4 + h * (tg - tdb) / (emissivity * (5.67 * 10 ** -8))) ** 0.25 - c_to_k
+        o = 0.0000000567
+        n = 1.27 * d + 0.57
 
-    return round(tr, 1)
+        ra = g * beta * np.absolute(tg - tdb) * d * d * d / nu / alpha
+        re = v * d / nu
+
+        nu_natural = 2 + (0.589 * np.power(ra, (1 / 4))) / (
+            np.power(1 + np.power(0.469 / pr, 9 / 16), (4 / 9))
+        )
+        nu_forced = 2 + (
+            0.4 * np.power(re, 0.5) + 0.06 * np.power(re, 2 / 3)
+        ) * np.power(pr, 0.4)
+
+        tr = (
+            np.power(
+                np.power(tg + 273.15, 4)
+                - (
+                    (
+                        (
+                            (
+                                np.power(
+                                    (np.power(nu_forced, n) + np.power(nu_natural, n)),
+                                    1 / n,
+                                )
+                            )
+                            * k_air
+                            / d
+                        )
+                        * (-tg + tdb)
+                    )
+                    / emissivity
+                    / o
+                ),
+                0.25,
+            )
+            - 273.15
+        )
+
+        d_valid = valid_range(d, (0.04, 0.15))
+        tr = np.where(~np.isnan(d_valid), tr, np.nan)
+
+        return np.around(tr, 1)
+
+    if standard == "iso":
+
+        tg = np.add(tg, c_to_k)
+        tdb = np.add(tdb, c_to_k)
+
+        # calculate heat transfer coefficient
+        h_n = np.power(1.4 * (np.abs(tg - tdb) / d), 0.25)  # natural convection
+        h_f = 6.3 * np.power(v, 0.6) / np.power(d, 0.4)  # forced convection
+
+        # get the biggest between the two coefficients
+        h = np.maximum(h_f, h_n)
+
+        tr = (
+            np.power(
+                np.power(tg, 4) + h * (tg - tdb) / (emissivity * (5.67 * 10 ** -8)),
+                0.25,
+            )
+            - c_to_k
+        )
+
+        return np.around(tr, 1)

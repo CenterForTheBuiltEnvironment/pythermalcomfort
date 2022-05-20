@@ -1158,9 +1158,29 @@ def test_p_sat():
     assert (p_sat(tdb=50)) == 12349.9
 
 
-def test_t_globe():
-    assert (t_mrt(tg=53.2, tdb=30, v=0.3, d=0.1, emissivity=0.95)) == 74.8
-    assert (t_mrt(tg=55, tdb=30, v=0.3, d=0.1, emissivity=0.95)) == 77.8
+def test_t_mrt():
+    np.testing.assert_equal(
+        t_mrt(
+            tg=[53.2, 55],
+            tdb=30,
+            v=0.3,
+            d=0.1,
+            emissivity=0.95,
+            standard="ISO",
+        ),
+        [74.8, 77.8],
+    )
+    np.testing.assert_equal(
+        t_mrt(
+            tg=[25.42, 26.42, 26.42, 26.42],
+            tdb=26.10,
+            v=0.1931,
+            d=[0.1, 0.1, 0.5, 0.03],
+            emissivity=0.95,
+            standard="Mixed Convection",
+        ),
+        [24.2, 27.0, np.nan, np.nan],
+    )
 
 
 def test_adaptive_ashrae():
