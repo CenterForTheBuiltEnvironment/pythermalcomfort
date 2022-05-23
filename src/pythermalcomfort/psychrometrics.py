@@ -224,7 +224,7 @@ def t_dp(tdb, rh):
     return round(c * gamma_m / (b - gamma_m), 1)
 
 
-def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9, standard="Mixed Convection"):
+def t_mrt(tg, tdb, v, d=0.15, emissivity=0.95, standard="Mixed Convection"):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
     7726:1998 Standard [5]_.
@@ -240,15 +240,15 @@ def t_mrt(tg, tdb, v, d=0.15, emissivity=0.9, standard="Mixed Convection"):
     d : float or array-like
         diameter of the globe, [m] default 0.15 m
     emissivity : float or array-like
-        emissivity of the globe temperature sensor, default 0.9
+        emissivity of the globe temperature sensor, default 0.95
     standard : {"Mixed Convection", "ISO"}
         either choose between the Mixed Convection and ISO formulations.
         The Mixed Convection formulation has been proposed by Teitelbaum E. et al. (2022)
         to better determine the free and forced convection coefficient used in the
         calculation of the mean radiant temperature. They also showed that mean radiant
         temperature measured with ping-pong ball-sized globe thermometers is not reliable
-        due to a stochastic convective bias [22]_. The Mixed Convection model is only
-        applicable to globe sensors with a diameter between 0.04 and 0.15 m.
+        due to a stochastic convective bias [22]_. The Mixed Convection model has only
+        been validated for globe sensors with a diameter between 0.04 and 0.15 m.
 
     Returns
     -------
