@@ -22,13 +22,12 @@ from pythermalcomfort.optimized_functions import (
 
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
-    """
-    Returns the value of the Cooling Effect (`CE`_) calculated in compliance with the
-    ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed is the value that,
-    when subtracted equally from both the average air temperature and the mean radiant
-    temperature, yields the same `SET`_ under still air as in the first `SET`_ calculation
-    under elevated air speed. The cooling effect is calculated only for air speed
-    higher than 0.1 m/s.
+    """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
+    with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
+    is the value that, when subtracted equally from both the average air
+    temperature and the mean radiant temperature, yields the same `SET`_ under
+    still air as in the first `SET`_ calculation under elevated air speed. The
+    cooling effect is calculated only for air speed higher than 0.1 m/s.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
 
@@ -149,13 +148,12 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
 
 def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
-    """
-    Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of Dissatisfied (
-    `PPD`_) calculated in accordance to main thermal comfort Standards. The PMV is an
-    index that predicts the mean value of the thermal sensation votes (self-reported
-    perceptions) of a large group of people on a sensation scale expressed from –3 to +3
-    corresponding to the categories \"cold,\" \"cool, \" \"slightly cool,\" \"neutral,\"
-    \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
+    """Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of
+    Dissatisfied ( `PPD`_) calculated in accordance to main thermal comfort
+    Standards. The PMV is an index that predicts the mean value of the thermal
+    sensation votes (self-reported perceptions) of a large group of people on a
+    sensation scale expressed from –3 to +3 corresponding to the categories:
+    cold, cool, slightly cool, neutral, slightly warm, warm, and hot. [1]_
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
     ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
@@ -357,12 +355,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
 
 def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
-    """
-    Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main thermal
-    comfort Standards. The PMV is an index that predicts the mean value of the thermal
-    sensation votes (self-reported perceptions) of a large group of people on a sensation
-    scale expressed from –3 to +3 corresponding to the categories \"cold,\" \"cool,
-    \" \"slightly cool,\" \"neutral,\" \"slightly warm,\" \"warm,\" and \"hot.\" [1]_
+    """Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main
+    thermal comfort Standards. The PMV is an index that predicts the mean value
+    of the thermal sensation votes (self-reported perceptions) of a large group
+    of people on a sensation scale expressed from –3 to +3 corresponding to the
+    categories: cold, cool, slightly cool, neutral, slightly warm, warm, and hot. [1]_
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
     ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
@@ -495,10 +492,9 @@ def set_tmp(
     """
     Calculates the Standard Effective Temperature (SET). The SET is the temperature of
     a hypothetical isothermal environment at 50% (rh), <0.1 m/s (20 fpm) average air
-    speed (v),
-    and tr = tdb, in which the total heat loss from the skin of an imaginary occupant
-    wearing clothing, standardized for the activity concerned. is the same as that
-    from a person in the actual environment with actual clothing and activity level.
+    speed (v), and tr = tdb, in which the total heat loss from the skin of an imaginary occupant
+    wearing clothing, standardized for the activity concerned is the same as that
+    from a person in the actual environment with actual clothing and activity level. [10]_
 
     Parameters
     ----------
@@ -646,8 +642,7 @@ def use_fans_heatwaves(
     max_skin_blood_flow=80,
     **kwargs,
 ):
-    """
-    Calculates whether the use of fans is beneficial during heatwaves.
+    """Calculates whether the use of fans is beneficial during heatwaves.
 
     Parameters
     ----------
@@ -812,10 +807,9 @@ def use_fans_heatwaves(
 
 
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
-    """
-    Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model
-    relates indoor design temperatures or acceptable temperature ranges to outdoor
-    meteorological or climatological parameters.
+    """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
+    model relates indoor design temperatures or acceptable temperature ranges
+    to outdoor meteorological or climatological parameters.
 
     Parameters
     ----------
@@ -891,7 +885,6 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         {'tmp_cmf': nan, 'tmp_cmf_80_low': nan, ... }
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is higher than 10°C
-
     """
 
     tdb = np.array(tdb)
@@ -1056,7 +1049,6 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         {'tmp_cmf': nan, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, ... }
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C
-
     """
 
     tdb = np.array(tdb)
@@ -1137,16 +1129,15 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
 
 def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=True):
     """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
-    equivalent temperature for the environment derived from a reference environment.
-    It is defined as the air temperature of the reference environment which produces
-    the same strain index value in comparison with the reference individual's response
-    to the real
-    environment. It is regarded as one of the most comprehensive indices for
-    calculating heat stress in outdoor spaces. The parameters that are taken into
-    account for calculating
-    UTCI involve dry bulb temperature, mean radiation temperature, the pressure of
-    water vapor or relative humidity, and wind speed (at the elevation of 10 m above the
-    ground) [7]_.
+    equivalent temperature for the environment derived from a reference
+    environment. It is defined as the air temperature of the reference
+    environment which produces the same strain index value in comparison with
+    the reference individual's response to the real environment. It is regarded
+    as one of the most comprehensive indices for calculating heat stress in
+    outdoor spaces. The parameters that are taken into account for calculating
+    UTCI involve dry bulb temperature, mean radiation temperature, the pressure
+    of water vapor or relative humidity, and wind speed (at the elevation of 10
+    m above the ground). [7]_
 
     Parameters
     ----------
@@ -1202,7 +1193,6 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
     ------
     ValueError
         Raised if the input are outside the Standard's applicability limits
-
     """
 
     tdb = np.array(tdb)
@@ -1257,8 +1247,8 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
 
 
 def clo_tout(tout, units="SI"):
-    """Representative clothing insulation Icl as a function of outdoor air temperature
-    at 06:00 a.m [4]_.
+    """Representative clothing insulation Icl as a function of outdoor air
+    temperature at 06:00 a.m [4]_.
 
     Parameters
     ----------
@@ -1286,7 +1276,6 @@ def clo_tout(tout, units="SI"):
         0.46
         >>> clo_tout(tout=[27, 25])
         array([0.46, 0.47])
-
     """
 
     tout = np.array(tout)
@@ -1302,9 +1291,9 @@ def clo_tout(tout, units="SI"):
 
 
 def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="SI"):
-    """Calculates the percentage of thermally dissatisfied people with a vertical
-    temperature gradient between feet and head [1]_.
-    This equation is only applicable for vr < 0.2 m/s (40 fps).
+    """Calculates the percentage of thermally dissatisfied people with a
+    vertical temperature gradient between feet and head [1]_. This equation is
+    only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
     ----------
@@ -1362,7 +1351,6 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
         >>> results = vertical_tmp_grad_ppd(25, 25, 0.1, 50, 1.2, 0.5, 7)
         >>> print(results)
         {'PPD_vg': 12.6, 'Acceptability': False}
-
     """
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
@@ -1382,7 +1370,7 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
 def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
     """
     Calculates the percentage of thermally dissatisfied people with the ankle draft (
-    0.1 m) above floor level [1]_.
+    0.1 m) above floor level [23]_.
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
@@ -1471,13 +1459,12 @@ def solar_gain(
     posture="seated",
     floor_reflectance=0.6,
 ):
-    """
-    Calculates the solar gain to the human body using the Effective Radiant Field (
-    ERF) [1]_. The ERF is a measure of the net energy flux to or from the human body.
-    ERF is expressed in W over human body surface area [w/m2]. In addition,
-    it calculates the delta mean radiant temperature. Which is the amount by which
-    the mean radiant
-    temperature of the space should be increased if no solar radiation is present.
+    """Calculates the solar gain to the human body using the Effective Radiant
+    Field ( ERF) [1]_. The ERF is a measure of the net energy flux to or from
+    the human body. ERF is expressed in W over human body surface area [w/m2].
+    In addition, it calculates the delta mean radiant temperature. Which is the
+    amount by which the mean radiant temperature of the space should be
+    increased if no solar radiation is present.
 
     Parameters
     ----------
@@ -1545,7 +1532,6 @@ def solar_gain(
         asw=0.7, posture='seated')
         >>> print(results)
         {'erf': 42.9, 'delta_mrt': 10.3}
-
     """
 
     posture = posture.lower()
@@ -1642,13 +1628,12 @@ def solar_gain(
 
 
 def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
-    """
-    Calculates the Predicted Heat Strain (PHS) index based in compliace with the ISO
-    7933:2004 Standard [8]_. The ISO 7933 provides a method for the analytical evaluation
-    and interpretation of the thermal stress experienced by a subject in a hot
-    environment. It describes a method for predicting the sweat rate and the internal
-    core temperature that the human body will develop in response to the working
-    conditions.
+    """Calculates the Predicted Heat Strain (PHS) index based in compliace with
+    the ISO 7933:2004 Standard [8]_. The ISO 7933 provides a method for the
+    analytical evaluation and interpretation of the thermal stress experienced
+    by a subject in a hot environment. It describes a method for predicting the
+    sweat rate and the internal core temperature that the human body will
+    develop in response to the working conditions.
 
     The PHS model can be used to predict the: heat by respiratory convection, heat flow
     by respiratory evaporation, steady state mean skin temperature, instantaneous value
@@ -1731,7 +1716,6 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         >>> print(results)
         {'t_re': 37.5, 'd_lim_loss_50': 440, 'd_lim_loss_95': 298, 'd_lim_t_re': 480,
         'water_loss': 6166.0}
-
     """
     default_kwargs = {
         "i_mst": 0.38,
@@ -1828,9 +1812,10 @@ def two_nodes(
     max_skin_blood_flow=90,
     **kwargs,
 ):
-    """
-    Two-node model of human temperature regulation Gagge et al. (1986) [10]_ This model
-    it can be used to calculate a variety of indices, including:
+    """Two-node model of human temperature regulation Gagge et al. (1986).
+
+    [10]_ This model it can be used to calculate a variety of indices,
+    including:
 
     * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two node model developed by Gagge et al. (1986) [10]_.
 
@@ -2039,13 +2024,13 @@ def two_nodes(
 
 
 def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
-    """
-    Calculates the Wet Bulb Globe Temperature (WBGT) index calculated in compliance with
-    the ISO 7243 [11]_. The WBGT is a heat stress index that measures the thermal
-    environment to which a person is exposed. In most situations, this index is simple
-    to calculate. It should be used as a screening tool to determine whether or not
-    heat stress is present. The PHS model allows a more accurate estimation of stress.
-    PHS can be calculated using the function :py:meth:`pythermalcomfort.models.phs`.
+    """Calculates the Wet Bulb Globe Temperature (WBGT) index calculated in
+    compliance with the ISO 7243 [11]_. The WBGT is a heat stress index that
+    measures the thermal environment to which a person is exposed. In most
+    situations, this index is simple to calculate. It should be used as a
+    screening tool to determine whether heat stress is present. The PHS model
+    allows a more accurate estimation of stress. PHS can be calculated using
+    the function :py:meth:`pythermalcomfort.models.phs`.
 
     The WBGT determines the impact of heat on a person throughout the course of a working
     day (up to 8 h). It does not apply to very brief heat exposures. It pertains to
@@ -2109,20 +2094,21 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
 
 
 def net(tdb, rh, v, **kwargs):
-    """
-    Calculates the Normal Effective Temperature (NET). Missenard (1933) devised a formula
-    for calculating effective temperature. The index establishes a link between the same
-    condition of the organism's thermoregulatory capability (warm and cold perception)
-    and the surrounding environment's temperature and humidity. The index is calculated
-    as a function of three meteorological factors: air temperature, relative humidity of
-    air, and wind speed. This index allows to calculate the effective temperature felt by
-    a person. Missenard original equation was then used to calculate the Normal Effective
-    Temperature (NET), by considering normal atmospheric pressure and a normal human body
-    temperature (37°C). The NET is still in use in Germany, where medical check-ups for
-    subjects working in the heat are decided on by prevailing levels of ET, depending
-    on metabolic rates. The NET is also constantly monitored by the Hong Kong
-    Observatory [16]_. In central Europe the following thresholds are in use:
-    <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
+    """Calculates the Normal Effective Temperature (NET). Missenard (1933)
+    devised a formula for calculating effective temperature. The index
+    establishes a link between the same condition of the organism's
+    thermoregulatory capability (warm and cold perception) and the surrounding
+    environment's temperature and humidity. The index is calculated as a
+    function of three meteorological factors: air temperature, relative
+    humidity of air, and wind speed. This index allows to calculate the
+    effective temperature felt by a person. Missenard original equation was
+    then used to calculate the Normal Effective Temperature (NET), by
+    considering normal atmospheric pressure and a normal human body temperature
+    (37°C). The NET is still in use in Germany, where medical check-ups for
+    subjects working in the heat are decided on by prevailing levels of ET,
+    depending on metabolic rates. The NET is also constantly monitored by the
+    Hong Kong Observatory [16]_. In central Europe the following thresholds are
+    in use: <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
     23–27 = warm; >27°C = hot [16]_.
 
     Parameters
@@ -2168,11 +2154,11 @@ def net(tdb, rh, v, **kwargs):
 
 
 def heat_index(tdb, rh, **kwargs):
-    """
-    Calculates the Heat Index (HI). It combines air temperature and relative
-    humidity to determine an apparent temperature. The HI equation [12]_
-    is derived by multiple regression analysis in temperature and relative humidity from
-    the first version of Steadman’s (1979) apparent temperature (AT) [13]_.
+    """Calculates the Heat Index (HI). It combines air temperature and relative
+    humidity to determine an apparent temperature. The HI equation [12]_ is
+    derived by multiple regression analysis in temperature and relative
+    humidity from the first version of Steadman’s (1979) apparent temperature
+    (AT) [13]_.
 
     Parameters
     ----------
@@ -2229,12 +2215,12 @@ def heat_index(tdb, rh, **kwargs):
 
 
 def humidex(tdb, rh, **kwargs):
-    """
-    Calculates the humidex (short for "humidity index"). It has been developed by the
-    Canadian Meteorological service. It was introduced in 1965 and then it was revised by
-    Masterson and Richardson (1979) [14]_. It aims to describe how hot, humid weather is
-    felt by the average person. The Humidex differs from the heat index in being related
-    to the dew point rather than relative humidity [15]_.
+    """Calculates the humidex (short for "humidity index"). It has been
+    developed by the Canadian Meteorological service. It was introduced in 1965
+    and then it was revised by Masterson and Richardson (1979) [14]_. It aims
+    to describe how hot, humid weather is felt by the average person. The
+    Humidex differs from the heat index in being related to the dew point
+    rather than relative humidity [15]_.
 
     Parameters
     ----------
@@ -2289,13 +2275,13 @@ def humidex(tdb, rh, **kwargs):
 
 
 def at(tdb, rh, v, q=None, **kwargs):
-    """
-    Calculates the Apparent Temperature (AT). The AT is defined as the temperature at the
-    reference humidity level producing the same amount of discomfort as that experienced
-    under the current ambient temperature, humidity, and solar radiation [17]_. In other
-    words, the AT is an adjustment to the dry bulb temperature based on the relative
-    humidity value. Absolute humidity with a dew point of 14°C is chosen as a
-    reference [16]_. It includes the chilling effect of the wind at lower temperatures.
+    """Calculates the Apparent Temperature (AT). The AT is defined as the
+    temperature at the reference humidity level producing the same amount of
+    discomfort as that experienced under the current ambient temperature,
+    humidity, and solar radiation [17]_. In other words, the AT is an
+    adjustment to the dry bulb temperature based on the relative humidity
+    value. Absolute humidity with a dew point of 14°C is chosen as a reference
+    [16]_. It includes the chilling effect of the wind at lower temperatures.
 
     Two formulas for AT are in use by the Australian Bureau of Meteorology: one includes
     solar radiation and the other one does not (http://www.bom.gov.au/info/thermal_stress/
@@ -2351,9 +2337,7 @@ def at(tdb, rh, v, q=None, **kwargs):
 
 
 def wc(tdb, v, **kwargs):
-    """
-    Calculates the Wind Chill Index (WCI) in accordance with the 2017 ASHRAE Handbook
-    Fundamentals - Chapter 9 [18]_.
+    """Calculates the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [18]_.
 
     The wind chill index (WCI) is an empirical index based on cooling measurements
     taken on a cylindrical flask partially filled with water in Antarctica
@@ -2669,9 +2653,8 @@ def pet_steady(
         """
 
         def vasomotricity(t_cr, t_sk):
-            """
-            Defines the vasomotricity (blood flow) in function of the core and skin
-            temperatures.
+            """Defines the vasomotricity (blood flow) in function of the core
+            and skin temperatures.
 
             Parameters
             ----------
@@ -2710,8 +2693,8 @@ def pet_steady(
             return {"m_blood": m_blood, "alpha": alpha}
 
         def sweat_rate(t_body):
-            """
-            Defines the sweating mechanism depending on the body and core temperatures.
+            """Defines the sweating mechanism depending on the body and core
+            temperatures.
 
             Parameters
             ----------
@@ -2932,8 +2915,7 @@ def pet_steady(
             return e_bal_scal
 
     def pet_fc(_t_stable):
-        """
-        Function to find the solution
+        """Function to find the solution.
 
         Parameters
         ----------
