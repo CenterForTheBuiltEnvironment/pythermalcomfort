@@ -5,7 +5,7 @@ from pythermalcomfort.utilities import (
     units_converter,
     transpose_sharp_altitude,
     check_standard_compliance,
-    map_stress_category,
+    mapping,
     check_standard_compliance_array,
     body_surface_area,
 )
@@ -1238,9 +1238,23 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
         utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
 
     if return_stress_category:
+
+        stress_categories = {
+            -40.0: "extreme cold stress",
+            -27.0: "very strong cold stress",
+            -13.0: "strong cold stress",
+            0.0: "moderate cold stress",
+            9.0: "slight cold stress",
+            26.0: "no thermal stress",
+            32.0: "moderate heat stress",
+            38.0: "strong heat stress",
+            46.0: "very strong heat stress",
+            1000.0: "extreme heat stress",
+        }
+
         return {
             "utci": np.round_(utci_approx, 1),
-            "stress_category": map_stress_category(utci_approx),
+            "stress_category": mapping(utci_approx, stress_categories),
         }
     else:
         return np.round_(utci_approx, 1)
@@ -2212,6 +2226,62 @@ def heat_index(tdb, rh, **kwargs):
         return round(hi, 1)
     else:
         return hi
+
+
+def discomfort_index(tdb, rh):
+    """Calculates the Discomfort Index (DI). The index is essentially an
+    effective temperature based on air temperature and humidity. The discomfort
+    index is usuallly divided in 6 dicomfort categories and it only applies to
+    warm environments: [24]_
+
+    * class 1 - DI < 21 °C - No discomfort
+    * class 2 - 21 <= DI < 24 °C - Less than 50% feels discomfort
+    * class 3 - 24 <= DI < 27 °C - More than 50% feels discomfort
+    * class 4 - 27 <= DI < 29 °C - Most of the population feels discomfort
+    * class 5 - 29 <= DI < 32 °C - Everyone feels severe stress
+    * class 6 - DI >= 32 °C - State of medical emergency
+
+    Parameters
+    ----------
+    tdb : float or array-like
+        dry bulb air temperature, [°C]
+    rh : float or array-like
+        relative humidity, [%]
+
+    Returns
+    -------
+    di : float or array-like
+        Discomfort Index, [°C]
+    discomfort_condition : str or array-like
+        Classification of the thermal comfort conditions according to the discomfort index
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import discomfort_index
+        >>> discomfort_index(tdb=25, rh=50)
+        {'di': 22.1, 'discomfort_condition': 'Less than 50% feels discomfort'}
+    """
+
+    tdb = np.array(tdb)
+    rh = np.array(rh)
+
+    di = tdb - 0.55 * (1 - 0.01 * rh) * (tdb - 14.5)
+
+    di_categories = {
+        21: "No discomfort",
+        24: "Less than 50% feels discomfort",
+        27: "More than 50% feels discomfort",
+        29: "Most of the population feels discomfort",
+        32: "Everyone feels severe stress",
+        99: "State of medical emergency",
+    }
+
+    return {
+        "di": np.around(di, 1),
+        "discomfort_condition": mapping(di, di_categories, right=False),
+    }
 
 
 def humidex(tdb, rh, **kwargs):
