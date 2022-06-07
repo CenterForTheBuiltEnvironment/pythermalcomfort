@@ -27,6 +27,7 @@ from pythermalcomfort.models import (
     wc,
     adaptive_en,
     pet_steady,
+    discomfort_index,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1653,3 +1654,30 @@ def test_pet():
     assert pet_steady(tdb=-5, tr=-5, rh=50, v=5.0, met=1.37, clo=0.9) == -13.38
     assert pet_steady(tdb=30, tr=60, rh=80, v=1.0, met=1.37, clo=0.9) == 43.05
     assert pet_steady(tdb=30, tr=30, rh=80, v=1.0, met=1.37, clo=0.9) == 31.69
+
+
+def test_di():
+    np.testing.assert_equal(
+        discomfort_index([21, 23.5, 29, 32, 35, 40], 50),
+        {
+            "di": [19.2, 21.0, 25.0, 27.2, 29.4, 33.0],
+            "discomfort_condition": [
+                "No discomfort",
+                "Less than 50% feels discomfort",
+                "More than 50% feels discomfort",
+                "Most of the population feels discomfort",
+                "Everyone feels severe stress",
+                "State of medical emergency",
+            ],
+        },
+    )
+    np.testing.assert_equal(
+        discomfort_index([35, 35], [10, 90]),
+        {
+            "di": [24.9, 33.9],
+            "discomfort_condition": [
+                "More than 50% feels discomfort",
+                "State of medical emergency",
+            ],
+        },
+    )

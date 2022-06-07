@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.2.0",
+    version="2.3.0",
     license="MIT",
     description="Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables. Please cite us if you use this package: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578",
     long_description="%s\n%s"
