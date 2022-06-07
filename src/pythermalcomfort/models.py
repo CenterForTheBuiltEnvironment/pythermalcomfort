@@ -2622,6 +2622,14 @@ def pet_steady(
     -------
     PET
         Steady-state PET under the given ambient conditions
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from pythermalcomfort.models import pet_steady
+        >>> pet_steady(tdb=20, tr=20, rh=50, v=0.15, met=1.37, clo=0.5)
+        18.85
     """
 
     met_factor = 58.2  # met conversion factor
