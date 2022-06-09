@@ -2,7 +2,7 @@
 Changelog
 =========
 
-2.3.0 (2022-06-01)
+2.3.1 (2022-06-09)
 -------------------
 
 * Added e_pmv model - Adjusted Predicted Mean Votes with Expectancy Factor
