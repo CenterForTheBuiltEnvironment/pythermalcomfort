@@ -28,6 +28,8 @@ from pythermalcomfort.models import (
     adaptive_en,
     pet_steady,
     discomfort_index,
+    a_pmv,
+    e_pmv,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1680,4 +1682,18 @@ def test_di():
                 "State of medical emergency",
             ],
         },
+    )
+
+
+def test_a_pmv():
+    np.testing.assert_equal(
+        a_pmv([24, 30], 30, vr=0.22, rh=50, met=1.4, clo=0.5, a_coefficient=0.293),
+        [0.48, 1.09],
+    )
+
+
+def test_e_pmv():
+    np.testing.assert_equal(
+        e_pmv([24, 30], 30, vr=0.22, rh=50, met=1.4, clo=0.5, e_coefficient=0.6),
+        [0.29, 0.91],
     )

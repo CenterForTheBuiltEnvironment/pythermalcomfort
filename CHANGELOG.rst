@@ -5,6 +5,12 @@ Changelog
 2.3.0 (2022-06-01)
 -------------------
 
+* Added e_pmv model - Adjusted Predicted Mean Votes with Expectancy Factor
+* Added a_pmv model - Adaptive Predicted Mean Vote
+
+2.3.0 (2022-06-01)
+-------------------
+
 * Added discomfort index
 
 2.2.0 (2022-05-17)
