@@ -6,6 +6,8 @@ Changelog
 -------------------
 
 * Added the adaptive thermal heat balance (ATHB) model
+* Added e_pmv model - Adjusted Predicted Mean Votes with Expectancy Factor
+* Added a_pmv model - Adaptive Predicted Mean Vote
 
 2.3.0 (2022-06-01)
 -------------------
