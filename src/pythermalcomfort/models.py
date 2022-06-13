@@ -3222,7 +3222,7 @@ def pet_steady(
 
 def athb(tdb, tr, vr, rh, met, t_running_mean):
     """Return the PMV value calculated with the Adaptive Thermal Heat Balance
-    Framework [25]_. The adaptive thermal heat balance (ATHB) framework
+    Framework [27]_. The adaptive thermal heat balance (ATHB) framework
     introduced a method to account for the three adaptive principals, namely
     physiological, behavioral, and psychological adaptation, individually
     within existing heat balance models. The objective is a predictive model of
