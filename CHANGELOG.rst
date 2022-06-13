@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.4.0 (2022-06-13)
+-------------------
+
+* Added the adaptive thermal heat balance (ATHB) model
+
 2.3.0 (2022-06-01)
 -------------------
 

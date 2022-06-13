@@ -28,6 +28,7 @@ from pythermalcomfort.models import (
     adaptive_en,
     pet_steady,
     discomfort_index,
+    athb,
 )
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -1680,4 +1681,18 @@ def test_di():
                 "State of medical emergency",
             ],
         },
+    )
+
+
+def test_athb():
+    np.testing.assert_equal(
+        athb(
+            tdb=[25, 25, 15, 25],
+            tr=[25, 35, 25, 25],
+            vr=[0.1, 0.1, 0.2, 0.1],
+            rh=[50, 50, 50, 60],
+            met=[1.1, 1.5, 1.2, 2],
+            t_running_mean=[20, 20, 20, 20],
+        ),
+        [0.2, 0.009, 0.092, -0.302],
     )
