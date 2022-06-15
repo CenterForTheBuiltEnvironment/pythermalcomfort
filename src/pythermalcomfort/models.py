@@ -3288,16 +3288,18 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
     )
 
     pmv_res = pmv_ppd_optimized(tdb, tr, vr, rh, met_adapted, clo_adapted, 0)
+    ts = 0.303 * np.exp(-0.036 * met_adapted * 58.15) + 0.028
+    l_adapted = pmv_res / ts
 
     # predicted thermal sensation vote
     return np.around(
         1.484
-        + 0.0276 * pmv_res
+        + 0.0276 * l_adapted
         - 0.9602 * met_adapted
         - 0.0342 * t_running_mean
-        + 0.0002264 * pmv_res * t_running_mean
+        + 0.0002264 * l_adapted * t_running_mean
         + 0.018696 * met_adapted * t_running_mean
-        - 0.0002909 * pmv_res * met_adapted * t_running_mean,
+        - 0.0002909 * l_adapted * met_adapted * t_running_mean,
         3,
     )
 
