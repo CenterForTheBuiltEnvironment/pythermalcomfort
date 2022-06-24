@@ -1011,7 +1011,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         outside the applicability limits of the model.
 
         The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
-        0 < vr [m/s] < 2, 10 < tr [°C] < 35.5
+        0 < vr [m/s] < 2, 10 < t running mean [°C] < 33.5
 
     Returns
     -------
@@ -1083,7 +1083,7 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
             tr_valid,
             v_valid,
         ) = check_standard_compliance_array(standard, tdb=tdb, tr=tr, v=v)
-        trm_valid = valid_range(t_running_mean, (10.0, 35.5))
+        trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
     to = t_o(tdb, tr, v, standard=standard)
 
@@ -1242,7 +1242,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         )
 
     if limit_inputs:
-        trm_valid = valid_range(t_running_mean, (10.0, 35.5))
+        trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
     to = t_o(tdb, tr, v, standard=standard)
 
