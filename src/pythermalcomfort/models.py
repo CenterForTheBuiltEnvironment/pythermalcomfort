@@ -988,7 +988,14 @@ def use_fans_heatwaves(
 def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
     """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
     model relates indoor design temperatures or acceptable temperature ranges
-    to outdoor meteorological or climatological parameters.
+    to outdoor meteorological or climatological parameters. The adaptive model
+    can only be used in occupant-controlled naturally conditioned spaces that
+    meet all the following criteria:
+
+    * There is no mechianical cooling or heating system in operation
+    * Occupants have a metabolic rate between 1.0 and 1.5 met
+    * Occupants are free to adapt their clothing within a range as wide as 0.5 and 1.0 clo
+    * The prevailing mean (runnin mean) outdoor temperature is between 10 and 33.5 °C
 
     Parameters
     ----------
