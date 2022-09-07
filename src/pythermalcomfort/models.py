@@ -703,11 +703,10 @@ def set_tmp(
     units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
     limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns values even if input values are
-        outside the applicability limits of the model.
-        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
-        0 < vr [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
+        By default, if the inputs are outsude the following limits the
+        function returns nan. If False returns values regardless of the input values.
+        The limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
+        0 < v [m/s] < 2, 1 < met [met] < 4, and 0 < clo [clo] < 1.5.
 
     Other Parameters
     ----------------
