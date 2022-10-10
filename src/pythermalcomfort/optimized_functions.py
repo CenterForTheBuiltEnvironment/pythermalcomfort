@@ -21,11 +21,11 @@ def two_nodes_optimized(
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
     k_clo = 0.25
-    body_weight = 69.9  # body weight in kg
+    body_weight = 70  # body weight in kg
     met_factor = 58.2  # met conversion factor
     sbc = 0.000000056697  # Stefan-Boltzmann constant (W/m2K4)
     c_sw = 170  # driving coefficient for regulatory sweating
-    c_dil = 200  # driving coefficient for vasodilation ashrae says 50 see page 195
+    c_dil = 200  # driving coefficient for vasodilation ashrae says 50 see page 9.19
     c_str = 0.5  # driving coefficient for vasoconstriction
 
     temp_skin_neutral = 33.7

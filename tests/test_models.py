@@ -997,7 +997,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=20, met=2, clo=0.5, body_position="sitting"
         )["m_rsw"]
-        == 230.0
+        == 229.9
     )
     assert (
         use_fans_heatwaves(
@@ -1009,7 +1009,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=40, met=0.7, clo=0.3, body_position="sitting"
         )["e_skin"]
-        == 129.3
+        == 129.2
     )
     assert (
         use_fans_heatwaves(
@@ -1472,6 +1472,15 @@ def test_phs():
         "d_lim_t_re": 70,
         "d_lim_loss_50": 372,
         "d_lim_loss_95": 247,
+    }
+    assert phs(
+        tdb=34, tr=34, acclimatized=0, posture=2, rh=56.3, v=0.3, met=150, clo=1
+    ) == {
+        "t_re": 41.0,
+        "water_loss": 5548,
+        "d_lim_loss_50": 480.0,
+        "d_lim_loss_95": 318.0,
+        "d_lim_t_re": 67.0,
     }
     assert phs(tdb=40, tr=40, rh=40.63, v=0.3, met=150, clo=0.4, posture=2) == {
         "t_re": 37.5,
