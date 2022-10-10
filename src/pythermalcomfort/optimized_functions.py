@@ -847,13 +847,13 @@ def phs_optimized(*args):
         t_cr,
         t_re,
         t_cr_eq,
-        sweat_rate,
+        t_sk_t_cr_wg,
+        sw_tot,
     ) = args
 
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight ** 0.425) * (height ** 0.725)
     sp_heat = 57.83 * weight / a_dubois  # specific heat of the body
-    sw_tot = 0
     t_sk_t_cr_wg = 0.3  # t_skin and t_core weighing
     d_lim_t_re = 0  # maximum allowable exposure time for heat storage [min]
     # maximum allowable exposure time for water loss, mean subject [min]
@@ -868,8 +868,7 @@ def phs_optimized(*args):
     const_t_eq = math.exp(-1 / 10)
     const_t_sk = math.exp(-1 / 3)
     const_sw = math.exp(-1 / 10)
-    # water loss [g]
-    sw_tot_g = 0
+    sweat_rate = sw_tot
 
     def_dir = 0
     if theta != 0:
@@ -1090,4 +1089,15 @@ def phs_optimized(*args):
     if d_lim_t_re == 0:
         d_lim_t_re = duration
 
-    return [t_re, d_lim_loss_50, d_lim_loss_95, d_lim_t_re, sw_tot_g]
+    return [
+        t_re,
+        t_sk,
+        t_cr,
+        t_cr_eq,
+        t_sk_t_cr_wg,
+        sweat_rate,
+        sw_tot_g,
+        d_lim_loss_50,
+        d_lim_loss_95,
+        d_lim_t_re,
+    ]

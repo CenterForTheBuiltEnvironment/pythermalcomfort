@@ -1931,7 +1931,9 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         "t_cr": 36.8,
         "t_re": False,
         "t_cr_eq": False,
+        "t_sk_t_cr_wg": 0.3,
         "sweat_rate": 0,
+        "round": True,
     }
     kwargs = {**default_kwargs, **kwargs}
 
@@ -1949,6 +1951,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     t_cr = kwargs["t_cr"]
     t_re = kwargs["t_re"]
     t_cr_eq = kwargs["t_cr_eq"]
+    t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
     sweat_rate = kwargs["sweat_rate"]
 
     p_a = p_sat(tdb) / 1000 * rh / 100
@@ -1962,7 +1965,18 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     if not t_cr_eq:
         t_cr_eq = t_cr
 
-    t_re, d_lim_loss_50, d_lim_loss_95, d_lim_t_re, sw_tot_g = phs_optimized(
+    (
+        t_re,
+        t_sk,
+        t_cr,
+        t_cr_eq,
+        t_sk_t_cr_wg,
+        sweat_rate,
+        sw_tot_g,
+        d_lim_loss_50,
+        d_lim_loss_95,
+        d_lim_t_re,
+    ) = phs_optimized(
         tdb,
         tr,
         v,
@@ -1985,16 +1999,36 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         t_cr,
         t_re,
         t_cr_eq,
+        t_sk_t_cr_wg,
         sweat_rate,
     )
 
-    return {
-        "t_re": round(t_re, 1),
-        "d_lim_loss_50": d_lim_loss_50,
-        "d_lim_loss_95": d_lim_loss_95,
-        "d_lim_t_re": d_lim_t_re,
-        "water_loss": round(sw_tot_g, 0),
-    }
+    if kwargs["round"]:
+        return {
+            "d_lim_loss_50": round(d_lim_loss_50, 1),
+            "d_lim_loss_95": round(d_lim_loss_95, 1),
+            "d_lim_t_re": round(d_lim_t_re, 1),
+            "water_loss": round(sw_tot_g, 1),
+            "t_re": round(t_re, 1),
+            "t_cr": round(t_cr, 1),
+            "t_sk": round(t_sk, 1),
+            "t_cr_eq": round(t_cr_eq, 1),
+            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 1),
+            "water_loss_watt": round(sweat_rate, 1),
+        }
+    else:
+        return {
+            "t_re": t_re,
+            "t_sk": t_sk,
+            "t_cr": t_cr,
+            "t_cr_eq": t_cr_eq,
+            "t_sk_t_cr_wg": t_sk_t_cr_wg,
+            "d_lim_loss_50": d_lim_loss_50,
+            "d_lim_loss_95": d_lim_loss_95,
+            "d_lim_t_re": d_lim_t_re,
+            "water_loss_watt": sweat_rate,
+            "water_loss": sw_tot_g,
+        }
 
 
 def two_nodes(
