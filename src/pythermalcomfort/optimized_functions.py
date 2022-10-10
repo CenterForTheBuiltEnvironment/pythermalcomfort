@@ -854,7 +854,6 @@ def phs_optimized(*args):
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight ** 0.425) * (height ** 0.725)
     sp_heat = 57.83 * weight / a_dubois  # specific heat of the body
-    t_sk_t_cr_wg = 0.3  # t_skin and t_core weighing
     d_lim_t_re = 0  # maximum allowable exposure time for heat storage [min]
     # maximum allowable exposure time for water loss, mean subject [min]
     d_lim_loss_50 = 0
