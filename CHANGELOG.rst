@@ -2,10 +2,11 @@
 Changelog
 =========
 
-2.5.3 (2022-10-10)
+2.5.4 (2022-10-12)
 -------------------
 
 * PHS model accepts all required inputs to be run on a minute by minute basis
+* fix error check compliance PHS model
 
 2.5.0 (2022-06-13)
 -------------------

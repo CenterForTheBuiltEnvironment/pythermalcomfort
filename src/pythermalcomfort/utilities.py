@@ -140,7 +140,7 @@ def check_standard_compliance(standard, **kwargs):
                 f"ISO 7933:2004 t_r - t_db applicability limits between 0 and {rh_max} %",
                 UserWarning,
             )
-        if params["tr"] - params["tdb"] > 50 or params["tr"] - params["tdb"] < 0:
+        if params["tr"] - params["tdb"] > 60 or params["tr"] - params["tdb"] < 0:
             warnings.warn(
                 "ISO 7933:2004 t_r - t_db applicability limits between 0 and 60 °C",
                 UserWarning,
