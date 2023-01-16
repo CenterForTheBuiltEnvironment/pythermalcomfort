@@ -2242,7 +2242,6 @@ def two_nodes(
         et,
         pmv_gagge,
         pmv_set,
-        ps,
         disc,
         t_sens,
     ) = np.vectorize(two_nodes_optimized, cache=True)(
@@ -2258,6 +2257,7 @@ def two_nodes(
         body_position=body_position,
         calculate_ce=kwargs["calculate_ce"],
         max_skin_blood_flow=max_skin_blood_flow,
+        max_sweating=kwargs["max_sweating"],
     )
 
     output = {
@@ -2278,7 +2278,6 @@ def two_nodes(
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
-        "ps": ps,
         "disc": disc,
         "t_sens": t_sens,
     }
@@ -3263,7 +3262,7 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
 # plt.legend()
 
 
-# todo add the following models:
+# include also the following models:
 #  radiant_tmp_asymmetry
 #  draft
 #  floor_surface_tmp
