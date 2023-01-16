@@ -849,12 +849,12 @@ def use_fans_heatwaves(
         select either "sitting" or "standing"
     units : {'SI', 'IP'}
         select the SI (International System of Units) or the IP (Imperial Units) system.
-    max_skin_blood_flow : float
-        maximum blood flow from the core to the skin, [L/(hm2)] default 80
+    max_skin_blood_flow : float, [kg/h/m2] default 80
+        maximum blood flow from the core to the skin
 
     Other Parameters
     ----------------
-    max_sweating: float, default 500 mL/h
+    max_sweating: float, [mL/h/m2] default 500
         max sweating
     round: boolean, default True
         if True rounds output value, if False it does not round it
@@ -880,9 +880,9 @@ def use_fans_heatwaves(
     t_skin : float
         Skin temperature, [°C]
     m_bl : float
-        Skin blood flow, [L/(hm2)]
+        Skin blood flow, [kg/h/m2]
     m_rsw : float
-        Rate at which regulatory sweat is generated, [mL/h2]
+        Rate at which regulatory sweat is generated, [mL/h/m2]
     w : float
         Skin wettedness, adimensional. Ranges from 0 and 1.
     w_max : float
@@ -1838,7 +1838,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     by respiratory evaporation, steady state mean skin temperature, instantaneous value
     of skin temperature, heat accumulation associated with the metabolic rate, maximum
     evaporative heat flow at the skin surface, predicted sweat rate, predicted evaporative
-    heat flow, and rectal temperature
+    heat flow, and rectal temperature.
 
     Parameters
     ----------
@@ -2019,7 +2019,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
             "t_cr": round(t_cr, 1),
             "t_sk": round(t_sk, 1),
             "t_cr_eq": round(t_cr_eq, 1),
-            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 1),
+            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 2),
             "water_loss_watt": round(sweat_rate, 1),
         }
     else:
@@ -2100,7 +2100,7 @@ def two_nodes(
     body_position: str default="standing" or array-like
         select either "sitting" or "standing"
     max_skin_blood_flow : float
-        maximum blood flow from the core to the skin, [L/(hm2)] default 80
+        maximum blood flow from the core to the skin, [kg/h/m2] default 80
 
     Other Parameters
     ----------------
@@ -2128,9 +2128,9 @@ def two_nodes(
     t_skin : float or array-like
         Skin temperature, [°C]
     m_bl : float or array-like
-        Skin blood flow, [L/(hm2)]
+        Skin blood flow, [kg/h/m2]
     m_rsw : float or array-like
-        Rate at which regulatory sweat is generated, [mL/h2]
+        Rate at which regulatory sweat is generated, [kg/h/m2]
     w : float or array-like
         Skin wettedness, adimensional. Ranges from 0 and 1.
     w_max : float or array-like
