@@ -71,34 +71,6 @@ def check_standard_compliance(standard, **kwargs):
                     "This equation is only applicable for air speed lower than 0.2 m/s"
                 )
 
-    elif params["standard"] == "fan_heatwaves":  # based on table 7.3.4 ashrae 55 2020
-        for key, value in params.items():
-            if key in ["tdb", "tr"]:
-                if key == "tdb":
-                    parameter = "dry-bulb"
-                else:
-                    parameter = "mean radiant"
-                if value > 50 or value < 30:
-                    warnings.warn(
-                        f"{parameter} temperature applicability limits between 30 and 50 °C",
-                        UserWarning,
-                    )
-            if key in ["v", "vr"] and (value > 4.5 or value < 0.1):
-                warnings.warn(
-                    "Air speed applicability limits between 0.4 and 4.5 m/s",
-                    UserWarning,
-                )
-            if key == "met" and (value > 2 or value < 0.7):
-                warnings.warn(
-                    "Met applicability limits between 0.7 and 2.0 met",
-                    UserWarning,
-                )
-            if key == "clo" and (value > 1.0 or value < 0):
-                warnings.warn(
-                    "Clo applicability limits between 0.0 and 1.0 clo",
-                    UserWarning,
-                )
-
     elif params["standard"] == "iso":  # based on ISO 7730:2005 page 3
         for key, value in params.items():
             if key == "tdb" and (value > 30 or value < 10):
@@ -206,6 +178,16 @@ def check_standard_compliance_array(standard, **kwargs):
         else:
             return tdb_valid, tr_valid, v_valid
 
+    if standard == "fan_heatwaves":
+        tdb_valid = valid_range(params["tdb"], (20.0, 50.0))
+        tr_valid = valid_range(params["tr"], (20.0, 50.0))
+        v_valid = valid_range(params["v"], (0.1, 4.5))
+        rh_valid = valid_range(params["rh"], (0, 100))
+        met_valid = valid_range(params["met"], (0.7, 2))
+        clo_valid = valid_range(params["clo"], (0.0, 1))
+
+        return tdb_valid, tr_valid, v_valid, rh_valid, met_valid, clo_valid
+
     if standard == "iso":  # based on ISO 7730:2005 page 3
         tdb_valid = valid_range(params["tdb"], (10.0, 30.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
@@ -235,7 +217,7 @@ def body_surface_area(weight, height, formula="dubois"):
     """
 
     if formula == "dubois":
-        return 0.202 * (weight ** 0.425) * (height ** 0.725)
+        return 0.202 * (weight**0.425) * (height**0.725)
 
 
 def f_svv(w, h, d):
@@ -353,7 +335,7 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         for ix, x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
-    coeff = [alpha ** ix for ix, x in enumerate(temp_array)]
+    coeff = [alpha**ix for ix, x in enumerate(temp_array)]
     t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
 
     if units.lower() == "ip":

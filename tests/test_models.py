@@ -411,6 +411,38 @@ def test_transpose_sharp_altitude():
 
 
 def test_use_fans_heatwaves():
+
+    # checking that returns np.nan when outside standard applicability limits
+    np.testing.assert_equal(
+        use_fans_heatwaves(
+            tdb=[41, 60],
+            tr=40,
+            v=0.1,
+            rh=50,
+            met=1.1,
+            clo=0.5,
+        ),
+        {
+            "e_skin": [65.2, np.nan],
+            "e_rsw": [63.9, np.nan],
+            "e_diff": [1.2, np.nan],
+            "e_max": [84.7, np.nan],
+            "q_sensible": [-18.5, np.nan],
+            "q_skin": [46.7, np.nan],
+            "q_res": [2.2, np.nan],
+            "t_core": [37.3, np.nan],
+            "t_skin": [36.8, np.nan],
+            "m_bl": [80.0, np.nan],
+            "m_rsw": [185.4, np.nan],
+            "w": [0.7, np.nan],
+            "w_max": [0.7, np.nan],
+            "heat_strain_blood_flow": [1.0, np.nan],
+            "heat_strain_w": [1.0, np.nan],
+            "heat_strain_sweating": [0.0, np.nan],
+            "heat_strain": [1.0, np.nan],
+        },
+    )
+
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=0.7, clo=0.3, body_position="sitting"

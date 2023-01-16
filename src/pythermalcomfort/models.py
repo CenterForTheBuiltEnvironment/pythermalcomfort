@@ -858,6 +858,11 @@ def use_fans_heatwaves(
         max sweating
     round: boolean, default True
         if True rounds output value, if False it does not round it
+    limit_inputs : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns pmv and ppd values even if input values are
+        outside the applicability limits of the model.
+        #fixme state limits
 
     Returns
     -------
@@ -901,8 +906,16 @@ def use_fans_heatwaves(
 
     # If the SET function is used to calculate the cooling effect then the h_c is
     # calculated in a slightly different way
-    default_kwargs = {"round": True, "max_sweating": 500}
+    default_kwargs = {"round": True, "max_sweating": 500, "limit_inputs": True}
     kwargs = {**default_kwargs, **kwargs}
+
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
 
     if units.lower() == "ip":
         if body_surface_area == 1.8258:
@@ -912,10 +925,6 @@ def use_fans_heatwaves(
         tdb, tr, v, body_surface_area, p_atm = units_converter(
             tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
         )
-
-    check_standard_compliance(
-        standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
-    )
 
     output = two_nodes(
         tdb,
@@ -954,27 +963,43 @@ def use_fans_heatwaves(
         "heat_strain",
     ]
 
-    output["heat_strain_blood_flow"] = False
-    if output["m_bl"] == max_skin_blood_flow:
-        output["heat_strain_blood_flow"] = True
+    output["heat_strain_blood_flow"] = np.where(
+        output["m_bl"] == max_skin_blood_flow, True, False
+    )
+    output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
+    # fixme allow user to pass max regulatory sweating
+    output["heat_strain_sweating"] = np.where(output["m_rsw"] == 500, True, False)
 
-    output["heat_strain_w"] = False
-    if output["w"] == output["w_max"]:
-        output["heat_strain_w"] = True
-
-    output["heat_strain_sweating"] = False
-    if output["m_rsw"] == 500:
-        output["heat_strain_sweating"] = True
-
-    output["heat_strain"] = any(
+    output["heat_strain"] = np.any(
         [
             output["heat_strain_blood_flow"],
             output["heat_strain_w"],
             output["heat_strain_sweating"],
-        ]
+        ],
+        axis=0,
     )
 
     output = {key: output[key] for key in output_vars}
+
+    if kwargs["limit_inputs"]:
+        (
+            tdb_valid,
+            tr_valid,
+            v_valid,
+            rh_valid,
+            met_valid,
+            clo_valid,
+        ) = check_standard_compliance_array(
+            standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+        )
+        all_valid = ~(
+            np.isnan(tdb_valid)
+            | np.isnan(tr_valid)
+            | np.isnan(v_valid)
+            | np.isnan(met_valid)
+            | np.isnan(clo_valid)
+        )
+        output = {key: np.where(all_valid, output[key], np.nan) for key in output_vars}
 
     for key in output.keys():
         # round the results if needed
