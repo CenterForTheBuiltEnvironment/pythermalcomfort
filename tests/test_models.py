@@ -1459,9 +1459,10 @@ def test_phs():
         "t_cr": 37.5,
         "t_sk": 35.3,
         "t_cr_eq": 37.1,
-        "t_sk_t_cr_wg": 0.2,
+        "t_sk_t_cr_wg": 0.24,
         "water_loss_watt": 266.1,
     }
+
     assert phs(tdb=35, tr=35, rh=71, v=0.3, met=150, clo=0.5, posture=2) == {
         "d_lim_loss_50": 385.0,
         "d_lim_loss_95": 256.0,
@@ -1474,6 +1475,7 @@ def test_phs():
         "t_sk_t_cr_wg": 0.1,
         "water_loss_watt": 276.9,
     }
+
     assert phs(tdb=30, tr=50, posture=2, rh=70.65, v=0.3, met=150, clo=0.5) == {
         "d_lim_loss_50": 380.0,
         "d_lim_loss_95": 258.0,
@@ -1483,7 +1485,7 @@ def test_phs():
         "t_cr": 37.7,
         "t_sk": 35.7,
         "t_cr_eq": 37.1,
-        "t_sk_t_cr_wg": 0.2,
+        "t_sk_t_cr_wg": 0.22,
         "water_loss_watt": 312.5,
     }
     assert phs(
@@ -1511,7 +1513,7 @@ def test_phs():
         "t_cr": 37.5,
         "t_sk": 34.8,
         "t_cr_eq": 37.1,
-        "t_sk_t_cr_wg": 0.2,
+        "t_sk_t_cr_wg": 0.24,
         "water_loss_watt": 165.7,
     }
     assert phs(tdb=43, tr=43, posture=1, rh=34.7, v=0.3, met=103, clo=0.5) == {
@@ -1523,7 +1525,7 @@ def test_phs():
         "t_cr": 37.2,
         "t_sk": 35.3,
         "t_cr_eq": 37.0,
-        "t_sk_t_cr_wg": 0.3,
+        "t_sk_t_cr_wg": 0.26,
         "water_loss_watt": 293.6,
     }
     assert phs(
@@ -1563,7 +1565,7 @@ def test_phs():
         "t_cr": 37.4,
         "t_sk": 35.5,
         "t_cr_eq": 37.1,
-        "t_sk_t_cr_wg": 0.2,
+        "t_sk_t_cr_wg": 0.24,
         "water_loss_watt": 290.4,
     }
     assert phs(
@@ -1585,7 +1587,7 @@ def test_phs():
         "t_cr": 37.5,
         "t_sk": 35.5,
         "t_cr_eq": 37.1,
-        "t_sk_t_cr_wg": 0.2,
+        "t_sk_t_cr_wg": 0.24,
         "water_loss_watt": 231.5,
     }
 
@@ -1638,10 +1640,10 @@ def test_check_standard_compliance():
 
     with pytest.warns(
         UserWarning,
-        match="ISO 7933:2004 t_r - t_db applicability limits between 0 and",
+        match="ISO 7933:2004 rh applicability limits between 0 and",
     ):
         warnings.warn(
-            phs(tdb=40, tr=40, rh=61, v=2, met=150, clo=2, posture=2),
+            phs(tdb=40, tr=40, rh=61, v=2, met=150, clo=0.5, posture=2),
             UserWarning,
         )
 
