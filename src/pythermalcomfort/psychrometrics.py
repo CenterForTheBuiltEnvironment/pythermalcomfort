@@ -327,7 +327,7 @@ def t_mrt(tg, tdb, v, d=0.15, emissivity=0.95, standard="Mixed Convection"):
 
         tr = (
             np.power(
-                np.power(tg, 4) + h * (tg - tdb) / (emissivity * (5.67 * 10 ** -8)),
+                np.power(tg, 4) + h * (tg - tdb) / (emissivity * (5.67 * 10**-8)),
                 0.25,
             )
             - c_to_k

@@ -2407,7 +2407,7 @@ def net(tdb, rh, v, **kwargs):
     }
     kwargs = {**default_kwargs, **kwargs}
 
-    frac = 1.0 / (1.76 + 1.4 * v ** 0.75)
+    frac = 1.0 / (1.76 + 1.4 * v**0.75)
 
     et = 37 - (37 - tdb) / (0.68 - 0.0014 * rh + frac) - 0.29 * tdb * (1 - 0.01 * rh)
 
@@ -2460,17 +2460,17 @@ def heat_index(tdb, rh, **kwargs):
     if kwargs["units"] == "SI":
         # from doi: 10.1007/s00484-011-0453-2
         hi = -8.784695 + 1.61139411 * tdb + 2.338549 * rh - 0.14611605 * tdb * rh
-        hi += -1.2308094 * 10 ** -2 * tdb ** 2 - 1.6424828 * 10 ** -2 * rh ** 2
-        hi += 2.211732 * 10 ** -3 * tdb ** 2 * rh + 7.2546 * 10 ** -4 * tdb * rh ** 2
-        hi += -3.582 * 10 ** -6 * tdb ** 2 * rh ** 2
+        hi += -1.2308094 * 10**-2 * tdb**2 - 1.6424828 * 10**-2 * rh**2
+        hi += 2.211732 * 10**-3 * tdb**2 * rh + 7.2546 * 10**-4 * tdb * rh**2
+        hi += -3.582 * 10**-6 * tdb**2 * rh**2
 
     else:
         # from doi: 10.1007/s00484-021-02105-0
         hi = -42.379 + 2.04901523 * tdb + 10.14333127 * rh
-        hi += -0.22475541 * tdb * rh - 6.83783 * 10 ** -3 * tdb ** 2
-        hi += -5.481717 * 10 ** -2 * rh ** 2
-        hi += 1.22874 * 10 ** -3 * tdb ** 2 * rh + 8.5282 * 10 ** -4 * tdb * rh ** 2
-        hi += -1.99 * 10 ** -6 * tdb ** 2 * rh ** 2
+        hi += -0.22475541 * tdb * rh - 6.83783 * 10**-3 * tdb**2
+        hi += -5.481717 * 10**-2 * rh**2
+        hi += 1.22874 * 10**-3 * tdb**2 * rh + 8.5282 * 10**-4 * tdb * rh**2
+        hi += -1.99 * 10**-6 * tdb**2 * rh**2
 
     if kwargs["round"]:
         return round(hi, 1)
@@ -2704,7 +2704,7 @@ def wc(tdb, v, **kwargs):
     }
     kwargs = {**default_kwargs, **kwargs}
 
-    wci = (10.45 + 10 * v ** 0.5 - v) * (33 - tdb)
+    wci = (10.45 + 10 * v**0.5 - v) * (33 - tdb)
 
     # the factor 1.163 is used to convert to W/m2
     wci = wci * 1.163
@@ -2764,9 +2764,9 @@ def use_fans_morris(
 
     f_cl_back = 1 + ((0.31 * r_cl_back) / 1.55)
     f_cl_front = 1 + ((0.31 * r_cl_front) / 1.55)
-    h_c_back = 8.3 * (v ** 0.6) / 1.5  # todo why divided by 1.5?
-    h_c_front = 8.3 * (v ** 0.6)
-    h_c_off = 8.3 * (v_still ** 0.6)
+    h_c_back = 8.3 * (v**0.6) / 1.5  # todo why divided by 1.5?
+    h_c_front = 8.3 * (v**0.6)
+    h_c_off = 8.3 * (v_still**0.6)
     h_e_on = (16.5 * h_c_front * 0.5) + (16.5 * h_c_back * 0.5)
     h_e_off = 16.5 * h_c_off
 
@@ -3045,7 +3045,7 @@ def pet_steady(
                 # In this case, Tbody<Tbody_set --> The sweat flow is 0
                 sig_body = 0.0
             # from Gagge's model
-            m_rsw = 304.94 * 10 ** -3 * sig_body
+            m_rsw = 304.94 * 10**-3 * sig_body
             # 500 g/m^2/h is the upper sweat rate limit
             if m_rsw > 500:
                 m_rsw = 500
@@ -3054,8 +3054,8 @@ def pet_steady(
 
         e_skin = 0.99  # Skin emissivity
         e_clo = 0.95  # Clothing emissivity
-        h_vap = 2.42 * 10 ** 6  # Latent heat of evaporation [J/Kg]
-        sbc = 5.67 * 10 ** -8  # Stefan-Boltzmann constant [W/(m2*K^(-4))]
+        h_vap = 2.42 * 10**6  # Latent heat of evaporation [J/Kg]
+        sbc = 5.67 * 10**-8  # Stefan-Boltzmann constant [W/(m2*K^(-4))]
         cb = 3640  # Blood specific heat [J/kg/k]
 
         t_arr = np.reshape(t_arr, (3, 1))  # reshape to proper dimensions for fsolve
@@ -3067,7 +3067,7 @@ def pet_steady(
         # Base metabolism for men and women in [W]
         met_female = (
             3.19
-            * weight ** 0.75
+            * weight**0.75
             * (
                 1.0
                 + 0.004 * (30.0 - age)
@@ -3076,7 +3076,7 @@ def pet_steady(
         )
         met_male = (
             3.45
-            * weight ** 0.75
+            * weight**0.75
             * (
                 1.0
                 + 0.004 * (30.0 - age)
@@ -3099,7 +3099,7 @@ def pet_steady(
             1 + 0.31 * _clo
         )  # Increase heat exchange surface depending on clothing level
         f_a_cl = (
-            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo ** 3.0
+            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0
         ) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
@@ -3115,11 +3115,11 @@ def pet_steady(
             vpa = 12  # [hPa] vapour pressure of the standard environment
 
         # Convection coefficient depending on wind velocity and subject position
-        hc = 2.67 + 6.5 * _v ** 0.67  # sitting
+        hc = 2.67 + 6.5 * _v**0.67  # sitting
         if position == 2:  # standing
-            hc = 2.26 + 7.42 * _v ** 0.67
+            hc = 2.26 + 7.42 * _v**0.67
         if position == 3:  # standing, forced convection
-            hc = 8.6 * _v ** 0.513
+            hc = 8.6 * _v**0.513
         # h_cc corrected convective heat transfer coefficient
         h_cc = 3.0 * pow(p_atm / 1013.25, 0.53)
         hc = max(h_cc, hc)

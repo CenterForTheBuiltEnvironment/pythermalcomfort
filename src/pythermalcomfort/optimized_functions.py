@@ -303,7 +303,7 @@ def two_nodes_optimized(
     pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
 
     # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"
-    ps = 100 * (1.13 * (t_op ** 0.5) - 0.24 * t_op + 2.7 * (v ** 0.5) - 0.99 * v)
+    ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
 
     return (
         _set,
@@ -423,7 +423,7 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
             hc = hcf
         else:
             hc = hcn
-        xn = (p5 + p4 * hc - p2 * xf ** 4) / (100 + p3 * hc)
+        xn = (p5 + p4 * hc - p2 * xf**4) / (100 + p3 * hc)
         n += 1
         if n > 150:
             raise StopIteration("Max iterations exceeded")
@@ -442,7 +442,7 @@ def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     # dry respiration heat loss
     hl4 = 0.0014 * m * (34 - tdb)
     # heat loss by radiation
-    hl5 = 3.96 * f_cl * (xn ** 4 - (tra / 100.0) ** 4)
+    hl5 = 3.96 * f_cl * (xn**4 - (tra / 100.0) ** 4)
     # heat loss by convection
     hl6 = f_cl * hc * (tcl - tdb)
 
@@ -852,7 +852,7 @@ def phs_optimized(*args):
     ) = args
 
     # DuBois body surface area [m2]
-    a_dubois = 0.202 * (weight ** 0.425) * (height ** 0.725)
+    a_dubois = 0.202 * (weight**0.425) * (height**0.725)
     sp_heat = 57.83 * weight / a_dubois  # specific heat of the body
     d_lim_t_re = 0  # maximum allowable exposure time for heat storage [min]
     # maximum allowable exposure time for water loss, mean subject [min]
@@ -961,7 +961,7 @@ def phs_optimized(*args):
     e_res = 0.00127 * met * (59.34 + 0.53 * tdb - 11.63 * p_a)
     z = 3.5 + 5.2 * v_r
     if v_r > 1:
-        z = 8.7 * v_r ** 0.6
+        z = 8.7 * v_r**0.6
 
     # dynamic convective heat transfer coefficient
     hc_dyn = 2.38 * abs(t_sk - tdb) ** 0.25
@@ -1030,7 +1030,7 @@ def phs_optimized(*args):
         elif w_req >= 1.7:
             sw_req = sw_max
         else:
-            e_v_eff = 1 - w_req ** 2 / 2
+            e_v_eff = 1 - w_req**2 / 2
             if w_req > 1:
                 e_v_eff = (2 - w_req) ** 2 / 2
             sw_req = e_req / e_v_eff
