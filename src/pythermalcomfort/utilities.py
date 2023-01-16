@@ -48,7 +48,8 @@ def check_standard_compliance(standard, **kwargs):
                     parameter = "mean radiant"
                 if value > 40 or value < 10:
                     warnings.warn(
-                        f"ASHRAE {parameter} temperature applicability limits between 10 and 40 °C",
+                        f"ASHRAE {parameter} temperature applicability limits between"
+                        " 10 and 40 °C",
                         UserWarning,
                     )
             if key in ["v", "vr"] and (value > 2 or value < 0):
@@ -80,7 +81,8 @@ def check_standard_compliance(standard, **kwargs):
                 )
             if key == "tr" and (value > 40 or value < 10):
                 warnings.warn(
-                    "ISO mean radiant temperature applicability limits between 10 and 40 °C",
+                    "ISO mean radiant temperature applicability limits between 10 and"
+                    " 40 °C",
                     UserWarning,
                 )
             if key in ["v", "vr"] and (value > 1 or value < 0):
@@ -102,7 +104,8 @@ def check_standard_compliance(standard, **kwargs):
     elif params["standard"] == "ISO7933":  # based on ISO 7933:2004 Annex A
         if params["tdb"] > 50 or params["tdb"] < 15:
             warnings.warn(
-                "ISO 7933:2004 air temperature applicability limits between 15 and 50 °C",
+                "ISO 7933:2004 air temperature applicability limits between 15 and"
+                " 50 °C",
                 UserWarning,
             )
         p_a = p_sat(params["tdb"]) / 1000 * params["rh"] / 100
@@ -311,9 +314,9 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     ----------
     temp_array: list
         array containing the mean daily temperature in descending order (i.e. from
-        newest/yesterday to oldest) :math:`[\Theta_{day-1}, \Theta_{day-2}, \dots ,
-        \Theta_{day-n}]`.
-        Where :math:`\Theta_{day-1}` is yesterday's daily mean temperature. The EN
+        newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
+        t_{day-n}]`.
+        Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
         16798-1 2019 [3]_ states that n should be equal to 7
     alpha : float
         constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
@@ -440,7 +443,7 @@ met_typical_tasks = {
     "Wrestling": 7.8,
 }
 
-#: Total clothing insulation of typical typical ensembles.
+#: Total clothing insulation of typical ensembles.
 clo_typical_ensembles = {
     "Walking shorts, short-sleeve shirt": 0.36,
     "Typical summer indoor clothing": 0.5,

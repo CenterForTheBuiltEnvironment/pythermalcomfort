@@ -295,22 +295,21 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
             "Standards"
         )
 
-    if kwargs["limit_inputs"]:
-        (
-            tdb_valid,
-            tr_valid,
-            v_valid,
-            met_valid,
-            clo_valid,
-        ) = check_standard_compliance_array(
-            standard,
-            tdb=tdb,
-            tr=tr,
-            v=vr,
-            met=met,
-            clo=clo,
-            airspeed_control=kwargs["airspeed_control"],
-        )
+    (
+        tdb_valid,
+        tr_valid,
+        v_valid,
+        met_valid,
+        clo_valid,
+    ) = check_standard_compliance_array(
+        standard,
+        tdb=tdb,
+        tr=tr,
+        v=vr,
+        met=met,
+        clo=clo,
+        airspeed_control=kwargs["airspeed_control"],
+    )
 
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
     ce = 0.0
@@ -333,10 +332,10 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
     if kwargs["limit_inputs"]:
+        pmv_valid = valid_range(pmv_array, (-2, 2))  # this is the ISO limit
         if standard == "ashrae":
             pmv_valid = valid_range(pmv_array, (-100, 100))
-        elif standard == "iso":
-            pmv_valid = valid_range(pmv_array, (-2, 2))
+
         all_valid = ~(
             np.isnan(tdb_valid)
             | np.isnan(tr_valid)
@@ -967,8 +966,9 @@ def use_fans_heatwaves(
         output["m_bl"] == max_skin_blood_flow, True, False
     )
     output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
-    # fixme allow user to pass max regulatory sweating
-    output["heat_strain_sweating"] = np.where(output["m_rsw"] == 500, True, False)
+    output["heat_strain_sweating"] = np.where(
+        output["m_rsw"] == kwargs["max_sweating"], True, False
+    )
 
     output["heat_strain"] = np.any(
         [
@@ -1108,13 +1108,12 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    if limit_inputs:
-        (
-            tdb_valid,
-            tr_valid,
-            v_valid,
-        ) = check_standard_compliance_array(standard, tdb=tdb, tr=tr, v=v)
-        trm_valid = valid_range(t_running_mean, (10.0, 33.5))
+    (
+        tdb_valid,
+        tr_valid,
+        v_valid,
+    ) = check_standard_compliance_array(standard, tdb=tdb, tr=tr, v=v)
+    trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
     to = t_o(tdb, tr, v, standard=standard)
 
@@ -1272,8 +1271,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    if limit_inputs:
-        trm_valid = valid_range(t_running_mean, (10.0, 33.5))
+    trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
     to = t_o(tdb, tr, v, standard=standard)
 
@@ -2715,149 +2713,148 @@ def wc(tdb, v, **kwargs):
     return {"wci": wci}
 
 
-def use_fans_morris(
-    tdb,
-    v,
-    rh,
-    met=70,
-    wme=0,
-    body_surface_area=1.8258,
-    target_person="young",
-    p_atm=101325,
-    body_position="standing",
-    units="SI",
-    **kwargs,
-):
-    """
-
-    met = 70/58.2
-    body_surface_area=1.8
-    clo = 0.23
-    v = 3.5
-    tdb = 30
-    rh = 5
-
-    """
-    # constants
-    v_still = 0.2
-    r_cl_back = 0.0844
-    r_cl_front = 0.0497
-    r_cl_off = 0.1291
-    r_e_cl_fan = 0.01  # todo should not this be higher than for fan off?
-    r_e_cl_off = 0.01
-    t_skin = 35.5
-    min_sw_eff = 0.55
-    h_r = 4.7
-
-    # personal variables based on participant type
-    w_c_on = 0.65
-    w_c_off = 0.85
-    max_rs = 660
-    if target_person == "old":
-        w_c_on = 0.5
-        w_c_off = 0.65
-        max_rs = 440
-    if target_person == "meds":
-        w_c_on = 0.38
-        w_c_off = 0.49
-        max_rs = 330
-
-    f_cl_back = 1 + ((0.31 * r_cl_back) / 1.55)
-    f_cl_front = 1 + ((0.31 * r_cl_front) / 1.55)
-    h_c_back = 8.3 * (v**0.6) / 1.5  # todo why divided by 1.5?
-    h_c_front = 8.3 * (v**0.6)
-    h_c_off = 8.3 * (v_still**0.6)
-    h_e_on = (16.5 * h_c_front * 0.5) + (16.5 * h_c_back * 0.5)
-    h_e_off = 16.5 * h_c_off
-
-    p_skin = p_sat(t_skin) / 1000
-
-    p_vap = psy_ta_rh(tdb, rh)["p_vap"] / 1000
-
-    e_req_on = (
-        met * body_surface_area
-        - (
-            (
-                (t_skin - tdb)
-                / (r_cl_front + (1 / (f_cl_front * (h_r + h_c_front))))
-                * (body_surface_area * 0.5)
-            )
-            + (
-                (t_skin - tdb)
-                / (
-                    r_cl_back + (1 / (f_cl_back * (h_r + h_c_back)))
-                )  # todo check if morris uses f_cl_back
-                * (body_surface_area * 0.5)
-            )
-        )
-        - (
-            body_surface_area
-            * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
-        )
-    )
-
-    # print(f"{e_req_on=}")
-
-    e_req_off = (
-        met * body_surface_area
-        - (
-            (
-                (t_skin - tdb)
-                / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
-                * (body_surface_area * 0.5)
-            )
-            + (
-                (t_skin - tdb)
-                / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
-                * (body_surface_area * 0.5)
-            )
-        )
-        - (
-            body_surface_area
-            * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
-        )
-    )
-    e_max_on = (p_skin - p_vap) / (r_e_cl_fan + (1 / (f_cl_front * h_e_on)))
-    e_max_off = (p_skin - p_vap) / (r_e_cl_off + (1 / (f_cl_front * h_e_off)))
-
-    e_max_on_young = e_max_on * w_c_on
-    e_max_off_young = e_max_off * w_c_off
-    if e_max_on_young < 0:
-        e_max_on_young = 0
-    if e_max_off_young < 0:
-        e_max_off_young = 0
-
-    sweat_eff_on = 1
-    if e_req_on > 0:
-        sweat_eff_on = 1 - (((e_req_on / e_max_on) ** 2) / 2)
-
-    val_on = min_sw_eff
-    if sweat_eff_on > min_sw_eff:
-        val_on = sweat_eff_on
-
-    person_e_max_on = ((max_rs * 2426) / 3600) * (val_on / body_surface_area)
-
-    sweat_eff_off = 1
-    if e_req_off > 0:
-        sweat_eff_off = 1 - (((e_req_off / e_max_off) ** 2) / 2)
-
-    val_off = min_sw_eff
-    if sweat_eff_off > min_sw_eff:
-        val_off = sweat_eff_off
-
-    person_e_max_off = ((max_rs * 2426) / 3600) * (val_off / body_surface_area)
-
-    combined_e_max_on = e_max_on_young
-    if person_e_max_on < e_max_on_young:
-        combined_e_max_on = person_e_max_on
-
-    combined_e_max_off = e_max_off_young
-    if person_e_max_off < e_max_off_young:
-        combined_e_max_off = person_e_max_off
-
-    tipping_point = (e_req_off - e_req_on) - (combined_e_max_off - combined_e_max_on)
-
-    return tipping_point
+# def use_fans_morris(
+#     tdb,
+#     v,
+#     rh,
+#     met=70,
+#     body_surface_area=1.8258,
+#     target_person="young",
+#     p_atm=101325,
+#     body_position="standing",
+#     units="SI",
+#     **kwargs,
+# ):
+#     """
+#
+#     met = 70/58.2
+#     body_surface_area=1.8
+#     clo = 0.23
+#     v = 3.5
+#     tdb = 30
+#     rh = 5
+#
+#     """
+#     # constants
+#     v_still = 0.2
+#     r_cl_back = 0.0844
+#     r_cl_front = 0.0497
+#     r_cl_off = 0.1291
+#     r_e_cl_fan = 0.01  # todo should not this be higher than for fan off?
+#     r_e_cl_off = 0.01
+#     t_skin = 35.5
+#     min_sw_eff = 0.55
+#     h_r = 4.7
+#
+#     # personal variables based on participant type
+#     w_c_on = 0.65
+#     w_c_off = 0.85
+#     max_rs = 660
+#     if target_person == "old":
+#         w_c_on = 0.5
+#         w_c_off = 0.65
+#         max_rs = 440
+#     if target_person == "meds":
+#         w_c_on = 0.38
+#         w_c_off = 0.49
+#         max_rs = 330
+#
+#     f_cl_back = 1 + ((0.31 * r_cl_back) / 1.55)
+#     f_cl_front = 1 + ((0.31 * r_cl_front) / 1.55)
+#     h_c_back = 8.3 * (v**0.6) / 1.5  # todo why divided by 1.5?
+#     h_c_front = 8.3 * (v**0.6)
+#     h_c_off = 8.3 * (v_still**0.6)
+#     h_e_on = (16.5 * h_c_front * 0.5) + (16.5 * h_c_back * 0.5)
+#     h_e_off = 16.5 * h_c_off
+#
+#     p_skin = p_sat(t_skin) / 1000
+#
+#     p_vap = psy_ta_rh(tdb, rh)["p_vap"] / 1000
+#
+#     e_req_on = (
+#         met * body_surface_area
+#         - (
+#             (
+#                 (t_skin - tdb)
+#                 / (r_cl_front + (1 / (f_cl_front * (h_r + h_c_front))))
+#                 * (body_surface_area * 0.5)
+#             )
+#             + (
+#                 (t_skin - tdb)
+#                 / (
+#                     r_cl_back + (1 / (f_cl_back * (h_r + h_c_back)))
+#                 )  # todo check if morris uses f_cl_back
+#                 * (body_surface_area * 0.5)
+#             )
+#         )
+#         - (
+#             body_surface_area
+#             * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
+#         )
+#     )
+#
+#     # print(f"{e_req_on=}")
+#
+#     e_req_off = (
+#         met * body_surface_area
+#         - (
+#             (
+#                 (t_skin - tdb)
+#                 / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
+#                 * (body_surface_area * 0.5)
+#             )
+#             + (
+#                 (t_skin - tdb)
+#                 / (r_cl_off + (1 / (f_cl_front * (h_r + h_c_off))))
+#                 * (body_surface_area * 0.5)
+#             )
+#         )
+#         - (
+#             body_surface_area
+#             * ((0.0014 * met * (34 - tdb)) + (0.0173 * met * (5.87 - p_vap)))
+#         )
+#     )
+#     e_max_on = (p_skin - p_vap) / (r_e_cl_fan + (1 / (f_cl_front * h_e_on)))
+#     e_max_off = (p_skin - p_vap) / (r_e_cl_off + (1 / (f_cl_front * h_e_off)))
+#
+#     e_max_on_young = e_max_on * w_c_on
+#     e_max_off_young = e_max_off * w_c_off
+#     if e_max_on_young < 0:
+#         e_max_on_young = 0
+#     if e_max_off_young < 0:
+#         e_max_off_young = 0
+#
+#     sweat_eff_on = 1
+#     if e_req_on > 0:
+#         sweat_eff_on = 1 - (((e_req_on / e_max_on) ** 2) / 2)
+#
+#     val_on = min_sw_eff
+#     if sweat_eff_on > min_sw_eff:
+#         val_on = sweat_eff_on
+#
+#     person_e_max_on = ((max_rs * 2426) / 3600) * (val_on / body_surface_area)
+#
+#     sweat_eff_off = 1
+#     if e_req_off > 0:
+#         sweat_eff_off = 1 - (((e_req_off / e_max_off) ** 2) / 2)
+#
+#     val_off = min_sw_eff
+#     if sweat_eff_off > min_sw_eff:
+#         val_off = sweat_eff_off
+#
+#     person_e_max_off = ((max_rs * 2426) / 3600) * (val_off / body_surface_area)
+#
+#     combined_e_max_on = e_max_on_young
+#     if person_e_max_on < e_max_on_young:
+#         combined_e_max_on = person_e_max_on
+#
+#     combined_e_max_off = e_max_off_young
+#     if person_e_max_off < e_max_off_young:
+#         combined_e_max_off = person_e_max_off
+#
+#     tipping_point = (e_req_off - e_req_on) - (combined_e_max_off - combined_e_max_on)
+#
+#     return tipping_point
 
 
 def pet_steady(

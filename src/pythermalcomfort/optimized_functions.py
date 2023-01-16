@@ -68,6 +68,7 @@ def two_nodes_optimized(
     if e_comfort < 0:
         e_comfort = 0
 
+    # todo allow users to pass in w_max
     if clo <= 0:
         w_max = 0.38 * pow(air_speed, -0.29)  # critical skin wettedness
         i_cl = 1.0  # permeation efficiency of water vapour through the clothing layer

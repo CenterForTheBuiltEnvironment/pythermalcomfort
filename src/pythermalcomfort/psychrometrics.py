@@ -16,12 +16,12 @@ def p_sat_torr(tdb):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, [C]
 
     Returns
     -------
-    p_sat  : float
+    p_sat : float
         saturation vapor pressure [torr]
     """
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
@@ -32,11 +32,11 @@ def t_o(tdb, tr, v, standard="ISO"):
 
     Parameters
     ----------
-    tdb: float
+    tdb: float or array-like
         air temperature, [°C]
-    tr: float
+    tr: float or array-like
         mean radiant temperature, [°C]
-    v: float
+    v: float or array-like
         air speed, [m/s]
     standard: str (default="ISO")
         either choose between ISO and ASHRAE
