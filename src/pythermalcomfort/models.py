@@ -819,7 +819,11 @@ def use_fans_heatwaves(
     max_skin_blood_flow=80,
     **kwargs,
 ):
-    """Calculates whether the use of fans is beneficial during heatwaves.
+    """It helps you to estimate if the conditions you have selected would cause heat strain.
+    This occurs when either the following variables reaches its maximum value:
+    * m_rsw Rate at which regulatory sweat is generated, [mL/h/m2]
+    * w : Skin wettedness, adimensional. Ranges from 0 and 1.
+    * m_bl : Skin blood flow [kg/h/m2]
 
     Parameters
     ----------
@@ -861,7 +865,9 @@ def use_fans_heatwaves(
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
-        #fixme state limits
+
+        The applicability limits are 20 < tdb [°C] < 50, 20 < tr [°C] < 50,
+        0.1 < v [m/s] < 4.5, 0.7 < met [met] < 2, and 0 < clo [clo] < 1.
 
     Returns
     -------
@@ -901,7 +907,7 @@ def use_fans_heatwaves(
         True if heat strain is caused by regulatory sweating (m_rsw) reaching its
         maximum value
     """
-    # todo add an example
+    from pythermalcomfort.models import use_fans_heatwaves
 
     # If the SET function is used to calculate the cooling effect then the h_c is
     # calculated in a slightly different way
