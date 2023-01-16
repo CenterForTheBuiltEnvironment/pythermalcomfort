@@ -137,7 +137,7 @@ def check_standard_compliance(standard, **kwargs):
         rh_max = 4.5 * 100 * 1000 / p_sat(params["tdb"])
         if p_a > 4.5 or p_a < 0:
             warnings.warn(
-                f"ISO 7933:2004 t_r - t_db applicability limits between 0 and {rh_max} %",
+                f"ISO 7933:2004 rh applicability limits between 0 and {rh_max} %",
                 UserWarning,
             )
         if params["tr"] - params["tdb"] > 60 or params["tr"] - params["tdb"] < 0:
