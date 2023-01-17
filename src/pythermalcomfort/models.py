@@ -951,7 +951,6 @@ def use_fans_heatwaves(
     output_vars = [
         "e_skin",
         "e_rsw",
-        "e_diff",
         "e_max",
         "q_sensible",
         "q_skin",
@@ -2195,6 +2194,7 @@ def two_nodes(
         "round": True,
         "calculate_ce": False,
         "max_sweating": 500,
+        "w_max": False,
     }
     kwargs = {**default_kwargs, **kwargs}
 
@@ -2228,7 +2228,6 @@ def two_nodes(
         _set,
         e_skin,
         e_rsw,
-        e_diff,
         e_max,
         q_sensible,
         q_skin,
@@ -2258,12 +2257,12 @@ def two_nodes(
         calculate_ce=kwargs["calculate_ce"],
         max_skin_blood_flow=max_skin_blood_flow,
         max_sweating=kwargs["max_sweating"],
+        w_max=kwargs["w_max"],
     )
 
     output = {
         "e_skin": e_skin,
         "e_rsw": e_rsw,
-        "e_diff": e_diff,
         "e_max": e_max,
         "q_sensible": q_sensible,
         "q_skin": q_skin,

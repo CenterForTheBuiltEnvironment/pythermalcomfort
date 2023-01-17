@@ -17,6 +17,7 @@ def two_nodes_optimized(
     calculate_ce=False,
     max_skin_blood_flow=90,
     max_sweating=500,
+    w_max=False,
 ):
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
@@ -68,13 +69,14 @@ def two_nodes_optimized(
     if e_comfort < 0:
         e_comfort = 0
 
-    # todo allow users to pass in w_max
-    if clo <= 0:
-        w_max = 0.38 * pow(air_speed, -0.29)  # critical skin wettedness
-        i_cl = 1.0  # permeation efficiency of water vapour through the clothing layer
-    else:
-        w_max = 0.59 * pow(air_speed, -0.08)  # critical skin wettedness
+    i_cl = 1.0  # permeation efficiency of water vapour naked skin
+    if clo > 0:
         i_cl = 0.45  # permeation efficiency of water vapour through the clothing layer
+
+    if not w_max:  # if the user did not pass a value of w_max
+        w_max = 0.38 * pow(air_speed, -0.29)  # critical skin wettedness naked
+        if clo > 0:
+            w_max = 0.59 * pow(air_speed, -0.08)  # critical skin wettedness clothed
 
     # h_cc corrected convective heat transfer coefficient
     h_cc = 3.0 * pow(pressure_in_atmospheres, 0.53)
@@ -313,7 +315,6 @@ def two_nodes_optimized(
         _set,
         e_skin,
         e_rsw,
-        e_diff,
         e_max,
         q_sensible,
         q_skin,

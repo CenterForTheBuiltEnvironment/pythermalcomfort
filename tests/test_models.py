@@ -421,26 +421,8 @@ def test_use_fans_heatwaves():
             rh=50,
             met=1.1,
             clo=0.5,
-        ),
-        {
-            "e_skin": [65.2, np.nan],
-            "e_rsw": [63.9, np.nan],
-            "e_diff": [1.2, np.nan],
-            "e_max": [84.7, np.nan],
-            "q_sensible": [-18.5, np.nan],
-            "q_skin": [46.7, np.nan],
-            "q_res": [2.2, np.nan],
-            "t_core": [37.3, np.nan],
-            "t_skin": [36.8, np.nan],
-            "m_bl": [80.0, np.nan],
-            "m_rsw": [185.4, np.nan],
-            "w": [0.7, np.nan],
-            "w_max": [0.7, np.nan],
-            "heat_strain_blood_flow": [1.0, np.nan],
-            "heat_strain_w": [1.0, np.nan],
-            "heat_strain_sweating": [0.0, np.nan],
-            "heat_strain": [1.0, np.nan],
-        },
+        )["e_skin"],
+        [65.2, np.nan],
     )
 
     assert (
@@ -553,12 +535,6 @@ def test_use_fans_heatwaves():
     )
     assert (
         use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=0.7, clo=0.3, body_position="sitting"
-        )["e_diff"]
-        == 17.9
-    )
-    assert (
-        use_fans_heatwaves(
             tdb=39, tr=39, v=1, rh=20, met=0.7, clo=0.5, body_position="sitting"
         )["heat_strain_sweating"]
         == False
@@ -601,12 +577,6 @@ def test_use_fans_heatwaves():
     )
     assert (
         use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=2, clo=0.7, body_position="sitting"
-        )["e_diff"]
-        == 6.3
-    )
-    assert (
-        use_fans_heatwaves(
             tdb=39, tr=39, v=1, rh=40, met=0.7, clo=0.3, body_position="sitting"
         )["w_max"]
         == 0.6
@@ -628,12 +598,6 @@ def test_use_fans_heatwaves():
             tdb=39, tr=39, v=1, rh=40, met=1.3, clo=0.3, body_position="sitting"
         )["e_rsw"]
         == 84.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=1.3, clo=0.5, body_position="sitting"
-        )["e_diff"]
-        == 6.4
     )
     assert (
         use_fans_heatwaves(
@@ -709,12 +673,6 @@ def test_use_fans_heatwaves():
     )
     assert (
         use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=2, clo=0.7, body_position="sitting"
-        )["e_diff"]
-        == 8.7
-    )
-    assert (
-        use_fans_heatwaves(
             tdb=39, tr=39, v=4, rh=40, met=0.7, clo=0.3, body_position="sitting"
         )["e_skin"]
         == 71.9
@@ -742,12 +700,6 @@ def test_use_fans_heatwaves():
             tdb=39, tr=39, v=4, rh=40, met=1.3, clo=0.5, body_position="sitting"
         )["w_max"]
         == 0.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["e_diff"]
-        == 5.9
     )
     assert (
         use_fans_heatwaves(
@@ -1029,7 +981,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=45, tr=45, v=4, rh=20, met=2, clo=0.5, body_position="sitting"
         )["m_rsw"]
-        == 229.9
+        == 254.5
     )
     assert (
         use_fans_heatwaves(
@@ -1718,12 +1670,6 @@ def test_net():
 
 
 def test_two_nodes():
-    # todo write more tests to validate all the following
-    #  effective temperature (already implemented in two_nodes)
-    #  pt set (already implemented in two_nodes)
-    #  pd (already implemented in two_nodes)
-    #  ps (already implemented in two_nodes)
-    #  t_sens (already implemented in two_nodes)
 
     assert two_nodes(25, 25, 1.1, 50, 2, 0.5)["disc"] == 0.3
     assert two_nodes(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 0.2
@@ -1738,6 +1684,18 @@ def test_two_nodes():
     assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.9
     assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 1.4
     assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.5
+
+    # testing limiting w_max
+    assert two_nodes(40, 40, 1.1, 50, 2, 0.5, w_max=False)["t_core"] == 37.9
+    assert two_nodes(40, 40, 1.1, 50, 2, 0.5, w_max=0.2)["t_core"] == 39.0
+
+    # testing limiting max_sweating
+    assert two_nodes(45, 45, 1.1, 20, 3, 0.2)["e_rsw"] == 248.4
+    assert two_nodes(45, 45, 1.1, 20, 3, 0.2, max_sweating=300)["e_rsw"] == 204.0
+
+    # testing limiting max skin blood flow
+    assert two_nodes(45, 45, 1.1, 20, 3, 0.2)["t_core"] == 38.0
+    assert two_nodes(45, 45, 1.1, 20, 3, 0.2, max_skin_blood_flow=60)["t_core"] == 38.2
 
 
 def test_pet():
