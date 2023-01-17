@@ -190,6 +190,9 @@ def two_nodes_optimized(
         e_skin = (
             e_rsw + e_diff
         )  # total evaporative heat loss sweating and vapor diffusion
+        m_rsw = (
+            e_rsw / 0.68
+        )  # back calculating the mass of regulatory sweating as a function of e_rsw
         met_shivering = 19.4 * colds * c_cold  # met shivering W/m2
         m = rm + met_shivering
         alfa = 0.0417737 + 0.7451833 / (m_bl + 0.585417)
