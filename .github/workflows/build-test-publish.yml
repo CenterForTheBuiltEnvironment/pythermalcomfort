@@ -12,17 +12,20 @@ jobs:
     # I am only testing with py37 but travis is Testing the other versions of Python
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, 'bump version')"
+    strategy:
+      matrix:
+        python: ["3.8", "3.9", "3.10"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: ${{ matrix.python }}
       - name: Install Tox and any other packages
-        run: pip install tox
+        run: pip install "tox<4"
       - name: Run Tox
         run: |
-          tox -e py37
+          tox -e py
 
   deploy:
 
