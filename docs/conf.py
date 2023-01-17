@@ -20,7 +20,7 @@ project = "pythermalcomfort"
 year = "2019-2020"
 author = "Federico Tartarini"
 copyright = "{0}, {1}".format(year, author)
-version = release = "2.5.4"
+version = release = "2.6.0"
 
 pygments_style = "trac"
 templates_path = ["."]
