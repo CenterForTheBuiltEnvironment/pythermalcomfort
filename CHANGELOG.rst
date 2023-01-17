@@ -2,6 +2,15 @@
 Changelog
 =========
 
+2.6.0 (2023-01-17)
+-------------------
+
+* max sweating rate can be passed to two node model
+* max skin wettedness can be passed to two node model
+* rounding w to two decimals
+* use_fans_heatwave function accepts arrays
+* fixed typos unit documentation
+
 2.5.4 (2022-10-12)
 -------------------
 
