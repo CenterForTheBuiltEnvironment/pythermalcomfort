@@ -819,8 +819,10 @@ def use_fans_heatwaves(
     max_skin_blood_flow=80,
     **kwargs,
 ):
-    """It helps you to estimate if the conditions you have selected would cause heat strain.
-    This occurs when either the following variables reaches its maximum value:
+    """It helps you to estimate if the conditions you have selected would cause
+    heat strain. This occurs when either the following variables reaches its
+    maximum value:
+
     * m_rsw Rate at which regulatory sweat is generated, [mL/h/m2]
     * w : Skin wettedness, adimensional. Ranges from 0 and 1.
     * m_bl : Skin blood flow [kg/h/m2]
