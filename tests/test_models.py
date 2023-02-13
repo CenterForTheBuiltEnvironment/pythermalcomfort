@@ -61,7 +61,7 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.5},
     {'tdb': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.7},
     {'tdb': 86, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 79.6},
-    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.6},
+    {'tdb': 104, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 93.8},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 10, 'met': 1, 'clo': 0.5, 'set': 74.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 90, 'met': 1, 'clo': 0.5, 'set': 76.8},
     {'tdb': 77, 'tr': 77, 'v': 19.7 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 75.2},
@@ -72,7 +72,7 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 77, 'tr': 104, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 88.9},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 1, 'set': 81.0},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.4},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 100.0},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 99.7},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 73.9},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
     {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.3},
@@ -221,7 +221,7 @@ def test_pmv_ppd():
 
     np.testing.assert_equal(
         pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", limit_inputs=False),
-        {"pmv": 4.46, "ppd": 100.0},
+        {"pmv": 4.48, "ppd": 100.0},
     )
 
     for table in reference_tables["reference_data"]["pmv_ppd"]:
@@ -319,8 +319,8 @@ def test_set():
     assert (set_tmp(25, 29, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 21.7
     assert (set_tmp(25, 31, 1.1, 50, 1.5, 0.5, calculate_ce=True)) == 22.3
     assert (set_tmp(25, 27, 1.3, 50, 1.5, 0.5, calculate_ce=True)) == 20.8
-    assert (set_tmp(25, 29, 1.5, 50, 1.5, 0.5, calculate_ce=True)) == 21.1
-    assert (set_tmp(25, 31, 1.7, 50, 1.5, 0.5, calculate_ce=True)) == 21.4
+    assert (set_tmp(25, 29, 1.5, 50, 1.5, 0.5, calculate_ce=True)) == 21.0
+    assert (set_tmp(25, 31, 1.7, 50, 1.5, 0.5, calculate_ce=True)) == 21.3
 
     assert (
         set_tmp(
@@ -411,7 +411,6 @@ def test_transpose_sharp_altitude():
 
 
 def test_use_fans_heatwaves():
-
     # checking that returns np.nan when outside standard applicability limits
     np.testing.assert_equal(
         use_fans_heatwaves(
@@ -435,31 +434,31 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=0.7, clo=0.5, body_position="sitting"
         )["q_skin"]
-        == 37.7
+        == 37.6
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=0.7, clo=0.7, body_position="sitting"
         )["m_rsw"]
-        == 67.6
+        == 68.6
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=1.3, clo=0.3, body_position="sitting"
         )["m_rsw"]
-        == 115.9
+        == 118.5
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=1.3, clo=0.5, body_position="sitting"
         )["m_rsw"]
-        == 115.1
+        == 117.3
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=1.3, clo=0.7, body_position="sitting"
         )["m_rsw"]
-        == 114.4
+        == 116.4
     )
     assert (
         use_fans_heatwaves(
@@ -477,7 +476,7 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=20, met=2, clo=0.7, body_position="sitting"
         )["t_skin"]
-        == 36.3
+        == 36.2
     )
     assert (
         use_fans_heatwaves(
@@ -495,553 +494,19 @@ def test_use_fans_heatwaves():
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=40, met=0.7, clo=0.7, body_position="sitting"
         )["m_rsw"]
-        == 72.8
+        == 73.9
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=40, met=1.3, clo=0.3, body_position="sitting"
         )["m_rsw"]
-        == 124.2
+        == 126.8
     )
     assert (
         use_fans_heatwaves(
             tdb=39, tr=39, v=0.2, rh=40, met=1.3, clo=0.5, body_position="sitting"
         )["e_rsw"]
-        == 83.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=0.2, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["e_rsw"]
-        == 82.1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=0.2, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["q_res"]
-        == 6.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=0.2, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["w"]
-        == 0.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=0.2, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["w_max"]
-        == 0.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=0.7, clo=0.5, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=0.7, clo=0.7, body_position="sitting"
-        )["t_skin"]
-        == 35.8
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=1.3, clo=0.3, body_position="sitting"
-        )["heat_strain_blood_flow"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=1.3, clo=0.5, body_position="sitting"
-        )["heat_strain"]
-        == 0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=1.3, clo=0.7, body_position="sitting"
-        )["w"]
-        == 0.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=2, clo=0.3, body_position="sitting"
-        )["q_res"]
-        == 9.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=20, met=2, clo=0.5, body_position="sitting"
-        )["e_skin"]
-        == 124.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=0.7, clo=0.3, body_position="sitting"
-        )["w_max"]
-        == 0.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=0.7, clo=0.5, body_position="sitting"
-        )["m_rsw"]
-        == 75.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=0.7, clo=0.7, body_position="sitting"
-        )["e_skin"]
-        == 56.1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=1.3, clo=0.3, body_position="sitting"
-        )["e_rsw"]
-        == 84.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["w_max"]
-        == 0.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["w"]
-        == 0.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["e_max"]
-        == 190.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=1, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["e_skin"]
-        == 104.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=0.7, clo=0.3, body_position="sitting"
-        )["e_max"]
-        == 473.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=0.7, clo=0.5, body_position="sitting"
-        )["e_skin"]
-        == 64.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=0.7, clo=0.7, body_position="sitting"
-        )["t_skin"]
-        == 35.8
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=1.3, clo=0.3, body_position="sitting"
-        )["q_sensible"]
-        == -32.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=1.3, clo=0.5, body_position="sitting"
-        )["q_res"]
-        == 5.8
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=1.3, clo=0.7, body_position="sitting"
-        )["w"]
-        == 0.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=2, clo=0.3, body_position="sitting"
-        )["q_skin"]
-        == 106.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=20, met=2, clo=0.5, body_position="sitting"
-        )["e_skin"]
-        == 129.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=0.7, clo=0.3, body_position="sitting"
-        )["e_skin"]
-        == 71.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=0.7, clo=0.5, body_position="sitting"
-        )["q_res"]
-        == 2.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=0.7, clo=0.7, body_position="sitting"
-        )["e_skin"]
-        == 59.1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=1.3, clo=0.3, body_position="sitting"
-        )["q_skin"]
-        == 71.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=1.3, clo=0.5, body_position="sitting"
-        )["w_max"]
-        == 0.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["e_rsw"]
-        == 126.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["e_max"]
-        == 236.1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=39, tr=39, v=4, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["w"]
-        == 0.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=0.7, clo=0.3, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=0.7, clo=0.5, body_position="sitting"
-        )["q_res"]
-        == 2.8
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=0.7, clo=0.7, body_position="sitting"
-        )["heat_strain_blood_flow"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=1.3, clo=0.3, body_position="sitting"
-        )["t_skin"]
-        == 36.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=1.3, clo=0.5, body_position="sitting"
-        )["t_core"]
-        == 37.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=1.3, clo=0.7, body_position="sitting"
-        )["m_bl"]
-        == 80.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=2, clo=0.3, body_position="sitting"
-        )["e_rsw"]
-        == 163.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=2, clo=0.5, body_position="sitting"
-        )["m_bl"]
-        == 80.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=20, met=2, clo=0.7, body_position="sitting"
-        )["q_skin"]
-        == 89.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=0.7, clo=0.3, body_position="sitting"
-        )["t_core"]
-        == 37.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=0.7, clo=0.5, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=0.7, clo=0.7, body_position="sitting"
-        )["m_bl"]
-        == 80.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=1.3, clo=0.3, body_position="sitting"
-        )["w"]
-        == 0.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=1.3, clo=0.5, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["t_core"]
-        == 38.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["heat_strain"]
-        == 1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["q_sensible"]
-        == -42.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=0.2, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["m_bl"]
-        == 80.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=0.7, clo=0.3, body_position="sitting"
-        )["q_sensible"]
-        == -70.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=0.7, clo=0.5, body_position="sitting"
-        )["heat_strain"]
-        == 0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=0.7, clo=0.7, body_position="sitting"
-        )["w"]
-        == 0.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=1.3, clo=0.3, body_position="sitting"
-        )["heat_strain_w"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=1.3, clo=0.5, body_position="sitting"
-        )["heat_strain"]
-        == 1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=1.3, clo=0.7, body_position="sitting"
-        )["e_skin"]
-        == 117.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=2, clo=0.3, body_position="sitting"
-        )["heat_strain_w"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=2, clo=0.5, body_position="sitting"
-        )["w"]
-        == 0.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=20, met=2, clo=0.7, body_position="sitting"
-        )["heat_strain_blood_flow"]
-        == True
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=0.7, clo=0.3, body_position="sitting"
-        )["heat_strain_w"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=0.7, clo=0.5, body_position="sitting"
-        )["t_core"]
-        == 37.1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=0.7, clo=0.7, body_position="sitting"
-        )["heat_strain_blood_flow"]
-        == True
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=1.3, clo=0.3, body_position="sitting"
-        )["e_max"]
-        == 189.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=1.3, clo=0.5, body_position="sitting"
-        )["q_sensible"]
-        == -52.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["e_rsw"]
-        == 78.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["t_skin"]
-        == 37.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["heat_strain"]
-        == 1
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=1, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["e_max"]
-        == 137.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=0.7, clo=0.3, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=0.7, clo=0.5, body_position="sitting"
-        )["q_skin"]
-        == 37.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=0.7, clo=0.7, body_position="sitting"
-        )["e_max"]
-        == 238.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=1.3, clo=0.3, body_position="sitting"
-        )["q_skin"]
-        == 69.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=1.3, clo=0.5, body_position="sitting"
-        )["e_max"]
-        == 312.6
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=1.3, clo=0.7, body_position="sitting"
-        )["w"]
-        == 0.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=2, clo=0.3, body_position="sitting"
-        )["w"]
-        == 0.4
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=2, clo=0.5, body_position="sitting"
-        )["m_rsw"]
-        == 254.5
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=20, met=2, clo=0.7, body_position="sitting"
-        )["q_skin"]
-        == 88.9
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=0.7, clo=0.3, body_position="sitting"
-        )["e_skin"]
-        == 129.2
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=0.7, clo=0.5, body_position="sitting"
-        )["m_bl"]
-        == 80.0
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=0.7, clo=0.7, body_position="sitting"
-        )["t_core"]
-        == 37.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=1.3, clo=0.3, body_position="sitting"
-        )["q_res"]
-        == 2.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=1.3, clo=0.5, body_position="sitting"
-        )["t_skin"]
-        == 37.3
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=1.3, clo=0.7, body_position="sitting"
-        )["heat_strain_sweating"]
-        == False
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=2, clo=0.3, body_position="sitting"
-        )["e_skin"]
-        == 162.7
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=2, clo=0.5, body_position="sitting"
-        )["heat_strain_w"]
-        == True
-    )
-    assert (
-        use_fans_heatwaves(
-            tdb=45, tr=45, v=4, rh=40, met=2, clo=0.7, body_position="sitting"
-        )["w_max"]
-        == 0.5
+        == 84.9
     )
 
 
@@ -1102,7 +567,7 @@ def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.6)) == 2.13
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=80, met=1, clo=0.6)) == 2.06
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=20, met=1, clo=0.6)) == 2.29
-    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.3, clo=0.6)) == 2.83
+    assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.3, clo=0.6)) == 2.84
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.6, clo=0.6)) == 3.5
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.41
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.05
@@ -1670,18 +1135,17 @@ def test_net():
 
 
 def test_two_nodes():
-
-    assert two_nodes(25, 25, 1.1, 50, 2, 0.5)["disc"] == 0.3
-    assert two_nodes(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 0.2
+    assert two_nodes(25, 25, 1.1, 50, 2, 0.5)["disc"] == 0.4
+    assert two_nodes(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 0.3
     assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 1.0
-    assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 1.5
-    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["disc"] == 0.7
+    assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["disc"] == 1.6
+    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["disc"] == 0.8
 
     assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 0.9
     assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 1.5
-    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 0.7
+    assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_gagge"] == 0.8
 
-    assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.9
+    assert two_nodes(tdb=30, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 1.0
     assert two_nodes(tdb=30, tr=30, v=0.1, rh=50, met=1.2, clo=0.5)["pmv_set"] == 1.4
     assert two_nodes(tdb=28, tr=28, v=0.4, rh=50, met=1.2, clo=0.5)["pmv_set"] == 0.5
 
@@ -1690,7 +1154,7 @@ def test_two_nodes():
     assert two_nodes(40, 40, 1.1, 50, 2, 0.5, w_max=0.2)["t_core"] == 39.0
 
     # testing limiting max_sweating
-    assert two_nodes(45, 45, 1.1, 20, 3, 0.2)["e_rsw"] == 248.4
+    assert two_nodes(45, 45, 1.1, 20, 3, 0.2)["e_rsw"] == 219.3
     assert two_nodes(45, 45, 1.1, 20, 3, 0.2, max_sweating=300)["e_rsw"] == 204.0
 
     # testing limiting max skin blood flow

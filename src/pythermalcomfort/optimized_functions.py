@@ -26,7 +26,7 @@ def two_nodes_optimized(
     met_factor = 58.2  # met conversion factor
     sbc = 0.000000056697  # Stefan-Boltzmann constant (W/m2K4)
     c_sw = 170  # driving coefficient for regulatory sweating
-    c_dil = 200  # driving coefficient for vasodilation ashrae says 50 see page 9.19
+    c_dil = 120  # driving coefficient for vasodilation ashrae says 50 see page 9.19
     c_str = 0.5  # driving coefficient for vasoconstriction
 
     temp_skin_neutral = 33.7
@@ -390,7 +390,6 @@ def two_nodes_optimized_return_set(
     ],
 )
 def pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
-
     pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))
 
     icl = 0.155 * clo  # thermal insulation of the clothing in M2K/W
