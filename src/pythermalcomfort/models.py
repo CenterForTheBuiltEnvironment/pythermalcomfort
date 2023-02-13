@@ -2136,6 +2136,10 @@ def two_nodes(
     ----------------
     round: boolean, default True
         if True rounds output values, if False it does not round them
+    max_sweating : float
+        Maximum rate at which regulatory sweat is generated, [kg/h/m2]
+    w_max : float
+        Maximum skin wettedness (w) adimensional. Ranges from 0 and 1.
 
     Returns
     -------
