@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.7.0 (2023-02-16)
+-------------------
+
+* changed coefficient of vasodilation in set_tmp() to 120 to match ASHRAE 55 2020 code
+* slightly modified validation tables
+
 2.6.0 (2023-01-17)
 -------------------
 
