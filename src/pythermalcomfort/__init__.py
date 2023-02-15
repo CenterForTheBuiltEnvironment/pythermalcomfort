@@ -1,3 +1,3 @@
-__version__ = "__version__ = '2.6.0'"
+__version__ = "__version__ = '2.7.0'"
 
 from pythermalcomfort.models import *
