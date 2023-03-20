@@ -40,7 +40,8 @@ Cooling Effect (CE)
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-    JOS-3 is a numeric model to simulate a human thermoregulation [19]_.
+    JOS-3 is a numerical model to simulate human thermal physiology such as skin temperature, core temperature, 
+    sweating rate, and so on at 17 local body parts as well as the whole body [19]_.
     The JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method. JOS-3 uses brown adipose tissue activity, aging effects, and heat gain by shortwave solar radiation at the skin to predict human physiological responses. It also considers personal characteristics in transient and non-uniform thermal environments. The JOS-3 was validated by comparing the results with those of human subject tests conducted under stable and transient conditions [19]_.
 
     To read the JOS-3 official documentation please use the following commands:
