@@ -11,6 +11,7 @@ Contents
    reference/index
    contributing
    authors
+   contact_us
    changelog
 
 Indices and tables
