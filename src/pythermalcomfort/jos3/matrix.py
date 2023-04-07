@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+"""
+This code defines a set of functions and constants to model heat exchange and blood flow in different body parts and layers.
+"""
+
 import numpy as np
 
 

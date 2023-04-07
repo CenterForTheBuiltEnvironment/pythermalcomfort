@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-This code is
+This code provides functions for calculating the surface area of different body parts, weight ratio,
+basal blood flow ratio, and thermal conductance and thermal capacity.
 """
+
 import numpy as np
 
 # Import

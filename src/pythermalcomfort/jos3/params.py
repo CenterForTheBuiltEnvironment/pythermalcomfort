@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
+"""
+This code defines a dictionary called ALL_OUT_PARAMS that contains information about various output parameters
+related to human body properties, heat exchange, and environmental conditions.
 
+It also includes a function called show_outparam_docs() that generates a formatted string with the documentation
+of the output parameters.
+
+The show_outparam_docs() function uses text wrapping to create a readable documentation string
+for both regular output parameters and extra output parameters.
+
+It sorts the parameters alphabetically by key and formats each line with the parameter's name, meaning, and unit.
+The resulting documentation string can be displayed or printed for user reference.
+"""
 import textwrap
 
 ALL_OUT_PARAMS = {

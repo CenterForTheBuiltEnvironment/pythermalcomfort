@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
-import math
 
+"""
+This code defines some functions related to thermal comfort calculations for calculating
+the set-point temperatures of JOS3 model.
+
+The set-point temperatures are used for calculating human thermoregulation.
+"""
+import math
 
 def pmv(ta, tr, va, rh, met, clo, wmet=0):
     """
@@ -125,38 +131,3 @@ def preferred_temp(va=0.1, rh=50, met=1, clo=0):
         else:
             to = to - vpmv / 3
     return to
-
-
-# def preferred_temp(va=0.1, RH=50, met=1, clo=0):
-#     """
-#     Calculate operative temperature [oC] at PMV=0.
-#     This is for calculating body set-point temperature
-#
-#     Parameters
-#     ----------
-#     va : float, optional
-#         Air velocity [m/s]. The default is 0.1.
-#     RH : float, optional
-#         Relative humidity [%]. The default is 50.
-#     met : float, optional
-#         Metabolic rate [met]. The default is 1.
-#     clo : float, optional
-#         Clothing insulation [clo]. The default is 0.
-#
-#     Returns
-#     -------
-#     to : float
-#         Operative temperature [oC].
-#     """
-#
-#     to = 28  # initial temp
-#     # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
-#     for i in range(100):
-#         vpmv = pmv(to, to, Va, RH, met, clo)
-#         # Break the loop if the absolute value of PMV is less than 0.001
-#         if abs(vpmv) < 0.001:
-#             break
-#         else:
-#             # Update the temperature based on the PMV value
-#             to = to - vpmv / 3
-#     return to
