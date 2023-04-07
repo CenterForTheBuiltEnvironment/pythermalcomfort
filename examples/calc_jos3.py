@@ -5,7 +5,7 @@ import os
 from pythermalcomfort.models import JOS3
 
 # Make "jos3_example" directory in the current directory
-directory_name = "jos3_example"
+directory_name = "jos3_output_example"
 CURRENT_DIRECTORY = os.getcwd()
 JOS3_EXAMPLE_DIRECTORY = os.path.join(CURRENT_DIRECTORY, directory_name)
 if not os.path.exists(JOS3_EXAMPLE_DIRECTORY):
