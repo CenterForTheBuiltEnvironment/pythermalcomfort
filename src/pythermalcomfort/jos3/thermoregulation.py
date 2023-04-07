@@ -848,7 +848,7 @@ def basal_met(
 
     Returns
     -------
-    BMR : float
+     bmr: float
         Basal metabolic rate [W].
 
     """
@@ -998,13 +998,13 @@ def local_mbase(
     return mbase_cr, mbase_ms, mbase_fat, mbase_sk
 
 
-def local_mwork(bmr, par):
+def local_mwork(tcr, par):
     """
     Calculate local metabolic rate by work [W]
 
     Parameters
     ----------
-    bmr : float
+    tcr : float
         Basal metbolic rate [W].
     par : float
         Physical activity ratio [-].
@@ -1015,7 +1015,7 @@ def local_mwork(bmr, par):
         Local metabolic rate by work [W].
 
     """
-    mwork_all = (par - 1) * bmr
+    mwork_all = (par - 1) * tcr
     mwf = np.array(
         [
             0,

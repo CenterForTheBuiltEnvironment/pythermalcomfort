@@ -29,7 +29,7 @@ import os
 from pythermalcomfort.jos3 import thermoregulation as threg
 from pythermalcomfort.jos3 import matrix
 from pythermalcomfort.jos3.matrix import NUM_NODES, INDEX, VINDEX, BODY_NAMES, remove_bodyname
-from pythermalcomfort.jos3.comfmod import preferred_temp
+from pythermalcomfort.jos3.comfmod import operative_temp_when_pmv_is_zero
 from pythermalcomfort.jos3 import construction as cons
 from pythermalcomfort.jos3.construction import (_BSAst, _to17array)
 from pythermalcomfort.jos3.params import ALL_OUT_PARAMS
@@ -3313,7 +3313,7 @@ class JOS3:
     local and mean skin wettedness, and heat loss from the skin etc. which can be accessed using getter methods.
     (ex. X.Tsk, X.TskMean, X.Tcr)
 
-    If you use this package, please cite us and mention the version used as follows:
+    If you use this package, please cite us as follows and mention the version of pythermalcomfort used:
     Y. Takahashi, A. Nomoto, S. Yoda, R. Hisayama, M. Ogata, Y. Ozeki, S. Tanabe,
     Thermoregulation Model JOS-3 with New Open Source Code, Energy & Buildings (2020),
     doi: https://doi.org/10.1016/j.enbuild.2020.110575
@@ -3340,6 +3340,8 @@ class JOS3:
     bsa_equation : str, optional
         The equation used to calculate body surface area (BSA). Choose a BSA equation.
         You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
+        The body surface area can be calculated using the function
+        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
     ex_output : None, list or "all", optional
         This is used when you want to display results other than the default output parameters (ex.skin temperature);
         by default, JOS outputs only the most necessary parameters in order to reduce the computational load.
@@ -3632,7 +3634,7 @@ class JOS3:
             Sex ("male" or "female"). The default is "male".
         ci : float, optional
             Cardiac index, in [L/min/m2]. The default is 2.6432.
-        bmr_equation : str, optional
+        tcr : str, optional
             The equation used to calculate basal metabolic rate (BMR). Choose a BMR equation.
             The default is "harris-benedict" equation created uding Caucasian's data. (https://doi.org/10.1073/pnas.4.12.370)
             If the Ganpule's equation (https://doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
@@ -3739,7 +3741,7 @@ class JOS3:
         # PAR = 1.25
         # 1 met = 58.15 W/m2
         met = self.BMR * 1.25 / 58.15  # [met]
-        self.To = preferred_temp(met=met)
+        self.To = operative_temp_when_pmv_is_zero(met=met)
         self.RH = 50 # Relative humidity
         self.Va = 0.1 # Air velocity
         self.Icl = 0 # Clothing insulation
@@ -4778,12 +4780,12 @@ class JOS3:
         BMR : float
             Basal metabolic rate [W/m2].
         """
-        bmr = threg.basal_met(
+        tcr = threg.basal_met(
             self._height,
             self._weight,
             self._age,
             self._sex,
             self._bmr_equation,
         )
-        return bmr / self.BSA.sum()
+        return tcr / self.BSA.sum()
 

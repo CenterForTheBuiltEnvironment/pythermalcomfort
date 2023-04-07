@@ -24,8 +24,6 @@ model.To = 28  # Operative temperature [oC]
 model.RH = 40  # Relative humidity [%]
 model.Va = 0.2  # Air velocity [m/s]
 model.PAR = 1.2  # Physical activity ratio [-]
-model.posture = "sitting"  # Set the posture
-model.Icl = 0.6  # Clothing insulation [clo]
 model.simulate(60)  # Exposure time = 60 [min]
 
 # Set the next condition (You only need to change the parameters that you want to change)
@@ -46,7 +44,7 @@ plt.show()  # Show the plot
 model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1 (default output).csv"))
 
 # Print the BMR value using the getter
-print(model.BMR)
+print('BMR=', model.BMR)
 
 # -------------------------------------------
 # EXAMPLE 2 (detail simulation)

@@ -6,7 +6,39 @@ the set-point temperatures of JOS3 model.
 
 The set-point temperatures are used for calculating human thermoregulation.
 """
+
 import math
+
+def operative_temp_when_pmv_is_zero(va=0.1, rh=50, met=1, clo=0):
+    """
+    Calculate operative temperature [oC] at PMV=0.
+    Parameters
+    ----------
+    va : float, optional
+        Air velocity [m/s]. The default is 0.1.
+    rh : float, optional
+        Relative humidity [%]. The default is 50.
+    met : float, optional
+        Metabolic rate [met]. The default is 1.
+    clo : float, optional
+        Clothing insulation [clo]. The default is 0.
+    Returns
+    -------
+    to : float
+        Operative temperature [oC].
+    """
+
+    to = 28  # initial temp
+    # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
+    for i in range(100):
+        vpmv = pmv(to, to, va, rh, met, clo)
+        # Break the loop if the absolute value of PMV is less than 0.001
+        if abs(vpmv) < 0.001:
+            break
+        # Update the temperature based on the PMV value
+        else:
+            to = to - vpmv / 3
+    return to
 
 def pmv(ta, tr, va, rh, met, clo, wmet=0):
     """
@@ -33,8 +65,8 @@ def pmv(ta, tr, va, rh, met, clo, wmet=0):
     PMV value
     """
 
-    met *= 58.15  # chage unit [met] to [W/m2]
-    wmet *= 58.15  # chage unit [met] to [W/m2]
+    met *= 58.15  # change unit [met] to [W/m2]
+    wmet *= 58.15  # change unit [met] to [W/m2]
     mw = met - wmet  # heat production [W/m2]
 
     if clo < 0.5:
@@ -99,35 +131,3 @@ def pmv(ta, tr, va, rh, met, clo, wmet=0):
     pmv_value = (0.303 * math.exp(-0.036 * met) + 0.028) * load  # Eq.63
 
     return pmv_value
-
-
-def preferred_temp(va=0.1, rh=50, met=1, clo=0):
-    """
-    Calculate operative temperature [oC] at PMV=0.
-    Parameters
-    ----------
-    va : float, optional
-        Air velocity [m/s]. The default is 0.1.
-    rh : float, optional
-        Relative humidity [%]. The default is 50.
-    met : float, optional
-        Metabolic rate [met]. The default is 1.
-    clo : float, optional
-        Clothing insulation [clo]. The default is 0.
-    Returns
-    -------
-    to : float
-        Operative temperature [oC].
-    """
-
-    to = 28  # initial temp
-    # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
-    for i in range(100):
-        vpmv = pmv(to, to, va, rh, met, clo)
-        # Break the loop if the absolute value of PMV is less than 0.001
-        if abs(vpmv) < 0.001:
-            break
-        # Update the temperature based on the PMV value
-        else:
-            to = to - vpmv / 3
-    return to
