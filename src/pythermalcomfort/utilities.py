@@ -537,27 +537,6 @@ f_r_garments = {
     "Glass fiber vacuum metallized with aluminium": 0.07,
 }
 
-sumple_code = """
-# This is a sample code that you can add ">>>" to example code in docstrings
-# Feel free to edit the following code and add prompt to your code.
-model = JOS3(height=1.7, weight=60, age=30)
-
-# Set the first phase
-model.to = 28  # Operative temperature [oC]
-model.RH = 40  # Relative humidity [%]
-model.vr = 0.2  # Air velocity [m/s]
-"""
-
-def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
-    lines = code.strip().split("\n")
-    result = []
-    for line in lines:
-        if re.match(r"^\s*#", line):  # If it's a comment line
-            result.append(line)
-        else:
-            result.append(prompt + line)
-    return "\n".join(result)
-
 def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
     lines = code.strip().split("\n")
     result = []
