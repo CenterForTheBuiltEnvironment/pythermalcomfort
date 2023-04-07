@@ -3349,17 +3349,17 @@ class JOS3:
 
     Setter & Getter
     -------
-    Ta : float or list
+    Ta : float or list-like
         Air temperature [oC].
-    Tr : float or list
+    Tr : float or list-like
         Mean radiant temperature [oC].
-    To : float or list
+    To : float or list-like
         Operative temperature [oC].
-    Va : float or list
+    Va : float or list-like
         Air velocity [m/s].
-    RH : float or list
+    RH : float or list-like
         Relative humidity [%].
-    Icl : float or list
+    Icl : float or list-like
         Clothing insulation [clo].
     PAR : float
         Physical activity ratio [-].
@@ -3497,9 +3497,6 @@ class JOS3:
         Tve     : Vein temperature (each body part) [oC]
         Va      : Air velocity (each body part) [m/s]
         Weight  : Body weight [kg]
-
-Process finished with exit code 0
-
 
     Examples
     -------
