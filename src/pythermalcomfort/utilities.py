@@ -557,12 +557,19 @@ print(add_prompt_to_code(sumple_code))
 sample_code = """
 # This is a sample code that you can add ">>>" to example code in docstrings
 # Feel free to edit the following code and add prompt to your code.
-model = JOS3(height=1.7, weight=60, age=30)
 
-# Set the first phase
-model.to = 28  # Operative temperature [oC]
-model.RH = 40  # Relative humidity [%]
-model.vr = 0.2  # Air velocity [m/s]
+# Build a model and set a body built
+# Create an instance of the JOS3 class with optional body parameters such as body height, weight, age, sex, etc.
+model = JOS3(
+    height=1.7,
+    weight=60,
+    fat=20,
+    age=30,
+    sex="male",
+    bmr_equation="japanese",
+    bsa_equation="fujimoto",
+    ex_output="all",
+)
 """
 
 def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
@@ -575,4 +582,4 @@ def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
             result.append(prompt + line)
     return "\n".join(result)
 
-print(add_prompt_to_code(sample_code))
+# print(add_prompt_to_code(sample_code))

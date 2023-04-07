@@ -29,7 +29,7 @@ model.Icl = 0.6  # Clothing insulation [clo]
 model.simulate(60)  # Exposure time = 60 [min]
 
 # Set the next condition (You only need to change the parameters that you want to change)
-model.to = 20  # Change only operative temperature
+model.To = 20  # Change only operative temperature
 model.simulate(60)  # Additional exposure time = 60 [min]
 
 # Show the results

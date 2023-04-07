@@ -3428,106 +3428,178 @@ class JOS3:
    Returns (default)
    -------
     output_params : dict
-       A dictionary containing the following output parameters (default):
+       A dictionary including the following output parameters:
 
-       "CycleTime" : int
-       The number of analysis cycles [-].
-       "ModTime" : datetime.timedelta
-           The analysis time [datetime.timedelta type].
-       "TskMean" : float
-           The mean skin temperature [°C].
-       "Tsk" : pd.Series
-           The skin temperature [°C] by body part.
-       "Tcr" : pd.Series
-           The core temperature [°C] by body part.
-       "WetMean" : float
-           The mean skin wettedness [-].
-       "Wet" : pd.Series
-           The skin wettedness [-] by body part.
-       "Wle" : float
-           The weight loss [g/sec].
-       "CO" : float
-           The cardiac output [L/h].
-       "Met" : float
-           The metabolic rate [W].
-       "SHL" : float
-           The sensible heat loss [W].
-       "LHL" : float
-           The latent heat loss [W].
+        CO      : Cardiac output (the sum of the whole blood flow) [L/h]
+        CycleTime: The counts of executing one cycle calculation [-]
+        Met     : Total heat production of the whole body [W]
+        ModTime : Simulation times [sec]
+        RES     : Heat loss by respiration [W]
+        THLsk   : Total heat loss from the skin (each body part) [W]
+        Tcr     : Core temperature (each body part) [oC]
+        Tsk     : Skin temperature (each body part) [oC]
+        TskMean : Mean skin temperature [oC]
+        Wet     : Skin wettedness (each body part) [-]
+        WetMean : Mean skin wettedness [-]
+        Wle     : Weight loss by the evaporation and respiration of the whole body [g/sec]
+        dt      : Time delta of the model [sec]
 
     Returns (optional)
     -------
     output_params : dict
-        A dictionary containing the following parameters (optional):
+        A dictionary including the following parameters:
 
-       "Name": Model name
-       "Height": Model height [m]
-       "Weight": Model weight [kg]
-       "BSA": Body surface area [m2] (by body part)
-       "Fat": Body fat percentage [%]
-       "Sex": Sex
-       "Age": Age
-       "Tcb": Core body temperature [oC]
-       "Tar": Artery temperature [oC] (by body part)
-       "Tve": Vein temperature [oC] (by body part)
-       "Tsve": Superficial vein temperature [oC] (by body part)
-       "Tms": Muscle temperature [oC]
-       "Tfat": Fat temperature [oC]
-       "To": Operating temperature [oC] (by body part)
-       "Rt": Heat transfer resistance between skin and environment [K･m2/W] (by body part)
-       "Ret": Latent heat transfer resistance between skin and environment [K･m2/W] (by body part)
-       "Ta": Air temperature [oC] (by body part)
-       "Tr": Radiant temperature [oC] (by body part)
-       "RH": Relative humidity [%] (by body part)
-       "Va": Air velocity [m/s] (by body part)
-       "PAR": Physical activity ratio
-       "Icl": Clothing insulation [clo] (by body part)
-       "SDstric": Attenuation coefficient of vascular constriction due to aging [-] (by body part)
-       "SDdilat": Attenuation coefficient of vascular dilation due to aging [-] (by body part)
-       "SDsweat": Attenuation coefficient of sweating due to aging [-] (by body part)
-       "SDshiv": Attenuation coefficient of shivering heat generation due to aging [-] (by body part)
-       "Esk": Latent heat loss from skin surface [W] (by body part)
-       "Emax": Maximum latent heat loss from skin surface [W] (by body part)
-       "Esweat": Heat loss due to sweating (including ineffective sweating) [W] (by body part)
-       "BFcr": Blood flow rate in core layer [L/h] (by body part)
-       "BFms": Blood flow rate in muscle layer [L/h]
-       "BFfat": Blood flow rate in fat layer [L/h]
-       "BFsk": Blood flow rate in skin layer [L.h] (by body part)
-       "BFava_hand": AVA blood flow rate in hand [L/h] (one side only)
-       "BFava_foot": AVA blood flow rate in foot [L/h] (one side only)
-       "Mbasecr": Heat generation due to basal metabolism in core layer [W] (by body part)
-       "Mbasems": Heat generation due to basal metabolism in muscle layer [W]
-       "Mbasefat": Heat generation due to basal metabolism in fat layer [W]
-       "Mbasesk": Heat generation due to basal metabolism in skin layer [W] (by body part)
-       "Mwork": Heat generation due to work [W] (by body part)
-       "Mshiv": Heat generation due to shivering [W] (by body part
+        Age     : Age [years]
+        BFava_foot: AVA blood flow rate of one foot [L/h]
+        BFava_hand: AVA blood flow rate of one hand [L/h]
+        BFcr    : Core blood flow rate (each body part) [L/h]
+        BFfat   : Fat blood flow rate (each body part) [L/h]
+        BFms    : Muscle blood flow rate (each body part) [L/h]
+        BFsk    : Skin blood flow rate (each body part) [L/h]
+        BSA     : Body surface area (each body part) [m2]
+        Emax    : Maximum evaporative heat loss from the skin (each body part) [W]
+        Esk     : Evaporative heat loss from the skin (each body part) [W]
+        Esweat  : Evaporative heat loss from the skin by only sweating (each body part) [W]
+        Fat     : Body fat rate [%]
+        Height  : Body height [m]
+        Icl     : Clothing insulation (each body part) [clo]
+        LHLsk   : Latent heat loss from the skin (each body part) [W]
+        Mbasecr : Core heat production by basal metabolism (each body part) [W]
+        Mbasefat: Fat heat production by basal metabolism (each body part) [W]
+        Mbasems : Muscle heat production by basal metabolism (each body part) [W]
+        Mbasesk : Skin heat production by basal metabolism (each body part) [W]
+        Mnst    : Core heat production by non-shivering thermogenesis (each body part) [W]
+        Mshiv   : Core or muscle heat production by shivering thermogenesis (each body part) [W]
+        Mwork   : Core or muscle heat production by work (each body part) [W]
+        Name    : Name of the model [-]
+        PAR     : Physical activity ratio [-]
+        Qcr     : Core total heat production (each body part) [W]
+        Qfat    : Fat total heat production (each body part) [W]
+        Qms     : Muscle total heat production (each body part) [W]
+        Qsk     : Skin total heat production (each body part) [W]
+        RESlh   : Latent heat loss by respiration (each body part) [W]
+        RESsh   : Sensible heat loss by respiration (each body part) [W]
+        RH      : Relative humidity (each body part) [%]
+        Ret     : Total clothing evaporative heat resistance (each body part) [m2.kPa/W]
+        Rt      : Total clothing heat resistance (each body part) [m2.K/W]
+        SHLsk   : Sensible heat loss from the skin (each body part) [W]
+        Setptcr : Set point skin temperature (each body part) [oC]
+        Setptsk : Set point core temperature (each body part) [oC]
+        Sex     : Sex [-]
+        Ta      : Air temperature (each body part) [oC]
+        Tar     : Arterial temperature (each body part) [oC]
+        Tcb     : Central blood temperature [oC]
+        Tfat    : Fat temperature (each body part) [oC]
+        Tms     : Muscle temperature (each body part) [oC]
+        To      : Operative temperature (each body part) [oC]
+        Tr      : Mean radiant temperature (each body part) [oC]
+        Tsve    : Superficial vein temperature (each body part) [oC]
+        Tve     : Vein temperature (each body part) [oC]
+        Va      : Air velocity (each body part) [m/s]
+        Weight  : Body weight [kg]
+
+Process finished with exit code 0
+
 
     Examples
     -------
-
-
-    >>> from pythermalcomfort.models import JOS3
-    >>> model = JOS3(height=1.7, weight=60, age=30)
-    # Set the first phase
-    >>> model.to = 28  # Operative temperature [oC]
+    >>>import numpy as np
+    >>>from pythermalcomfort.models import JOS3
+    # Build a model and set a body built
+    # Create an instance of the JOS3 class with optional body parameters such as body height, weight, age, sex, etc.
+    >>> model = JOS3(
+    >>>     height=1.7,
+    >>>     weight=60,
+    >>>     fat=20,
+    >>>     age=30,
+    >>>     sex="male",
+    >>>     bmr_equation="japanese",
+    >>>     bsa_equation="fujimoto",
+    >>>     ex_output="all",
+    >>> )
+    # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
+    # Set the first condition
+    >>> model.Ta = 28  # Air temperature [oC]
+    >>> model.Tr = 30  # Mean radiant temperature [oC]
     >>> model.RH = 40  # Relative humidity [%]
     >>> model.Va = 0.2  # Air velocity [m/s]
-    >>> model.PAR = 1.2  # Physical activity ratio [-]
-    >>> model.posture = "sitting"  # Set the posture
-    >>> model.simulate(60)  # Exposre time = 60 [min]
-    # Set the next phase
-    >>> model.to = 20  # Change only operative temperature
-    >>> model.simulate(60)  # Additional exposre time = 60 [min]
+    >>> model.PAR = 1.2  # Physical activity ratio [-], assuming a sitting position
+    >>> model.posture = "sitting"  # Posture [-], assuming a sitting position
+    >>> model.options[]
+    >>> model.Icl = np.array(
+    >>>     [  # Clothing insulation [clo]
+    >>>         0.00,  # Head
+    >>>         0.00,  # Neck
+    >>>         1.14,  # Chest
+    >>>         0.84,  # Back
+    >>>         1.04,  # Pelvis
+    >>>         0.84,  # Left-Shoulder
+    >>>         0.42,  # Left-Arm
+    >>>         0.00,  # Left-Hand
+    >>>         0.84,  # Right-Shoulder
+    >>>         0.42,  # Right-Arm
+    >>>         0.00,  # Right-Hand
+    >>>         0.58,  # Left-Thigh
+    >>>         0.62,  # Left-Leg
+    >>>         0.82,  # Left-Foot
+    >>>         0.58,  # Right-Thigh
+    >>>         0.62,  # Right-Leg
+    >>>         0.82,  # Right-Foot
+    >>>     ]
+    >>> )
+    # Run JOS-3 model
+    >>> model.simulate(
+    >>>     times=30,  # Number of loops of a simulation
+    >>>     dtime=60,  # Time delta [sec]. The default is 60.
+    >>> )  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
+    # Set the next condition (You only need to change the parameters that you want to change)
+    >>> model.To = 20  # Change operative temperature
+    >>> model.Va = np.array(
+    >>>     [  # Air velocity [m/s], assuming to use a desk fan
+    >>>         0.2,  # Head
+    >>>         0.4,  # Neck
+    >>>         0.4,  # Chest
+    >>>         0.1,  # Back
+    >>>         0.1,  # Pelvis
+    >>>         0.4,  # Left-Shoulder
+    >>>         0.4,  # Left-Arm
+    >>>         0.4,  # Left-Hand
+    >>>         0.4,  # Right-Shoulder
+    >>>         0.4,  # Right-Arm
+    >>>         0.4,  # Right-Hand
+    >>>         0.1,  # Left-Thigh
+    >>>         0.1,  # Left-Leg
+    >>>         0.1,  # Left-Foot
+    >>>         0.1,  # Right-Thigh
+    >>>         0.1,  # Right-Leg
+    >>>         0.1,  # Right-Foot
+    >>>     ]
+    >>> )
+    # Run JOS-3 model
+    >>> model.simulate(
+    >>>     times=60,  # Number of loops of a simulation
+    >>>     dtime=60,  # Time delta [sec]. The default is 60.
+    >>> )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
+    >>>
+    # Set the next condition (You only need to change the parameters that you want to change)
+    >>> model.Ta = 30  # Change air temperature [oC]
+    >>> model.Tr = 35  # Change mean radiant temperature [oC]
+    # Run JOS-3 model
+    >>> model.simulate(
+    >>>     times=30,  # Number of loops of a simulation
+    >>>     dtime=60,  # Time delta [sec]. The default is 60.
+    >>> )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
     # Show the results
-    >>> import pandas as pd
-    >>> df = pd.DataFrame(model.dict_results()) # Make pandas.DataFrame
-    >>> df.TskMean.plot()  # Show the graph of mean skin temp.
-    Exporting the results as csv:
-    >>> model.to_csv(folder="C:/Users/takahashi/Desktop")
-    Show the documentaion of the output parameters:
-    >>> print(JOS3.show_outparam_docs())
-    Check basal metabolic rate [W/m2] using Getters:
-    >>> model.BMR
+    >>>import pandas as pd
+    >>>import matplotlib.pyplot as plt
+    >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
+    >>> df[["TskMean", "TskHead", "TskChest", "TskLHand"]].plot()  # Plot time series of local skin temperature.
+    >>> plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
+    >>> plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
+    >>> plt.savefig("jos3_example2_local_skin_temperatures.png")  # Save plot at the current directory
+    >>> plt.show()  # Show the plot
+    # Exporting the results as csv
+    >>> model.to_csv("jos3_example2 (all output).csv")
     """
 
     def __init__(
@@ -3670,7 +3742,7 @@ class JOS3:
         # PAR = 1.25
         # 1 met = 58.15 W/m2
         met = self.BMR * 1.25 / 58.15  # [met]
-        self.to = preferred_temp(met=met)
+        self.To = preferred_temp(met=met)
         self.RH = 50 # Relative humidity
         self.Va = 0.1 # Air velocity
         self.Icl = 0 # Clothing insulation
@@ -3764,8 +3836,8 @@ class JOS3:
         # Compute heat and evaporative heat resistance [m2.K/W], [m2.kPa/W]
 
         # Get core and skin temperatures
-        Tcr = self.Tcr
-        Tsk = self.Tsk
+        tcr = self.Tcr
+        tsk = self.Tsk
 
         # Convective and radiative heat transfer coefficients [W/K.m2]
         hc = threg.fixed_hc(
@@ -3773,7 +3845,7 @@ class JOS3:
                 self._posture,
                 self._va,
                 self._ta,
-                Tsk,
+                tsk,
             ),
             self._va,
         )
@@ -3816,15 +3888,15 @@ class JOS3:
 
         # Setpoint temperature for thermoregulation
         if passive:
-            setpt_cr = Tcr.copy()
-            setpt_sk = Tsk.copy()
+            setpt_cr = tcr.copy()
+            setpt_sk = tsk.copy()
         else:
             setpt_cr = self.setpt_cr.copy()
             setpt_sk = self.setpt_sk.copy()
 
         # Error signal = Difference between setpoint and body temperatures
-        err_cr = Tcr - setpt_cr
-        err_sk = Tsk - setpt_sk
+        err_cr = tcr - setpt_cr
+        err_sk = tsk - setpt_sk
 
         # SWEATING THERMOREGULATION
         # Skinwettedness [-], Esk, Emax, Esw [W]
@@ -3832,7 +3904,7 @@ class JOS3:
         wet, e_sk, e_max, e_sweat = threg.evaporation(
             err_cr,
             err_sk,
-            Tsk,
+            tsk,
             self._ta,
             self._rh,
             r_et,
@@ -3873,8 +3945,8 @@ class JOS3:
         mshiv = threg.shivering(
             err_cr,
             err_sk,
-            Tcr,
-            Tsk,
+            tcr,
+            tsk,
             self._height,
             self._weight,
             self._bsa_equation,
@@ -3945,7 +4017,7 @@ class JOS3:
         res_sh, res_lh = threg.resp_heatloss(self._ta[0], p_a[0], qall)
 
         # Calculate sensible heat loss [W]
-        shlsk = (Tsk - to) / r_t * self._bsa
+        shlsk = (tsk - to) / r_t * self._bsa
 
         # Calculate cardiac output [L/h]
         co = threg.sum_bf(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot)
@@ -4331,7 +4403,7 @@ class JOS3:
         self._tr = _to17array(inp)
 
     @property
-    def to(self):
+    def To(self):
         """
         Getter
         Returns
@@ -4361,8 +4433,8 @@ class JOS3:
         )
         return to
 
-    @to.setter
-    def to(self, inp):
+    @To.setter
+    def To(self, inp):
         self._ta = _to17array(inp)
         self._tr = _to17array(inp)
 

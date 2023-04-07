@@ -77,10 +77,10 @@ ALL_OUT_PARAMS = {
         "unit": "W",
     },
     "Fat": {"ex_output": True, "meaning": "Body fat rate", "suffix": None, "unit": "%"},
-    "Height": {"ex_output": True, "meaning": "Body heigh", "suffix": None, "unit": "m"},
+    "Height": {"ex_output": True, "meaning": "Body height", "suffix": None, "unit": "m"},
     "Icl": {
         "ex_output": True,
-        "meaning": "Clothing insulation value (each body part)",
+        "meaning": "Clothing insulation (each body part)",
         "suffix": "Body name",
         "unit": "clo",
     },
@@ -236,13 +236,13 @@ ALL_OUT_PARAMS = {
     },
     "Sex": {
         "ex_output": True,
-        "meaning": "Male or female",
+        "meaning": "Sex",
         "suffix": None,
         "unit": "-",
     },
     "THLsk": {
         "ex_output": False,
-        "meaning": "Heat loss from the skin (each body part)",
+        "meaning": "Total heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
