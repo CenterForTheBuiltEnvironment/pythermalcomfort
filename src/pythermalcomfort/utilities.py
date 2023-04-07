@@ -211,8 +211,9 @@ def body_surface_area(weight, height, formula="dubois"):
         body weight, [kg]
     height : float
         height, [m]
-    formula : {"dubois"}, default="dubois"
-        formula used to calculate the body surface area
+    formula : str, optional,
+        formula used to calculate the body surface area. default="dubois"
+        Choose a name from "dubois", "takahira", "fujimoto", or "kurazumi".
 
     Returns
     -------
@@ -222,7 +223,12 @@ def body_surface_area(weight, height, formula="dubois"):
 
     if formula == "dubois":
         return 0.202 * (weight**0.425) * (height**0.725)
-
+    elif formula == "takahira":
+        return 0.2042 * (weight**0.425) * (height**0.725)
+    elif formula == "fujimoto":
+        return 0.1882 * (weight**0.444) * (height**0.663)
+    elif formula == "kurazumi":
+        return 0.2440 * (weight**0.383) * (height**0.693)
 
 def f_svv(w, h, d):
     """Calculates the sky-vault view fraction.
@@ -552,26 +558,6 @@ def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
             result.append(prompt + line)
     return "\n".join(result)
 
-print(add_prompt_to_code(sumple_code))
-
-sample_code = """
-# This is a sample code that you can add ">>>" to example code in docstrings
-# Feel free to edit the following code and add prompt to your code.
-
-# Build a model and set a body built
-# Create an instance of the JOS3 class with optional body parameters such as body height, weight, age, sex, etc.
-model = JOS3(
-    height=1.7,
-    weight=60,
-    fat=20,
-    age=30,
-    sex="male",
-    bmr_equation="japanese",
-    bsa_equation="fujimoto",
-    ex_output="all",
-)
-"""
-
 def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
     lines = code.strip().split("\n")
     result = []
@@ -582,4 +568,9 @@ def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
             result.append(prompt + line)
     return "\n".join(result)
 
+# sample_code = """
+# # This is a sample code for "add_prompt_to_code" that you can add ">>>" to example code in docstrings
+# # Feel free to edit the following code and add prompt to your code.
+# print('Hello!')
+# """
 # print(add_prompt_to_code(sample_code))
