@@ -6,9 +6,8 @@ basal blood flow ratio, and thermal conductance and thermal capacity.
 """
 
 import numpy as np
-
-# Import
 from pythermalcomfort.jos3.matrix import NUM_NODES, IDICT, BODY_NAMES
+from pythermalcomfort.utilities import body_surface_area
 
 
 _BSAst = np.array(
@@ -32,11 +31,6 @@ _BSAst = np.array(
         0.056,
     ]
 )
-
-dubois = lambda height, weight: 0.2025 * (height**0.725) * (weight**0.425)
-takahira = lambda height, weight: 0.2042 * (height**0.725) * (weight**0.425)
-fujimoto = lambda height, weight: 0.1882 * (height**0.663) * (weight**0.444)
-kurazumi = lambda height, weight: 0.2440 * (height**0.693) * (weight**0.383)
 
 def _to17array(inp):
     """
@@ -66,46 +60,10 @@ def _to17array(inp):
 
     return array.copy()
 
-def body_surface_area(
-    height=1.72,
-    weight=74.43,
-    equation="dubois",
-):
-    """
-    Calculate body surface area (BSA) [m2].
-
-    Parameters
-    ----------
-    height : float, optional
-        Body height [m]. The default is 1.72.
-    weight : float, optional
-        Body weight [kg]. The default is 74.43.
-    equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
-
-    Returns
-    -------
-    bsa : float
-        Body surface area (BSA) [m2].
-    """
-
-    if equation == "dubois":
-        bsa = dubois(height, weight)
-    elif equation == "takahira":
-        bsa = takahira(height, weight)
-    elif equation == "fujimoto":
-        bsa = fujimoto(height, weight)
-    elif equation == "kurazumi":
-        bsa = kurazumi(height, weight)
-
-    return bsa
-
-
 def bsa_rate(
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    formula="dubois",
 ):
     """
     Calculate the rate of BSA to standard body.
@@ -116,7 +74,7 @@ def bsa_rate(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    formula : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
 
@@ -126,18 +84,17 @@ def bsa_rate(
         The ratio of BSA to the standard body [-].
     """
     bsa_all = body_surface_area(
-        height,
-        weight,
-        equation,
+        height=height,
+        weight=weight,
+        formula=formula,
     )
     bsa_rate = bsa_all / _BSAst.sum()  # The BSA ratio to the standard body (1.87m2)
     return bsa_rate
 
-
 def localbsa(
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    formula="dubois",
 ):
     """
     Calculate local body surface area (BSA) [m2].
@@ -153,7 +110,7 @@ def localbsa(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    formula : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
 
@@ -166,9 +123,9 @@ def localbsa(
 
     """
     _bsa_rate = bsa_rate(
-        height,
-        weight,
-        equation,
+        height=height,
+        weight=weight,
+        formula=formula,
     )  # The BSA ratio to the standard body (1.87m2)
     bsa = _BSAst * _bsa_rate
     return bsa
