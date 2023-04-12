@@ -29,7 +29,7 @@ import os
 from pythermalcomfort.jos3 import thermoregulation as threg
 from pythermalcomfort.jos3 import matrix
 from pythermalcomfort.jos3.matrix import NUM_NODES, INDEX, VINDEX, BODY_NAMES, remove_bodyname
-from pythermalcomfort.jos3.comfmod import operative_temp_when_pmv_is_zero
+# from pythermalcomfort.jos3.comfmod import operative_temp_when_pmv_is_zero
 from pythermalcomfort.jos3 import construction as cons
 from pythermalcomfort.jos3.construction import (_BSAst, _to17array)
 from pythermalcomfort.jos3.params import ALL_OUT_PARAMS
@@ -3726,6 +3726,37 @@ class JOS3:
         dictout = self._reset_setpt()
         self._history.append(dictout)
 
+    def _calculate_operative_temp_when_pmv_is_zero(self, va=0.1, rh=50, met=1, clo=0):
+        """
+        Calculate operative temperature [oC] when PMV=0.
+        Parameters
+        ----------
+        va : float, optional
+            Air velocity [m/s]. The default is 0.1.
+        rh : float, optional
+            Relative humidity [%]. The default is 50.
+        met : float, optional
+            Metabolic rate [met]. The default is 1.
+        clo : float, optional
+            Clothing insulation [clo]. The default is 0.
+        Returns
+        -------
+        to : float
+            Operative temperature [oC].
+        """
+
+        to = 28  # initial operative temperature
+        # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
+        for i in range(100):
+            vpmv = pmv(tdb=to, tr=to, vr=va, rh=rh, met=met, clo=clo)
+            # Break the loop if the absolute value of PMV is less than 0.001
+            if abs(vpmv) < 0.001:
+                break
+            # Update the temperature based on the PMV value
+            else:
+                to = to - vpmv / 3
+        return to
+
     def _reset_setpt(self):
         """
         Reset setpoint temperature under steady state calculation.
@@ -3741,7 +3772,7 @@ class JOS3:
         # PAR = 1.25
         # 1 met = 58.15 W/m2
         met = self.BMR * 1.25 / 58.15  # [met]
-        self.To = operative_temp_when_pmv_is_zero(met=met)
+        self.To = self._calculate_operative_temp_when_pmv_is_zero(met=met)
         self.RH = 50 # Relative humidity
         self.Va = 0.1 # Air velocity
         self.Icl = 0 # Clothing insulation
