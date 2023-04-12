@@ -6,7 +6,6 @@ This code defines a set of functions and constants to model heat exchange and bl
 
 import numpy as np
 
-
 def sub2whole(subarr_list):
     ishape = 0
     jshape = 0
@@ -33,7 +32,7 @@ BODY_NAMES = [
     "Chest",
     "Back",
     "Pelvis",
-    "Lshoulder",
+    "LShoulder",
     "LArm",
     "LHand",
     "RShoulder",
@@ -303,7 +302,7 @@ def wholebody(bf_art, bf_vein, bf_ava_hand, bf_ava_foot):
     Chest = IDICT["Chest"]["artery"]
     Back = IDICT["Back"]["artery"]
     Pelvis = IDICT["Pelvis"]["artery"]
-    Lshoulder = IDICT["Lshoulder"]["artery"]
+    LShoulder = IDICT["LShoulder"]["artery"]
     LArm = IDICT["LArm"]["artery"]
     LHand = IDICT["LHand"]["artery"]
     RShoulder = IDICT["RShoulder"]["artery"]
@@ -330,17 +329,17 @@ def wholebody(bf_art, bf_vein, bf_ava_hand, bf_ava_foot):
     arr83 += flow(CB, Pelvis, bf_art[4])  # CB to Pelvis.art
     arr83 += flow(Pelvis + 1, CB, bf_vein[4])  # Pelvis.vein to CB
 
-    arr83 += flow(CB, Lshoulder, bf_art[5])  # CB to Lshoulder.art
-    arr83 += flow(Lshoulder, LArm, bf_art[6])  # Lshoulder.art to LArm.art
+    arr83 += flow(CB, LShoulder, bf_art[5])  # CB to LShoulder.art
+    arr83 += flow(LShoulder, LArm, bf_art[6])  # LShoulder.art to LArm.art
     arr83 += flow(LArm, LHand, bf_art[7])  # LArm.art to LHand.art
     arr83 += flow(LHand + 1, LArm + 1, bf_vein[7])  # LHand.vein to LArm.vein
-    arr83 += flow(LArm + 1, Lshoulder + 1, bf_vein[6])  # LArm.vein to Lshoulder.vein
-    arr83 += flow(Lshoulder + 1, CB, bf_vein[5])  # Lshoulder.vein to CB
+    arr83 += flow(LArm + 1, LShoulder + 1, bf_vein[6])  # LArm.vein to LShoulder.vein
+    arr83 += flow(LShoulder + 1, CB, bf_vein[5])  # LShoulder.vein to CB
     arr83 += flow(LHand + 2, LArm + 2, bf_ava_hand)  # LHand.sfvein to LArm.sfvein
     arr83 += flow(
-        LArm + 2, Lshoulder + 2, bf_ava_hand
-    )  # LArm.sfvein to Lshoulder.sfvein
-    arr83 += flow(Lshoulder + 2, CB, bf_ava_hand)  # Lshoulder.sfvein to CB
+        LArm + 2, LShoulder + 2, bf_ava_hand
+    )  # LArm.sfvein to LShoulder.sfvein
+    arr83 += flow(LShoulder + 2, CB, bf_ava_hand)  # LShoulder.sfvein to CB
 
     arr83 += flow(CB, RShoulder, bf_art[8])  # CB to RShoulder.art
     arr83 += flow(RShoulder, RArm, bf_art[9])  # RShoulder.art to RArm.art
