@@ -3306,9 +3306,10 @@ class JOS3:
 
     Environmental conditions such as air temperature, mean radiant temperature, air velocity, etc.
     can be set using the setter methods. (ex. X.Ta, X.Tr X.Va)
-    If you want to set the different conditons in each body part, set them as numpy array format.
+    If you want to set the different conditons in each body part, set them
+    as a 17 lengths of list, dictionaly, or numpy array format.
 
-    Numpy array format input must be 17 lengths and means the order of "Head", "Neck", "Chest",
+    List or numpy array format input must be 17 lengths and means the order of "Head", "Neck", "Chest",
     "Back", "Pelvis", "LShoulder", "LArm", "LHand", "RShoulder", "RArm",
     "RHand", "LThigh", "LLeg", "LFoot", "RThigh", "RLeg" and "RFoot".
 
@@ -3407,7 +3408,7 @@ class JOS3:
         Fat temperatures of Head and Pelvis  [oC].
     BMR : float
         Basal metabolic rate [W/m2].
-    bodyname : list (17)
+    bodynames : list (17)
         JOS3 body names [-].
         "Head", "Neck", "Chest", "Back", "Pelvis",
         "LShoulder", "LArm", "LHand", "RShoulder", "RArm", "RHand",
@@ -3638,7 +3639,7 @@ class JOS3:
             Sex ("male" or "female"). The default is "male".
         ci : float, optional
             Cardiac index, in [L/min/m2]. The default is 2.6432.
-        tcr : str, optional
+        bmr_equation : str, optional
             The equation used to calculate basal metabolic rate (BMR). Choose a BMR equation.
             The default is "harris-benedict" equation created uding Caucasian's data. (https://doi.org/10.1073/pnas.4.12.370)
             If the Ganpule's equation (https://doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
@@ -4777,39 +4778,15 @@ class JOS3:
         return self._bodytemp[INDEX["fat"]].copy()
 
     @property
-    def bodyname(self):
+    def bodynames(self):
         """
         Getter
         Returns
         -------
-        bodyname : list
-            JOS3 body names,
-            "Head", "Neck", "Chest", "Back", "Pelvis",
-            "LShoulder", "LArm", "LHand",
-            "RShoulder", "RArm", "RHand",
-            "LThigh", "LLeg", "LHand",
-            "RThigh", "RLeg" and "RHand".
+        bodynames : list
+            JOS3 body names
         """
-        body = [
-            "Head",
-            "Neck",
-            "Chest",
-            "Back",
-            "Pelvis",
-            "LShoulder",
-            "LArm",
-            "LHand",
-            "RShoulder",
-            "RArm",
-            "RHand",
-            "LThigh",
-            "LLeg",
-            "LHand",
-            "RThigh",
-            "RLeg",
-            "RHand",
-        ]
-        return body
+        return BODY_NAMES
 
     @property
     def results(self):

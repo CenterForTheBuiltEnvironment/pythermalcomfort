@@ -38,25 +38,32 @@ def _to17array(inp):
 
     Parameters
     ----------
-    inp : int, float, ndarray, list
+    inp : int, float, dict, list, ndarray
         The value(s) to use when creating the 17-element array.
+        Supports int, float, dict (with BODY_NAMES as keys), list, and ndarray types.
 
     Returns
     -------
     ndarray
         A NumPy array of shape (17,) with the specified values.
+
+    Raises
+    ------
+    ValueError
+        If the input type is not supported or if the input list or ndarray is not of length 17.
     """
     if isinstance(inp, (int, float)):
         array = np.ones(17) * inp
+    elif isinstance(inp, dict):
+        return np.array([inp[key] for key in BODY_NAMES])
     elif isinstance(inp, (list, np.ndarray)):
         inp = np.asarray(inp)
         if inp.shape == (17,):
             array = inp
         else:
-            first_item = inp[0]
-            array = np.ones(17) * first_item
+            ValueError("The input list or ndarray is not of length 17")
     else:
-        raise ValueError("Unsupported input type. Supported types: int, float, list, ndarray")
+        raise ValueError("Unsupported input type. Supported types: int, float, list, dict, ndarray")
 
     return array.copy()
 

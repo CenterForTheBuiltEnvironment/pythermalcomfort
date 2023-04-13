@@ -45,6 +45,7 @@ model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1 (default output
 
 # Print the BMR value using the getter
 print('BMR=', model.BMR)
+print('Body name list: ', model.bodynames)
 
 # -------------------------------------------
 # EXAMPLE 2 (detail simulation)
@@ -65,43 +66,12 @@ model = JOS3(
 
 # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
 # Set the first condition
+# Environmental parameters can be input as int, float, list, dict, numpy array format.
 model.Ta = 28  # Air temperature [oC]
 model.Tr = 30  # Mean radiant temperature [oC]
 model.RH = 40  # Relative humidity [%]
-model.Va = 0.2  # Air velocity [m/s]
-model.PAR = 1.2  # Physical activity ratio [-], assuming a sitting position
-model.posture = "sitting"  # Posture [-], assuming a sitting position
-model.Icl = np.array(
-    [  # Clothing insulation [clo]
-        0.00,  # Head
-        0.00,  # Neck
-        1.14,  # Chest
-        0.84,  # Back
-        1.04,  # Pelvis
-        0.84,  # Left-Shoulder
-        0.42,  # Left-Arm
-        0.00,  # Left-Hand
-        0.84,  # Right-Shoulder
-        0.42,  # Right-Arm
-        0.00,  # Right-Hand
-        0.58,  # Left-Thigh
-        0.62,  # Left-Leg
-        0.82,  # Left-Foot
-        0.58,  # Right-Thigh
-        0.62,  # Right-Leg
-        0.82,  # Right-Foot
-    ]
-)
-# Run JOS-3 model
-model.simulate(
-    times=30,  # Number of loops of a simulation
-    dtime=60,  # Time delta [sec]. The default is 60.
-)  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
-
-# Set the next condition (You only need to change the parameters that you want to change)
-model.To = 20  # Change operative temperature
-model.Va = np.array(
-    [  # Air velocity [m/s], assuming to use a desk fan
+model.Va = np.array( # Air velocity [m/s]
+    [
         0.2,  # Head
         0.4,  # Neck
         0.4,  # Chest
@@ -121,6 +91,59 @@ model.Va = np.array(
         0.1,  # Right-Foot
     ]
 )
+model.Icl = { # Clothing insulation for each body part [clo]
+    'Head' : 0.00,
+    'Neck' : 0.00,
+    'Chest' : 1.14,
+    'Back': 0.84,
+    'Pelvis' : 1.04,
+    'LShoulder' : 0.84,
+    'LArm' : 0.42,
+    'LHand' : 0.00,
+    'RShoulder' : 0.84,
+    'RArm' : 0.42,
+    'RHand' : 0.00,
+    'LThigh' : 0.58,
+    'LLeg' : 0.62,
+    'LFoot' : 0.82,
+    'RThigh' : 0.58,
+    'RLeg' : 0.62,
+    'RFoot' : 0.82
+    }
+
+# PAR should be input as int, float.
+model.PAR = 1.2  # Physical activity ratio [-], assuming a sitting position
+# posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
+# (0="standing", 1="sitting" or 2="lying")
+model.posture = "sitting"  # Posture [-], assuming a sitting position
+
+# Run JOS-3 model
+model.simulate(
+    times=30,  # Number of loops of a simulation
+    dtime=60,  # Time delta [sec]. The default is 60.
+)  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
+
+# Set the next condition (You only need to change the parameters that you want to change)
+model.To = 20  # Change operative temperature
+model.Va = { # Air velocity [m/s], assuming to use a desk fan
+    'Head' : 0.2,
+    'Neck' : 0.4,
+    'Chest' : 0.4,
+    'Back': 0.1,
+    'Pelvis' : 0.1,
+    'LShoulder' : 0.4,
+    'LArm' : 0.4,
+    'LHand' : 0.4,
+    'RShoulder' : 0.4,
+    'RArm' : 0.4,
+    'RHand' : 0.4,
+    'LThigh' : 0.1,
+    'LLeg' : 0.1,
+    'LFoot' : 0.1,
+    'RThigh' : 0.1,
+    'RLeg' : 0.1,
+    'RFoot' : 0.1
+    }
 # Run JOS-3 model
 model.simulate(
     times=60,  # Number of loops of a simulation
