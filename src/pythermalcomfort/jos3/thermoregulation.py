@@ -399,7 +399,7 @@ def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
     clo : float or array
         Clothing insulation [clo].
     iclo : float, or array, optional
-        Clothin vapor permeation efficiency [-]. The default is 0.45.
+        Clothing vapor permeation efficiency [-]. The default is 0.45.
     lewis_rate : float, optional
         Lewis rate [K/kPa]. The default is 16.5.
 
