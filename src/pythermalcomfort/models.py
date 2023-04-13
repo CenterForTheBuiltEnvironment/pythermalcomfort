@@ -1,4 +1,5 @@
 import numpy as np
+import re
 import warnings
 from pythermalcomfort.psychrometrics import t_o, p_sat_torr, p_sat, psy_ta_rh
 from pythermalcomfort.utilities import (
@@ -33,6 +34,7 @@ from pythermalcomfort.jos3.matrix import NUM_NODES, INDEX, VINDEX, BODY_NAMES, r
 from pythermalcomfort.jos3 import construction as cons
 from pythermalcomfort.jos3.construction import (_BSAst, _to17array)
 from pythermalcomfort.jos3.params import ALL_OUT_PARAMS
+from pythermalcomfort.__init__ import __version__
 
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
@@ -278,7 +280,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         >>> print(results['pmv'])
         -0.06
         >>> # you can also pass an array-like of inputs
-        >>> results = pmv_ppd(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
+        >>> results = (tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
         {'pmv': array([-0.47,  0.06]), 'ppd': array([9.6, 5.1])}
 
@@ -3305,6 +3307,7 @@ class JOS3:
     Environmental conditions such as air temperature, mean radiant temperature, air velocity, etc.
     can be set using the setter methods. (ex. X.Ta, X.Tr X.Va)
     If you want to set the different conditons in each body part, set them as numpy array format.
+
     Numpy array format input must be 17 lengths and means the order of "Head", "Neck", "Chest",
     "Back", "Pelvis", "LShoulder", "LArm", "LHand", "RShoulder", "RArm",
     "RHand", "LThigh", "LLeg", "LFoot", "RThigh", "RLeg" and "RFoot".
@@ -3590,7 +3593,7 @@ class JOS3:
     >>> )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
     # Show the results
     >>>import pandas as pd
-    >>>import matplotlib.pyplot as plt
+    >>>import matplotlib.pyplot as
     >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
     >>> df[["TskMean", "TskHead", "TskChest", "TskLHand"]].plot()  # Plot time series of local skin temperature.
     >>> plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
@@ -3600,6 +3603,7 @@ class JOS3:
     # Exporting the results as csv
     >>> model.to_csv("jos3_example2 (all output).csv")
     """
+
 
     def __init__(
         self,
@@ -3653,6 +3657,12 @@ class JOS3:
         None.
 
         """
+
+        # Version of pythermalcomfort
+        version_string = __version__ # get the current version of pythermalcomfort package
+        version_number_string = re.findall('\d+\.\d+\.\d+', version_string)[0]
+        self._version = version_number_string # (ex. 'X.Y.Z')
+
         # Initialize basic attributes
         self._height = height
         self._weight = weight
@@ -4156,6 +4166,7 @@ class JOS3:
         # ------------------------------------------------------------------
         dictout = {}
         if output:  # Default output
+            dictout["PythermalcomfortVersion"] = self._version
             dictout["CycleTime"] = self._cycle
             dictout["ModTime"] = self._t
             dictout["dt"] = dtime
@@ -4383,6 +4394,7 @@ class JOS3:
     def _set_ex_q(self, tissue, value):
         """
         Set extra heat gain by tissue name.
+
         Parameters
         ----------
         tissue : str
@@ -4390,6 +4402,7 @@ class JOS3:
             Head muscle and other segment's core, set "all_muscle".
         value : int, float, array
             Heat gain [W]
+
         Returns
         -------
         array
@@ -4820,3 +4833,14 @@ class JOS3:
         )
         return tcr / self.BSA.sum()
 
+    @property
+    def version(self):
+        """
+        Getter
+        Returns
+        -------
+        version : float
+            The current version of pythermalcomfort.
+        """
+
+        return self._version

@@ -362,9 +362,15 @@ ALL_OUT_PARAMS = {
     },
     "dt": {
         "ex_output": False,
-        "meaning": "Time delta of the model",
+        "meaning": "Time step",
         "suffix": None,
         "unit": "sec",
+    },
+    "PythermalcomfortVersion": {
+        "ex_output": False,
+        "meaning": "Version of pythermalcomfort",
+        "suffix": None,
+        "unit": "-",
     },
 }
 
