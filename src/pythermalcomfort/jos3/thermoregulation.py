@@ -322,11 +322,43 @@ def fixed_hr(hr):
 
 
 def operative_temp(Ta, Tr, hc, hr):
+    """
+    Calculate operative temperature [oC]
+
+    Parameters
+    ----------
+    Ta : float or array
+        Air temperature [oC]
+    Tr : float or array
+        Mean radiant temperature [oC]
+    hc : float or array
+        Convective heat transfer coefficient [W/K.m2]
+    hr : float or array
+        Radiative heat transfer coefficient [W/K.m2]
+
+    Returns
+    -------
+    to : float or array
+        Operative temperature [oC]
+    """
     to = (hc * Ta + hr * Tr) / (hc + hr)
     return to
 
 
 def clo_area_factor(clo):
+    """
+    Calculate clothing area factor [-]
+
+    Parameters
+    ----------
+    clo : float or array
+        Clothing insulation [clo]
+
+    Returns
+    -------
+    fcl : float or array
+        clothing area factor [-]
+    """
     fcl = np.where(clo < 0.5, clo * 0.2 + 1, clo * 0.1 + 1.05)
     return fcl
 
@@ -346,7 +378,7 @@ def dry_r(hc, hr, clo):
 
     Returns
     -------
-    rt : float or array
+    r_t : float or array
         Total sensible thermal resistance between skin and ambient.
     """
     fcl = clo_area_factor(clo)
@@ -373,7 +405,7 @@ def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
 
     Returns
     -------
-    ret : float or array
+    r_et : float or array
         Total evaporative thermal resistance.
 
     """
@@ -743,7 +775,7 @@ def skin_bloodflow(
         )
         sd_stric = np.ones(17)
 
-    # 皮膚血流量 [L/h]
+    # Skin blood flow [L/h]
     bf_sk = (
         (1 + skin_dilat * sd_dilat * sig_dilat)
         / (1 + skin_stric * sd_stric * sig_stric)
