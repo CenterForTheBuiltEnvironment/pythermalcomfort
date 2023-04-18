@@ -15,360 +15,360 @@ The resulting documentation string can be displayed or printed for user referenc
 import textwrap
 
 ALL_OUT_PARAMS = {
-    "Age": {"ex_output": True, "meaning": "Age", "suffix": None, "unit": "years"},
-    "BFava_foot": {
+    "age": {"ex_output": True, "meaning": "age", "suffix": None, "unit": "years"},
+    "bf_ava_foot": {
         "ex_output": True,
         "meaning": "AVA blood flow rate of one foot",
         "suffix": None,
         "unit": "L/h",
     },
-    "BFava_hand": {
+    "bf_ava_hand": {
         "ex_output": True,
         "meaning": "AVA blood flow rate of one hand",
         "suffix": None,
         "unit": "L/h",
     },
-    "BFcr": {
+    "bf_core": {
         "ex_output": True,
-        "meaning": "Core blood flow rate (each body part)",
+        "meaning": "core blood flow rate (each body part)",
         "suffix": "Body name",
         "unit": "L/h",
     },
-    "BFfat": {
+    "bf_fat": {
         "ex_output": True,
-        "meaning": "Fat blood flow rate (each body part)",
+        "meaning": "fat blood flow rate (each body part)",
         "suffix": "Body name",
         "unit": "L/h",
     },
-    "BFms": {
+    "bf_muscle": {
         "ex_output": True,
-        "meaning": "Muscle blood flow rate (each body part)",
+        "meaning": "muscle blood flow rate (each body part)",
         "suffix": "Body name",
         "unit": "L/h",
     },
-    "BFsk": {
+    "bf_skin": {
         "ex_output": True,
-        "meaning": "Skin blood flow rate (each body part)",
+        "meaning": "skin blood flow rate (each body part)",
         "suffix": "Body name",
         "unit": "L/h",
     },
-    "BSA": {
+    "bsa": {
         "ex_output": True,
-        "meaning": "Body surface area (each body part)",
+        "meaning": "body surface area (each body part)",
         "suffix": "Body name",
         "unit": "m2",
     },
-    "CO": {
+    "cardiac_output": {
         "ex_output": False,
-        "meaning": "Cardiac output (the sum of the whole blood flow)",
+        "meaning": "cardiac output (the sum of the whole blood flow)",
         "suffix": None,
         "unit": "L/h",
     },
-    "CycleTime": {
+    "cycle_time": {
         "ex_output": False,
-        "meaning": "The counts of executing one cycle calculation",
+        "meaning": "the counts of executing one cycle calculation",
         "suffix": None,
         "unit": "-",
     },
-    "Emax": {
+    "e_max": {
         "ex_output": True,
-        "meaning": "Maximum evaporative heat loss from the skin (each body part)",
+        "meaning": "maximum evaporative heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Esk": {
+    "e_skin": {
         "ex_output": True,
-        "meaning": "Evaporative heat loss from the skin (each body part)",
+        "meaning": "evaporative heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Esweat": {
+    "e_sweat": {
         "ex_output": True,
-        "meaning": "Evaporative heat loss from the skin by only sweating (each body part)",
+        "meaning": "evaporative heat loss from the skin by only sweating (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Fat": {"ex_output": True, "meaning": "Body fat rate", "suffix": None, "unit": "%"},
-    "Height": {"ex_output": True, "meaning": "Body height", "suffix": None, "unit": "m"},
-    "Icl": {
+    "fat": {"ex_output": True, "meaning": "body fat rate", "suffix": None, "unit": "%"},
+    "height": {"ex_output": True, "meaning": "body height", "suffix": None, "unit": "m"},
+    "clo": {
         "ex_output": True,
-        "meaning": "Clothing insulation (each body part)",
+        "meaning": "clothing insulation (each body part)",
         "suffix": "Body name",
         "unit": "clo",
     },
-    "LHLsk": {
+    "q_skin_latent": {
         "ex_output": True,
-        "meaning": "Latent heat loss from the skin (each body part)",
+        "meaning": "latent heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Mbasecr": {
+    "Q_bmr_core": {
         "ex_output": True,
-        "meaning": "Core heat production by basal metabolism (each body part)",
+        "meaning": "core heat production by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Mbasefat": {
+    "met_base_fat": {
         "ex_output": True,
-        "meaning": "Fat heat production by basal metabolism (each body part)",
+        "meaning": "fat heat production by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Mbasems": {
+    "Q_bmr_muscle": {
         "ex_output": True,
-        "meaning": "Muscle heat production by basal metabolism (each body part)",
+        "meaning": "muscle heat production by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Mbasesk": {
+    "Q_bmr_skin": {
         "ex_output": True,
-        "meaning": "Skin heat production by basal metabolism (each body part)",
+        "meaning": "skin heat production by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Met": {
+    "Q_total": {
         "ex_output": False,
-        "meaning": "Total heat production of the whole body",
+        "meaning": "total heat production of the whole body",
         "suffix": None,
         "unit": "W",
     },
-    "Mnst": {
+    "Q_nst": {
         "ex_output": True,
-        "meaning": "Core heat production by non-shivering thermogenesis (each body part)",
+        "meaning": "core heat production by non-shivering thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "ModTime": {
+    "simulation_time": {
         "ex_output": False,
-        "meaning": "Simulation times",
+        "meaning": "simulation times",
         "suffix": None,
         "unit": "sec",
     },
-    "Mshiv": {
+    "Q_shiv": {
         "ex_output": True,
-        "meaning": "Core or muscle heat production by shivering thermogenesis (each body part)",
+        "meaning": "core or muscle heat production by shivering thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Mwork": {
+    "Q_work": {
         "ex_output": True,
-        "meaning": "Core or muscle heat production by work (each body part)",
+        "meaning": "core or muscle heat production by work (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Name": {
+    "name": {
         "ex_output": True,
-        "meaning": "Name of the model",
+        "meaning": "name of the model",
         "suffix": None,
         "unit": "-",
     },
-    "PAR": {
+    "par": {
         "ex_output": True,
-        "meaning": "Physical activity ratio",
+        "meaning": "physical activity ratio",
         "suffix": None,
         "unit": "-",
     },
-    "Qcr": {
+    "Q_core": {
         "ex_output": True,
-        "meaning": "Core total heat production (each body part)",
+        "meaning": "core total heat production (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Qfat": {
+    "Q_fat": {
         "ex_output": True,
-        "meaning": "Fat total heat production (each body part)",
+        "meaning": "fat total heat production (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Qms": {
+    "Q_muscle": {
         "ex_output": True,
-        "meaning": "Muscle total heat production (each body part)",
+        "meaning": "muscle total heat production (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Qsk": {
+    "Q_skin": {
         "ex_output": True,
-        "meaning": "Skin total heat production (each body part)",
+        "meaning": "skin total heat production (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "RES": {
+    "q_res": {
         "ex_output": False,
-        "meaning": "Heat loss by respiration",
+        "meaning": "heat loss by respiration",
         "suffix": None,
         "unit": "W",
     },
-    "RESlh": {
+    "q_res_latent": {
         "ex_output": True,
-        "meaning": "Latent heat loss by respiration (each body part)",
+        "meaning": "latent heat loss by respiration (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "RESsh": {
+    "q_res_sensible": {
         "ex_output": True,
-        "meaning": "Sensible heat loss by respiration (each body part)",
+        "meaning": "sensible heat loss by respiration (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "RH": {
+    "rh": {
         "ex_output": True,
-        "meaning": "Relative humidity (each body part)",
+        "meaning": "relative humidity (each body part)",
         "suffix": "Body name",
         "unit": "%",
     },
     "Ret": {
         "ex_output": True,
-        "meaning": "Total clothing evaporative heat resistance (each body part)",
+        "meaning": "total clothing evaporative heat resistance (each body part)",
         "suffix": "Body name",
         "unit": "m2.kPa/W",
     },
     "Rt": {
         "ex_output": True,
-        "meaning": "Total clothing heat resistance (each body part)",
+        "meaning": "total clothing heat resistance (each body part)",
         "suffix": "Body name",
         "unit": "m2.K/W",
     },
-    "SHLsk": {
+    "q_skin_sensible": {
         "ex_output": True,
-        "meaning": "Sensible heat loss from the skin (each body part)",
+        "meaning": "sensible heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Setptcr": {
+    "t_core_set": {
         "ex_output": True,
-        "meaning": "Set point skin temperature (each body part)",
+        "meaning": "skin set point temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Setptsk": {
+    "t_skin_set": {
         "ex_output": True,
-        "meaning": "Set point core temperature (each body part)",
+        "meaning": "core set point temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Sex": {
+    "sex": {
         "ex_output": True,
-        "meaning": "Sex",
+        "meaning": "sex",
         "suffix": None,
         "unit": "-",
     },
-    "THLsk": {
+    "q_skin": {
         "ex_output": False,
-        "meaning": "Total heat loss from the skin (each body part)",
+        "meaning": "total heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Ta": {
+    "tdb": {
         "ex_output": True,
-        "meaning": "Air temperature (each body part)",
+        "meaning": "dry bulb air temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tar": {
+    "t_artery": {
         "ex_output": True,
-        "meaning": "Arterial temperature (each body part)",
+        "meaning": "arterial temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tcb": {
+    "t_cb": {
         "ex_output": True,
-        "meaning": "Central blood temperature",
+        "meaning": "central blood temperature",
         "suffix": None,
         "unit": "oC",
     },
-    "Tcr": {
+    "t_core": {
         "ex_output": False,
-        "meaning": "Core temperature (each body part)",
+        "meaning": "core temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tfat": {
+    "t_fat": {
         "ex_output": True,
-        "meaning": "Fat temperature (each body part)",
+        "meaning": "fat temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tms": {
+    "t_muscle": {
         "ex_output": True,
-        "meaning": "Muscle temperature (each body part)",
+        "meaning": "muscle temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "To": {
+    "to": {
         "ex_output": True,
-        "meaning": "Operative temperature (each body part)",
+        "meaning": "operative temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tr": {
+    "tr": {
         "ex_output": True,
-        "meaning": "Mean radiant temperature (each body part)",
+        "meaning": "mean radiant temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tsk": {
+    "t_skin": {
         "ex_output": False,
-        "meaning": "Skin temperature (each body part)",
+        "meaning": "skin temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "TskMean": {
+    "t_skin_mean": {
         "ex_output": False,
-        "meaning": "Mean skin temperature",
+        "meaning": "mean skin temperature",
         "suffix": None,
         "unit": "oC",
     },
-    "Tsve": {
+    "t_superficial_vein": {
         "ex_output": True,
-        "meaning": "Superficial vein temperature (each body part)",
+        "meaning": "superficial vein temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Tve": {
+    "t_vein": {
         "ex_output": True,
-        "meaning": "Vein temperature (each body part)",
+        "meaning": "vein temperature (each body part)",
         "suffix": "Body name",
         "unit": "oC",
     },
-    "Va": {
+    "v": {
         "ex_output": True,
-        "meaning": "Air velocity (each body part)",
+        "meaning": "air velocity (each body part)",
         "suffix": "Body name",
         "unit": "m/s",
     },
-    "Weight": {
+    "weight": {
         "ex_output": True,
-        "meaning": "Body weight",
+        "meaning": "body weight",
         "suffix": None,
         "unit": "kg",
     },
-    "Wet": {
+    "w": {
         "ex_output": False,
-        "meaning": "Skin wettedness (each body part)",
+        "meaning": "skin wettedness (each body part)",
         "suffix": "Body name",
         "unit": "-",
     },
-    "WetMean": {
+    "w_mean": {
         "ex_output": False,
-        "meaning": "Mean skin wettedness",
+        "meaning": "mean skin wettedness",
         "suffix": None,
         "unit": "-",
     },
-    "Wle": {
+    "weight_loss_by_evap_and_res": {
         "ex_output": False,
-        "meaning": "Weight loss by the evaporation and respiration of the whole body",
+        "meaning": "weight loss by the evaporation and respiration of the whole body",
         "suffix": None,
         "unit": "g/sec",
     },
     "dt": {
         "ex_output": False,
-        "meaning": "Time step",
+        "meaning": "time step",
         "suffix": None,
         "unit": "sec",
     },
-    "PythermalcomfortVersion": {
+    "pythermalcomfort_version": {
         "ex_output": False,
-        "meaning": "Version of pythermalcomfort",
+        "meaning": "version of pythermalcomfort",
         "suffix": None,
         "unit": "-",
     },

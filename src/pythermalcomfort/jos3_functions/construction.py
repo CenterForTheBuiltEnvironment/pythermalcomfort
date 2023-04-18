@@ -6,7 +6,7 @@ basal blood flow ratio, and thermal conductance and thermal capacity.
 """
 
 import numpy as np
-from pythermalcomfort.jos3.matrix import NUM_NODES, IDICT, BODY_NAMES
+from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.utilities import body_surface_area
 
 
@@ -73,7 +73,7 @@ def bsa_rate(
     formula="dubois",
 ):
     """
-    Calculate the rate of BSA to standard body.
+    Calculate the rate of bsa to standard body.
 
     Parameters
     ----------
@@ -88,14 +88,14 @@ def bsa_rate(
     Returns
     -------
     bsa_rate : float
-        The ratio of BSA to the standard body [-].
+        The ratio of bsa to the standard body [-].
     """
     bsa_all = body_surface_area(
         height=height,
         weight=weight,
         formula=formula,
     )
-    bsa_rate = bsa_all / _BSAst.sum()  # The BSA ratio to the standard body (1.87m2)
+    bsa_rate = bsa_all / _BSAst.sum()  # The bsa ratio to the standard body (1.87m2)
     return bsa_rate
 
 def localbsa(
@@ -104,12 +104,12 @@ def localbsa(
     formula="dubois",
 ):
     """
-    Calculate local body surface area (BSA) [m2].
+    Calculate local body surface area (bsa) [m2].
 
     The local body surface area has been derived from 65MN.
-    The Head have been devided to Head and Neck based on Smith's model.
-        Head = 0.1396*0.1117/0.1414 (65MN_Head * Smith_Head / Smith_Head+Neck)
-        Neck = 0.1396*0.0297/0.1414 (65MN_Head * Smith_Neck / Smith_Head+Neck)
+    The head have been devided to head and neck based on Smith's model.
+        head = 0.1396*0.1117/0.1414 (65MN_Head * Smith_Head / Smith_Head+neck)
+        neck = 0.1396*0.0297/0.1414 (65MN_Head * Smith_Neck / Smith_Head+neck)
 
     Parameters
     ----------
@@ -124,16 +124,16 @@ def localbsa(
     Returns
     -------
     localbsa : ndarray(17,)
-        Local body surface area (BSA) [m2].
+        Local body surface area (bsa) [m2].
     bsa_rate : float
-        The ratio of BSA to the standard body [-].
+        The ratio of bsa to the standard body [-].
 
     """
     _bsa_rate = bsa_rate(
         height=height,
         weight=weight,
         formula=formula,
-    )  # The BSA ratio to the standard body (1.87m2)
+    )  # The bsa ratio to the standard body (1.87m2)
     bsa = _BSAst * _bsa_rate
     return bsa
 
@@ -150,7 +150,7 @@ def weight_rate(
             2.16, 1.37, 0.34, 2.16, 1.37, 0.34,
             7.01, 3.34, 0.48, 7.01, 3.34, 0.48])
     The data have been derived from 65MN.
-    The weight of Neck is extracted from the weight of 65MN's Head based on
+    The weight of neck is extracted from the weight of 65MN's head based on
     the local body surface area of Smith's model.
 
     Parameters
@@ -188,7 +188,7 @@ def bfb_rate(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     ci : float, optional
         Cardiac index [L/min/㎡]. The default is 2.59.
 
@@ -358,11 +358,11 @@ def conductance(
     cdt_ms_fat = np.zeros(17)  # muscle to fat [W/K]
     cdt_fat_sk = np.zeros(17)  # fat to skin [W/K]
 
-    # Head and Pelvis consists of 65MN's conductances
-    cdt_cr_ms[0] = 1.601  # Head
+    # head and pelvis consists of 65MN's conductances
+    cdt_cr_ms[0] = 1.601  # head
     cdt_ms_fat[0] = 13.222
     cdt_fat_sk[0] = 16.008
-    cdt_cr_ms[4] = 3.0813  # Pelvis
+    cdt_cr_ms[4] = 3.0813  # pelvis
     cdt_ms_fat[4] = 10.3738
     cdt_fat_sk[4] = 41.4954
 
@@ -444,7 +444,7 @@ def conductance(
     # Changes values by body size based on the standard body.
     wr = weight_rate(weight)
     bsar = bsa_rate(height, weight, equation)
-    # Head, Neck (Sphere shape)
+    # head, neck (Sphere shape)
     cdt_cr_sk[:2] *= wr / bsar
     cdt_cr_ms[:2] *= wr / bsar
     cdt_ms_fat[:2] *= wr / bsar
@@ -509,7 +509,7 @@ def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     ci : float, optional
         Cardiac index [L/min/㎡]. The default is 2.59.
 

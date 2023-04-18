@@ -26,14 +26,13 @@ import csv
 import datetime as dt
 import os
 
-# import functions and valuables from "jos3" folder
-from pythermalcomfort.jos3 import thermoregulation as threg
-from pythermalcomfort.jos3 import matrix
-from pythermalcomfort.jos3.matrix import NUM_NODES, INDEX, VINDEX, BODY_NAMES, remove_bodyname
-# from pythermalcomfort.jos3.comfmod import operative_temp_when_pmv_is_zero
-from pythermalcomfort.jos3 import construction as cons
-from pythermalcomfort.jos3.construction import (_BSAst, _to17array)
-from pythermalcomfort.jos3.params import ALL_OUT_PARAMS
+# import functions and valuables from "jos3_functions" folder
+from pythermalcomfort.jos3_functions import thermoregulation as threg
+from pythermalcomfort.jos3_functions import matrix
+from pythermalcomfort.jos3_functions.matrix import NUM_NODES, INDEX, VINDEX, BODY_NAMES, remove_body_name
+from pythermalcomfort.jos3_functions import construction as cons
+from pythermalcomfort.jos3_functions.construction import (_BSAst, _to17array)
+from pythermalcomfort.jos3_functions.params import ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
 
@@ -3305,17 +3304,17 @@ class JOS3:
     such as body height, weight, age, sex, etc.
 
     Environmental conditions such as air temperature, mean radiant temperature, air velocity, etc.
-    can be set using the setter methods. (ex. X.Ta, X.Tr X.Va)
+    can be set using the setter methods. (ex. X.tdb, X.tr X.v)
     If you want to set the different conditons in each body part, set them
     as a 17 lengths of list, dictionaly, or numpy array format.
 
-    List or numpy array format input must be 17 lengths and means the order of "Head", "Neck", "Chest",
-    "Back", "Pelvis", "LShoulder", "LArm", "LHand", "RShoulder", "RArm",
-    "RHand", "LThigh", "LLeg", "LFoot", "RThigh", "RLeg" and "RFoot".
+    List or numpy array format input must be 17 lengths and means the order of "head", "neck", "chest",
+    "back", "pelvis", "left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm",
+    "right_hand", "left_thigh", "left_leg", "left_foot", "right_thigh", "right_leg" and "right_foot".
 
     The model output includes local and mean skin temperature, local core temperature,
     local and mean skin wettedness, and heat loss from the skin etc. which can be accessed using getter methods.
-    (ex. X.Tsk, X.TskMean, X.Tcr)
+    (ex. X.t_skin, X.t_skin_mean, X.t_core)
 
     If you use this package, please cite us as follows and mention the version of pythermalcomfort used:
     Y. Takahashi, A. Nomoto, S. Yoda, R. Hisayama, M. Ogata, Y. Ozeki, S. Tanabe,
@@ -3330,11 +3329,11 @@ class JOS3:
     weight : float, optional
         Body weight, in [kg]. The default is 74.43.
     fat : float, optional
-        Fat percentage, in [%]. The default is 15.
+        fat percentage, in [%]. The default is 15.
     age : int, optional
-        Age, in [years]. The default is 20.
+        age, in [years]. The default is 20.
     sex : str, optional
-        Sex ("male" or "female"). The default is "male".
+        sex ("male" or "female"). The default is "male".
     ci : float, optional
         Cardiac index, in [L/min/m2]. The default is 2.6432.
     bmr_equation : str, optional
@@ -3342,7 +3341,7 @@ class JOS3:
         The default is "harris-benedict" equation created uding Caucasian's data. (https://doi.org/10.1073/pnas.4.12.370)
         If the Ganpule's equation (https://doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
     bsa_equation : str, optional
-        The equation used to calculate body surface area (BSA). Choose a BSA equation.
+        The equation used to calculate body surface area (bsa). Choose a bsa equation.
         You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
         The body surface area can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.body_surface_area`.
@@ -3350,27 +3349,27 @@ class JOS3:
         This is used when you want to display results other than the default output parameters (ex.skin temperature);
         by default, JOS outputs only the most necessary parameters in order to reduce the computational load.
         If the parameters other than the default output parameters are needed,
-        specify the list of the desired parameter names in string format like ["BFsk", "BFcr", "Tar"].
+        specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
         If you want to display all output results, set ex_output is "all".
 
     Setter & Getter
     -------
-    Ta : float or list-like
+    tdb : float or list-like
         Air temperature [oC].
-    Tr : float or list-like
+    tr : float or list-like
         Mean radiant temperature [oC].
-    To : float or list-like
+    to : float or list-like
         Operative temperature [oC].
-    Va : float or list-like
+    v : float or list-like
         Air velocity [m/s].
-    RH : float or list-like
+    rh : float or list-like
         Relative humidity [%].
-    Icl : float or list-like
+    clo : float or list-like
         Clothing insulation [clo].
-    PAR : float
+    par : float
         Physical activity ratio [-].
         This equals the ratio of metaboric rate to basal metablic rate.
-        PAR of sitting quietly is 1.2.
+        par of sitting quietly is 1.2.
     posture : str
         Choose a posture from standing, sitting or lying.
     bodytemp : numpy.ndarray (85,)
@@ -3378,41 +3377,41 @@ class JOS3:
 
     Getter
     -------
-    BSA : numpy.ndarray (17,)
+    bsa : numpy.ndarray (17,)
         Body surface areas by local body segments [m2].
     Rt : numpy.ndarray (17,)
         Dry heat resistances between the skin and ambience areas by local body segments [K.m2/W].
     Ret : numpy.ndarray (17,)
         Wet (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
-    Wet : numpy.ndarray (17,)
+    w : numpy.ndarray (17,)
         Skin wettedness on local body segments [-].
-    WetMean : float
+    w_mean : float
         Mean skin wettedness of the whole body [-].
-    TskMean : float
+    t_skin_mean : float
         Mean skin temperature of the whole body [oC].
-    Tsk : numpy.ndarray (17,)
+    t_skin : numpy.ndarray (17,)
         Skin temperatures by the local body segments [oC].
-    Tcr : numpy.ndarray (17,)
+    t_core : numpy.ndarray (17,)
         Skin temperatures by the local body segments [oC].
-    Tcb : numpy.ndarray (1,)
+    t_cb : numpy.ndarray (1,)
         Core temperatures by the local body segments [oC].
-    Tar : numpy.ndarray (17,)
+    t_artery : numpy.ndarray (17,)
         Arterial temperatures by the local body segments [oC].
-    Tve : numpy.ndarray (17,)
+    t_vein : numpy.ndarray (17,)
         Vein temperatures by the local body segments [oC].
-    Tsve : numpy.ndarray (12,)
+    t_superficial_vein : numpy.ndarray (12,)
         Superfical vein temperatures by the local body segments [oC].
-    Tms : numpy.ndarray (2,)
-        Muscle temperatures of Head and Pelvis [oC].
-    Tfat : numpy.ndarray (2,)
-        Fat temperatures of Head and Pelvis  [oC].
+    t_muscle : numpy.ndarray (2,)
+        Muscle temperatures of head and pelvis [oC].
+    t_fat : numpy.ndarray (2,)
+        fat temperatures of head and pelvis  [oC].
     BMR : float
         Basal metabolic rate [W/m2].
     bodynames : list (17)
         JOS3 body names [-].
-        "Head", "Neck", "Chest", "Back", "Pelvis",
-        "LShoulder", "LArm", "LHand", "RShoulder", "RArm", "RHand",
-        "LThigh", "LLeg", "LHand", "RThigh", "RLeg" and "RHand".
+        "head", "neck", "chest", "back", "pelvis",
+        "left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
+        "left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
     results : dict
         output as dictionaly format
 
@@ -3436,18 +3435,18 @@ class JOS3:
     output_params : dict
        A dictionary including the following output parameters:
 
-        CO      : Cardiac output (the sum of the whole blood flow) [L/h]
-        CycleTime: The counts of executing one cycle calculation [-]
-        Met     : Total heat production of the whole body [W]
-        ModTime : Simulation times [sec]
-        RES     : Heat loss by respiration [W]
-        THLsk   : Total heat loss from the skin (each body part) [W]
-        Tcr     : Core temperature (each body part) [oC]
-        Tsk     : Skin temperature (each body part) [oC]
-        TskMean : Mean skin temperature [oC]
-        Wet     : Skin wettedness (each body part) [-]
-        WetMean : Mean skin wettedness [-]
-        Wle     : Weight loss by the evaporation and respiration of the whole body [g/sec]
+        cardiac_output      : Cardiac output (the sum of the whole blood flow) [L/h]
+        cycle_time: The counts of executing one cycle calculation [-]
+        Q_total     : Total heat production of the whole body [W]
+        simulation_time : Simulation times [sec]
+        q_res     : Heat loss by respiration [W]
+        q_skin   : Total heat loss from the skin (each body part) [W]
+        t_core     : Core temperature (each body part) [oC]
+        t_skin     : Skin temperature (each body part) [oC]
+        t_skin_mean : Mean skin temperature [oC]
+        w     : Skin wettedness (each body part) [-]
+        w_mean : Mean skin wettedness [-]
+        weight_loss_by_evap_and_res     : weight loss by the evaporation and respiration of the whole body [g/sec]
         dt      : Time delta of the model [sec]
 
     Returns (optional)
@@ -3455,54 +3454,54 @@ class JOS3:
     output_params : dict
         A dictionary including the following parameters:
 
-        Age     : Age [years]
-        BFava_foot: AVA blood flow rate of one foot [L/h]
-        BFava_hand: AVA blood flow rate of one hand [L/h]
-        BFcr    : Core blood flow rate (each body part) [L/h]
-        BFfat   : Fat blood flow rate (each body part) [L/h]
-        BFms    : Muscle blood flow rate (each body part) [L/h]
-        BFsk    : Skin blood flow rate (each body part) [L/h]
-        BSA     : Body surface area (each body part) [m2]
-        Emax    : Maximum evaporative heat loss from the skin (each body part) [W]
-        Esk     : Evaporative heat loss from the skin (each body part) [W]
-        Esweat  : Evaporative heat loss from the skin by only sweating (each body part) [W]
-        Fat     : Body fat rate [%]
-        Height  : Body height [m]
-        Icl     : Clothing insulation (each body part) [clo]
-        LHLsk   : Latent heat loss from the skin (each body part) [W]
-        Mbasecr : Core heat production by basal metabolism (each body part) [W]
-        Mbasefat: Fat heat production by basal metabolism (each body part) [W]
-        Mbasems : Muscle heat production by basal metabolism (each body part) [W]
-        Mbasesk : Skin heat production by basal metabolism (each body part) [W]
-        Mnst    : Core heat production by non-shivering thermogenesis (each body part) [W]
-        Mshiv   : Core or muscle heat production by shivering thermogenesis (each body part) [W]
-        Mwork   : Core or muscle heat production by work (each body part) [W]
-        Name    : Name of the model [-]
-        PAR     : Physical activity ratio [-]
-        Qcr     : Core total heat production (each body part) [W]
-        Qfat    : Fat total heat production (each body part) [W]
-        Qms     : Muscle total heat production (each body part) [W]
-        Qsk     : Skin total heat production (each body part) [W]
-        RESlh   : Latent heat loss by respiration (each body part) [W]
-        RESsh   : Sensible heat loss by respiration (each body part) [W]
-        RH      : Relative humidity (each body part) [%]
+        age     : age [years]
+        bf_ava_foot: AVA blood flow rate of one foot [L/h]
+        bf_ava_hand: AVA blood flow rate of one hand [L/h]
+        bf_core    : Core blood flow rate (each body part) [L/h]
+        bf_fat   : fat blood flow rate (each body part) [L/h]
+        bf_muscle    : Muscle blood flow rate (each body part) [L/h]
+        bf_skin    : Skin blood flow rate (each body part) [L/h]
+        bsa     : Body surface area (each body part) [m2]
+        e_max    : Maximum evaporative heat loss from the skin (each body part) [W]
+        e_skin     : Evaporative heat loss from the skin (each body part) [W]
+        e_sweat  : Evaporative heat loss from the skin by only sweating (each body part) [W]
+        fat     : Body fat rate [%]
+        height  : Body height [m]
+        clo     : Clothing insulation (each body part) [clo]
+        q_skin_latent   : Latent heat loss from the skin (each body part) [W]
+        Q_bmr_core : Core heat production by basal metabolism (each body part) [W]
+        met_base_fat: fat heat production by basal metabolism (each body part) [W]
+        Q_bmr_muscle : Muscle heat production by basal metabolism (each body part) [W]
+        Q_bmr_skin : Skin heat production by basal metabolism (each body part) [W]
+        Q_nst    : Core heat production by non-shivering thermogenesis (each body part) [W]
+        Q_shiv   : Core or muscle heat production by shivering thermogenesis (each body part) [W]
+        Q_work   : Core or muscle heat production by work (each body part) [W]
+        name    : name of the model [-]
+        par     : Physical activity ratio [-]
+        Q_core     : Core total heat production (each body part) [W]
+        Q_fat    : fat total heat production (each body part) [W]
+        Q_muscle     : Muscle total heat production (each body part) [W]
+        Q_skin     : Skin total heat production (each body part) [W]
+        q_res_latent   : Latent heat loss by respiration (each body part) [W]
+        q_res_sensible   : Sensible heat loss by respiration (each body part) [W]
+        rh      : Relative humidity (each body part) [%]
         Ret     : Total clothing evaporative heat resistance (each body part) [m2.kPa/W]
         Rt      : Total clothing heat resistance (each body part) [m2.K/W]
-        SHLsk   : Sensible heat loss from the skin (each body part) [W]
-        Setptcr : Set point skin temperature (each body part) [oC]
-        Setptsk : Set point core temperature (each body part) [oC]
-        Sex     : Sex [-]
-        Ta      : Air temperature (each body part) [oC]
-        Tar     : Arterial temperature (each body part) [oC]
-        Tcb     : Central blood temperature [oC]
-        Tfat    : Fat temperature (each body part) [oC]
-        Tms     : Muscle temperature (each body part) [oC]
-        To      : Operative temperature (each body part) [oC]
-        Tr      : Mean radiant temperature (each body part) [oC]
-        Tsve    : Superficial vein temperature (each body part) [oC]
-        Tve     : Vein temperature (each body part) [oC]
-        Va      : Air velocity (each body part) [m/s]
-        Weight  : Body weight [kg]
+        q_skin_sensible   : Sensible heat loss from the skin (each body part) [W]
+        t_core_set : Set point skin temperature (each body part) [oC]
+        t_skin_set : Set point core temperature (each body part) [oC]
+        sex     : sex [-]
+        tdb      : Air temperature (each body part) [oC]
+        t_artery     : Arterial temperature (each body part) [oC]
+        t_cb     : Central blood temperature [oC]
+        t_fat    : fat temperature (each body part) [oC]
+        t_muscle     : Muscle temperature (each body part) [oC]
+        to      : Operative temperature (each body part) [oC]
+        tr      : Mean radiant temperature (each body part) [oC]
+        t_superficial_vein    : Superficial vein temperature (each body part) [oC]
+        t_vein     : Vein temperature (each body part) [oC]
+        v      : Air velocity (each body part) [m/s]
+        weight  : Body weight [kg]
 
     Examples
     -------
@@ -3522,20 +3521,20 @@ class JOS3:
     >>> )
     # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
     # Set the first condition
-    >>> model.Ta = 28  # Air temperature [oC]
-    >>> model.Tr = 30  # Mean radiant temperature [oC]
-    >>> model.RH = 40  # Relative humidity [%]
-    >>> model.Va = 0.2  # Air velocity [m/s]
-    >>> model.PAR = 1.2  # Physical activity ratio [-], assuming a sitting position
+    >>> model.tdb = 28  # Air temperature [oC]
+    >>> model.tr = 30  # Mean radiant temperature [oC]
+    >>> model.rh = 40  # Relative humidity [%]
+    >>> model.v = 0.2  # Air velocity [m/s]
+    >>> model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
     >>> model.posture = "sitting"  # Posture [-], assuming a sitting position
     >>> model.options[]
-    >>> model.Icl = np.array(
+    >>> model.clo = np.array(
     >>>     [  # Clothing insulation [clo]
-    >>>         0.00,  # Head
-    >>>         0.00,  # Neck
-    >>>         1.14,  # Chest
-    >>>         0.84,  # Back
-    >>>         1.04,  # Pelvis
+    >>>         0.00,  # head
+    >>>         0.00,  # neck
+    >>>         1.14,  # chest
+    >>>         0.84,  # back
+    >>>         1.04,  # pelvis
     >>>         0.84,  # Left-Shoulder
     >>>         0.42,  # Left-Arm
     >>>         0.00,  # Left-Hand
@@ -3556,14 +3555,14 @@ class JOS3:
     >>>     dtime=60,  # Time delta [sec]. The default is 60.
     >>> )  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
     # Set the next condition (You only need to change the parameters that you want to change)
-    >>> model.To = 20  # Change operative temperature
-    >>> model.Va = np.array(
+    >>> model.to = 20  # Change operative temperature
+    >>> model.v = np.array(
     >>>     [  # Air velocity [m/s], assuming to use a desk fan
-    >>>         0.2,  # Head
-    >>>         0.4,  # Neck
-    >>>         0.4,  # Chest
-    >>>         0.1,  # Back
-    >>>         0.1,  # Pelvis
+    >>>         0.2,  # head
+    >>>         0.4,  # neck
+    >>>         0.4,  # chest
+    >>>         0.1,  # back
+    >>>         0.1,  # pelvis
     >>>         0.4,  # Left-Shoulder
     >>>         0.4,  # Left-Arm
     >>>         0.4,  # Left-Hand
@@ -3585,8 +3584,8 @@ class JOS3:
     >>> )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
     >>>
     # Set the next condition (You only need to change the parameters that you want to change)
-    >>> model.Ta = 30  # Change air temperature [oC]
-    >>> model.Tr = 35  # Change mean radiant temperature [oC]
+    >>> model.tdb = 30  # Change air temperature [oC]
+    >>> model.tr = 35  # Change mean radiant temperature [oC]
     # Run JOS-3 model
     >>> model.simulate(
     >>>     times=30,  # Number of loops of a simulation
@@ -3596,7 +3595,7 @@ class JOS3:
     >>>import pandas as pd
     >>>import matplotlib.pyplot as
     >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
-    >>> df[["TskMean", "TskHead", "TskChest", "TskLHand"]].plot()  # Plot time series of local skin temperature.
+    >>> df[["t_skin_mean", "TskHead", "TskChest", "TskLHand"]].plot()  # Plot time series of local skin temperature.
     >>> plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
     >>> plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
     >>> plt.savefig("jos3_example2_local_skin_temperatures.png")  # Save plot at the current directory
@@ -3632,11 +3631,11 @@ class JOS3:
         weight : float, optional
             Body weight, in [kg]. The default is 74.43.
         fat : float, optional
-            Fat percentage, in [%]. The default is 15.
+            fat percentage, in [%]. The default is 15.
         age : int, optional
-            Age, in [years]. The default is 20.
+            age, in [years]. The default is 20.
         sex : str, optional
-            Sex ("male" or "female"). The default is "male".
+            sex ("male" or "female"). The default is "male".
         ci : float, optional
             Cardiac index, in [L/min/m2]. The default is 2.6432.
         bmr_equation : str, optional
@@ -3644,13 +3643,13 @@ class JOS3:
             The default is "harris-benedict" equation created uding Caucasian's data. (https://doi.org/10.1073/pnas.4.12.370)
             If the Ganpule's equation (https://doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
         bsa_equation : str, optional
-            The equation used to calculate body surface area (BSA). Choose a BSA equation.
+            The equation used to calculate body surface area (bsa). Choose a bsa equation.
             You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
         ex_output : None, list or "all", optional
             This is used when you want to display results other than the default output parameters (ex.skin temperature);
             by default, JOS outputs only the most necessary parameters in order to reduce the computational load.
             If the parameters other than the default output parameters are needed,
-            specify the list of the desired parameter names in string format like ["BFsk", "BFcr", "Tar"].
+            specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
             If you want to display all output results, set ex_output is "all".
 
         Returns
@@ -3675,7 +3674,7 @@ class JOS3:
         self._bsa_equation = bsa_equation
         self._ex_output = ex_output
 
-        # Calculate body surface area (BSA) rate
+        # Calculate body surface area (bsa) rate
         self._bsa_rate = cons.bsa_rate(height, weight, bsa_equation)
 
         # Calculate local body surface area
@@ -3771,7 +3770,7 @@ class JOS3:
     def _reset_setpt(self):
         """
         Reset setpoint temperature under steady state calculation.
-        Be careful, input parameters (Ta, Tr, RH, Va, Icl, PAR) and body
+        Be careful, input parameters (tdb, tr, rh, v, clo, par) and body
         temperatures are also reset.
 
         Returns
@@ -3780,14 +3779,14 @@ class JOS3:
             Parameters of JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
-        # PAR = 1.25
+        # par = 1.25
         # 1 met = 58.15 W/m2
         met = self.BMR * 1.25 / 58.15  # [met]
-        self.To = self._calculate_operative_temp_when_pmv_is_zero(met=met)
-        self.RH = 50 # Relative humidity
-        self.Va = 0.1 # Air velocity
-        self.Icl = 0 # Clothing insulation
-        self.PAR = 1.25 # Physical activity ratio
+        self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
+        self.rh = 50 # Relative humidity
+        self.v = 0.1 # Air velocity
+        self.clo = 0 # Clothing insulation
+        self.par = 1.25 # Physical activity ratio
 
         # Steady-calculation
         self.options["ava_zero"] = True
@@ -3795,8 +3794,8 @@ class JOS3:
             dictout = self._run(dtime=60000, passive=True)
 
         # Set new setpoint temperatures for core and skin
-        self.setpt_cr = self.Tcr
-        self.setpt_sk = self.Tsk
+        self.setpt_cr = self.t_core
+        self.setpt_sk = self.t_skin
         self.options["ava_zero"] = False
 
         return dictout
@@ -3850,7 +3849,7 @@ class JOS3:
         It then calculates the new body temperature by solving the matrices using numpy's linalg library.
 
         Finally, the function returns a dictionary of the simulation results.
-        The output parameters include cycle time, model time, TskMean, Tsk, Tcr, WetMean, Wet, Wle, CO, Met, RES, and THLsk.
+        The output parameters include cycle time, model time, t_skin_mean, t_skin, t_core, w_mean, w, weight_loss_by_evap_and_res, cardiac_output, Q_total, q_res, and q_skin.
 
         Additionally, if the _ex_output variable is set to "all" or is a list of keys,
         the function also returns a detailed dictionary of all the thermoregulation parameters
@@ -3877,8 +3876,8 @@ class JOS3:
         # Compute heat and evaporative heat resistance [m2.K/W], [m2.kPa/W]
 
         # Get core and skin temperatures
-        tcr = self.Tcr
-        tsk = self.Tsk
+        tcr = self.t_core
+        tsk = self.t_skin
 
         # Convective and radiative heat transfer coefficients [W/K.m2]
         hc = threg.fixed_hc(
@@ -3940,7 +3939,7 @@ class JOS3:
         err_sk = tsk - setpt_sk
 
         # SWEATING THERMOREGULATION
-        # Skinwettedness [-], Esk, Emax, Esw [W]
+        # Skinwettedness [-], e_skin, e_max, e_sweat [W]
         # Calculate skin wettedness, sweating heat loss, maximum sweating rate, and total sweat rate
         wet, e_sk, e_max, e_sweat = threg.evaporation(
             err_cr,
@@ -4138,7 +4137,7 @@ class JOS3:
         arrQ[INDEX["skin"]] += qsk
 
         # Respiratory [W]
-        arrQ[INDEX["core"][2]] -= res_sh + res_lh  # Chest core
+        arrQ[INDEX["core"][2]] -= res_sh + res_lh  # chest core
 
         # Sweating [W]
         arrQ[INDEX["skin"]] -= e_sk
@@ -4167,71 +4166,71 @@ class JOS3:
         # ------------------------------------------------------------------
         dictout = {}
         if output:  # Default output
-            dictout["PythermalcomfortVersion"] = self._version
-            dictout["CycleTime"] = self._cycle
-            dictout["ModTime"] = self._t
+            dictout["pythermalcomfort_version"] = self._version
+            dictout["cycle_time"] = self._cycle
+            dictout["simulation_time"] = self._t
             dictout["dt"] = dtime
-            dictout["TskMean"] = self.TskMean
-            dictout["Tsk"] = self.Tsk
-            dictout["Tcr"] = self.Tcr
-            dictout["WetMean"] = np.average(wet, weights=_BSAst)
-            dictout["Wet"] = wet
-            dictout["Wle"] = wlesk.sum() + wleres
-            dictout["CO"] = co
-            dictout["Met"] = qall
-            dictout["RES"] = res_sh + res_lh
-            dictout["THLsk"] = shlsk + e_sk
+            dictout["t_skin_mean"] = self.t_skin_mean
+            dictout["t_skin"] = self.t_skin
+            dictout["t_core"] = self.t_core
+            dictout["w_mean"] = np.average(wet, weights=_BSAst)
+            dictout["w"] = wet
+            dictout["weight_loss_by_evap_and_res"] = wlesk.sum() + wleres
+            dictout["cardiac_output"] = co
+            dictout["Q_total"] = qall
+            dictout["q_res"] = res_sh + res_lh
+            dictout["q_skin"] = shlsk + e_sk
 
         detailout = {}
         if self._ex_output and output:
-            detailout["Name"] = self.model_name
-            detailout["Height"] = self._height
-            detailout["Weight"] = self._weight
-            detailout["BSA"] = self._bsa
-            detailout["Fat"] = self._fat
-            detailout["Sex"] = self._sex
-            detailout["Age"] = self._age
-            detailout["Setptcr"] = setpt_cr
-            detailout["Setptsk"] = setpt_sk
-            detailout["Tcb"] = self.Tcb
-            detailout["Tar"] = self.Tar
-            detailout["Tve"] = self.Tve
-            detailout["Tsve"] = self.Tsve
-            detailout["Tms"] = self.Tms
-            detailout["Tfat"] = self.Tfat
-            detailout["To"] = to
+            detailout["name"] = self.model_name
+            detailout["height"] = self._height
+            detailout["weight"] = self._weight
+            detailout["bsa"] = self._bsa
+            detailout["fat"] = self._fat
+            detailout["sex"] = self._sex
+            detailout["age"] = self._age
+            detailout["t_core_set"] = setpt_cr
+            detailout["t_skin_set"] = setpt_sk
+            detailout["t_cb"] = self.t_cb
+            detailout["t_artery"] = self.t_artery
+            detailout["t_vein"] = self.t_vein
+            detailout["t_superficial_vein"] = self.t_superficial_vein
+            detailout["t_muscle"] = self.t_muscle
+            detailout["t_fat"] = self.t_fat
+            detailout["to"] = to
             detailout["Rt"] = r_t
             detailout["Ret"] = r_et
-            detailout["Ta"] = self._ta.copy()
-            detailout["Tr"] = self._tr.copy()
-            detailout["RH"] = self._rh.copy()
-            detailout["Va"] = self._va.copy()
-            detailout["PAR"] = self._par
-            detailout["Icl"] = self._clo.copy()
-            detailout["Esk"] = e_sk
-            detailout["Emax"] = e_max
-            detailout["Esweat"] = e_sweat
-            detailout["BFcr"] = bf_cr
-            detailout["BFms"] = bf_ms[VINDEX["muscle"]]
-            detailout["BFfat"] = bf_fat[VINDEX["fat"]]
-            detailout["BFsk"] = bf_sk
-            detailout["BFava_hand"] = bf_ava_hand
-            detailout["BFava_foot"] = bf_ava_foot
-            detailout["Mbasecr"] = mbase[0]
-            detailout["Mbasems"] = mbase[1][VINDEX["muscle"]]
-            detailout["Mbasefat"] = mbase[2][VINDEX["fat"]]
-            detailout["Mbasesk"] = mbase[3]
-            detailout["Mwork"] = mwork
-            detailout["Mshiv"] = mshiv
-            detailout["Mnst"] = mnst
-            detailout["Qcr"] = qcr
-            detailout["Qms"] = qms[VINDEX["muscle"]]
-            detailout["Qfat"] = qfat[VINDEX["fat"]]
-            detailout["Qsk"] = qsk
-            dictout["SHLsk"] = shlsk
-            dictout["LHLsk"] = e_sk
-            dictout["RESsh"] = res_sh
-            dictout["RESlh"] = res_lh
+            detailout["tdb"] = self._ta.copy()
+            detailout["tr"] = self._tr.copy()
+            detailout["rh"] = self._rh.copy()
+            detailout["v"] = self._va.copy()
+            detailout["par"] = self._par
+            detailout["clo"] = self._clo.copy()
+            detailout["e_skin"] = e_sk
+            detailout["e_max"] = e_max
+            detailout["e_sweat"] = e_sweat
+            detailout["bf_core"] = bf_cr
+            detailout["bf_muscle"] = bf_ms[VINDEX["muscle"]]
+            detailout["bf_fat"] = bf_fat[VINDEX["fat"]]
+            detailout["bf_skin"] = bf_sk
+            detailout["bf_ava_hand"] = bf_ava_hand
+            detailout["bf_ava_foot"] = bf_ava_foot
+            detailout["Q_bmr_core"] = mbase[0]
+            detailout["Q_bmr_muscle"] = mbase[1][VINDEX["muscle"]]
+            detailout["met_base_fat"] = mbase[2][VINDEX["fat"]]
+            detailout["Q_bmr_skin"] = mbase[3]
+            detailout["Q_work"] = mwork
+            detailout["Q_shiv"] = mshiv
+            detailout["Q_nst"] = mnst
+            detailout["Q_core"] = qcr
+            detailout["Q_muscle"] = qms[VINDEX["muscle"]]
+            detailout["Q_fat"] = qfat[VINDEX["fat"]]
+            detailout["Q_skin"] = qsk
+            dictout["q_skin_sensible"] = shlsk
+            dictout["q_skin_latent"] = e_sk
+            dictout["q_res_sensible"] = res_sh
+            dictout["q_res_latent"] = res_lh
 
         if self._ex_output == "all":
             dictout.update(detailout)
@@ -4286,15 +4285,15 @@ class JOS3:
                 if isinstance(value, str):
                     keys = [key]  # str is iter. Convert to list without suffix
                 elif check_word_contain(key, "sve", "sfv", "superficialvein"):
-                    keys = [key + BODY_NAMES[i] for i in VINDEX["sfvein"]]
+                    keys = [key + '_' + BODY_NAMES[i] for i in VINDEX["sfvein"]]
                 elif check_word_contain(key, "ms", "muscle"):
-                    keys = [key + BODY_NAMES[i] for i in VINDEX["muscle"]]
+                    keys = [key + '_' + BODY_NAMES[i] for i in VINDEX["muscle"]]
                 elif check_word_contain(key, "fat"):
-                    keys = [key + BODY_NAMES[i] for i in VINDEX["fat"]]
+                    keys = [key + '_' + BODY_NAMES[i] for i in VINDEX["fat"]]
                 elif length == 17:  # if data contains 17 values
-                    keys = [key + bn for bn in BODY_NAMES]
+                    keys = [key + '_' + bn for bn in BODY_NAMES]
                 else:
-                    keys = [key + BODY_NAMES[i] for i in range(length)]
+                    keys = [key + '_' + BODY_NAMES[i] for i in range(length)]
             except TypeError:  # if the value is not iter.
                 keys = [key]  # convert to iter
             key2keys.update({key: keys})
@@ -4361,14 +4360,14 @@ class JOS3:
         units = []
         meanigs = []
         for col in columns:
-            param, rbn = remove_bodyname(col)
+            param, bodyname = remove_body_name(col)
             if param in ALL_OUT_PARAMS:
                 u = ALL_OUT_PARAMS[param]["unit"]
                 units.append(u)
 
                 m = ALL_OUT_PARAMS[param]["meaning"]
-                if rbn:
-                    meanigs.append(m.replace("each body part", rbn))
+                if bodyname:
+                    meanigs.append(m.replace("each body part", bodyname))
                 else:
                     meanigs.append(m)
             else:
@@ -4383,7 +4382,7 @@ class JOS3:
                 writer.writerow(units)
             if meanig:
                 writer.writerow(meanigs)
-            for i in range(len(dictout["CycleTime"])):
+            for i in range(len(dictout["cycle_time"])):
                 row = []
                 for k in columns:
                     row.append(dictout[k][i])
@@ -4400,7 +4399,7 @@ class JOS3:
         ----------
         tissue : str
             Tissue name. "core", "skin", or "artery".... If you set value to
-            Head muscle and other segment's core, set "all_muscle".
+            head muscle and other segment's core, set "all_muscle".
         value : int, float, array
             Heat gain [W]
 
@@ -4417,37 +4416,37 @@ class JOS3:
     # --------------------------------------------------------------------------
 
     @property
-    def Ta(self):
+    def tdb(self):
         """
         Getter
         Returns
         -------
-        Ta : numpy.ndarray (17,)
+        tdb : numpy.ndarray (17,)
             Air temperature [oC].
         """
         return self._ta
 
-    @Ta.setter
-    def Ta(self, inp):
+    @tdb.setter
+    def tdb(self, inp):
         self._ta = _to17array(inp)
 
     @property
-    def Tr(self):
+    def tr(self):
         """
         Getter
         Returns
         -------
-        Tr : numpy.ndarray (17,)
+        tr : numpy.ndarray (17,)
             Mean radiant temperature [oC].
         """
         return self._tr
 
-    @Tr.setter
-    def Tr(self, inp):
+    @tr.setter
+    def tr(self, inp):
         self._tr = _to17array(inp)
 
     @property
-    def To(self):
+    def to(self):
         """
         Getter
         Returns
@@ -4460,7 +4459,7 @@ class JOS3:
                 self._posture,
                 self._va,
                 self._ta,
-                self.Tsk,
+                self.t_skin,
             ),
             self._va,
         )
@@ -4477,39 +4476,39 @@ class JOS3:
         )
         return to
 
-    @To.setter
-    def To(self, inp):
+    @to.setter
+    def to(self, inp):
         self._ta = _to17array(inp)
         self._tr = _to17array(inp)
 
     @property
-    def RH(self):
+    def rh(self):
         """
         Getter
         Returns
         -------
-        RH : numpy.ndarray (17,)
+        rh : numpy.ndarray (17,)
             Relative humidity [%].
         """
         return self._rh
 
-    @RH.setter
-    def RH(self, inp):
+    @rh.setter
+    def rh(self, inp):
         self._rh = _to17array(inp)
 
     @property
-    def Va(self):
+    def v(self):
         """
         Getter
         Returns
         -------
-        Va : numpy.ndarray (17,)
+        v : numpy.ndarray (17,)
             Air velocity [m/s].
         """
         return self._va
 
-    @Va.setter
-    def Va(self, inp):
+    @v.setter
+    def v(self, inp):
         self._va = _to17array(inp)
 
     @property
@@ -4544,35 +4543,35 @@ class JOS3:
             print('posture was set "standing".')
 
     @property
-    def Icl(self):
+    def clo(self):
         """
         Getter
         Returns
         -------
-        Icl : numpy.ndarray (17,)
+        clo : numpy.ndarray (17,)
             Clothing insulation [clo].
         """
         return self._clo
 
-    @Icl.setter
-    def Icl(self, inp):
+    @clo.setter
+    def clo(self, inp):
         self._clo = _to17array(inp)
 
     @property
-    def PAR(self):
+    def par(self):
         """
         Getter
         Returns
         -------
-        PAR : float
+        par : float
             Physical activity ratio [-].
             This equals the ratio of metaboric rate to basal metablic rate.
-            PAR of sitting quietly is 1.2.
+            par of sitting quietly is 1.2.
         """
         return self._par
 
-    @PAR.setter
-    def PAR(self, inp):
+    @par.setter
+    def par(self, inp):
         self._par = inp
 
     @property
@@ -4595,12 +4594,12 @@ class JOS3:
     # --------------------------------------------------------------------------
 
     @property
-    def BSA(self):
+    def bsa(self):
         """
         Getter
         Returns
         -------
-        BSA : numpy.ndarray (17,)
+        bsa : numpy.ndarray (17,)
             Body surface areas by local body segments [m2].
         """
         return self._bsa.copy()
@@ -4619,7 +4618,7 @@ class JOS3:
                 self._posture,
                 self._va,
                 self._ta,
-                self.Tsk,
+                self.t_skin,
             ),
             self._va,
         )
@@ -4637,143 +4636,143 @@ class JOS3:
         Returns
         -------
         Ret : numpy.ndarray (17,)
-            Wet (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
+            w (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
         """
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
                 self._va,
                 self._ta,
-                self.Tsk,
+                self.t_skin,
             ),
             self._va,
         )
         return threg.wet_r(hc, self._clo, self._iclo)
 
     @property
-    def Wet(self):
+    def w(self):
         """
         Getter
         Returns
         -------
-        Wet : numpy.ndarray (17,)
+        w : numpy.ndarray (17,)
             Skin wettedness on local body segments [-].
         """
-        err_cr = self.Tcr - self.setpt_cr
-        err_sk = self.Tsk - self.setpt_sk
+        err_cr = self.t_core - self.setpt_cr
+        err_sk = self.t_skin - self.setpt_sk
         wet, *_ = threg.evaporation(
             err_cr, err_sk, self._ta, self._rh, self.Ret, self._bsa_rate, self._age
         )
         return wet
 
     @property
-    def WetMean(self):
+    def w_mean(self):
         """
         Getter
         Returns
         -------
-        WetMean : float
+        w_mean : float
             Mean skin wettedness of the whole body [-].
         """
-        wet = self.Wet
+        wet = self.w
         return np.average(wet, weights=_BSAst)
 
     @property
-    def TskMean(self):
+    def t_skin_mean(self):
         """
         Getter
         Returns
         -------
-        TskMean : float
+        t_skin_mean : float
             Mean skin temperature of the whole body [oC].
         """
         return np.average(self._bodytemp[INDEX["skin"]], weights=_BSAst)
 
     @property
-    def Tsk(self):
+    def t_skin(self):
         """
         Getter
         Returns
         -------
-        Tsk : numpy.ndarray (17,)
+        t_skin : numpy.ndarray (17,)
             Skin temperatures by the local body segments [oC].
         """
         return self._bodytemp[INDEX["skin"]].copy()
 
     @property
-    def Tcr(self):
+    def t_core(self):
         """
         Getter
         Returns
         -------
-        Tcr : numpy.ndarray (17,)
+        t_core : numpy.ndarray (17,)
             Skin temperatures by the local body segments [oC].
         """
         return self._bodytemp[INDEX["core"]].copy()
 
     @property
-    def Tcb(self):
+    def t_cb(self):
         """
         Getter
         Returns
         -------
-        Tcb : numpy.ndarray (1,)
+        t_cb : numpy.ndarray (1,)
             Temperature at central blood pool [oC].
         """
         return self._bodytemp[0].copy()
 
     @property
-    def Tar(self):
+    def t_artery(self):
         """
         Getter
         Returns
         -------
-        Tar : numpy.ndarray (17,)
+        t_artery : numpy.ndarray (17,)
             Arterial temperatures by the local body segments [oC].
         """
         return self._bodytemp[INDEX["artery"]].copy()
 
     @property
-    def Tve(self):
+    def t_vein(self):
         """
         Getter
         Returns
         -------
-        Tve : numpy.ndarray (17,)
+        t_vein : numpy.ndarray (17,)
             Vein temperatures by the local body segments [oC].
         """
         return self._bodytemp[INDEX["vein"]].copy()
 
     @property
-    def Tsve(self):
+    def t_superficial_vein(self):
         """
         Getter
         Returns
         -------
-        Tsve : numpy.ndarray (12,)
+        t_superficial_vein : numpy.ndarray (12,)
             Superfical vein temperatures by the local body segments [oC].
         """
         return self._bodytemp[INDEX["sfvein"]].copy()
 
     @property
-    def Tms(self):
+    def t_muscle(self):
         """
         Getter
         Returns
         -------
-        Tms : numpy.ndarray (2,)
-            Muscle temperatures of Head and Pelvis [oC].
+        t_muscle : numpy.ndarray (2,)
+            Muscle temperatures of head and pelvis [oC].
         """
         return self._bodytemp[INDEX["muscle"]].copy()
 
     @property
-    def Tfat(self):
+    def t_fat(self):
         """
         Getter
         Returns
         -------
-        Tfat : numpy.ndarray (2,)
-            Fat temperatures of Head and Pelvis  [oC].
+        t_fat : numpy.ndarray (2,)
+            fat temperatures of head and pelvis  [oC].
         """
         return self._bodytemp[INDEX["fat"]].copy()
 
@@ -4808,7 +4807,7 @@ class JOS3:
             self._sex,
             self._bmr_equation,
         )
-        return tcr / self.BSA.sum()
+        return tcr / self.bsa.sum()
 
     @property
     def version(self):

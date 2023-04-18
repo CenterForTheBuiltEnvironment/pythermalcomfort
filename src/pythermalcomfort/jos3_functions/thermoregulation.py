@@ -7,8 +7,8 @@ This code includes some functions of jos-3 model to calculate human thermoregula
 import numpy as np
 import math
 
-from pythermalcomfort.jos3.matrix import NUM_NODES, IDICT, BODY_NAMES
-from pythermalcomfort.jos3 import construction as cons
+from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
+from pythermalcomfort.jos3_functions import construction as cons
 
 
 _BSAst = np.array(
@@ -36,9 +36,9 @@ _BSAst = np.array(
 
 def conv_coef(
     posture="standing",
-    Va=0.1,
-    Ta=28.8,
-    Tsk=34.0,
+    v=0.1,
+    tdb=28.8,
+    t_skin=34.0,
 ):
     """
     Calculate convective heat transfer coefficient (hc) [W/K.m2]
@@ -48,13 +48,13 @@ def conv_coef(
     posture : str, optional
         Select posture from standing, sitting or lying.
         The default is "standing".
-    Va : float or iter, optional
+    v : float or iter, optional
         Air velocity [m/s]. If iter is input, its length should be 17.
         The default is 0.1.
-    Ta : float or iter, optional
+    tdb : float or iter, optional
         Air temperature [oC]. If iter is input, its length should be 17.
         The default is 28.8.
-    Tsk : float or iter, optional
+    t_skin : float or iter, optional
         Skin temperature [oC]. If iter is input, its length should be 17.
         The default is 34.0.
 
@@ -157,7 +157,7 @@ def conv_coef(
                 0.966,
             ]
         )
-        hc_natural = hc_a * (abs(Ta - Tsk) ** hc_b)
+        hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
 
     # Forced convection
     # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -203,11 +203,11 @@ def conv_coef(
             0.62,
         ]
     )
-    hc_forced = hc_a * (Va**hc_b)
+    hc_forced = hc_a * (v**hc_b)
 
     # Select natural or forced hc.
-    # If local Va is under 0.2 m/s, the hc valuse is natural.
-    hc = np.where(Va < 0.2, hc_natural, hc_forced)  # hc [W/K.m2)]
+    # If local v is under 0.2 m/s, the hc valuse is natural.
+    hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/K.m2)]
 
     return hc
 
@@ -301,12 +301,12 @@ def rad_coef(posture="standing"):
     return hr
 
 
-def fixed_hc(hc, Va):
+def fixed_hc(hc, v):
     """
     Fixes hc values to fit tow-node-model's values.
     """
     mean_hc = np.average(hc, weights=_BSAst)
-    mean_va = np.average(Va, weights=_BSAst)
+    mean_va = np.average(v, weights=_BSAst)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
     _fixed_hc = hc * mean_hc_whole / mean_hc
     return _fixed_hc
@@ -321,15 +321,15 @@ def fixed_hr(hr):
     return _fixed_hr
 
 
-def operative_temp(Ta, Tr, hc, hr):
+def operative_temp(tdb, tr, hc, hr):
     """
     Calculate operative temperature [oC]
 
     Parameters
     ----------
-    Ta : float or array
+    tdb : float or array
         Air temperature [oC]
-    Tr : float or array
+    tr : float or array
         Mean radiant temperature [oC]
     hc : float or array
         Convective heat transfer coefficient [W/K.m2]
@@ -341,7 +341,7 @@ def operative_temp(Ta, Tr, hc, hr):
     to : float or array
         Operative temperature [oC]
     """
-    to = (hc * Ta + hr * Tr) / (hc + hr)
+    to = (hc * tdb + hr * tr) / (hc + hr)
     return to
 
 
@@ -418,10 +418,10 @@ def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
 
 
 def heat_resistances(
-    Ta=np.ones(17) * 28.8,
-    Tr=np.ones(17) * 28.8,
-    Va=np.ones(17) * 0.1,
-    Tsk=np.ones(17) * 34,
+    tdb=np.ones(17) * 28.8,
+    tr=np.ones(17) * 28.8,
+    v=np.ones(17) * 0.1,
+    t_skin=np.ones(17) * 34,
     clo=np.zeros(17),
     posture="standing",
     iclo=np.ones(17) * 0.45,
@@ -430,9 +430,9 @@ def heat_resistances(
     hc = fixed_hc(
         conv_coef(
             posture,
-            Va,
-            Ta,
-            Tsk,
+            v,
+            tdb,
+            t_skin,
         )
     )
     hr = fixed_hr(
@@ -441,8 +441,8 @@ def heat_resistances(
         )
     )
     to = operative_temp(
-        Ta,
-        Tr,
+        tdb,
+        tr,
         hc,
         hr,
     )
@@ -515,9 +515,9 @@ tetens = lambda x: 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 def evaporation(
     err_cr,
     err_sk,
-    Tsk,
-    Ta,
-    RH,
+    t_skin,
+    tdb,
+    rh,
     ret,
     height=1.72,
     weight=74.43,
@@ -531,11 +531,11 @@ def evaporation(
     ----------
     err_cr, err_sk : array
         Difference between setpoint and body temperatures [oC].
-    Tsk : array
+    t_skin : array
         Skin temperatures [oC].
-    Ta : array
+    tdb : array
         Air temperatures at local body segments [oC].
-    RH : array
+    rh : array
         Relative humidity at local body segments [%].
     ret : array
         Total evaporative thermal resistances [m2.K/W].
@@ -547,7 +547,7 @@ def evaporation(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
 
     Returns
     -------
@@ -570,10 +570,10 @@ def evaporation(
         height,
         weight,
         equation,
-    )  # BSA rate
-    bsa = _BSAst * bsar  # BSA
-    p_a = antoine(Ta) * RH / 100  # Saturated vapor pressure of ambient [kPa]
-    p_sk_s = antoine(Tsk)  # Saturated vapor pressure at the skin [kPa]
+    )  # bsa rate
+    bsa = _BSAst * bsar  # bsa
+    p_a = antoine(tdb) * rh / 100  # Saturated vapor pressure of ambient [kPa]
+    p_sk_s = antoine(t_skin)  # Saturated vapor pressure at the skin [kPa]
 
     e_max = (p_sk_s - p_a) / ret * bsa  # Maximum evaporative heat loss
 
@@ -648,7 +648,7 @@ def skin_bloodflow(
     ci=2.59,
 ):
     """
-    Calculate skin blood flow rate (BFsk) [L/h].
+    Calculate skin blood flow rate (bf_skin) [L/h].
 
     Parameters
     ----------
@@ -662,13 +662,13 @@ def skin_bloodflow(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     ci : float, optional
         Cardiac index [L/min/㎡]. The default is 2.59.
 
     Returns
     -------
-    BFsk : array
+    bf_skin : array
         Skin blood flow rate [L/h].
 
     """
@@ -819,18 +819,18 @@ def ava_bloodflow(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     ci : float, optional
         Cardiac index [L/min/m2]. The default is 2.59.
 
     Returns
     -------
-    BFava_hand, BFava_foot : array
+    bf_ava_hand, bf_ava_foot : array
         AVA blood flow rate at hand and foot [L/h].
 
     """
     # Cal. mean error body core temp.
-    cap_bcr = [10.2975, 9.3935, 13.834]  # Thermal capacity at Chest, Back and Pelvis
+    cap_bcr = [10.2975, 9.3935, 13.834]  # Thermal capacity at chest, back and pelvis
     err_bcr = np.average(err_cr[2:5], weights=cap_bcr)
 
     # Cal. mean error skin temp.
@@ -872,7 +872,7 @@ def basal_met(
     weight : float, optional
         Body weight [kg]. The default is 74.43.
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
     equation : str, optional
@@ -923,7 +923,7 @@ def local_mbase(
     weight : float, optional
         Body weight [kg]. The default is 74.43.
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
     equation : str, optional
@@ -1043,7 +1043,7 @@ def local_mwork(tcr, par):
 
     Returns
     -------
-    Mwork : array
+    Q_work : array
         Local metabolic rate by work [W].
 
     """
@@ -1079,8 +1079,8 @@ PRE_SHIV = 0
 def shivering(
     err_cr,
     err_sk,
-    Tcr,
-    Tsk,
+    t_core,
+    t_skin,
     height=1.72,
     weight=74.43,
     equation="dubois",
@@ -1096,7 +1096,7 @@ def shivering(
     ----------
     err_cr, err_sk : array
         Difference between setpoint and body temperatures [oC].
-    Tcr, Tsk : array
+    t_core, t_skin : array
         Core and skin temperatures [oC].
     height : float, optional
         Body height [m]. The default is 1.72.
@@ -1106,7 +1106,7 @@ def shivering(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
     dtime : float, optional
@@ -1114,7 +1114,7 @@ def shivering(
 
     Returns
     -------
-    Mshiv : array
+    Q_shiv : array
         Local metabolic rate by shivering [W].
 
     """
@@ -1150,7 +1150,7 @@ def shivering(
         if options["shivering_threshold"]:
             # Asaka, 2016
             # Threshold of starting shivering
-            tskm = np.average(Tsk, weights=_BSAst)  # Mean skin temp.
+            tskm = np.average(t_skin, weights=_BSAst)  # Mean skin temp.
             if tskm < 31:
                 thres = 36.6
             else:
@@ -1159,7 +1159,7 @@ def shivering(
                 else:  # sex == "female":
                     thres = -0.2250 * tskm + 43.05
             # Second threshold of starting shivering
-            if thres < Tcr[0]:
+            if thres < t_core[0]:
                 sig_shiv = 0
 
     global PRE_SHIV  # Previous shivering thermogenesis [W]
@@ -1228,7 +1228,7 @@ def nonshivering(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     coldacclimation : bool, optional
         Whether the subject acclimates cold enviroment or not.
         The default is False.
@@ -1238,7 +1238,7 @@ def nonshivering(
 
     Returns
     -------
-    Mnst : array
+    Q_nst : array
         Local metabolic rate by non-shivering [W].
 
     """
@@ -1352,13 +1352,13 @@ def crmsfat_bloodflow(
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
-        Age [years]. The default is 20.
+        age [years]. The default is 20.
     ci : float, optional
         Cardiac index [L/min/㎡]. The default is 2.59.
 
     Returns
     -------
-    BFcr, BFms, BFfat : array
+    bf_core, bf_muscle, bf_fat : array
         Core, muslce and fat blood flow rate [L/h].
 
     """
@@ -1462,5 +1462,5 @@ def resp_heatloss(t, p, met):
     return res_sh, res_lh
 
 
-def get_lts(Ta):
+def get_lts(tdb):
     return 2.418 * 1000
