@@ -3,6 +3,11 @@
 """
 This code provides functions for calculating the surface area of different body parts, weight ratio,
 basal blood flow ratio, and thermal conductance and thermal capacity.
+
+The values of a NumPy array containing 17 elements correspond to the following order:
+"head", "neck", "chest", "back", "pelvis",
+"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
+"left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
 """
 
 import numpy as np

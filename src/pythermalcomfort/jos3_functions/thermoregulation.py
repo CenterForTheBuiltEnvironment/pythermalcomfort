@@ -2,6 +2,11 @@
 
 """
 This code includes some functions of jos-3 model to calculate human thermoregulation.
+
+The values of a NumPy array containing 17 elements correspond to the following order:
+"head", "neck", "chest", "back", "pelvis",
+"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
+"left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
 """
 
 import numpy as np
