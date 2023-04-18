@@ -3525,7 +3525,6 @@ class JOS3:
     >>>     bsa_equation="fujimoto",
     >>>     ex_output="all",
     >>> )
-    >>>
     # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
     # Set the first condition
     # Environmental parameters can be input as int, float, list, dict, numpy array format.
@@ -3554,7 +3553,6 @@ class JOS3:
     >>>     ]
     >>> )
     >>> model.clo = local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"]
-    >>>
     # par should be input as int, float.
     >>> model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
     # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
@@ -3566,7 +3564,6 @@ class JOS3:
     >>>     times=30,  # Number of loops of a simulation
     >>>     dtime=60,  # Time delta [sec]. The default is 60.
     >>> )  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
-    >>>
     # Set the next condition (You only need to change the parameters that you want to change)
     >>> model.to = 20  # Change operative temperature
     >>> model.v = { # Air velocity [m/s], assuming to use a desk fan
@@ -3593,7 +3590,6 @@ class JOS3:
     >>>     times=60,  # Number of loops of a simulation
     >>>     dtime=60,  # Time delta [sec]. The default is 60.
     >>> )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
-    >>>
     # Set the next condition (You only need to change the parameters that you want to change)
     >>> model.tdb = 30  # Change air temperature [oC]
     >>> model.tr = 35  # Change mean radiant temperature [oC]
@@ -3602,7 +3598,6 @@ class JOS3:
     >>>     times=30,  # Number of loops of a simulation
     >>>     dtime=60,  # Time delta [sec]. The default is 60.
     >>> )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
-    >>>
     # Show the results
     >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
     >>> df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  # Plot time series of local skin temperature.
@@ -3611,7 +3606,6 @@ class JOS3:
     >>> plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
     >>> plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
     >>> plt.show()  # Show the plot
-    >>>
     # Exporting the results as csv
     >>> model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2 (all output).csv"))
     """
