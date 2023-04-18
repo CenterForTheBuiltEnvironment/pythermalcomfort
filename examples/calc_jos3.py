@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from pythermalcomfort.utilities import local_clo_typical_ensembles
 from pythermalcomfort.models import JOS3
 
 # Make "jos3_example" directory in the current directory
@@ -91,25 +92,7 @@ model.v = np.array( # Air velocity [m/s]
         0.1,  # right foot
     ]
 )
-model.clo = { # Clothing insulation for each body part [clo]
-    'head' : 0.00,
-    'neck' : 0.00,
-    'chest': 1.14,
-    'back': 0.84,
-    'pelvis' : 1.04,
-    'left_shoulder' : 0.84,
-    'left_arm' : 0.42,
-    'left_hand' : 0.00,
-    'right_shoulder' : 0.84,
-    'right_arm' : 0.42,
-    'right_hand' : 0.00,
-    'left_thigh' : 0.58,
-    'left_leg' : 0.62,
-    'left_foot' : 0.82,
-    'right_thigh' : 0.58,
-    'right_leg' : 0.62,
-    'right_foot' : 0.82
-    }
+model.clo = local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"]
 
 # par should be input as int, float.
 model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
@@ -165,7 +148,7 @@ df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  #
 plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
 plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
-plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_local_skin_temperatures.png"))  # Save plot at the current directory
+plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
 plt.show()  # Show the plot
 
 # Exporting the results as csv
