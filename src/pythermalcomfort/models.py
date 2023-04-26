@@ -277,7 +277,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         >>> print(results['pmv'])
         -0.06
         >>> # you can also pass an array-like of inputs
-        >>> results = (tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
+        >>> results = pmv_ppd(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
         {'pmv': array([-0.47,  0.06]), 'ppd': array([9.6, 5.1])}
 
