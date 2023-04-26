@@ -1665,10 +1665,10 @@ def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
     --------
     .. code-block:: python
 
-    >>> from pythermalcomfort.models import ankle_draft
-    >>> results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
-    >>> print(results)
-    {'PPD_ad': 18.5, 'Acceptability': True}
+        >>> from pythermalcomfort.models import ankle_draft
+        >>> results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
+        >>> print(results)
+        {'PPD_ad': 18.5, 'Acceptability': True}
 
     """
     if units.lower() == "ip":
@@ -3209,8 +3209,8 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
     --------
     .. code-block:: python
 
-    >>> from pythermalcomfort.models import athb
-    >>> print(athb( tdb=[25, 27], tr=25, vr=0.1, rh=50, met=1.1, t_running_mean=20))
+        >>> from pythermalcomfort.models import athb
+        >>> print(athb( tdb=[25, 27], tr=25, vr=0.1, rh=50, met=1.1, t_running_mean=20))
         [0.2, 0.209]
     """
     tdb = np.array(tdb)
