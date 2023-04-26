@@ -3272,7 +3272,7 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
 #     plt.plot(rh_array, y_new, "-", label=person)
 # ax.set(
 #     ylabel="Temperature [°C]",
-#     xlabel="Relative Humidity [rh]",
+#     xlabel="Relative Humidity [Rh]",
 #     ylim=(24, 52),
 #     xlim=(5, 70),
 # )
