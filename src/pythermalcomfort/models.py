@@ -1,6 +1,9 @@
 import numpy as np
 import re
 import warnings
+import csv
+import datetime as dt
+import os
 from pythermalcomfort.psychrometrics import t_o, p_sat_torr, p_sat, psy_ta_rh
 from pythermalcomfort.utilities import (
     units_converter,
@@ -20,11 +23,6 @@ from pythermalcomfort.optimized_functions import (
     utci_optimized,
     two_nodes_optimized_return_set,
 )
-
-# import packages for jos-3 model
-import csv
-import datetime as dt
-import os
 
 # import functions and valuables from "jos3_functions" folder
 from pythermalcomfort.jos3_functions import thermoregulation as threg
