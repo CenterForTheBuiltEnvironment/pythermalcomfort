@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 import math
+import re
 from pythermalcomfort.psychrometrics import p_sat, t_o
 from pythermalcomfort.shared_functions import valid_range
 
@@ -210,8 +211,9 @@ def body_surface_area(weight, height, formula="dubois"):
         body weight, [kg]
     height : float
         height, [m]
-    formula : {"dubois"}, default="dubois"
-        formula used to calculate the body surface area
+    formula : str, optional,
+        formula used to calculate the body surface area. default="dubois"
+        Choose a name from "dubois", "takahira", "fujimoto", or "kurazumi".
 
     Returns
     -------
@@ -221,7 +223,12 @@ def body_surface_area(weight, height, formula="dubois"):
 
     if formula == "dubois":
         return 0.202 * (weight**0.425) * (height**0.725)
-
+    elif formula == "takahira":
+        return 0.2042 * (weight**0.425) * (height**0.725)
+    elif formula == "fujimoto":
+        return 0.1882 * (weight**0.444) * (height**0.663)
+    elif formula == "kurazumi":
+        return 0.2440 * (weight**0.383) * (height**0.693)
 
 def f_svv(w, h, d):
     """Calculates the sky-vault view fraction.

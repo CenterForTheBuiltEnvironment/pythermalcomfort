@@ -1,0 +1,408 @@
+# -*- coding: utf-8 -*-
+
+"""
+This code defines a set of functions and constants to model heat exchange and blood flow in different body parts and layers.
+"""
+
+import numpy as np
+
+def sub2whole(subarr_list):
+    ishape = 0
+    jshape = 0
+    for subarr in subarr_list:
+        ishape += subarr.shape[0]
+        jshape += subarr.shape[1]
+
+    wholearr = np.zeros((ishape, jshape))
+    i = 0
+    j = 0
+    for subarr in subarr_list:
+        iend = i + subarr.shape[0]
+        jend = j + subarr.shape[1]
+        wholearr[i:iend, j:jend] = subarr.copy()
+        i += subarr.shape[0]
+        j += subarr.shape[1]
+
+    return wholearr
+
+
+BODY_NAMES = [
+    "head",
+    "neck",
+    "chest",
+    "back",
+    "pelvis",
+    "left_shoulder",
+    "left_arm",
+    "left_hand",
+    "right_shoulder",
+    "right_arm",
+    "right_hand",
+    "left_thigh",
+    "left_leg",
+    "left_foot",
+    "right_thigh",
+    "right_leg",
+    "right_foot",
+]
+LAYER_NAMES = ["artery", "vein", "sfvein", "core", "muscle", "fat", "skin"]
+
+
+def index_order():
+    """
+    Defines the index's order of the matrix
+    Returns
+    -------
+    indexdict : nested dictionary
+        keys are BODY_NAMES and LAYER_NAMES
+    """
+    # Defines exsisting layers as 1 or None
+    indexdict = {}
+
+    for key in ["head", "pelvis"]:
+        indexdict[key] = {
+            "artery": 1,
+            "vein": 1,
+            "sfvein": None,
+            "core": 1,
+            "muscle": 1,
+            "fat": 1,
+            "skin": 1,
+        }
+
+    for key in ["neck", "chest", "back"]:
+        indexdict[key] = {
+            "artery": 1,
+            "vein": 1,
+            "sfvein": None,
+            "core": 1,
+            "muscle": None,
+            "fat": None,
+            "skin": 1,
+        }
+
+    for key in BODY_NAMES[5:]:  # limb segments
+        indexdict[key] = {
+            "artery": 1,
+            "vein": 1,
+            "sfvein": 1,
+            "core": 1,
+            "muscle": None,
+            "fat": None,
+            "skin": 1,
+        }
+
+    # Sets ordered indices in the matrix
+    indexdict["CB"] = 0
+    order_count = 1
+    for bn in BODY_NAMES:
+        for ln in LAYER_NAMES:
+            if not indexdict[bn][ln] is None:
+                indexdict[bn][ln] = order_count
+                order_count += 1
+
+    return indexdict, order_count
+
+
+IDICT, NUM_NODES = index_order()
+
+
+def index_bylayer(layer):
+    """
+    Get indices of the matrix by the layer name.
+    Parameters
+    ----------
+    layer : str
+        Layer name of jos.
+        ex) artery, vein, sfvein, core, muscle, fat or skin.
+    Returns
+    -------
+    indices of the matrix : list
+    """
+
+    # Gets indices by the layer name
+    outindex = []
+    for bn in BODY_NAMES:
+        for ln in LAYER_NAMES:
+            if (layer.lower() == ln) and IDICT[bn][ln]:
+                outindex.append(IDICT[bn][ln])
+    return outindex
+
+
+def validindex_bylayer(layer):
+    """
+    Get indices of the matrix by the layer name.
+    Parameters
+    ----------
+    layer : str
+        Layer name of jos.
+        ex) artery, vein, sfvein, core, muscle, fat or skin.
+    Returns
+    -------
+    indices of the matrix : list
+    """
+
+    # Gets valid indices of the layer name
+    outindex = []
+    for i, bn in enumerate(BODY_NAMES):
+        if IDICT[bn][layer]:
+            outindex.append(i)
+    return outindex
+
+
+# Constant parameters of the matrix' indicies
+INDEX = {}
+VINDEX = {}
+for key in LAYER_NAMES:
+    INDEX[key] = index_bylayer(key)
+    VINDEX[key] = validindex_bylayer(key)
+
+
+def localarr(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
+    """
+    Create matrix to calculate heat exchage by blood flow in each segment [W/K]
+        1.067 [Wh/(L･K)] * Bloodflow [L/h] = [W/K]
+    """
+    bf_local = np.zeros((NUM_NODES, NUM_NODES))
+    for i, bn in enumerate(BODY_NAMES):
+        # Dictionary of indecies in each body segment
+        # key = layer name, value = index of matrix
+        indexof = IDICT[bn]
+
+        # Common
+        bf_local[indexof["core"], indexof["artery"]] = 1.067 * bf_cr[i]  # art to cr
+        bf_local[indexof["skin"], indexof["artery"]] = 1.067 * bf_sk[i]  # art to sk
+        bf_local[indexof["vein"], indexof["core"]] = 1.067 * bf_cr[i]  # vein to cr
+        bf_local[indexof["vein"], indexof["skin"]] = 1.067 * bf_sk[i]  # vein to sk
+
+        # If the segment has a muslce or fat layer
+        if not indexof["muscle"] is None:
+            bf_local[indexof["muscle"], indexof["artery"]] = (
+                1.067 * bf_ms[i]
+            )  # art to ms
+            bf_local[indexof["vein"], indexof["muscle"]] = (
+                1.067 * bf_ms[i]
+            )  # vein to ms
+        if not indexof["fat"] is None:
+            bf_local[indexof["fat"], indexof["artery"]] = (
+                1.067 * bf_fat[i]
+            )  # art to fat
+            bf_local[indexof["vein"], indexof["fat"]] = 1.067 * bf_fat[i]  # vein to fat
+
+        # Only hand
+        if i == 7 or i == 10:
+            bf_local[indexof["sfvein"], indexof["artery"]] = (
+                1.067 * bf_ava_hand
+            )  # art to sfvein
+        # Only foot
+        if i == 13 or i == 16:
+            bf_local[indexof["sfvein"], indexof["artery"]] = (
+                1.067 * bf_ava_foot
+            )  # art to sfvein
+
+    return bf_local
+
+
+def vessel_bloodflow(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
+    """
+    Get artery and vein blood flow rate [l/h]
+    """
+    xbf = bf_cr + bf_ms + bf_fat + bf_sk
+
+    bf_art = np.zeros(17)
+    bf_vein = np.zeros(17)
+
+    # head
+    bf_art[0] = xbf[0]
+    bf_vein[0] = xbf[0]
+
+    # neck (+head)
+    bf_art[1] = xbf[1] + xbf[0]
+    bf_vein[1] = xbf[1] + xbf[0]
+
+    # chest
+    bf_art[2] = xbf[2]
+    bf_vein[2] = xbf[2]
+
+    # back
+    bf_art[3] = xbf[3]
+    bf_vein[3] = xbf[3]
+
+    # pelvis (+Thighs, Legs, Feet, AVA_Feet)
+    bf_art[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
+    bf_vein[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
+
+    # L.Shoulder (+Arm, Hand, (arteryのみAVA_Hand))
+    bf_art[5] = xbf[5:8].sum() + bf_ava_hand
+    bf_vein[5] = xbf[5:8].sum()
+
+    # L.Arm (+Hand)
+    bf_art[6] = xbf[6:8].sum() + bf_ava_hand
+    bf_vein[6] = xbf[6:8].sum()
+
+    # L.Hand
+    bf_art[7] = xbf[7] + bf_ava_hand
+    bf_vein[7] = xbf[7]
+
+    # R.Shoulder (+Arm, Hand, (arteryのみAVA_Hand))
+    bf_art[8] = xbf[8:11].sum() + bf_ava_hand
+    bf_vein[8] = xbf[8:11].sum()
+
+    # R.Arm (+Hand)
+    bf_art[9] = xbf[9:11].sum() + bf_ava_hand
+    bf_vein[9] = xbf[9:11].sum()
+
+    # R.Hand
+    bf_art[10] = xbf[10] + bf_ava_hand
+    bf_vein[10] = xbf[10]
+
+    # L.Thigh (+Leg, Foot, (arteryのみAVA_Foot))
+    bf_art[11] = xbf[11:14].sum() + bf_ava_foot
+    bf_vein[11] = xbf[11:14].sum()
+
+    # L.Leg (+Foot)
+    bf_art[12] = xbf[12:14].sum() + bf_ava_foot
+    bf_vein[12] = xbf[12:14].sum()
+
+    # L.Foot
+    bf_art[13] = xbf[13] + bf_ava_foot
+    bf_vein[13] = xbf[13]
+
+    # R.Thigh (+Leg, Foot, (arteryのみAVA_Foot))
+    bf_art[14] = xbf[14:17].sum() + bf_ava_foot
+    bf_vein[14] = xbf[14:17].sum()
+
+    # R.Leg (+Foot)
+    bf_art[15] = xbf[15:17].sum() + bf_ava_foot
+    bf_vein[15] = xbf[15:17].sum()
+
+    # R.Foot
+    bf_art[16] = xbf[16] + bf_ava_foot
+    bf_vein[16] = xbf[16]
+
+    return bf_art, bf_vein
+
+
+def wholebody(bf_art, bf_vein, bf_ava_hand, bf_ava_foot):
+    """
+    Create matrix to calculate heat exchange by blood flow between segments [W/K]
+    """
+
+    def flow(up, down, bloodflow):
+        arr = np.zeros((NUM_NODES, NUM_NODES))
+        # Coefficient = 1.067 [Wh/L.K]
+        arr[down, up] = 1.067 * bloodflow  # Change unit [L/h] to [W/K]
+        return arr
+
+    arr83 = np.zeros((NUM_NODES, NUM_NODES))
+    # Matrix offsets of segments
+    CB = IDICT["CB"]
+    head = IDICT["head"]["artery"]
+    neck = IDICT["neck"]["artery"]
+    chest = IDICT["chest"]["artery"]
+    back = IDICT["back"]["artery"]
+    pelvis = IDICT["pelvis"]["artery"]
+    left_shoulder = IDICT["left_shoulder"]["artery"]
+    left_arm = IDICT["left_arm"]["artery"]
+    left_hand = IDICT["left_hand"]["artery"]
+    right_shoulder = IDICT["right_shoulder"]["artery"]
+    right_arm = IDICT["right_arm"]["artery"]
+    right_hand = IDICT["right_hand"]["artery"]
+    left_thigh = IDICT["left_thigh"]["artery"]
+    left_leg = IDICT["left_leg"]["artery"]
+    left_foot = IDICT["left_foot"]["artery"]
+    right_thigh = IDICT["right_thigh"]["artery"]
+    right_leg = IDICT["right_leg"]["artery"]
+    right_foot = IDICT["right_foot"]["artery"]
+
+    arr83 += flow(CB, neck, bf_art[1])  # CB to neck.art
+    arr83 += flow(neck, head, bf_art[0])  # neck.art to head.art
+    arr83 += flow(head + 1, neck + 1, bf_vein[0])  # head.vein to neck.vein
+    arr83 += flow(neck + 1, CB, bf_vein[1])  # neck.vein to CB
+
+    arr83 += flow(CB, chest, bf_art[2])  # CB to chest.art
+    arr83 += flow(chest + 1, CB, bf_vein[2])  # chest.vein to CB
+
+    arr83 += flow(CB, back, bf_art[3])  # CB to back.art
+    arr83 += flow(back + 1, CB, bf_vein[3])  # back.vein to CB
+
+    arr83 += flow(CB, pelvis, bf_art[4])  # CB to pelvis.art
+    arr83 += flow(pelvis + 1, CB, bf_vein[4])  # pelvis.vein to CB
+
+    arr83 += flow(CB, left_shoulder, bf_art[5])  # CB to left_shoulder.art
+    arr83 += flow(left_shoulder, left_arm, bf_art[6])  # left_shoulder.art to left_arm.art
+    arr83 += flow(left_arm, left_hand, bf_art[7])  # left_arm.art to left_hand.art
+    arr83 += flow(left_hand + 1, left_arm + 1, bf_vein[7])  # left_hand.vein to left_arm.vein
+    arr83 += flow(left_arm + 1, left_shoulder + 1, bf_vein[6])  # left_arm.vein to left_shoulder.vein
+    arr83 += flow(left_shoulder + 1, CB, bf_vein[5])  # left_shoulder.vein to CB
+    arr83 += flow(left_hand + 2, left_arm + 2, bf_ava_hand)  # left_hand.sfvein to left_arm.sfvein
+    arr83 += flow(
+        left_arm + 2, left_shoulder + 2, bf_ava_hand
+    )  # left_arm.sfvein to left_shoulder.sfvein
+    arr83 += flow(left_shoulder + 2, CB, bf_ava_hand)  # left_shoulder.sfvein to CB
+
+    arr83 += flow(CB, right_shoulder, bf_art[8])  # CB to right_shoulder.art
+    arr83 += flow(right_shoulder, right_arm, bf_art[9])  # right_shoulder.art to right_arm.art
+    arr83 += flow(right_arm, right_hand, bf_art[10])  # right_arm.art to right_hand.art
+    arr83 += flow(right_hand + 1, right_arm + 1, bf_vein[10])  # right_hand.vein to right_arm.vein
+    arr83 += flow(right_arm + 1, right_shoulder + 1, bf_vein[9])  # right_arm.vein to right_shoulder.vein
+    arr83 += flow(right_shoulder + 1, CB, bf_vein[8])  # right_shoulder.vein to CB
+    arr83 += flow(right_hand + 2, right_arm + 2, bf_ava_hand)  # right_hand.sfvein to right_arm.sfvein
+    arr83 += flow(
+        right_arm + 2, right_shoulder + 2, bf_ava_hand
+    )  # right_arm.sfvein to right_shoulder.sfvein
+    arr83 += flow(right_shoulder + 2, CB, bf_ava_hand)  # right_shoulder.sfvein to CB
+
+    arr83 += flow(pelvis, left_thigh, bf_art[11])  # pelvis to left_thigh.art
+    arr83 += flow(left_thigh, left_leg, bf_art[12])  # left_thigh.art to left_leg.art
+    arr83 += flow(left_leg, left_foot, bf_art[13])  # left_leg.art to left_foot.art
+    arr83 += flow(left_foot + 1, left_leg + 1, bf_vein[13])  # left_foot.vein to left_leg.vein
+    arr83 += flow(left_leg + 1, left_thigh + 1, bf_vein[12])  # left_leg.vein to left_thigh.vein
+    arr83 += flow(left_thigh + 1, pelvis + 1, bf_vein[11])  # left_thigh.vein to pelvis
+    arr83 += flow(left_foot + 2, left_leg + 2, bf_ava_foot)  # left_foot.sfvein to left_leg.sfvein
+    arr83 += flow(left_leg + 2, left_thigh + 2, bf_ava_foot)  # left_leg.sfvein to left_thigh.sfvein
+    arr83 += flow(left_thigh + 2, pelvis + 1, bf_ava_foot)  # left_thigh.vein to pelvis
+
+    arr83 += flow(pelvis, right_thigh, bf_art[14])  # pelvis to right_thigh.art
+    arr83 += flow(right_thigh, right_leg, bf_art[15])  # right_thigh.art to right_leg.art
+    arr83 += flow(right_leg, right_foot, bf_art[16])  # right_leg.art to right_foot.art
+    arr83 += flow(right_foot + 1, right_leg + 1, bf_vein[16])  # right_foot.vein to right_leg.vein
+    arr83 += flow(right_leg + 1, right_thigh + 1, bf_vein[15])  # right_leg.vein to right_thigh.vein
+    arr83 += flow(right_thigh + 1, pelvis + 1, bf_vein[14])  # right_thigh.vein to pelvis
+    arr83 += flow(right_foot + 2, right_leg + 2, bf_ava_foot)  # right_foot.sfvein to right_leg.sfvein
+    arr83 += flow(right_leg + 2, right_thigh + 2, bf_ava_foot)  # right_leg.sfvein to right_thigh.sfvein
+    arr83 += flow(right_thigh + 2, pelvis + 1, bf_ava_foot)  # right_thigh.vein to pelvis
+
+    return arr83
+
+
+def remove_body_name(text):
+    """
+    Removing the body name from the parameter name.
+
+    Parameters
+    ----------
+    text : str
+        Parameter name
+
+    Returns
+    -------
+    rtext : str
+        Parameter name removed the body name.
+    removed : str
+        The removed body name
+
+    """
+
+    rtext = text
+    removed = None
+
+    # Remove the body part name from the parameter name
+    for bn in BODY_NAMES:
+        if bn in text:
+            rtext = rtext.replace(bn, "") # Remove the body part name from the parameter name
+            if rtext.endswith("_"):  # Check if rtext ends with an underscore
+                rtext = rtext[:-1]  # Remove the trailing underscore
+            removed = bn # Store the removed body part name
+            break
+    return rtext, removed
