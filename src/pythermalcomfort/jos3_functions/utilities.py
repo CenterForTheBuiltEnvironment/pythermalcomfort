@@ -153,8 +153,8 @@ plt.show()  # Show the plot
 # Exporting the results as csv
 model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2 (all output).csv"))
 """
-print(convert_and_print_local_clo_values_from_csv_to_dict(csv_name='local_clo_summary.csv'))
-print(add_prompt_to_code(sample_code))
+# print(convert_and_print_local_clo_values_from_csv_to_dict(csv_name='local_clo_summary.csv'))
+# print(add_prompt_to_code(sample_code))
 
 # This dictionary contains the local and the whole body clothing insulation of typical clothing ensemble.
 # It is based on the study by Juyoun et al. (https://escholarship.org/uc/item/18f0r375)
