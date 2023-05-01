@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from pythermalcomfort.utilities import local_clo_typical_ensembles
 from pythermalcomfort.models import JOS3
+from pythermalcomfort.jos3_functions.utilities import local_clo_typical_ensembles
 
-# Make "jos3_example" directory in the current directory
+# Make "jos3_example_example" directory in the current directory
 directory_name = "jos3_output_example"
 CURRENT_DIRECTORY = os.getcwd()
 JOS3_EXAMPLE_DIRECTORY = os.path.join(CURRENT_DIRECTORY, directory_name)
