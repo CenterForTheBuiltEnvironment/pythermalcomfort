@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-This code defines a dictionary called ALL_OUT_PARAMS that contains information about various output parameters
-related to human body properties, heat exchange, and environmental conditions.
+"""This code defines a dictionary called ALL_OUT_PARAMS that contains
+information about various output parameters related to human body properties,
+heat exchange, and environmental conditions.
 
 It also includes a function called show_outparam_docs() that generates a formatted string with the documentation
 of the output parameters.
@@ -84,12 +84,19 @@ ALL_OUT_PARAMS = {
     },
     "e_sweat": {
         "ex_output": True,
-        "meaning": "evaporative heat loss from the skin by only sweating (each body part)",
+        "meaning": (
+            "evaporative heat loss from the skin by only sweating (each body part)"
+        ),
         "suffix": "Body name",
         "unit": "W",
     },
     "fat": {"ex_output": True, "meaning": "body fat rate", "suffix": None, "unit": "%"},
-    "height": {"ex_output": True, "meaning": "body height", "suffix": None, "unit": "m"},
+    "height": {
+        "ex_output": True,
+        "meaning": "body height",
+        "suffix": None,
+        "unit": "m",
+    },
     "clo": {
         "ex_output": True,
         "meaning": "clothing insulation (each body part)",
@@ -134,7 +141,9 @@ ALL_OUT_PARAMS = {
     },
     "Q_nst": {
         "ex_output": True,
-        "meaning": "core heat production by non-shivering thermogenesis (each body part)",
+        "meaning": (
+            "core heat production by non-shivering thermogenesis (each body part)"
+        ),
         "suffix": "Body name",
         "unit": "W",
     },
@@ -146,7 +155,9 @@ ALL_OUT_PARAMS = {
     },
     "Q_shiv": {
         "ex_output": True,
-        "meaning": "core or muscle heat production by shivering thermogenesis (each body part)",
+        "meaning": (
+            "core or muscle heat production by shivering thermogenesis (each body part)"
+        ),
         "suffix": "Body name",
         "unit": "W",
     },
@@ -238,13 +249,13 @@ ALL_OUT_PARAMS = {
         "ex_output": True,
         "meaning": "skin set point temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_skin_set": {
         "ex_output": True,
         "meaning": "core set point temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "sex": {
         "ex_output": True,
@@ -262,73 +273,73 @@ ALL_OUT_PARAMS = {
         "ex_output": True,
         "meaning": "dry bulb air temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_artery": {
         "ex_output": True,
         "meaning": "arterial temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_cb": {
         "ex_output": True,
         "meaning": "central blood temperature",
         "suffix": None,
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_core": {
         "ex_output": False,
         "meaning": "core temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_fat": {
         "ex_output": True,
         "meaning": "fat temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_muscle": {
         "ex_output": True,
         "meaning": "muscle temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "to": {
         "ex_output": True,
         "meaning": "operative temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "tr": {
         "ex_output": True,
         "meaning": "mean radiant temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_skin": {
         "ex_output": False,
         "meaning": "skin temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_skin_mean": {
         "ex_output": False,
         "meaning": "mean skin temperature",
         "suffix": None,
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_superficial_vein": {
         "ex_output": True,
         "meaning": "superficial vein temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "t_vein": {
         "ex_output": True,
         "meaning": "vein temperature (each body part)",
         "suffix": "Body name",
-        "unit": "oC",
+        "unit": "°C",
     },
     "v": {
         "ex_output": True,
@@ -375,13 +386,12 @@ ALL_OUT_PARAMS = {
 }
 
 
-def show_outparam_docs():
-    """
-    Show the documentation of the output parameters.
+def show_out_param_docs():
+    """Show the documentation of the output parameters.
 
     Returns
     -------
-    docstirng : str
+    docstring : str
         Text of the documentation of the output parameters
     """
 
@@ -416,5 +426,6 @@ def show_outparam_docs():
 
     return docs
 
+
 if __name__ == "__main__":
-    print(show_outparam_docs())
+    print(show_out_param_docs())

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""
-This code provides functions for calculating the surface area of different body parts, weight ratio,
-basal blood flow ratio, and thermal conductance and thermal capacity.
+"""This code provides functions for calculating the surface area of different
+body parts, weight ratio, basal blood flow ratio, and thermal conductance and
+thermal capacity.
 
-The values of a NumPy array containing 17 elements correspond to the following order:
-"head", "neck", "chest", "back", "pelvis",
-"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
-"left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
+The values of a NumPy array containing 17 elements correspond to the
+following order: "head", "neck", "chest", "back", "pelvis",
+"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm",
+"right_hand", "left_thigh", "left_leg", "left_hand", "right_thigh",
+"right_leg" and "right_hand".
 """
 
 import numpy as np
@@ -37,9 +38,9 @@ _BSAst = np.array(
     ]
 )
 
+
 def _to17array(inp):
-    """
-    Create a NumPy array of shape (17,) with the given input.
+    """Create a NumPy array of shape (17,) with the given input.
 
     Parameters
     ----------
@@ -66,19 +67,21 @@ def _to17array(inp):
         if inp.shape == (17,):
             array = inp
         else:
-            ValueError("The input list or ndarray is not of length 17")
+            raise ValueError("The input list or ndarray is not of length 17")
     else:
-        raise ValueError("Unsupported input type. Supported types: int, float, list, dict, ndarray")
+        raise ValueError(
+            "Unsupported input type. Supported types: int, float, list, dict, ndarray"
+        )
 
     return array.copy()
+
 
 def bsa_rate(
     height=1.72,
     weight=74.43,
     formula="dubois",
 ):
-    """
-    Calculate the rate of bsa to standard body.
+    """Calculate the rate of bsa to standard body.
 
     Parameters
     ----------
@@ -100,19 +103,18 @@ def bsa_rate(
         weight=weight,
         formula=formula,
     )
-    bsa_rate = bsa_all / _BSAst.sum()  # The bsa ratio to the standard body (1.87m2)
-    return bsa_rate
+    return bsa_all / _BSAst.sum()  # The bsa ratio to the standard body (1.87m2)
 
-def localbsa(
+
+def local_bsa(
     height=1.72,
     weight=74.43,
     formula="dubois",
 ):
-    """
-    Calculate local body surface area (bsa) [m2].
+    """Calculate local body surface area (bsa) [m2].
 
     The local body surface area has been derived from 65MN.
-    The head have been devided to head and neck based on Smith's model.
+    The head have been divided to head and neck based on Smith's model.
         head = 0.1396*0.1117/0.1414 (65MN_Head * Smith_Head / Smith_Head+neck)
         neck = 0.1396*0.0297/0.1414 (65MN_Head * Smith_Neck / Smith_Head+neck)
 
@@ -132,7 +134,6 @@ def localbsa(
         Local body surface area (bsa) [m2].
     bsa_rate : float
         The ratio of bsa to the standard body [-].
-
     """
     _bsa_rate = bsa_rate(
         height=height,
@@ -146,8 +147,7 @@ def localbsa(
 def weight_rate(
     weight=74.43,
 ):
-    """
-    Calculate the ratio of the body weitht to the standard body (74.43 kg).
+    """Calculate the ratio of the body weight to the standard body (74.43 kg).
 
     The standard values of local body weights are as below.
         weight_local = np.array([
@@ -169,8 +169,7 @@ def weight_rate(
         The ratio of the body weight to the standard body (74.43 kg).
         weight_rate = weight / 74.43
     """
-    rate = weight / 74.43
-    return rate
+    return weight / 74.43
 
 
 def bfb_rate(
@@ -180,8 +179,8 @@ def bfb_rate(
     age=20,
     ci=2.59,
 ):
-    """
-    Calculate the ratio of basal blood flow (BFB) of the standard body (290 L/h).
+    """Calculate the ratio of basal blood flow (BFB) of the standard body (290
+    L/h).
 
     Parameters
     ----------
@@ -216,8 +215,7 @@ def bfb_rate(
         ci *= 0.7
 
     bfb_all = ci * bsa_rate(height, weight, equation) * _BSAst.sum()  # [L/h]
-    _bfb_rate = bfb_all / 290
-    return _bfb_rate
+    return bfb_all / 290
 
 
 def conductance(
@@ -226,8 +224,7 @@ def conductance(
     equation="dubois",
     fat=15,
 ):
-    """
-    Calculate thermal conductance between layers [W/K].
+    """Calculate thermal conductance between layers [W/K].
 
     Parameters
     ----------
@@ -375,7 +372,7 @@ def conductance(
     # The shape is a cylinder.
     # It is assumed that the inner is vascular radius, 2.5mm and the outer is
     # stolwijk's core radius.
-    # The heat transer coefficient of the core is assumed as the Michel's
+    # The heat transfer coefficient of the core is assumed as the Michel's
     # counter-flow model 0.66816 [W/(m･K)].
     cdt_ves_cr = np.array(
         [
@@ -423,7 +420,7 @@ def conductance(
 
     # art to vein (counter-flow) [W/K]
     # The data has been derived Mitchell's model.
-    # THe values = 15.869 [W/(m･K)] * the segment lenght [m]
+    # THe values = 15.869 [W/(m･K)] * the segment length [m]
     cdt_art_vein = np.array(
         [
             0,
@@ -468,27 +465,27 @@ def conductance(
 
     cdt_whole = np.zeros((NUM_NODES, NUM_NODES))
     for i, bn in enumerate(BODY_NAMES):
-        # Dictionary of indecies in each body segment
+        # Dictionary of indices in each body segment
         # key = layer name, value = index of matrix
-        indexof = IDICT[bn]
+        index_of = IDICT[bn]
 
         # Common
-        cdt_whole[indexof["artery"], indexof["vein"]] = cdt_art_vein[i]  # art to vein
-        cdt_whole[indexof["artery"], indexof["core"]] = cdt_ves_cr[i]  # art to cr
-        cdt_whole[indexof["vein"], indexof["core"]] = cdt_ves_cr[i]  # vein to cr
+        cdt_whole[index_of["artery"], index_of["vein"]] = cdt_art_vein[i]  # art to vein
+        cdt_whole[index_of["artery"], index_of["core"]] = cdt_ves_cr[i]  # art to cr
+        cdt_whole[index_of["vein"], index_of["core"]] = cdt_ves_cr[i]  # vein to cr
 
         # Only limbs
         if i >= 5:
-            cdt_whole[indexof["sfvein"], indexof["skin"]] = cdt_sfv_sk[i]  # sfv to sk
+            cdt_whole[index_of["sfvein"], index_of["skin"]] = cdt_sfv_sk[i]  # sfv to sk
 
         # If the segment has a muscle or fat layer
-        if not indexof["muscle"] is None:  # or not indexof["fat"] is None
-            cdt_whole[indexof["core"], indexof["muscle"]] = cdt_cr_ms[i]  # cr to ms
-            cdt_whole[indexof["muscle"], indexof["fat"]] = cdt_ms_fat[i]  # ms to fat
-            cdt_whole[indexof["fat"], indexof["skin"]] = cdt_fat_sk[i]  # fat to sk
+        if index_of["muscle"] is not None:  # or not indexof["fat"] is None
+            cdt_whole[index_of["core"], index_of["muscle"]] = cdt_cr_ms[i]  # cr to ms
+            cdt_whole[index_of["muscle"], index_of["fat"]] = cdt_ms_fat[i]  # ms to fat
+            cdt_whole[index_of["fat"], index_of["skin"]] = cdt_fat_sk[i]  # fat to sk
 
         else:
-            cdt_whole[indexof["core"], indexof["skin"]] = cdt_cr_sk[i]  # cr to sk
+            cdt_whole[index_of["core"], index_of["skin"]] = cdt_cr_sk[i]  # cr to sk
 
     # Creates a symmetrical matrix
     cdt_whole = cdt_whole + cdt_whole.T
@@ -497,8 +494,7 @@ def conductance(
 
 
 def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
-    """
-    Calculate the thermal capacity [J/K].
+    """Calculate the thermal capacity [J/K].
 
     The values of vascular and central blood capacity have been derived from
     Yokoyama's model.
@@ -704,24 +700,24 @@ def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
     cap_whole[0] = cap_cb
 
     for i, bn in enumerate(BODY_NAMES):
-        # Dictionary of indecies in each body segment
+        # Dictionary of indices in each body segment
         # key = layer name, value = index of matrix
-        indexof = IDICT[bn]
+        index_of = IDICT[bn]
 
         # Common
-        cap_whole[indexof["artery"]] = cap_art[i]
-        cap_whole[indexof["vein"]] = cap_vein[i]
-        cap_whole[indexof["core"]] = cap_cr[i]
-        cap_whole[indexof["skin"]] = cap_sk[i]
+        cap_whole[index_of["artery"]] = cap_art[i]
+        cap_whole[index_of["vein"]] = cap_vein[i]
+        cap_whole[index_of["core"]] = cap_cr[i]
+        cap_whole[index_of["skin"]] = cap_sk[i]
 
         # Only limbs
         if i >= 5:
-            cap_whole[indexof["sfvein"]] = cap_sfv[i]
+            cap_whole[index_of["sfvein"]] = cap_sfv[i]
 
         # If the segment has a muscle or fat layer
-        if not indexof["muscle"] is None:  # or not indexof["fat"] is None
-            cap_whole[indexof["muscle"]] = cap_ms[i]
-            cap_whole[indexof["fat"]] = cap_fat[i]
+        if index_of["muscle"] is not None:  # or not indexof["fat"] is None
+            cap_whole[index_of["muscle"]] = cap_ms[i]
+            cap_whole[index_of["fat"]] = cap_fat[i]
 
     cap_whole *= 3600  # Changes unit [Wh/K] to [J/K]
     return cap_whole

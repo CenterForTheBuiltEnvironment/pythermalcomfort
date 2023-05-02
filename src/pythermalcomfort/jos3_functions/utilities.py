@@ -1,10 +1,9 @@
 import pandas as pd
 import re
 
-def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
-    """
 
-    Parameters
+def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
+    """Parameters
     ----------
     csv_name : file path that you want to convert (it should be in the same folder as this function)
 
@@ -25,20 +24,21 @@ def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
     # Add data from each row to the dictionary
     for index, row in df.iterrows():
         # Get the name of the clothing combination as the key
-        key = row['clothing_ensemble']
+        key = row["clothing_ensemble"]
         # Create a dictionary as the value
-        value = {'whole_body': row['whole_body'], 'local_body_part': {}}
+        value = {"whole_body": row["whole_body"], "local_body_part": {}}
         # Add data from each column to the Local body dictionary
         for col in df.columns[2:]:
             # Get the name of the body part
             body_part = col
             # Get the clo value for the local body part and add it to the Local body dictionary
             clo = row[col]
-            value['local_body_part'][body_part] = clo
+            value["local_body_part"][body_part] = clo
         # Add the data to the dictionary
         local_clo_dict[key] = value
 
     return local_clo_dict
+
 
 def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
     lines = code.strip().split("\n")
@@ -49,6 +49,7 @@ def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
         else:
             result.append(prompt + line)
     return "\n".join(result)
+
 
 sample_code = """
 # Build a model and set a body built
@@ -67,8 +68,8 @@ model = JOS3(
 # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
 # Set the first condition
 # Environmental parameters can be input as int, float, list, dict, numpy array format.
-model.tdb = 28  # Air temperature [oC]
-model.tr = 30  # Mean radiant temperature [oC]
+model.tdb = 28  # Air temperature [°C]
+model.tr = 30  # Mean radiant temperature [°C]
 model.rh = 40  # Relative humidity [%]
 model.v = np.array( # Air velocity [m/s]
     [
@@ -133,8 +134,8 @@ model.simulate(
 )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
 
 # Set the next condition (You only need to change the parameters that you want to change)
-model.tdb = 30  # Change air temperature [oC]
-model.tr = 35  # Change mean radiant temperature [oC]
+model.tdb = 30  # Change air temperature [°C]
+model.tr = 35  # Change mean radiant temperature [°C]
 # Run JOS-3 model
 model.simulate(
     times=30,  # Number of loops of a simulation
@@ -145,7 +146,7 @@ model.simulate(
 df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
 df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  # Plot time series of local skin temperature.
 plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
-plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
+plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
 plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
 plt.show()  # Show the plot
@@ -162,7 +163,7 @@ model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2 (all output).cs
 # Please note that value for the neck is the same as the measured value for the head
 # and it does not take into account the insulation effect of the hair.
 # Typically, the clothing insulation for the hair are quantified by assuming a head covering of approximately 0.6 to 1.0 clo.
-local_clo_typical_ensembles =  {
+local_clo_typical_ensembles = {
     "nude (mesh chair)": {
         "whole_body": 0.01,
         "local_body_part": {

@@ -21,7 +21,7 @@ if not os.path.exists(JOS3_EXAMPLE_DIRECTORY):
 model = JOS3(height=1.7, weight=60, age=30)
 
 # Set the first phase
-model.to = 28  # Operative temperature [oC]
+model.to = 28  # Operative temperature [°C]
 model.rh = 40  # Relative humidity [%]
 model.v = 0.2  # Air velocity [m/s]
 model.par = 1.2  # Physical activity ratio [-]
@@ -34,7 +34,7 @@ model.simulate(60)  # Additional exposure time = 60 [min]
 # Show the results
 df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
 df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
-plt.ylabel("Mean skin temperature [oC]")  # Set y-label as 'Mean skin temperature [oC]'
+plt.ylabel("Mean skin temperature [°C]")  # Set y-label as 'Mean skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
 plt.savefig(
     os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1_mean_skin_temperature.png")
@@ -45,8 +45,8 @@ plt.show()  # Show the plot
 model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1 (default output).csv"))
 
 # Print the BMR value using the getter
-print('BMR=', model.BMR)
-print('Body name list: ', model.bodynames)
+print("BMR=", model.BMR)
+print("Body name list: ", model.body_names)
 
 # -------------------------------------------
 # EXAMPLE 2 (detail simulation)
@@ -68,10 +68,10 @@ model = JOS3(
 # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
 # Set the first condition
 # Environmental parameters can be input as int, float, list, dict, numpy array format.
-model.tdb = 28  # Air temperature [oC]
-model.tr = 30  # Mean radiant temperature [oC]
+model.tdb = 28  # Air temperature [°C]
+model.tr = 30  # Mean radiant temperature [°C]
 model.rh = 40  # Relative humidity [%]
-model.v = np.array( # Air velocity [m/s]
+model.v = np.array(  # Air velocity [m/s]
     [
         0.2,  # head
         0.4,  # neck
@@ -92,7 +92,9 @@ model.v = np.array( # Air velocity [m/s]
         0.1,  # right foot
     ]
 )
-model.clo = local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"]
+model.clo = local_clo_typical_ensembles[
+    "briefs, socks, undershirt, work jacket, work pants, safety shoes"
+]["local_body_part"]
 
 # par should be input as int, float.
 model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
@@ -108,25 +110,25 @@ model.simulate(
 
 # Set the next condition (You only need to change the parameters that you want to change)
 model.to = 20  # Change operative temperature
-model.v = { # Air velocity [m/s], assuming to use a desk fan
-    'head' : 0.2,
-    'neck' : 0.4,
-    'chest' : 0.4,
-    'back': 0.1,
-    'pelvis' : 0.1,
-    'left_shoulder' : 0.4,
-    'left_arm' : 0.4,
-    'left_hand' : 0.4,
-    'right_shoulder' : 0.4,
-    'right_arm' : 0.4,
-    'right_hand' : 0.4,
-    'left_thigh' : 0.1,
-    'left_leg' : 0.1,
-    'left_foot' : 0.1,
-    'right_thigh' : 0.1,
-    'right_leg' : 0.1,
-    'right_foot' : 0.1
-    }
+model.v = {  # Air velocity [m/s], assuming to use a desk fan
+    "head": 0.2,
+    "neck": 0.4,
+    "chest": 0.4,
+    "back": 0.1,
+    "pelvis": 0.1,
+    "left_shoulder": 0.4,
+    "left_arm": 0.4,
+    "left_hand": 0.4,
+    "right_shoulder": 0.4,
+    "right_arm": 0.4,
+    "right_hand": 0.4,
+    "left_thigh": 0.1,
+    "left_leg": 0.1,
+    "left_foot": 0.1,
+    "right_thigh": 0.1,
+    "right_leg": 0.1,
+    "right_foot": 0.1,
+}
 # Run JOS-3 model
 model.simulate(
     times=60,  # Number of loops of a simulation
@@ -134,8 +136,8 @@ model.simulate(
 )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
 
 # Set the next condition (You only need to change the parameters that you want to change)
-model.tdb = 30  # Change air temperature [oC]
-model.tr = 35  # Change mean radiant temperature [oC]
+model.tdb = 30  # Change air temperature [°C]
+model.tr = 35  # Change mean radiant temperature [°C]
 # Run JOS-3 model
 model.simulate(
     times=30,  # Number of loops of a simulation
@@ -144,11 +146,15 @@ model.simulate(
 
 # Show the results
 df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
-df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  # Plot time series of local skin temperature.
+df[
+    ["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]
+].plot()  # Plot time series of local skin temperature.
 plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
-plt.ylabel("Skin temperature [oC]")  # Set y-label as 'Skin temperature [oC]'
+plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
-plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
+plt.savefig(
+    os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png")
+)  # Save plot at the current directory
 plt.show()  # Show the plot
 
 # Exporting the results as csv

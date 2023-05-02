@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-"""
-This code includes some functions of jos-3 model to calculate human thermoregulation.
+"""This code includes some functions of jos-3 model to calculate human
+thermoregulation.
 
-The values of a NumPy array containing 17 elements correspond to the following order:
-"head", "neck", "chest", "back", "pelvis",
-"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
-"left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
+The values of a NumPy array containing 17 elements correspond to the
+following order: "head", "neck", "chest", "back", "pelvis",
+"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm",
+"right_hand", "left_thigh", "left_leg", "left_hand", "right_thigh",
+"right_leg" and "right_hand".
 """
 
 import numpy as np
@@ -45,8 +46,7 @@ def conv_coef(
     tdb=28.8,
     t_skin=34.0,
 ):
-    """
-    Calculate convective heat transfer coefficient (hc) [W/K.m2]
+    """Calculate convective heat transfer coefficient (hc) [W/K.m2]
 
     Parameters
     ----------
@@ -57,17 +57,16 @@ def conv_coef(
         Air velocity [m/s]. If iter is input, its length should be 17.
         The default is 0.1.
     tdb : float or iter, optional
-        Air temperature [oC]. If iter is input, its length should be 17.
+        Air temperature [°C]. If iter is input, its length should be 17.
         The default is 28.8.
     t_skin : float or iter, optional
-        Skin temperature [oC]. If iter is input, its length should be 17.
+        Skin temperature [°C]. If iter is input, its length should be 17.
         The default is 34.0.
 
     Returns
     -------
     hc : numpy.ndarray
         Convective heat transfer coefficient (hc) [W/K.m2].
-
     """
     # Natural convection
     if posture.lower() == "standing":
@@ -216,10 +215,10 @@ def conv_coef(
 
     return hc
 
+
 # change
 def rad_coef(posture="standing"):
-    """
-    Calculate radiative heat transfer coefficient (hr) [W/K.m2]
+    """Calculate radiative heat transfer coefficient (hr) [W/K.m2]
 
     Parameters
     ----------
@@ -231,7 +230,6 @@ def rad_coef(posture="standing"):
     -------
     hr : numpy.ndarray
         Radiative heat transfer coefficient (hr) [W/K.m2].
-
     """
 
     if posture.lower() == "standing":
@@ -307,9 +305,7 @@ def rad_coef(posture="standing"):
 
 
 def fixed_hc(hc, v):
-    """
-    Fixes hc values to fit tow-node-model's values.
-    """
+    """Fixes hc values to fit tow-node-model's values."""
     mean_hc = np.average(hc, weights=_BSAst)
     mean_va = np.average(v, weights=_BSAst)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
@@ -318,24 +314,21 @@ def fixed_hc(hc, v):
 
 
 def fixed_hr(hr):
-    """
-    Fixes hr values to fit tow-node-model's values.
-    """
+    """Fixes hr values to fit tow-node-model's values."""
     mean_hr = np.average(hr, weights=_BSAst)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
 
 
 def operative_temp(tdb, tr, hc, hr):
-    """
-    Calculate operative temperature [oC]
+    """Calculate operative temperature [°C]
 
     Parameters
     ----------
     tdb : float or array
-        Air temperature [oC]
+        Air temperature [°C]
     tr : float or array
-        Mean radiant temperature [oC]
+        Mean radiant temperature [°C]
     hc : float or array
         Convective heat transfer coefficient [W/K.m2]
     hr : float or array
@@ -344,15 +337,14 @@ def operative_temp(tdb, tr, hc, hr):
     Returns
     -------
     to : float or array
-        Operative temperature [oC]
+        Operative temperature [°C]
     """
     to = (hc * tdb + hr * tr) / (hc + hr)
     return to
 
 
 def clo_area_factor(clo):
-    """
-    Calculate clothing area factor [-]
+    """Calculate clothing area factor [-]
 
     Parameters
     ----------
@@ -369,8 +361,7 @@ def clo_area_factor(clo):
 
 
 def dry_r(hc, hr, clo):
-    """
-    Calculate total sensible thermal resistance.
+    """Calculate total sensible thermal resistance.
 
     Parameters
     ----------
@@ -393,9 +384,8 @@ def dry_r(hc, hr, clo):
     return r_t
 
 
-def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
-    """
-    Calculate total evaporative thermal resistance.
+def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
+    """Calculate total evaporative thermal resistance.
 
     Parameters
     ----------
@@ -403,7 +393,7 @@ def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
         Convective heat transfer coefficient (hc) [W/K.m2].
     clo : float or array
         Clothing insulation [clo].
-    iclo : float, or array, optional
+    i_clo : float, or array, optional
         Clothing vapor permeation efficiency [-]. The default is 0.45.
     lewis_rate : float, optional
         Lewis rate [K/kPa]. The default is 16.5.
@@ -412,12 +402,11 @@ def wet_r(hc, clo, iclo=0.45, lewis_rate=16.5):
     -------
     r_et : float or array
         Total evaporative thermal resistance.
-
     """
     fcl = clo_area_factor(clo)
     r_cl = 0.155 * clo
     r_ea = 1 / (lewis_rate * hc)
-    r_ecl = r_cl / (lewis_rate * iclo)
+    r_ecl = r_cl / (lewis_rate * i_clo)
     r_et = r_ea / fcl + r_ecl
     return r_et
 
@@ -429,7 +418,7 @@ def heat_resistances(
     t_skin=np.ones(17) * 34,
     clo=np.zeros(17),
     posture="standing",
-    iclo=np.ones(17) * 0.45,
+    i_clo=np.ones(17) * 0.45,
     options={},
 ):
     hc = fixed_hc(
@@ -455,19 +444,18 @@ def heat_resistances(
         clo,
     )
     r_t, r_a, r_cl = dry_r(hc, hr, clo)
-    r_et, r_ea, r_ecl = wet_r(hc, clo, iclo)
+    r_et, r_ea, r_ecl = wet_r(hc, clo, i_clo)
 
     return to, r_t, r_et, r_a, r_cl, r_ea, r_ecl, fcl
 
 
 def error_signals(err_cr=0, err_sk=0):
-    """
-    Calculate WRMS and CLDS signals of thermoregulation
+    """Calculate WRMS and CLDS signals of thermoregulation.
 
     Parameters
     ----------
     err_cr, err_sk : float or array, optional
-        Difference between setpoint and body temperatures.
+        Difference between set-point and body temperatures.
         The default is 0.
 
     Returns
@@ -529,17 +517,16 @@ def evaporation(
     equation="dubois",
     age=20,
 ):
-    """
-    Calculate evaporative heat loss.
+    """Calculate evaporative heat loss.
 
     Parameters
     ----------
     err_cr, err_sk : array
-        Difference between setpoint and body temperatures [oC].
+        Difference between set-point and body temperatures [°C].
     t_skin : array
-        Skin temperatures [oC].
+        Skin temperatures [°C].
     tdb : array
-        Air temperatures at local body segments [oC].
+        Air temperatures at local body segments [°C].
     rh : array
         Relative humidity at local body segments [%].
     ret : array
@@ -564,7 +551,6 @@ def evaporation(
         Maximum evaporative heat loss at the skin [W].
     e_sweat : TYPE
         Evaporative heat loss at the skin by only sweating [W].
-
     """
 
     wrms, clds = error_signals(
@@ -635,7 +621,7 @@ def evaporation(
             ]
         )
 
-    e_sweat = skin_sweat * sig_sweat * sd_sweat * 2 ** ((err_sk) / 10)
+    e_sweat = skin_sweat * sig_sweat * sd_sweat * 2 ** (err_sk / 10)
     wet = 0.06 + 0.94 * (e_sweat / e_max)
     wet = np.minimum(wet, 1)  # Wettedness' upper limit
     e_sk = wet * e_max
@@ -643,7 +629,7 @@ def evaporation(
     return wet, e_sk, e_max, e_sweat
 
 
-def skin_bloodflow(
+def skin_blood_flow(
     err_cr,
     err_sk,
     height=1.72,
@@ -652,13 +638,12 @@ def skin_bloodflow(
     age=20,
     ci=2.59,
 ):
-    """
-    Calculate skin blood flow rate (bf_skin) [L/h].
+    """Calculate skin blood flow rate (bf_skin) [L/h].
 
     Parameters
     ----------
     err_cr, err_sk : array
-        Difference between setpoint and body temperatures [oC].
+        Difference between set-point and body temperatures [°C].
     height : float, optional
         Body height [m]. The default is 1.72.
     weight : float, optional
@@ -675,7 +660,6 @@ def skin_bloodflow(
     -------
     bf_skin : array
         Skin blood flow rate [L/h].
-
     """
 
     wrms, clds = error_signals(err_cr, err_sk)
@@ -799,7 +783,7 @@ def skin_bloodflow(
     return bf_sk
 
 
-def ava_bloodflow(
+def ava_blood_flow(
     err_cr,
     err_sk,
     height=1.72,
@@ -808,14 +792,13 @@ def ava_bloodflow(
     age=20,
     ci=2.59,
 ):
-    """
-    Calculate areteriovenous anastmoses (AVA) blood flow rate [L/h] based on
+    """Calculate areteriovenous anastmoses (AVA) blood flow rate [L/h] based on
     Takemori's model, 1995.
 
     Parameters
     ----------
     err_cr, err_sk : array
-        Difference between setpoint and body temperatures [oC].
+        Difference between set-point and body temperatures [°C].
     height : float, optional
         Body height [m]. The default is 1.72.
     weight : float, optional
@@ -832,7 +815,6 @@ def ava_bloodflow(
     -------
     bf_ava_hand, bf_ava_foot : array
         AVA blood flow rate at hand and foot [L/h].
-
     """
     # Cal. mean error body core temp.
     cap_bcr = [10.2975, 9.3935, 13.834]  # Thermal capacity at chest, back and pelvis
@@ -867,8 +849,7 @@ def ava_bloodflow(
 def basal_met(
     height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
 ):
-    """
-    Calculate basal metabolic rate [W].
+    """Calculate basal metabolic rate [W].
 
     Parameters
     ----------
@@ -887,7 +868,6 @@ def basal_met(
     -------
      bmr: float
         Basal metabolic rate [W].
-
     """
 
     if equation == "harris-benedict":
@@ -918,8 +898,7 @@ def basal_met(
 def local_mbase(
     height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
 ):
-    """
-    Calculate local basal metabolic rate [W].
+    """Calculate local basal metabolic rate [W].
 
     Parameters
     ----------
@@ -938,7 +917,6 @@ def local_mbase(
     -------
     mbase : array
         Local basal metabolic rate (Mbase) [W].
-
     """
 
     mbase_all = basal_met(height, weight, age, sex, equation)
@@ -1035,14 +1013,13 @@ def local_mbase(
     return mbase_cr, mbase_ms, mbase_fat, mbase_sk
 
 
-def local_mwork(tcr, par):
-    """
-    Calculate local metabolic rate by work [W]
+def local_m_work(tcr, par):
+    """Calculate local metabolic rate by work [W]
 
     Parameters
     ----------
     tcr : float
-        Basal metbolic rate [W].
+        Basal metabolic rate [W].
     par : float
         Physical activity ratio [-].
 
@@ -1050,7 +1027,6 @@ def local_mwork(tcr, par):
     -------
     Q_work : array
         Local metabolic rate by work [W].
-
     """
     mwork_all = (par - 1) * tcr
     mwf = np.array(
@@ -1094,15 +1070,14 @@ def shivering(
     dtime=60,
     options={},
 ):
-    """
-    Calculate local metabolic rate by shivering [W].
+    """Calculate local metabolic rate by shivering [W].
 
     Parameters
     ----------
     err_cr, err_sk : array
-        Difference between setpoint and body temperatures [oC].
+        Difference between set-point and body temperatures [°C].
     t_core, t_skin : array
-        Core and skin temperatures [oC].
+        Core and skin temperatures [°C].
     height : float, optional
         Body height [m]. The default is 1.72.
     weight : float, optional
@@ -1121,7 +1096,6 @@ def shivering(
     -------
     Q_shiv : array
         Local metabolic rate by shivering [W].
-
     """
     wrms, clds = error_signals(
         err_cr,
@@ -1170,9 +1144,7 @@ def shivering(
     global PRE_SHIV  # Previous shivering thermogenesis [W]
     if options:
         if options["limit_dshiv/dt"]:
-            # Asaka, 2016
-            # dshiv < 0.0077 [W/s]
-            dshiv = sig_shiv - PRE_SHIV
+            dshiv = sig_shiv - PRE_SHIV  # Asaka, 2016 dshiv < 0.0077 [W/s]
             if options["limit_dshiv/dt"] is True:  # default is 0.0077 [W/s]
                 limit_dshiv = 0.0077 * dtime
             else:
@@ -1214,17 +1186,16 @@ def nonshivering(
     weight=74.43,
     equation="dubois",
     age=20,
-    coldacclimation=False,
+    cold_acclimation=False,
     batpositive=True,
     options={},
 ):
-    """
-    Calculate local metabolic rate by non-shivering [W]
+    """Calculate local metabolic rate by non-shivering [W]
 
     Parameters
     ----------
     err_cr, err_sk : array
-        Difference between setpoint and body temperatures [oC].
+        Difference between set-point and body temperatures [°C].
     height : float, optional
         Body height [m]. The default is 1.72.
     weight : float, optional
@@ -1234,18 +1205,17 @@ def nonshivering(
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
         age [years]. The default is 20.
-    coldacclimation : bool, optional
-        Whether the subject acclimates cold enviroment or not.
+    cold_acclimation : bool, optional
+        Whether the subject acclimates cold environment or not.
         The default is False.
     batpositive : bool, optional
-        Whether BAT ativity is positive or not.
+        Whether BAT activity is positive or not.
         The default is True.
 
     Returns
     -------
     Q_nst : array
         Local metabolic rate by non-shivering [W].
-
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
     wrms, clds = error_signals(
@@ -1266,7 +1236,7 @@ def nonshivering(
     else:  # age >= 40
         bat *= 0.80
 
-    if coldacclimation:
+    if cold_acclimation:
         bat += 3.46
 
     if not batpositive:
@@ -1322,7 +1292,7 @@ def sum_m(mbase, mwork, mshiv, mnst):
 
     for i, bn in enumerate(BODY_NAMES):
         # If the segment has a muscle layer, muscle heat production increases by the activity.
-        if not IDICT[bn]["muscle"] is None:
+        if IDICT[bn]["muscle"] is not None:
             qms[i] += mwork[i] + mshiv[i]
         # In other segments, core heat production increase, instead of muscle.
         else:
@@ -1331,23 +1301,22 @@ def sum_m(mbase, mwork, mshiv, mnst):
     return qcr, qms, qfat, qsk
 
 
-def crmsfat_bloodflow(
-    mwork,
-    mshiv,
+def cr_ms_fat_blood_flow(
+    m_work,
+    m_shiv,
     height=1.72,
     weight=74.43,
     equation="dubois",
     age=20,
     ci=2.59,
 ):
-    """
-    Calculate core, muslce and fat blood flow rate [L/h].
+    """Calculate core, muscle and fat blood flow rate [L/h].
 
     Parameters
     ----------
-    mwork : array
+    m_work : array
         Metablic rate by work [W].
-    mshiv : array
+    m_shiv : array
         Metablic rate by shivering [W].
     height : float, optional
         Body height [m]. The default is 1.72.
@@ -1365,7 +1334,6 @@ def crmsfat_bloodflow(
     -------
     bf_core, bf_muscle, bf_fat : array
         Core, muslce and fat blood flow rate [L/h].
-
     """
     # Basal blood flow rate [L/h]
     # core, CBFB
@@ -1442,11 +1410,11 @@ def crmsfat_bloodflow(
 
     for i, bn in enumerate(BODY_NAMES):
         # If the segment has a muscle layer, muscle blood flow increases.
-        if not IDICT[bn]["muscle"] is None:
-            bf_ms[i] += (mwork[i] + mshiv[i]) / 1.163
+        if IDICT[bn]["muscle"] is not None:
+            bf_ms[i] += (m_work[i] + m_shiv[i]) / 1.163
         # In other segments, core blood flow increase, instead of muscle blood flow.
         else:
-            bf_cr[i] += (mwork[i] + mshiv[i]) / 1.163
+            bf_cr[i] += (m_work[i] + m_shiv[i]) / 1.163
     return bf_cr, bf_ms, bf_fat
 
 
@@ -1461,7 +1429,7 @@ def sum_bf(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
     return co
 
 
-def resp_heatloss(t, p, met):
+def resp_heat_loss(t, p, met):
     res_sh = 0.0014 * met * (34 - t)  # sensible heat loss
     res_lh = 0.0173 * met * (5.87 - p)  # latent heat loss
     return res_sh, res_lh

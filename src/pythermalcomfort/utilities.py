@@ -230,6 +230,7 @@ def body_surface_area(weight, height, formula="dubois"):
     elif formula == "kurazumi":
         return 0.2440 * (weight**0.383) * (height**0.693)
 
+
 def f_svv(w, h, d):
     """Calculates the sky-vault view fraction.
 
