@@ -5,27 +5,6 @@ and blood flow in different body parts and layers."""
 
 import numpy as np
 
-
-def sub2whole(subarr_list):
-    ishape = 0
-    jshape = 0
-    for sub_arr in subarr_list:
-        ishape += sub_arr.shape[0]
-        jshape += sub_arr.shape[1]
-
-    whole_arr = np.zeros((ishape, jshape))
-    i = 0
-    j = 0
-    for sub_arr in subarr_list:
-        iend = i + sub_arr.shape[0]
-        jend = j + sub_arr.shape[1]
-        whole_arr[i:iend, j:jend] = sub_arr.copy()
-        i += sub_arr.shape[0]
-        j += sub_arr.shape[1]
-
-    return whole_arr
-
-
 BODY_NAMES = [
     "head",
     "neck",
