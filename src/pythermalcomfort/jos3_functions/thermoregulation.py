@@ -327,7 +327,7 @@ def rad_coef(posture="standing"):
 
 
 def fixed_hc(hc, v):
-    """Fixes hc values to fit tow-node-model's values."""
+    """Fixes hc values to fit two-node-model's values."""
     mean_hc = np.average(hc, weights=_BSAst)
     mean_va = np.average(v, weights=_BSAst)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
@@ -336,7 +336,7 @@ def fixed_hc(hc, v):
 
 
 def fixed_hr(hr):
-    """Fixes hr values to fit tow-node-model's values."""
+    """Fixes hr values to fit two-node-model's values."""
     mean_hr = np.average(hr, weights=_BSAst)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
