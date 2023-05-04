@@ -130,18 +130,16 @@ def local_bsa(
 
     Returns
     -------
-    localbsa : ndarray(17,)
+    local_bsa : ndarray(17,)
         Local body surface area (bsa) [m2].
-    bsa_rate : float
-        The ratio of bsa to the standard body [-].
     """
     _bsa_rate = bsa_rate(
         height=height,
         weight=weight,
         formula=formula,
     )  # The bsa ratio to the standard body (1.87m2)
-    bsa = _BSAst * _bsa_rate
-    return bsa
+    local_bsa = _BSAst * _bsa_rate
+    return local_bsa
 
 
 def weight_rate(
