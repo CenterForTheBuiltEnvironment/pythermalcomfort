@@ -51,7 +51,7 @@ def conv_coef(
     Parameters
     ----------
     posture : str, optional
-        Select posture from standing, sitting or lying.
+        Select posture from standing, sitting, lying, sedentary or supine.
         The default is "standing".
     v : float or iter, optional
         Air velocity [m/s]. If iter is input, its length should be 17.
@@ -67,154 +67,171 @@ def conv_coef(
     -------
     hc : numpy.ndarray
         Convective heat transfer coefficient (hc) [W/K.m2].
-    """
-    # Natural convection
-    if posture.lower() == "standing":
-        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_natural = np.array(
-            [
-                4.48,
-                4.48,
-                2.97,
-                2.91,
-                2.85,
-                3.61,
-                3.55,
-                3.67,
-                3.61,
-                3.55,
-                3.67,
-                2.80,
-                2.04,
-                2.04,
-                2.80,
-                2.04,
-                2.04,
-            ]
-        )
-    elif posture.lower() in ["sitting", "sedentary"]:
-        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_natural = np.array(
-            [
-                4.75,
-                4.75,
-                3.12,
-                2.48,
-                1.84,
-                3.76,
-                3.62,
-                2.06,
-                3.76,
-                3.62,
-                2.06,
-                2.98,
-                2.98,
-                2.62,
-                2.98,
-                2.98,
-                2.62,
-            ]
-        )
 
-    elif posture.lower() in ["lying", "supine"]:
-        # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
-        # The values are applied under cold environment.
+    References
+    ----------
+    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+    Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
+    """
+
+    # Natural convection
+    def natural_convection(posture, tdb, t_skin):
+        if posture.lower() == "standing":
+            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+            hc_natural = np.array(
+                [
+                    4.48,
+                    4.48,
+                    2.97,
+                    2.91,
+                    2.85,
+                    3.61,
+                    3.55,
+                    3.67,
+                    3.61,
+                    3.55,
+                    3.67,
+                    2.80,
+                    2.04,
+                    2.04,
+                    2.80,
+                    2.04,
+                    2.04,
+                ]
+            )
+        elif posture.lower() in ["sitting", "sedentary"]:
+            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+            hc_natural = np.array(
+                [
+                    4.75,
+                    4.75,
+                    3.12,
+                    2.48,
+                    1.84,
+                    3.76,
+                    3.62,
+                    2.06,
+                    3.76,
+                    3.62,
+                    2.06,
+                    2.98,
+                    2.98,
+                    2.62,
+                    2.98,
+                    2.98,
+                    2.62,
+                ]
+            )
+        elif posture.lower() in ["lying", "supine"]:
+            # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
+            # The values are applied under cold environment.
+            hc_a = np.array(
+                [
+                    1.105,
+                    1.105,
+                    1.211,
+                    1.211,
+                    1.211,
+                    0.913,
+                    2.081,
+                    2.178,
+                    0.913,
+                    2.081,
+                    2.178,
+                    0.945,
+                    0.385,
+                    0.200,
+                    0.945,
+                    0.385,
+                    0.200,
+                ]
+            )
+            hc_b = np.array(
+                [
+                    0.345,
+                    0.345,
+                    0.046,
+                    0.046,
+                    0.046,
+                    0.373,
+                    0.850,
+                    0.297,
+                    0.373,
+                    0.850,
+                    0.297,
+                    0.447,
+                    0.580,
+                    0.966,
+                    0.447,
+                    0.580,
+                    0.966,
+                ]
+            )
+            hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
+        else:
+            valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
+            raise ValueError(f"Invalid posture: '{posture}'. Must be one of {valid_postures}")
+        return hc_natural
+
+    # Forced convection
+    def forced_convection(v):
+        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
         hc_a = np.array(
             [
-                1.105,
-                1.105,
-                1.211,
-                1.211,
-                1.211,
-                0.913,
-                2.081,
-                2.178,
-                0.913,
-                2.081,
-                2.178,
-                0.945,
-                0.385,
-                0.200,
-                0.945,
-                0.385,
-                0.200,
+                15.0,
+                15.0,
+                11.0,
+                17.0,
+                13.0,
+                17.0,
+                17.0,
+                20.0,
+                17.0,
+                17.0,
+                20.0,
+                14.0,
+                15.8,
+                15.1,
+                14.0,
+                15.8,
+                15.1,
             ]
         )
         hc_b = np.array(
             [
-                0.345,
-                0.345,
-                0.046,
-                0.046,
-                0.046,
-                0.373,
-                0.850,
-                0.297,
-                0.373,
-                0.850,
-                0.297,
-                0.447,
-                0.580,
-                0.966,
-                0.447,
-                0.580,
-                0.966,
+                0.62,
+                0.62,
+                0.67,
+                0.49,
+                0.60,
+                0.59,
+                0.61,
+                0.60,
+                0.59,
+                0.61,
+                0.60,
+                0.61,
+                0.74,
+                0.62,
+                0.61,
+                0.74,
+                0.62,
             ]
         )
-        hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
+        hc_forced = hc_a * (v**hc_b)
+        return hc_forced
 
-    # Forced convection
-    # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-    hc_a = np.array(
-        [
-            15.0,
-            15.0,
-            11.0,
-            17.0,
-            13.0,
-            17.0,
-            17.0,
-            20.0,
-            17.0,
-            17.0,
-            20.0,
-            14.0,
-            15.8,
-            15.1,
-            14.0,
-            15.8,
-            15.1,
-        ]
-    )
-    hc_b = np.array(
-        [
-            0.62,
-            0.62,
-            0.67,
-            0.49,
-            0.60,
-            0.59,
-            0.61,
-            0.60,
-            0.59,
-            0.61,
-            0.60,
-            0.61,
-            0.74,
-            0.62,
-            0.61,
-            0.74,
-            0.62,
-        ]
-    )
-    hc_forced = hc_a * (v**hc_b)
+    # Calculate natural convection
+    hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
+
+    # Calculate forced convection
+    hc_forced = forced_convection(v=v)
 
     # Select natural or forced hc.
-    # If local v is under 0.2 m/s, the hc valuse is natural.
+    # If the local v is less than 0.2 m/s, it is considered natural convection;
+    # if it is greater than 0.2 m/s, it is considered forced convection.
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/K.m2)]
-
     return hc
-
 
 # change
 def rad_coef(posture="standing"):
@@ -223,7 +240,7 @@ def rad_coef(posture="standing"):
     Parameters
     ----------
     posture : str, optional
-        Select posture from standing, sitting or lying.
+        Select posture from standing, sitting, lying, sedentary or supine.
         The default is "standing".
 
     Returns
@@ -300,6 +317,11 @@ def rad_coef(posture="standing"):
                 5.547,
                 6.085,
             ]
+        )
+    else:
+        valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
+        raise ValueError(
+            f"Invalid posture '{posture}'. Must be one of {valid_postures}"
         )
     return hr
 
