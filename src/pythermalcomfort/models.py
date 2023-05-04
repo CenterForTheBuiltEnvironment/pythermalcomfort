@@ -3876,7 +3876,7 @@ class JOS3:
             Output parameters.
         """
 
-        # Compute convective and radiative heat transfer coefficient [W/K.m2]
+        # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
         # Manual setting is possible by setting self._hc and self._hr.
         # Compute heat and evaporative heat resistance [m2.K/W], [m2.kPa/W]
@@ -3885,7 +3885,7 @@ class JOS3:
         tcr = self.t_core
         tsk = self.t_skin
 
-        # Convective and radiative heat transfer coefficients [W/K.m2]
+        # Convective and radiative heat transfer coefficients [W/(m2*K)]
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,

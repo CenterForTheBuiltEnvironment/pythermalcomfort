@@ -46,7 +46,7 @@ def conv_coef(
     tdb=28.8,
     t_skin=34.0,
 ):
-    """Calculate convective heat transfer coefficient (hc) [W/K.m2]
+    """Calculate convective heat transfer coefficient (hc) [W/(m2*K)]
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ def conv_coef(
     Returns
     -------
     hc : numpy.ndarray
-        Convective heat transfer coefficient (hc) [W/K.m2].
+        Convective heat transfer coefficient (hc) [W/(m2*K)].
 
     References
     ----------
@@ -230,12 +230,12 @@ def conv_coef(
     # Select natural or forced hc.
     # If the local v is less than 0.2 m/s, it is considered natural convection;
     # if it is greater than 0.2 m/s, it is considered forced convection.
-    hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/K.m2)]
+    hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
 
 # change
 def rad_coef(posture="standing"):
-    """Calculate radiative heat transfer coefficient (hr) [W/K.m2]
+    """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
 
     Parameters
     ----------
@@ -246,7 +246,7 @@ def rad_coef(posture="standing"):
     Returns
     -------
     hr : numpy.ndarray
-        Radiative heat transfer coefficient (hr) [W/K.m2].
+        Radiative heat transfer coefficient (hr) [W/(m2*K)].
     """
 
     if posture.lower() == "standing":
@@ -352,9 +352,9 @@ def operative_temp(tdb, tr, hc, hr):
     tr : float or array
         Mean radiant temperature [°C]
     hc : float or array
-        Convective heat transfer coefficient [W/K.m2]
+        Convective heat transfer coefficient [W/(m2*K)]
     hr : float or array
-        Radiative heat transfer coefficient [W/K.m2]
+        Radiative heat transfer coefficient [W/(m2*K)]
 
     Returns
     -------
@@ -388,9 +388,9 @@ def dry_r(hc, hr, clo):
     Parameters
     ----------
     hc : float or array
-        Convective heat transfer coefficient (hc) [W/K.m2].
+        Convective heat transfer coefficient (hc) [W/(m2*K)].
     hr : float or array
-        Radiative heat transfer coefficient (hr) [W/K.m2].
+        Radiative heat transfer coefficient (hr) [W/(m2*K)].
     clo : float or array
         Clothing insulation [clo].
 
@@ -412,7 +412,7 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     Parameters
     ----------
     hc : float or array
-        Convective heat transfer coefficient (hc) [W/K.m2].
+        Convective heat transfer coefficient (hc) [W/(m2*K)].
     clo : float or array
         Clothing insulation [clo].
     i_clo : float, or array, optional
