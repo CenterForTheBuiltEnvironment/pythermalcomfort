@@ -441,7 +441,6 @@ def heat_resistances(
     clo=np.zeros(17),
     posture="standing",
     i_clo=np.ones(17) * 0.45,
-    options={},
 ):
     hc = fixed_hc(
         conv_coef(
