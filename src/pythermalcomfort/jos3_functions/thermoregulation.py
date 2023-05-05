@@ -578,7 +578,6 @@ def evaporation(
     """
 
     wrms, clds = error_signals(
-        err_cr,
         err_sk,
     )  # Thermoregulation signals
     bsar = cons.bsa_rate(
@@ -686,7 +685,7 @@ def skin_blood_flow(
         Skin blood flow rate [L/h].
     """
 
-    wrms, clds = error_signals(err_cr, err_sk)
+    wrms, clds = error_signals(err_sk)
 
     # BFBsk
     bfb_sk = np.array(
@@ -1122,7 +1121,6 @@ def shivering(
         Local metabolic rate by shivering [W].
     """
     wrms, clds = error_signals(
-        err_cr,
         err_sk,
     )
     shivf = np.array(
@@ -1243,7 +1241,6 @@ def nonshivering(
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
     wrms, clds = error_signals(
-        err_cr,
         err_sk,
     )
 
