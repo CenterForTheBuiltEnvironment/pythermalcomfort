@@ -1410,7 +1410,3 @@ def resp_heat_loss(t, p, met):
     res_sh = 0.0014 * met * (34 - t)  # sensible heat loss
     res_lh = 0.0173 * met * (5.87 - p)  # latent heat loss
     return res_sh, res_lh
-
-
-def get_lts(tdb):
-    return 2.418 * 1000
