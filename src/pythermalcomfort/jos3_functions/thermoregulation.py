@@ -233,7 +233,6 @@ def conv_coef(
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
 
-# change
 def rad_coef(posture="standing"):
     """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
 
@@ -383,7 +382,7 @@ def clo_area_factor(clo):
 
 
 def dry_r(hc, hr, clo):
-    """Calculate total sensible thermal resistance.
+    """Calculate total sensible thermal resistance (between the skin and ambient air).
 
     Parameters
     ----------
@@ -407,7 +406,7 @@ def dry_r(hc, hr, clo):
 
 
 def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
-    """Calculate total evaporative thermal resistance.
+    """Calculate total evaporative thermal resistance (between the skin and ambient air).
 
     Parameters
     ----------
@@ -433,7 +432,7 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     return r_et
 
 
-def heat_resistances(
+def _heat_resistances(
     tdb=np.ones(17) * 28.8,
     tr=np.ones(17) * 28.8,
     v=np.ones(17) * 0.1,
@@ -1202,7 +1201,6 @@ shivering
 
 
 def nonshivering(
-    err_cr,
     err_sk,
     height=1.72,
     weight=74.43,
@@ -1216,7 +1214,7 @@ def nonshivering(
 
     Parameters
     ----------
-    err_cr, err_sk : array
+    err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
         Body height [m]. The default is 1.72.
@@ -1241,7 +1239,7 @@ def nonshivering(
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
     wrms, clds = error_signals(
-        err_sk,
+        err_sk
     )
 
     bmi = weight / height**2
