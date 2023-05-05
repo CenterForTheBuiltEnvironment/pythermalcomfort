@@ -1158,10 +1158,6 @@ def shivering(
     mshiv = shivf * bsar * sd_shiv * sig_shiv
     return mshiv
 
-
-shivering
-
-
 def nonshivering(
     err_sk,
     height=1.72,
