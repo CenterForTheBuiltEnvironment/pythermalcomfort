@@ -4005,7 +4005,6 @@ class JOS3:
         # Calculate non-shivering thermogenesis (NST) [W]
         if self.options["nonshivering_thermogenesis"]:
             mnst = threg.nonshivering(
-                err_cr,
                 err_sk,
                 self._height,
                 self._weight,
