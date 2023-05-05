@@ -4245,17 +4245,6 @@ class JOS3:
                     dict_out[key] = detail_out[key]
         return dict_out
 
-    # def dict_results(self):
-    #     """
-    #     Get results as pandas.DataFrame format.
-    #     Returns
-    #     -------
-    #     Dictionaly of the results
-    #     """
-    #     if not self._history:
-    #         print("The model has no data.")
-    #         return None
-
     def dict_results(self):
         """Get results as a dictionary with pandas.DataFrame values.
 
