@@ -3434,7 +3434,7 @@ class JOS3:
          Run JOS-3 model once and gets the model parameters.
      dict_results():
          Get results as a dictionary with pandas.DataFrame values.
-     to_csv(path=None, folder=None, unit=True, meanig=True):
+     to_csv(path=None, folder=None, unit=True, meaning=True):
          Export results as csv format.
      _set_ex_q(tissue, value):
          Set extra heat gain by tissue name.
@@ -4306,7 +4306,7 @@ class JOS3:
                 out_dict[k].append(row[k])
         return out_dict
 
-    def to_csv(self, path=None, folder=None, unit=True, meanig=True):
+    def to_csv(self, path=None, folder=None, unit=True, meaning=True):
         """Export results as csv format.
 
         Parameters
@@ -4347,30 +4347,32 @@ class JOS3:
         # Get column names, units and meanings
         columns = [k for k in dictout.keys()]
         units = []
-        meanigs = []
+        meanings = []
         for col in columns:
-            param, bodyname = remove_body_name(col)
+            param, body_name = remove_body_name(col)
             if param in ALL_OUT_PARAMS:
                 u = ALL_OUT_PARAMS[param]["unit"]
                 units.append(u)
 
                 m = ALL_OUT_PARAMS[param]["meaning"]
-                if bodyname:
-                    meanigs.append(m.replace("each body part", bodyname))
+                if body_name:
+                    # Replace underscores with spaces
+                    body_name_with_spaces = body_name.replace("_", " ")
+                    meanings.append(m.replace("each body part", body_name_with_spaces))
                 else:
-                    meanigs.append(m)
+                    meanings.append(m)
             else:
                 units.append("")
-                meanigs.append("")
+                meanings.append("")
 
         # Write to csv file
-        with open(path, "wt", newline="") as f:
+        with open(path, "wt", newline="", encoding='utf-8-sig') as f:
             writer = csv.writer(f)
             writer.writerow(list(columns))
             if unit:
                 writer.writerow(units)
-            if meanig:
-                writer.writerow(meanigs)
+            if meaning:
+                writer.writerow(meanings)
             for i in range(len(dictout["cycle_time"])):
                 row = []
                 for k in columns:
