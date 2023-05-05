@@ -1218,13 +1218,13 @@ def nonshivering(
 
     if not batpositive:
         # incidence age factor: T.Yoneshiro 2011
-        if age < 30:
+        if age < 30: # age = 20s or younger
             bat *= 44 / 83
-        elif age < 40:
+        elif age < 40: # age = 30s
             bat *= 15 / 38
-        elif age < 50:
+        elif age < 50: # age = 40s
             bat *= 7 / 26
-        elif age < 50:
+        elif age < 60: # age = 50s
             bat *= 1 / 8
         else:  # age > 60
             bat *= 0
