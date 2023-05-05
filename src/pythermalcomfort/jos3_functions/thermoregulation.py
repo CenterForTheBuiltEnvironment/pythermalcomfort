@@ -431,44 +431,6 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et = r_ea / fcl + r_ecl
     return r_et
 
-
-def _heat_resistances(
-    tdb=np.ones(17) * 28.8,
-    tr=np.ones(17) * 28.8,
-    v=np.ones(17) * 0.1,
-    t_skin=np.ones(17) * 34,
-    clo=np.zeros(17),
-    posture="standing",
-    i_clo=np.ones(17) * 0.45,
-):
-    hc = fixed_hc(
-        conv_coef(
-            posture,
-            v,
-            tdb,
-            t_skin,
-        )
-    )
-    hr = fixed_hr(
-        rad_coef(
-            posture,
-        )
-    )
-    to = operative_temp(
-        tdb,
-        tr,
-        hc,
-        hr,
-    )
-    fcl = clo_area_factor(
-        clo,
-    )
-    r_t, r_a, r_cl = dry_r(hc, hr, clo)
-    r_et, r_ea, r_ecl = wet_r(hc, clo, i_clo)
-
-    return to, r_t, r_et, r_a, r_cl, r_ea, r_ecl, fcl
-
-
 def error_signals(err_sk=0):
     """Calculate WRMS and CLDS signals of thermoregulation.
 
