@@ -470,22 +470,25 @@ def heat_resistances(
     return to, r_t, r_et, r_a, r_cl, r_ea, r_ecl, fcl
 
 
-def error_signals(err_cr=0, err_sk=0):
+def error_signals(err_sk=0):
     """Calculate WRMS and CLDS signals of thermoregulation.
 
     Parameters
     ----------
-    err_cr, err_sk : float or array, optional
-        Difference between set-point and body temperatures.
+    err_sk : float or array, optional
+        Difference between set-point and skin temperatures [°C].
+        If array, its length should be 17.
         The default is 0.
 
     Returns
     -------
-    wrms, clds : array
-        WRMS and CLDS signals.
+    wrms : array
+        Warm signal (WRMS) [°C].
+    clds : array
+        Cold signal (CLDS) [°C].
     """
 
-    # SKINR
+    # SKINR (Distribution coefficients of thermal receptor) [-]
     receptor = np.array(
         [
             0.0549,
