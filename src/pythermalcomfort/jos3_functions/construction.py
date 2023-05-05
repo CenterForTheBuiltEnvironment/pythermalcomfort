@@ -15,7 +15,7 @@ import numpy as np
 from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.utilities import body_surface_area
 
-
+# Body surface area of the standard body [m2]
 _BSAst = np.array(
     [
         0.110,
@@ -683,12 +683,12 @@ def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
     )
 
     # Changes the values based on the standard body
-    bfbr = bfb_rate(height, weight, equation, age, ci)
+    bfb_r = bfb_rate(height, weight, equation, age, ci)
     wr = weight_rate(weight)
-    cap_art *= bfbr
-    cap_vein *= bfbr
-    cap_sfv *= bfbr
-    cap_cb *= bfbr
+    cap_art *= bfb_r
+    cap_vein *= bfb_r
+    cap_sfv *= bfb_r
+    cap_cb *= bfb_r
     cap_cr *= wr
     cap_ms *= wr
     cap_fat *= wr

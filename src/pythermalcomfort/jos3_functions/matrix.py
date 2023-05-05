@@ -138,7 +138,7 @@ for key in LAYER_NAMES:
     VINDEX[key] = valid_index_by_layer(key)
 
 
-def local_arr(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
+def local_arr(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     """Create matrix to calculate heat exchange by blood flow in each segment.
 
     [W/K]
@@ -152,18 +152,18 @@ def local_arr(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
         index_of = IDICT[bn]
 
         # Common
-        bf_local[index_of["core"], index_of["artery"]] = 1.067 * bf_cr[i]  # art to cr
-        bf_local[index_of["skin"], index_of["artery"]] = 1.067 * bf_sk[i]  # art to sk
-        bf_local[index_of["vein"], index_of["core"]] = 1.067 * bf_cr[i]  # vein to cr
-        bf_local[index_of["vein"], index_of["skin"]] = 1.067 * bf_sk[i]  # vein to sk
+        bf_local[index_of["core"], index_of["artery"]] = 1.067 * bf_core[i]  # art to cr
+        bf_local[index_of["skin"], index_of["artery"]] = 1.067 * bf_skin[i]  # art to sk
+        bf_local[index_of["vein"], index_of["core"]] = 1.067 * bf_core[i]  # vein to cr
+        bf_local[index_of["vein"], index_of["skin"]] = 1.067 * bf_skin[i]  # vein to sk
 
         # If the segment has a muslce or fat layer
         if index_of["muscle"] is not None:
             bf_local[index_of["muscle"], index_of["artery"]] = (
-                1.067 * bf_ms[i]
+                1.067 * bf_muscle[i]
             )  # art to ms
             bf_local[index_of["vein"], index_of["muscle"]] = (
-                1.067 * bf_ms[i]
+                1.067 * bf_muscle[i]
             )  # vein to ms
         if index_of["fat"] is not None:
             bf_local[index_of["fat"], index_of["artery"]] = (
@@ -187,9 +187,9 @@ def local_arr(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
     return bf_local
 
 
-def vessel_blood_flow(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
+def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     """Get artery and vein blood flow rate [l/h]"""
-    xbf = bf_cr + bf_ms + bf_fat + bf_sk
+    xbf = bf_core + bf_muscle + bf_fat + bf_skin
 
     bf_art = np.zeros(17)
     bf_vein = np.zeros(17)

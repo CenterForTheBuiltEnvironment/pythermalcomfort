@@ -749,22 +749,22 @@ def skin_blood_flow(
         sd_stric = np.ones(17)
 
     # Skin blood flow [L/h]
-    bf_sk = (
+    bf_skin = (
         (1 + skin_dilat * sd_dilat * sig_dilat)
         / (1 + skin_stric * sd_stric * sig_stric)
         * bfb_sk
         * 2 ** (err_sk / 6)
     )
-
-    bfbr = cons.bfb_rate(
+    # Basal blood flow rate to the standard body [-]
+    bfb_rate = cons.bfb_rate(
         height,
         weight,
         equation,
         age,
         ci,
     )
-    bf_sk *= bfbr
-    return bf_sk
+    bf_skin *= bfb_rate
+    return bf_skin
 
 
 def ava_blood_flow(
@@ -817,7 +817,8 @@ def ava_blood_flow(
     sig_ava_foot = min(sig_ava_foot, 1)
     sig_ava_foot = max(sig_ava_foot, 0)
 
-    bfbr = bfbr = cons.bfb_rate(
+    # Basal blood flow rate to the standard body [-]
+    bfb_rate = cons.bfb_rate(
         height,
         weight,
         equation,
@@ -825,8 +826,8 @@ def ava_blood_flow(
         ci,
     )
     # AVA blood flow rate [L/h]
-    bf_ava_hand = 1.71 * bfbr * sig_ava_hand  # Hand
-    bf_ava_foot = 2.16 * bfbr * sig_ava_foot  # Foot
+    bf_ava_hand = 1.71 * bfb_rate * sig_ava_hand  # Hand
+    bf_ava_foot = 2.16 * bfb_rate * sig_ava_foot  # Foot
     return bf_ava_hand, bf_ava_foot
 
 
@@ -873,6 +874,11 @@ def basal_met(
         else:
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
         bmr *= 1000 / 4.186
+    else:
+        valid_equations = ["harris-benedict", "harris-benedict_origin", "japanese", "ganpule"]
+        raise ValueError(
+            f"Invalid equation: '{equation}'. Must be one of {valid_equations}"
+        )
 
     bmr *= 0.048  # [kcal/day] to [W]
 
@@ -997,12 +1003,12 @@ def local_mbase(
     return mbase_cr, mbase_ms, mbase_fat, mbase_sk
 
 
-def local_m_work(tcr, par):
-    """Calculate local metabolic rate by work [W]
+def local_q_work(bmr, par):
+    """Calculate local heat production by work [W]
 
     Parameters
     ----------
-    tcr : float
+    bmr : float
         Basal metabolic rate [W].
     par : float
         Physical activity ratio [-].
@@ -1010,10 +1016,12 @@ def local_m_work(tcr, par):
     Returns
     -------
     Q_work : array
-        Local metabolic rate by work [W].
+        Local heat production by work [W].
     """
-    mwork_all = (par - 1) * tcr
-    mwf = np.array(
+    q_work_all = (par - 1) * bmr
+
+    # Distribution coefficient of heat production by work
+    workf = np.array(
         [
             0,
             0,
@@ -1034,8 +1042,8 @@ def local_m_work(tcr, par):
             0.005,
         ]
     )
-    mwork = mwork_all * mwf
-    return mwork
+    q_work = q_work_all * workf
+    return q_work
 
 
 PRE_SHIV = 0
@@ -1054,7 +1062,7 @@ def shivering(
     dtime=60,
     options={},
 ):
-    """Calculate local metabolic rate by shivering [W].
+    """Calculate local heat production by shivering [W].
 
     Parameters
     ----------
@@ -1079,11 +1087,12 @@ def shivering(
     Returns
     -------
     Q_shiv : array
-        Local metabolic rate by shivering [W].
+        Local heat production by shivering [W].
     """
-    wrms, clds = error_signals(
-        err_sk,
-    )
+    # Integrated error signal in the warm and cold receptors
+    wrms, clds = error_signals(err_sk)
+
+    # Distribution coefficient of heat production by shivering
     shivf = np.array(
         [
             0.0339,
@@ -1105,6 +1114,7 @@ def shivering(
             0.00035,
         ]
     )
+    # integrated error signal of shivering
     sig_shiv = 24.36 * clds * (-err_cr[0])
     sig_shiv = max(sig_shiv, 0)
 
@@ -1154,9 +1164,12 @@ def shivering(
     else:  # age >= 80
         sd_shiv = np.ones(17) * 0.82597
 
+    # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, equation)
-    mshiv = shivf * bsar * sd_shiv * sig_shiv
-    return mshiv
+
+    # Local heat production by shivering [W]
+    q_shiv = shivf * bsar * sd_shiv * sig_shiv
+    return q_shiv
 
 def nonshivering(
     err_sk,
@@ -1166,7 +1179,6 @@ def nonshivering(
     age=20,
     cold_acclimation=False,
     batpositive=True,
-    options={},
 ):
     """Calculate local metabolic rate by non-shivering [W]
 
@@ -1196,10 +1208,9 @@ def nonshivering(
         Local metabolic rate by non-shivering [W].
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
-    wrms, clds = error_signals(
-        err_sk
-    )
+    wrms, clds = error_signals(err_sk)
 
+    # BMI (Body Mass Index)
     bmi = weight / height**2
 
     # BAT: brown adipose tissue [SUV]
@@ -1235,7 +1246,8 @@ def nonshivering(
     sig_nst = 2.8 * clds  # [W]
     sig_nst = min(sig_nst, thres)
 
-    mnstf = np.array(
+    # Distribution coefficient of heat production by non-shivering
+    nstf = np.array(
         [
             0.000,
             0.190,
@@ -1256,31 +1268,53 @@ def nonshivering(
             0.000,
         ]
     )
+
+    # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, equation)
-    mnst = bsar * mnstf * sig_nst
-    return mnst
+
+    # Local heat production by non-shivering [W]
+    q_nst = bsar * nstf * sig_nst
+    return q_nst
 
 
-def sum_m(mbase, mwork, mshiv, mnst):
-    qcr = mbase[0].copy()
-    qms = mbase[1].copy()
-    qfat = mbase[2].copy()
-    qsk = mbase[3].copy()
+def sum_m(mbase, q_work, q_shiv, q_nst):
+    """Calculate total heat production in each layer [W].
+
+    Parameters
+    ----------
+    mbase : array
+        Local basal metabolic rate (Mbase) [W].
+    q_work : array
+        Local heat production by work [W].
+    q_shiv : array
+        Local heat production by shivering [W].
+    q_nst : array
+        Local heat production by non-shivering [W].
+
+    Returns
+    -------
+    q_core, q_muscle, q_fat, q_skin : array
+        Total heat production in core, muscle, fat, skin layers [W].
+    """
+    q_core = mbase[0].copy()
+    q_muscle = mbase[1].copy()
+    q_fat = mbase[2].copy()
+    q_skin = mbase[3].copy()
 
     for i, bn in enumerate(BODY_NAMES):
         # If the segment has a muscle layer, muscle heat production increases by the activity.
         if IDICT[bn]["muscle"] is not None:
-            qms[i] += mwork[i] + mshiv[i]
+            q_muscle[i] += q_work[i] + q_shiv[i]
         # In other segments, core heat production increase, instead of muscle.
         else:
-            qcr[i] += mwork[i] + mshiv[i]
-    qcr += mnst  # Non-shivering thermogenesis occurs in core layers
-    return qcr, qms, qfat, qsk
+            q_core[i] += q_work[i] + q_shiv[i]
+    q_core += q_nst  # Non-shivering thermogenesis occurs in core layers
+    return q_core, q_muscle, q_fat, q_skin
 
 
 def cr_ms_fat_blood_flow(
-    m_work,
-    m_shiv,
+    q_work,
+    q_shiv,
     height=1.72,
     weight=74.43,
     equation="dubois",
@@ -1291,10 +1325,10 @@ def cr_ms_fat_blood_flow(
 
     Parameters
     ----------
-    m_work : array
-        Metablic rate by work [W].
-    m_shiv : array
-        Metablic rate by shivering [W].
+    q_work : array
+        Heat production by work [W].
+    q_shiv : array
+        Heat production by shivering [W].
     height : float, optional
         Body height [m]. The default is 1.72.
     weight : float, optional
@@ -1310,11 +1344,11 @@ def cr_ms_fat_blood_flow(
     Returns
     -------
     bf_core, bf_muscle, bf_fat : array
-        Core, muslce and fat blood flow rate [L/h].
+        Core, muscle and fat blood flow rate [L/h].
     """
     # Basal blood flow rate [L/h]
     # core, CBFB
-    bfb_cr = np.array(
+    bfb_core = np.array(
         [
             35.251,
             15.240,
@@ -1336,7 +1370,7 @@ def cr_ms_fat_blood_flow(
         ]
     )
     # muscle, MSBFB
-    bfb_ms = np.array(
+    bfb_muscle = np.array(
         [
             0.682,
             0.0,
@@ -1380,33 +1414,74 @@ def cr_ms_fat_blood_flow(
         ]
     )
 
-    bfbr = cons.bfb_rate(height, weight, equation, age, ci)
-    bf_cr = bfb_cr * bfbr
-    bf_ms = bfb_ms * bfbr
-    bf_fat = bfb_fat * bfbr
+    bfb_rate = cons.bfb_rate(height, weight, equation, age, ci)
+    bf_core = bfb_core * bfb_rate
+    bf_muscle = bfb_muscle * bfb_rate
+    bf_fat = bfb_fat * bfb_rate
 
     for i, bn in enumerate(BODY_NAMES):
         # If the segment has a muscle layer, muscle blood flow increases.
         if IDICT[bn]["muscle"] is not None:
-            bf_ms[i] += (m_work[i] + m_shiv[i]) / 1.163
+            bf_muscle[i] += (q_work[i] + q_shiv[i]) / 1.163
         # In other segments, core blood flow increase, instead of muscle blood flow.
         else:
-            bf_cr[i] += (m_work[i] + m_shiv[i]) / 1.163
-    return bf_cr, bf_ms, bf_fat
+            bf_core[i] += (q_work[i] + q_shiv[i]) / 1.163
+    return bf_core, bf_muscle, bf_fat
 
 
-def sum_bf(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot):
+def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
+    """
+    Sum the total blood flow in various body parts.
+
+    Parameters
+    ----------
+    bf_core : array
+        Blood flow rate in the core region [L/h].
+    bf_muscle : array
+        Blood flow rate in the muscle region [L/h].
+    bf_fat : array
+        Blood flow rate in the fat region [L/h].
+    bf_skin : array
+        Blood flow rate in the skin region [L/h].
+    bf_ava_hand : array
+        AVA blood flow rate in one hand [L/h].
+    bf_ava_foot: array
+        AVA blood flow rate in one foot [L/h].
+
+    Returns
+    -------
+    co : float
+        Cardiac output (the sum of the whole blood flow rate) [L/h].
+    """
+    # Cardiac output (CO)
     co = 0
-    co += bf_cr.sum()
-    co += bf_ms.sum()
+    co += bf_core.sum()
+    co += bf_muscle.sum()
     co += bf_fat.sum()
-    co += bf_sk.sum()
+    co += bf_skin.sum()
     co += 2 * bf_ava_hand
     co += 2 * bf_ava_foot
     return co
 
 
-def resp_heat_loss(t, p, met):
-    res_sh = 0.0014 * met * (34 - t)  # sensible heat loss
-    res_lh = 0.0173 * met * (5.87 - p)  # latent heat loss
+def resp_heat_loss(tdb, p_a, q_total):
+    """
+    Calculate heat loss by respiration [W].
+
+    Parameters
+    ----------
+    tdb : float
+        Dry bulb air temperature [oC].
+    p_a : float
+        Water vapor pressure in the ambient air  [kPa].
+    q_total: float
+        Total heat production [W].
+
+    Returns
+    -------
+    res_sh, res_lh : float
+        Sensible and latent heat loss by respiration [W].
+    """
+    res_sh = 0.0014 * q_total * (34 - tdb)  # sensible heat loss
+    res_lh = 0.0173 * q_total * (5.87 - p_a)  # latent heat loss
     return res_sh, res_lh
