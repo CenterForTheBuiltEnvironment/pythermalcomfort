@@ -14,8 +14,7 @@ Overview
     * - downloads
       - |downloads|
     * - tests
-      - | |travis| |appveyor|
-        | |codecov| |requires|
+      - | |appveyor| |codecov|
     * - package
       - | |version| |wheel|
         | |supported-ver|
@@ -36,17 +35,9 @@ Overview
 .. |downloads| image:: https://img.shields.io/pypi/dm/pythermalcomfort?color=brightgreen
     :alt: PyPI - Downloads
 
-.. |travis| image:: https://api.travis-ci.org/CenterForTheBuiltEnvironment/pythermalcomfort.svg?branch=master
-    :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/CenterForTheBuiltEnvironment/pythermalcomfort
-
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/CenterForTheBuiltEnvironment/pythermalcomfort?branch=master&svg=true
     :alt: AppVeyor Build Status
     :target: https://ci.appveyor.com/project/CenterForTheBuiltEnvironment/pythermalcomfort
-
-.. |requires| image:: https://requires.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/requirements.svg?branch=master
-    :alt: Requirements Status
-    :target: https://requires.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/requirements/?branch=master
 
 .. |codecov| image:: https://codecov.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/coverage.svg?branch=master
     :alt: Coverage Status

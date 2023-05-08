@@ -45,7 +45,7 @@ plt.show()  # Show the plot
 model.to_csv(os.path.join(jos3_example_directory, "jos3_example1 (default output).csv"))
 
 # Print the BMR value using the getter
-print("BMR=", model.BMR)
+print("BMR=", model.bmr)
 print("Body name list: ", model.body_names)
 
 # -------------------------------------------
