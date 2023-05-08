@@ -445,7 +445,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     airspeed_control : boolean default True
         This only applies if standard = "ASHRAE". By default it is assumed that the
         occupant has control over the airspeed. In this case the ASHRAE 55 Standard does
-        not imposes any airspeed limits. On the other hand, if the occupant has no control
+        not impose any airspeed limits. On the other hand, if the occupant has no control
         over the airspeed the ASHRAE 55 imposes an upper limit for v which varies as a
         function of the operative temperature, for more information please consult the
         Standard.
