@@ -40,47 +40,7 @@ Cooling Effect (CE)
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-    JOS-3 is a numerical model to simulate human thermal physiology such as skin temperature, core temperature, 
-    sweating rate, and so on at 17 local body parts as well as the whole body [19]_.
-    The JOS-3 model consists of 83 nodes. Human physiological responses and body temperatures are calculated using the backward difference method. JOS-3 uses brown adipose tissue activity, aging effects, and heat gain by shortwave solar radiation at the skin to predict human physiological responses. It also considers personal characteristics in transient and non-uniform thermal environments. The JOS-3 was validated by comparing the results with those of human subject tests conducted under stable and transient conditions [19]_.
-
-    To read the JOS-3 official documentation please use the following commands:
-
-    .. code-block:: python
-
-        >>> import jos3
-        >>> model = jos3.JOS3()
-
-        >>> # Print documentation:
-        >>> print(model.__doc__)
-
-        >>> # Show the documentation of the output parameters:
-        >>> print(jos3.show_outparam_docs())
-
-
-    Below an example on how to use the JOS-3 model
-
-    .. code-block:: python
-
-        >>> import pandas as pd
-        >>> import jos3
-
-        >>> model = jos3.JOS3(height=1.7, weight=60, age=30)  # Builds a model
-
-        >>> # Set the first condition
-        >>> model.To = 28  # Operative temperature [oC]
-        >>> model.RH = 40  # Relative humidity [%]
-        >>> model.Va = 0.2  # Air velocity [m/s]
-        >>> model.PAR = 1.2  # Physical activity ratio [-]
-        >>> model.simulate(60)  # Exposure time = 60 [min]
-
-        >>> # Set the next condition
-        >>> model.To = 20  # Changes only operative temperature
-        >>> model.simulate(60)  # Additional exposure time = 60 [min]
-
-        >>> # Show the results
-        >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
-        >>> df.TskMean.plot()  # Show the graph of mean skin temp.
+.. autofunction:: pythermalcomfort.models.JOS3
 
 
 Adaptive Thermal Heat Balance (ATHB)
@@ -280,7 +240,6 @@ Insulation of individual garments, [clo]
 .. [16] Blazejczyk, K., Epstein, Y., Jendritzky, G., Staiger, H., Tinz, B., 2012. Comparison of UTCI to selected thermal indices. Int. J. Biometeorol. 56, 515–535. https://doi.org/10.1007/s00484-011-0453-2
 .. [17] Steadman RG (1984) A universal scale of apparent temperature. J Appl Meteorol Climatol 23:1674–1687
 .. [18] ASHRAE, 2017. 2017 ASHRAE Handbook Fundamentals. Atlanta.
-.. [19] Takahashi, Y., Nomoto, A., Yoda, S., Hisayama, R., Ogata, M., Ozeki, Y., & Tanabe, S. ichi. (2021). Thermoregulation model JOS-3 with new open source code. Energy and Buildings, 231, 110575. https://doi.org/10.1016/j.enbuild.2020.110575
 .. [20] Höppe P. The physiological equivalent temperature - a universal index for the biometeorological assessment of the thermal environment. Int J Biometeorol. 1999 Oct;43(2):71-5. doi: 10.1007/s004840050118. PMID: 10552310.
 .. [21] Walther, E. and Goestchel, Q., 2018. The PET comfort index: Questioning the model. Building and Environment, 137, pp.1-10. https://doi.org/10.1016/j.buildenv.2018.03.054
 .. [22] Teitelbaum, E., Alsaad, H., Aviv, D., Kim, A., Voelker, C., Meggers, F., & Pantelic, J. (2022). Addressing a systematic error correcting for free and mixed convection when measuring mean radiant temperature with globe thermometers. Scientific Reports, 12(1), 1–18. https://doi.org/10.1038/s41598-022-10172-5
