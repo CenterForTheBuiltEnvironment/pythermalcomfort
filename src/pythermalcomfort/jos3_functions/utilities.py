@@ -148,11 +148,11 @@ df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  #
 plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
 plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
-plt.savefig(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
+plt.savefig(os.path.join(jos3_example_directory, "jos3_example2_skin_temperatures.png"))  # Save plot at the current directory
 plt.show()  # Show the plot
 
 # Exporting the results as csv
-model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2 (all output).csv"))
+model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
 """
 # print(convert_and_print_local_clo_values_from_csv_to_dict(csv_name='local_clo_summary.csv'))
 # print(add_prompt_to_code(sample_code))

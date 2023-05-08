@@ -7,10 +7,10 @@ from pythermalcomfort.jos3_functions.utilities import local_clo_typical_ensemble
 
 # Make "jos3_example_example" directory in the current directory
 directory_name = "jos3_output_example"
-CURRENT_DIRECTORY = os.getcwd()
-JOS3_EXAMPLE_DIRECTORY = os.path.join(CURRENT_DIRECTORY, directory_name)
-if not os.path.exists(JOS3_EXAMPLE_DIRECTORY):
-    os.makedirs(JOS3_EXAMPLE_DIRECTORY)
+current_directory = os.getcwd()
+jos3_example_directory = os.path.join(current_directory, directory_name)
+if not os.path.exists(jos3_example_directory):
+    os.makedirs(jos3_example_directory)
 
 # -------------------------------------------
 # EXAMPLE 1 (simple simulation)
@@ -37,12 +37,12 @@ df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
 plt.ylabel("Mean skin temperature [°C]")  # Set y-label as 'Mean skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
 plt.savefig(
-    os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1_mean_skin_temperature.png")
+    os.path.join(jos3_example_directory, "jos3_example1_mean_skin_temperature.png")
 )  # Save plot at the current directory
 plt.show()  # Show the plot
 
 # Exporting the results as csv
-model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example1 (default output).csv"))
+model.to_csv(os.path.join(jos3_example_directory, "jos3_example1 (default output).csv"))
 
 # Print the BMR value using the getter
 print("BMR=", model.BMR)
@@ -153,9 +153,9 @@ plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
 plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
 plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
 plt.savefig(
-    os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2_skin_temperatures.png")
+    os.path.join(jos3_example_directory, "jos3_example2_skin_temperatures.png")
 )  # Save plot at the current directory
 plt.show()  # Show the plot
 
 # Exporting the results as csv
-model.to_csv(os.path.join(JOS3_EXAMPLE_DIRECTORY, "jos3_example2 (all output).csv"))
+model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
