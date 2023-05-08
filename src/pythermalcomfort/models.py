@@ -3357,8 +3357,8 @@ class JOS3:
         specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
         If you want to display all output results, set ex_output is "all".
 
-    Setter & Getter
-    ---------------
+    Setters
+    -------
     tdb : float or array-like
         dry bulb air temperature [°C].
     tr : float or list-like
@@ -3383,7 +3383,7 @@ class JOS3:
     bodytemp : numpy.ndarray (85,)
         All segment temperatures of JOS-3
 
-    Getter
+    Getters
     -------
     bsa : numpy.ndarray (17,)
         Body surface areas by local body segments [m2].
@@ -3513,8 +3513,8 @@ class JOS3:
 
     Examples
     --------
-    # Build a model and set a body built
-    # Create an instance of the JOS3 class with optional body parameters such as body height, weight, age, sex, etc.
+    Build a model and set a body built
+    Create an instance of the JOS3 class with optional body parameters such as body height, weight, age, sex, etc.
 
     .. code-block:: python
 
