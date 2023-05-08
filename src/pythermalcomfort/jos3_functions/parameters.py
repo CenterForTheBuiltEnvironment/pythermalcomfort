@@ -231,13 +231,13 @@ ALL_OUT_PARAMS = {
         "ex_output": True,
         "meaning": "total clothing evaporative heat resistance (each body part)",
         "suffix": "Body name",
-        "unit": "m2.kPa/W",
+        "unit": "(m2*kPa)/W",
     },
     "Rt": {
         "ex_output": True,
         "meaning": "total clothing heat resistance (each body part)",
         "suffix": "Body name",
-        "unit": "m2.K/W",
+        "unit": "(m2*K)/W",
     },
     "q_skin_sensible": {
         "ex_output": True,

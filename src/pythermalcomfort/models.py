@@ -3434,7 +3434,7 @@ class JOS3:
          Run JOS-3 model once and gets the model parameters.
      dict_results():
          Get results as a dictionary with pandas.DataFrame values.
-     to_csv(path=None, folder=None, unit=True, meanig=True):
+     to_csv(path=None, folder=None, unit=True, meaning=True):
          Export results as csv format.
      _set_ex_q(tissue, value):
          Set extra heat gain by tissue name.
@@ -3876,7 +3876,7 @@ class JOS3:
             Output parameters.
         """
 
-        # Compute convective and radiative heat transfer coefficient [W/K.m2]
+        # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
         # Manual setting is possible by setting self._hc and self._hr.
         # Compute heat and evaporative heat resistance [m2.K/W], [m2.kPa/W]
@@ -3885,7 +3885,7 @@ class JOS3:
         tcr = self.t_core
         tsk = self.t_skin
 
-        # Convective and radiative heat transfer coefficients [W/K.m2]
+        # Convective and radiative heat transfer coefficients [W/(m2*K)]
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -3962,7 +3962,7 @@ class JOS3:
 
         # VASOCONSTRICTION, VASODILATION
         # Calculate skin blood flow and basal skin blood flow [L/h]
-        bf_sk = threg.skin_blood_flow(
+        bf_skin = threg.skin_blood_flow(
             err_cr,
             err_sk,
             self._height,
@@ -3988,7 +3988,7 @@ class JOS3:
 
         # SHIVERING AND NON-SHIVERING
         # Calculate shivering thermogenesis [W]
-        mshiv = threg.shivering(
+        q_shiv = threg.shivering(
             err_cr,
             err_sk,
             tcr,
@@ -4004,8 +4004,7 @@ class JOS3:
 
         # Calculate non-shivering thermogenesis (NST) [W]
         if self.options["nonshivering_thermogenesis"]:
-            mnst = threg.nonshivering(
-                err_cr,
+            q_nst = threg.nonshivering(
                 err_sk,
                 self._height,
                 self._weight,
@@ -4015,7 +4014,7 @@ class JOS3:
                 self.options["bat_positive"],
             )
         else:  # not consider NST
-            mnst = np.zeros(17)
+            q_nst = np.zeros(17)
 
         # ------------------------------------------------------------------
         # Thermogenesis
@@ -4033,24 +4032,24 @@ class JOS3:
         m_base_all = sum([m.sum() for m in m_base])
 
         # Calculate thermogenesis by work [W]
-        m_work = threg.local_m_work(m_base_all, self._par)
+        q_work = threg.local_q_work(m_base_all, self._par)
 
         # Calculate the sum of thermogenesis in core, muscle, fat, skin [W]
-        qcr, qms, qfat, qsk = threg.sum_m(
+        q_core, q_muscle, q_fat, q_skin = threg.sum_m(
             m_base,
-            m_work,
-            mshiv,
-            mnst,
+            q_work,
+            q_shiv,
+            q_nst,
         )
-        qall = qcr.sum() + qms.sum() + qfat.sum() + qsk.sum()
+        qall = q_core.sum() + q_muscle.sum() + q_fat.sum() + q_skin.sum()
 
         # ------------------------------------------------------------------
         # Others
         # ------------------------------------------------------------------
         # Calculate blood flow in core, muscle, fat [L/h]
-        bf_cr, bf_ms, bf_fat = threg.cr_ms_fat_blood_flow(
-            m_work,
-            mshiv,
+        bf_core, bf_muscle, bf_fat = threg.cr_ms_fat_blood_flow(
+            q_work,
+            q_shiv,
             self._height,
             self._weight,
             self._bsa_equation,
@@ -4066,7 +4065,7 @@ class JOS3:
         shlsk = (tsk - to) / r_t * self._bsa
 
         # Calculate cardiac output [L/h]
-        co = threg.sum_bf(bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot)
+        co = threg.sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot)
 
         # Calculate weight loss rate by evaporation [g/sec]
         wlesk = (e_sweat + 0.06 * e_max) / 2418
@@ -4089,10 +4088,10 @@ class JOS3:
         # 1) bf_local for the local blood flow and 2) bf_whole for the whole-body blood flow.
         # These arrays are then combined to form arr_bf.
         bf_art, bf_vein = matrix.vessel_blood_flow(
-            bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot
+            bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot
         )
         bf_local = matrix.local_arr(
-            bf_cr, bf_ms, bf_fat, bf_sk, bf_ava_hand, bf_ava_foot
+            bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot
         )
         bf_whole = matrix.whole_body(bf_art, bf_vein, bf_ava_hand, bf_ava_foot)
         arr_bf = np.zeros((NUM_NODES, NUM_NODES))
@@ -4136,10 +4135,10 @@ class JOS3:
         # Matrix Q [W] / [J/K] * [sec] = [-]
         # Thermogensis
         arr_q = np.zeros(NUM_NODES)
-        arr_q[INDEX["core"]] += qcr
-        arr_q[INDEX["muscle"]] += qms[VINDEX["muscle"]]
-        arr_q[INDEX["fat"]] += qfat[VINDEX["fat"]]
-        arr_q[INDEX["skin"]] += qsk
+        arr_q[INDEX["core"]] += q_core
+        arr_q[INDEX["muscle"]] += q_muscle[VINDEX["muscle"]]
+        arr_q[INDEX["fat"]] += q_fat[VINDEX["fat"]]
+        arr_q[INDEX["skin"]] += q_skin
 
         # Respiratory [W]
         arr_q[INDEX["core"][2]] -= res_sh + res_lh  # chest core
@@ -4215,23 +4214,23 @@ class JOS3:
             detail_out["e_skin"] = e_sk
             detail_out["e_max"] = e_max
             detail_out["e_sweat"] = e_sweat
-            detail_out["bf_core"] = bf_cr
-            detail_out["bf_muscle"] = bf_ms[VINDEX["muscle"]]
+            detail_out["bf_core"] = bf_core
+            detail_out["bf_muscle"] = bf_muscle[VINDEX["muscle"]]
             detail_out["bf_fat"] = bf_fat[VINDEX["fat"]]
-            detail_out["bf_skin"] = bf_sk
+            detail_out["bf_skin"] = bf_skin
             detail_out["bf_ava_hand"] = bf_ava_hand
             detail_out["bf_ava_foot"] = bf_ava_foot
             detail_out["Q_bmr_core"] = m_base[0]
             detail_out["Q_bmr_muscle"] = m_base[1][VINDEX["muscle"]]
             detail_out["met_base_fat"] = m_base[2][VINDEX["fat"]]
             detail_out["Q_bmr_skin"] = m_base[3]
-            detail_out["Q_work"] = m_work
-            detail_out["Q_shiv"] = mshiv
-            detail_out["Q_nst"] = mnst
-            detail_out["Q_core"] = qcr
-            detail_out["Q_muscle"] = qms[VINDEX["muscle"]]
-            detail_out["Q_fat"] = qfat[VINDEX["fat"]]
-            detail_out["Q_skin"] = qsk
+            detail_out["Q_work"] = q_work
+            detail_out["Q_shiv"] = q_shiv
+            detail_out["Q_nst"] = q_nst
+            detail_out["Q_core"] = q_core
+            detail_out["Q_muscle"] = q_muscle[VINDEX["muscle"]]
+            detail_out["Q_fat"] = q_fat[VINDEX["fat"]]
+            detail_out["Q_skin"] = q_skin
             dict_out["q_skin_sensible"] = shlsk
             dict_out["q_skin_latent"] = e_sk
             dict_out["q_res_sensible"] = res_sh
@@ -4245,17 +4244,6 @@ class JOS3:
                 if key in out_keys:
                     dict_out[key] = detail_out[key]
         return dict_out
-
-    # def dict_results(self):
-    #     """
-    #     Get results as pandas.DataFrame format.
-    #     Returns
-    #     -------
-    #     Dictionaly of the results
-    #     """
-    #     if not self._history:
-    #         print("The model has no data.")
-    #         return None
 
     def dict_results(self):
         """Get results as a dictionary with pandas.DataFrame values.
@@ -4318,7 +4306,7 @@ class JOS3:
                 out_dict[k].append(row[k])
         return out_dict
 
-    def to_csv(self, path=None, folder=None, unit=True, meanig=True):
+    def to_csv(self, path=None, folder=None, unit=True, meaning=True):
         """Export results as csv format.
 
         Parameters
@@ -4359,30 +4347,32 @@ class JOS3:
         # Get column names, units and meanings
         columns = [k for k in dictout.keys()]
         units = []
-        meanigs = []
+        meanings = []
         for col in columns:
-            param, bodyname = remove_body_name(col)
+            param, body_name = remove_body_name(col)
             if param in ALL_OUT_PARAMS:
                 u = ALL_OUT_PARAMS[param]["unit"]
                 units.append(u)
 
                 m = ALL_OUT_PARAMS[param]["meaning"]
-                if bodyname:
-                    meanigs.append(m.replace("each body part", bodyname))
+                if body_name:
+                    # Replace underscores with spaces
+                    body_name_with_spaces = body_name.replace("_", " ")
+                    meanings.append(m.replace("each body part", body_name_with_spaces))
                 else:
-                    meanigs.append(m)
+                    meanings.append(m)
             else:
                 units.append("")
-                meanigs.append("")
+                meanings.append("")
 
         # Write to csv file
-        with open(path, "wt", newline="") as f:
+        with open(path, "wt", newline="", encoding='utf-8-sig') as f:
             writer = csv.writer(f)
             writer.writerow(list(columns))
             if unit:
                 writer.writerow(units)
-            if meanig:
-                writer.writerow(meanigs)
+            if meaning:
+                writer.writerow(meanings)
             for i in range(len(dictout["cycle_time"])):
                 row = []
                 for k in columns:
