@@ -43,7 +43,6 @@ Joint system thermoregulation model (JOS-3)
 .. autoclass:: pythermalcomfort.models.JOS3
     :members:
     :undoc-members:
-    :show-inheritance:
     :special-members: __init__
 
 Adaptive Thermal Heat Balance (ATHB)

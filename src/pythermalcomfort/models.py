@@ -3378,6 +3378,78 @@ class JOS3:
             specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
             If you want to display all output results, set ex_output is "all".
 
+        Attributes
+        ----------
+        tdb : float or array-like
+            dry bulb air temperature [°C].
+        tr : float or list-like
+            Mean radiant temperature [°C].
+        to : float or list-like
+            Operative temperature [°C].
+        v : float or list-like
+            Air speed [m/s].
+        rh : float or list-like
+            Relative humidity [%].
+        clo : float or list-like
+            Clothing insulation [clo].
+            Note: If you want to input clothing insulation to each body part,
+            it can be input using the dictionaly in utilities.py.
+            :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
+        par : float
+            Physical activity ratio [-].
+            This equals the ratio of metaboric rate to basal metablic rate.
+            The par of sitting quietly is 1.2.
+        posture : str
+            Choose a posture from standing, sitting or lying.
+        bodytemp : numpy.ndarray (85,)
+            All segment temperatures of JOS-3
+        bsa : numpy.ndarray (17,)
+            Body surface areas by local body segments [m2].
+        Rt : numpy.ndarray (17,)
+            Dry heat resistances between the skin and ambience areas by local body segments [K.m2/W].
+        Ret : numpy.ndarray (17,)
+            Wet (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
+        w : numpy.ndarray (17,)
+            Skin wettedness on local body segments [-].
+        w_mean : float
+            Mean skin wettedness of the whole body [-].
+        t_skin_mean : float
+            Mean skin temperature of the whole body [°C].
+        t_skin : numpy.ndarray (17,)
+            Skin temperatures by the local body segments [°C].
+        t_core : numpy.ndarray (17,)
+            Skin temperatures by the local body segments [°C].
+        t_cb : numpy.ndarray (1,)
+            Core temperatures by the local body segments [°C].
+        t_artery : numpy.ndarray (17,)
+            Arterial temperatures by the local body segments [°C].
+        t_vein : numpy.ndarray (17,)
+            Vein temperatures by the local body segments [°C].
+        t_superficial_vein : numpy.ndarray (12,)
+            Superfical vein temperatures by the local body segments [°C].
+        t_muscle : numpy.ndarray (2,)
+            Muscle temperatures of head and pelvis [°C].
+        t_fat : numpy.ndarray (2,)
+            fat temperatures of head and pelvis  [°C].
+        BMR : float
+            Basal metabolic rate [W/m2].
+        body_names : list (17)
+            JOS3 body names [-].
+            "head", "neck", "chest", "back", "pelvis",
+            "left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
+            "left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
+        results : dict
+            output as dictionaly format
+
+        Methods
+        -------
+        simulate(times, dtime, output):
+            Run JOS-3 model for given times.
+        dict_results():
+            Get results as a dictionary with pandas.DataFrame values.
+        to_csv(path=None, folder=None, unit=True, meaning=True):
+            Export results as csv format.
+
         Returns
         -------
         Q_total : total heat production of the whole body [W]
@@ -4202,7 +4274,13 @@ class JOS3:
                 out_dict[k].append(row[k])
         return out_dict
 
-    def to_csv(self, path=None, folder=None, unit=True, meaning=True):
+    def to_csv(
+        self,
+        path: str = None,
+        folder: str = None,
+        unit: bool = True,
+        meaning: bool = True,
+    ) -> None:
         """Export results as csv format.
 
         Parameters
@@ -4218,6 +4296,10 @@ class JOS3:
             Write units in csv file. The default is True.
         meaning : bool, optional
             Write meanings of the parameters in csv file. The default is True.
+
+        Returns
+        -------
+        None
 
         Examples
         ----------
@@ -4275,9 +4357,6 @@ class JOS3:
                     row.append(dictout[k][i])
                 writer.writerow(row)
 
-    # --------------------------------------------------------------------------
-    # Setter
-    # --------------------------------------------------------------------------
     def _set_ex_q(self, tissue, value):
         """Set extra heat gain by tissue name.
 
@@ -4297,13 +4376,17 @@ class JOS3:
         self.ex_q[INDEX[tissue]] = value
         return self.ex_q
 
-    # --------------------------------------------------------------------------
-    # Setter & getter
-    # --------------------------------------------------------------------------
-
     @property
     def tdb(self):
-        """numpy.ndarray (17,) Air temperature [°C]."""
+        """Dry-bulb air temperature. The setter accepts int, float, dict, list,
+        ndarray. The inputs are used to create a 17-element array. dict should
+        be passed with BODY_NAMES as keys.
+
+        Returns
+        -------
+        ndarray
+            A NumPy array of shape (17,).
+        """
         return self._ta
 
     @tdb.setter
