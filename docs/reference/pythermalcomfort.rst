@@ -40,8 +40,10 @@ Cooling Effect (CE)
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.JOS3
-
+.. autoclass:: pythermalcomfort.models.JOS3
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Adaptive Thermal Heat Balance (ATHB)
 ------------------------------------

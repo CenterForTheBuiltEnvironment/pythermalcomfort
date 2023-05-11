@@ -3357,158 +3357,71 @@ class JOS3:
         specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
         If you want to display all output results, set ex_output is "all".
 
-    Setters
+    Returns
     -------
-    tdb : float or array-like
-        dry bulb air temperature [°C].
-    tr : float or list-like
-        Mean radiant temperature [°C].
-    to : float or list-like
-        Operative temperature [°C].
-    v : float or list-like
-        Air speed [m/s].
-    rh : float or list-like
-        Relative humidity [%].
-    clo : float or list-like
-        Clothing insulation [clo].
-        Note: If you want to input clothing insulation to each body part,
-        it can be input using the dictionaly in utilities.py.
-        :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
-    par : float
-        Physical activity ratio [-].
-        This equals the ratio of metaboric rate to basal metablic rate.
-        The par of sitting quietly is 1.2.
-    posture : str
-        Choose a posture from standing, sitting or lying.
-    bodytemp : numpy.ndarray (85,)
-        All segment temperatures of JOS-3
-
-    Getters
-    -------
-    bsa : numpy.ndarray (17,)
-        Body surface areas by local body segments [m2].
-    Rt : numpy.ndarray (17,)
-        Dry heat resistances between the skin and ambience areas by local body segments [K.m2/W].
-    Ret : numpy.ndarray (17,)
-        Wet (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
-    w : numpy.ndarray (17,)
-        Skin wettedness on local body segments [-].
-    w_mean : float
-        Mean skin wettedness of the whole body [-].
-    t_skin_mean : float
-        Mean skin temperature of the whole body [°C].
-    t_skin : numpy.ndarray (17,)
-        Skin temperatures by the local body segments [°C].
-    t_core : numpy.ndarray (17,)
-        Skin temperatures by the local body segments [°C].
-    t_cb : numpy.ndarray (1,)
-        Core temperatures by the local body segments [°C].
-    t_artery : numpy.ndarray (17,)
-        Arterial temperatures by the local body segments [°C].
-    t_vein : numpy.ndarray (17,)
-        Vein temperatures by the local body segments [°C].
-    t_superficial_vein : numpy.ndarray (12,)
-        Superfical vein temperatures by the local body segments [°C].
-    t_muscle : numpy.ndarray (2,)
-        Muscle temperatures of head and pelvis [°C].
-    t_fat : numpy.ndarray (2,)
-        fat temperatures of head and pelvis  [°C].
-    BMR : float
-        Basal metabolic rate [W/m2].
-    body_names : list (17)
-        JOS3 body names [-].
-        "head", "neck", "chest", "back", "pelvis",
-        "left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
-        "left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
-    results : dict
-        output as dictionaly format
-
-    Methods
-    -------
-    _reset_setpt():
-        Reset set-point temperature under steady state calculation.
-    simulate(times, dtime, output):
-        Run JOS-3 model for given times.
-    _run(dtime, passive=False, output=True):
-        Run JOS-3 model once and gets the model parameters.
-    dict_results():
-        Get results as a dictionary with pandas.DataFrame values.
-    to_csv(path=None, folder=None, unit=True, meaning=True):
-        Export results as csv format.
-    _set_ex_q(tissue, value):
-        Set extra heat gain by tissue name.
-
-    Returns (default)
-    -----------------
-    output_params : dict
-        A dictionary including the following output parameters:
-        Q_total : total heat production of the whole body [W]
-        cardiac_output: cardiac output (the sum of the whole blood flow) [L/h]
-        cycle_time: the counts of executing one cycle calculation [-]
-        dt      : time step [sec]
-        pythermalcomfort_version: version of pythermalcomfort [-]
-        q_res   : heat loss by respiration [W]
-        q_skin  : total heat loss from the skin (each body part) [W]
-        simulation_time: simulation times [sec]
-        t_core  : core temperature (each body part) [°C]
-        t_skin  : skin temperature (each body part) [°C]
-        t_skin_mean: mean skin temperature [°C]
-        w       : skin wettedness (each body part) [-]
-        w_mean  : mean skin wettedness [-]
-        weight_loss_by_evap_and_res: weight loss by the evaporation and respiration of the whole body [g/sec]
-
-    Returns (optional)
-    ------------------
-    output_params : dict
-        A dictionary including the following parameters:
-        Q_bmr_core: core heat production by basal metabolism (each body part) [W]
-        Q_bmr_muscle: muscle heat production by basal metabolism (each body part) [W]
-        Q_bmr_skin: skin heat production by basal metabolism (each body part) [W]
-        Q_core  : core total heat production (each body part) [W]
-        Q_fat   : fat total heat production (each body part) [W]
-        Q_muscle: muscle total heat production (each body part) [W]
-        Q_nst   : core heat production by non-shivering thermogenesis (each body part) [W]
-        Q_shiv  : core or muscle heat production by shivering thermogenesis (each body part) [W]
-        Q_skin  : skin total heat production (each body part) [W]
-        Q_work  : core or muscle heat production by work (each body part) [W]
-        Ret     : total clothing evaporative heat resistance (each body part) [m2.kPa/W]
-        Rt      : total clothing heat resistance (each body part) [m2.K/W]
-        age     : age [years]
-        bf_ava_foot: AVA blood flow rate of one foot [L/h]
-        bf_ava_hand: AVA blood flow rate of one hand [L/h]
-        bf_core : core blood flow rate (each body part) [L/h]
-        bf_fat  : fat blood flow rate (each body part) [L/h]
-        bf_muscle: muscle blood flow rate (each body part) [L/h]
-        bf_skin : skin blood flow rate (each body part) [L/h]
-        bsa     : body surface area (each body part) [m2]
-        clo     : clothing insulation (each body part) [clo]
-        e_max   : maximum evaporative heat loss from the skin (each body part) [W]
-        e_skin  : evaporative heat loss from the skin (each body part) [W]
-        e_sweat : evaporative heat loss from the skin by only sweating (each body part) [W]
-        fat     : body fat rate [%]
-        height  : body height [m]
-        met_base_fat: fat heat production by basal metabolism (each body part) [W]
-        name    : name of the model [-]
-        par     : physical activity ratio [-]
-        q_res_latent: latent heat loss by respiration (each body part) [W]
-        q_res_sensible: sensible heat loss by respiration (each body part) [W]
-        q_skin_latent: latent heat loss from the skin (each body part) [W]
-        q_skin_sensible: sensible heat loss from the skin (each body part) [W]
-        rh      : relative humidity (each body part) [%]
-        sex     : sex [-]
-        t_artery: arterial temperature (each body part) [°C]
-        t_cb    : central blood temperature [°C]
-        t_core_set: skin set point temperature (each body part) [°C]
-        t_fat   : fat temperature (each body part) [°C]
-        t_muscle: muscle temperature (each body part) [°C]
-        t_skin_set: core set point temperature (each body part) [°C]
-        t_superficial_vein: superficial vein temperature (each body part) [°C]
-        t_vein  : vein temperature (each body part) [°C]
-        tdb     : dry bulb air temperature (each body part) [°C]
-        to      : operative temperature (each body part) [°C]
-        tr      : mean radiant temperature (each body part) [°C]
-        v       : air velocity (each body part) [m/s]
-        weight  : body weight [kg]
+    Q_total : total heat production of the whole body [W]
+    cardiac_output: cardiac output (the sum of the whole blood flow) [L/h]
+    cycle_time: the counts of executing one cycle calculation [-]
+    dt      : time step [sec]
+    pythermalcomfort_version: version of pythermalcomfort [-]
+    q_res   : heat loss by respiration [W]
+    q_skin  : total heat loss from the skin (each body part) [W]
+    simulation_time: simulation times [sec]
+    t_core  : core temperature (each body part) [°C]
+    t_skin  : skin temperature (each body part) [°C]
+    t_skin_mean: mean skin temperature [°C]
+    w       : skin wettedness (each body part) [-]
+    w_mean  : mean skin wettedness [-]
+    weight_loss_by_evap_and_res: weight loss by the evaporation and respiration of the whole body [g/sec]
+    OPTIONAL PARAMETERS : the paramters listed below are returned if ex_output = "all"
+    Q_bmr_core: core heat production by basal metabolism (each body part) [W]
+    Q_bmr_muscle: muscle heat production by basal metabolism (each body part) [W]
+    Q_bmr_skin: skin heat production by basal metabolism (each body part) [W]
+    Q_core  : core total heat production (each body part) [W]
+    Q_fat   : fat total heat production (each body part) [W]
+    Q_muscle: muscle total heat production (each body part) [W]
+    Q_nst   : core heat production by non-shivering thermogenesis (each body part) [W]
+    Q_shiv  : core or muscle heat production by shivering thermogenesis (each body part) [W]
+    Q_skin  : skin total heat production (each body part) [W]
+    Q_work  : core or muscle heat production by work (each body part) [W]
+    Ret     : total clothing evaporative heat resistance (each body part) [m2.kPa/W]
+    Rt      : total clothing heat resistance (each body part) [m2.K/W]
+    age     : age [years]
+    bf_ava_foot: AVA blood flow rate of one foot [L/h]
+    bf_ava_hand: AVA blood flow rate of one hand [L/h]
+    bf_core : core blood flow rate (each body part) [L/h]
+    bf_fat  : fat blood flow rate (each body part) [L/h]
+    bf_muscle: muscle blood flow rate (each body part) [L/h]
+    bf_skin : skin blood flow rate (each body part) [L/h]
+    bsa     : body surface area (each body part) [m2]
+    clo     : clothing insulation (each body part) [clo]
+    e_max   : maximum evaporative heat loss from the skin (each body part) [W]
+    e_skin  : evaporative heat loss from the skin (each body part) [W]
+    e_sweat : evaporative heat loss from the skin by only sweating (each body part) [W]
+    fat     : body fat rate [%]
+    height  : body height [m]
+    met_base_fat: fat heat production by basal metabolism (each body part) [W]
+    name    : name of the model [-]
+    par     : physical activity ratio [-]
+    q_res_latent: latent heat loss by respiration (each body part) [W]
+    q_res_sensible: sensible heat loss by respiration (each body part) [W]
+    q_skin_latent: latent heat loss from the skin (each body part) [W]
+    q_skin_sensible: sensible heat loss from the skin (each body part) [W]
+    rh      : relative humidity (each body part) [%]
+    sex     : sex [-]
+    t_artery: arterial temperature (each body part) [°C]
+    t_cb    : central blood temperature [°C]
+    t_core_set: skin set point temperature (each body part) [°C]
+    t_fat   : fat temperature (each body part) [°C]
+    t_muscle: muscle temperature (each body part) [°C]
+    t_skin_set: core set point temperature (each body part) [°C]
+    t_superficial_vein: superficial vein temperature (each body part) [°C]
+    t_vein  : vein temperature (each body part) [°C]
+    tdb     : dry bulb air temperature (each body part) [°C]
+    to      : operative temperature (each body part) [°C]
+    tr      : mean radiant temperature (each body part) [°C]
+    v       : air velocity (each body part) [m/s]
+    weight  : body weight [kg]
 
 
     Examples
@@ -3759,8 +3672,8 @@ class JOS3:
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(self, va=0.1, rh=50, met=1, clo=0):
-        """
-        Calculate operative temperature [°C] when PMV=0.
+        """Calculate operative temperature [°C] when PMV=0.
+
         Parameters
         ----------
         va : float, optional
@@ -3771,6 +3684,7 @@ class JOS3:
             Metabolic rate [met]. The default is 1.
         clo : float, optional
             Clothing insulation [clo]. The default is 0.
+
         Returns
         -------
         to : float
