@@ -280,7 +280,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         >>> results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
         >>> print(results)
         {'pmv': 0.06, 'ppd': 5.1}
-        >>> print(results['pmv'])
+        >>> print(results["pmv"])
         -0.06
         >>> # you can also pass an array-like of inputs
         >>> results = pmv_ppd(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
@@ -883,7 +883,7 @@ def use_fans_heatwaves(
     round: boolean, default True
         if True rounds output value, if False it does not round it
     limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
+        By default, if the inputs are outside the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
         outside the applicability limits of the model.
 
@@ -3364,8 +3364,8 @@ class JOS3:
             Cardiac index, in [L/min/m2]. The default is 2.6432.
         bmr_equation : str, optional
             The equation used to calculate basal metabolic rate (BMR). Choose a BMR equation.
-            The default is "harris-benedict" equation created uding Caucasian's data. (https://doi.org/10.1073/pnas.4.12.370)
-            If the Ganpule's equation (https://doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
+            The default is "harris-benedict" equation created uding Caucasian's data. (DOI: doi.org/10.1073/pnas.4.12.370)
+            If the Ganpule's equation (DOI: doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
         bsa_equation : str, optional
             The equation used to calculate body surface area (bsa). Choose a bsa equation.
             You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
@@ -3712,7 +3712,9 @@ class JOS3:
         dictout = self._reset_setpt()
         self._history.append(dictout)
 
-    def _calculate_operative_temp_when_pmv_is_zero(self, va=0.1, rh=50, met=1, clo=0):
+    def _calculate_operative_temp_when_pmv_is_zero(
+        self, va: float = 0.1, rh: float = 50, met: float = 1, clo: float = 0
+    ) -> float:
         """Calculate operative temperature [°C] when PMV=0.
 
         Parameters
@@ -4227,11 +4229,11 @@ class JOS3:
 
         def check_word_contain(word, *args):
             """Check if word contains *args."""
-            boolfilter = False
+            bool_filter = False
             for arg in args:
                 if arg in word:
-                    boolfilter = True
-            return boolfilter
+                    bool_filter = True
+            return bool_filter
 
         # Set column titles
         # If the values are iter, add the body names as suffix words.
@@ -4311,8 +4313,8 @@ class JOS3:
 
         # Use the model name and current time as default output file name
         if path is None:
-            nowtime = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-            path = "{}_{}.csv".format(self.model_name, nowtime)
+            now_time = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+            path = "{}_{}.csv".format(self.model_name, now_time)
             if folder:
                 os.makedirs(folder, exist_ok=True)
                 path = folder + os.sep + path
@@ -4320,10 +4322,10 @@ class JOS3:
             path += ".csv"
 
         # Get simulation results as a dictionary
-        dictout = self.dict_results()
+        dict_out = self.dict_results()
 
         # Get column names, units and meanings
-        columns = [k for k in dictout.keys()]
+        columns = [k for k in dict_out.keys()]
         units = []
         meanings = []
         for col in columns:
@@ -4351,10 +4353,10 @@ class JOS3:
                 writer.writerow(units)
             if meaning:
                 writer.writerow(meanings)
-            for i in range(len(dictout["cycle_time"])):
+            for i in range(len(dict_out["cycle_time"])):
                 row = []
                 for k in columns:
-                    row.append(dictout[k][i])
+                    row.append(dict_out[k][i])
                 writer.writerow(row)
 
     def _set_ex_q(self, tissue, value):

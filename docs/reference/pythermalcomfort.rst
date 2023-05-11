@@ -135,6 +135,11 @@ Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 
 .. autofunction:: pythermalcomfort.models.e_pmv
 
+Discomfort Index (DI)
+---------------------
+
+.. autofunction:: pythermalcomfort.models.discomfort_index
+
 Psychrometrics functions
 ========================
 
