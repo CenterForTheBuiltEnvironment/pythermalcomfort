@@ -39,27 +39,45 @@ To set up `pythermalcomfort` for local development:
 
 1. Fork `pythermalcomfort <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort>`_
    (look for the "Fork" button).
-2. Clone your fork locally::
+2. Clone your fork locally. Fetch and pull all the updates from the master branch before you do anything:
+
+.. code-block::
 
     git clone git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
 
-3. Create a branch for local development::
+3. Create a branch for local development. The naming rule for new branch are, as follows:
+
+    * If this update is for a new feature Feature/feature_name_here
+    * If this update is for bug fix Fix/bug_name_here
+    * If this update is for documentation Documentation/doc_name_here
+
+You can create a branch locally using the following command. Make sure you only push updates to this new branch only:
+
+.. code-block::
 
     git checkout -b name-of-your-bugfix-or-feature
 
-   Now you can make your changes locally.
+Now you can make your changes locally.
 
-4. When you're done making changes run all the checks and docs builder with tox one command::
+4. When you're done making changes run all the checks and docs builder with tox one command:
+
+.. code-block::
 
     tox
 
-5. Commit your changes and push your branch to GitHub::
+5. Commit your changes and push your branch to GitHub:
+
+.. code-block::
 
     git add .
     git commit -m "Your detailed description of your changes."
     git push origin name-of-your-bugfix-or-feature
 
-6. Submit a pull request through the GitHub website.
+6. Submit a pull request after you have done all your modifications and tested your work. The pull request should include a detailed description of your work:
+
+    * What this pull request is about
+    * Have you tested your work
+    * Will this work affect other component in the product
 
 Pull Request Guidelines
 -----------------------
@@ -68,24 +86,23 @@ If you need some code review or feedback while you're developing the code just m
 
 For merging, you should:
 
-1. Include passing tests (run ``tox``) [1]_.
+1. Include passing tests (run ``tox``).
 2. Update documentation when there's new API, functionality etc.
 3. Add a note to ``CHANGELOG.rst`` about the changes.
 4. Add yourself to ``AUTHORS.rst``.
 
-.. [1] If you don't have all the necessary python versions available locally you can rely on Travis - it will
-       `run the tests <https://travis-ci.org/CenterForTheBuiltEnvironment/pythermalcomfort/pull_requests>`_ for each change you add in the pull request.
-
-       It will be slower though ...
-
 Tips
 ----
 
-To run a subset of tests::
+To run a subset of tests:
+
+.. code-block::
 
     tox -e envname -- pytest -k test_myfeature
 
-To run all the test environments in *parallel* (you need to ``pip install detox``)::
+To run all the test environments in *parallel* (you need to ``pip install detox``):
+
+.. code-block::
 
     detox
 
