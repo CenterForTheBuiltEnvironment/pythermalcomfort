@@ -3350,6 +3350,29 @@ class JOS3:
 
         Parameters
         ----------
+        tdb : float or array-like
+            dry bulb air temperature [°C].
+        tr : float or list-like
+            Mean radiant temperature [°C].
+        to : float or list-like
+            Operative temperature [°C].
+        v : float or list-like
+            Air speed [m/s].
+        rh : float or list-like
+            Relative humidity [%].
+        clo : float or list-like
+            Clothing insulation [clo].
+            Note: If you want to input clothing insulation to each body part,
+            it can be input using the dictionary in utilities.py.
+            :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
+        par : float
+            Physical activity ratio [-].
+            This equals the ratio of metabolic rate to basal metabolic rate.
+            The par of sitting quietly is 1.2.
+        posture : str
+            Choose a posture from standing, sitting or lying.
+        bodytemp : numpy.ndarray (85,)
+            All segment temperatures of JOS-3
         height : float, optional
             body height, in [m]. The default is 1.72.
         weight : float, optional
@@ -3378,68 +3401,6 @@ class JOS3:
             specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
             If you want to display all output results, set ex_output is "all".
 
-        Attributes
-        ----------
-        tdb : float or array-like
-            dry bulb air temperature [°C].
-        tr : float or list-like
-            Mean radiant temperature [°C].
-        to : float or list-like
-            Operative temperature [°C].
-        v : float or list-like
-            Air speed [m/s].
-        rh : float or list-like
-            Relative humidity [%].
-        clo : float or list-like
-            Clothing insulation [clo].
-            Note: If you want to input clothing insulation to each body part,
-            it can be input using the dictionaly in utilities.py.
-            :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
-        par : float
-            Physical activity ratio [-].
-            This equals the ratio of metaboric rate to basal metablic rate.
-            The par of sitting quietly is 1.2.
-        posture : str
-            Choose a posture from standing, sitting or lying.
-        bodytemp : numpy.ndarray (85,)
-            All segment temperatures of JOS-3
-        bsa : numpy.ndarray (17,)
-            Body surface areas by local body segments [m2].
-        Rt : numpy.ndarray (17,)
-            Dry heat resistances between the skin and ambience areas by local body segments [K.m2/W].
-        Ret : numpy.ndarray (17,)
-            Wet (Evaporative) heat resistances between the skin and ambience areas by local body segments [Pa.m2/W].
-        w : numpy.ndarray (17,)
-            Skin wettedness on local body segments [-].
-        w_mean : float
-            Mean skin wettedness of the whole body [-].
-        t_skin_mean : float
-            Mean skin temperature of the whole body [°C].
-        t_skin : numpy.ndarray (17,)
-            Skin temperatures by the local body segments [°C].
-        t_core : numpy.ndarray (17,)
-            Skin temperatures by the local body segments [°C].
-        t_cb : numpy.ndarray (1,)
-            Core temperatures by the local body segments [°C].
-        t_artery : numpy.ndarray (17,)
-            Arterial temperatures by the local body segments [°C].
-        t_vein : numpy.ndarray (17,)
-            Vein temperatures by the local body segments [°C].
-        t_superficial_vein : numpy.ndarray (12,)
-            Superfical vein temperatures by the local body segments [°C].
-        t_muscle : numpy.ndarray (2,)
-            Muscle temperatures of head and pelvis [°C].
-        t_fat : numpy.ndarray (2,)
-            fat temperatures of head and pelvis  [°C].
-        BMR : float
-            Basal metabolic rate [W/m2].
-        body_names : list (17)
-            JOS3 body names [-].
-            "head", "neck", "chest", "back", "pelvis",
-            "left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm", "right_hand",
-            "left_thigh", "left_leg", "left_hand", "right_thigh", "right_leg" and "right_hand".
-        results : dict
-            output as dictionaly format
 
         Methods
         -------
