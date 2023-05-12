@@ -48,6 +48,7 @@ from pythermalcomfort.utilities import (
     running_mean_outdoor_temperature,
     units_converter,
     body_surface_area,
+    v_relative,
 )
 
 # get file containing validation tables
@@ -605,6 +606,25 @@ def test_ip_units_converter():
         1.0322474090590033,
     ]
 
+    expected_result = [25.0, 3.047]
+    assert np.allclose(units_converter("ip", tdb=77, v=10), expected_result, atol=0.01)
+
+    # Test case 2: Conversion from SI to IP for temperature and velocity
+    expected_result = [68, 6.562]
+    assert np.allclose(units_converter("si", tdb=20, v=2), expected_result, atol=0.01)
+
+    # Test case 3: Conversion from IP to SI for area and pressure
+    expected_result = [9.29, 1489477.5]
+    assert np.allclose(
+        units_converter("ip", area=100, pressure=14.7), expected_result, atol=0.01
+    )
+
+    # Test case 4: Conversion from SI to IP for area and pressure
+    expected_result = [538.199, 1]
+    assert np.allclose(
+        units_converter("si", area=50, pressure=101325), expected_result, atol=0.01
+    )
+
 
 def test_p_sat():
     assert (p_sat(tdb=25)) == 3169.2
@@ -865,6 +885,19 @@ def test_clo_dynamic():
     assert (clo_dynamic(clo=1, met=0.5, standard="ASHRAE")) == 1
     assert (clo_dynamic(clo=2, met=0.5, standard="ASHRAE")) == 2
 
+    # Test ASHRAE standard
+    assert np.allclose(clo_dynamic(1.0, 1.0), np.array(1))
+    assert np.allclose(clo_dynamic(1.0, 1.2), np.array(1))
+    assert np.allclose(clo_dynamic(1.0, 2.0), np.array(0.8))
+
+    # Test ISO standard
+    assert np.allclose(clo_dynamic(1.0, 1.0, standard="ISO"), np.array(1))
+    assert np.allclose(clo_dynamic(1.0, 2.0, standard="ISO"), np.array(0.8))
+
+    # Test invalid standard input
+    with pytest.raises(ValueError):
+        clo_dynamic(1.0, 1.0, standard="invalid")
+
 
 def test_phs():
     assert phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2) == {
@@ -1067,6 +1100,12 @@ def test_check_standard_compliance():
 
 def test_body_surface_area():
     assert body_surface_area(weight=80, height=1.8) == 1.9917607971689137
+    assert body_surface_area(70, 1.8, "dubois") == pytest.approx(1.88, rel=1e-2)
+    assert body_surface_area(75, 1.75, "takahira") == pytest.approx(1.91, rel=1e-2)
+    assert body_surface_area(80, 1.7, "fujimoto") == pytest.approx(1.872, rel=1e-2)
+    assert body_surface_area(85, 1.65, "kurazumi") == pytest.approx(1.89, rel=1e-2)
+    with pytest.raises(ValueError):
+        body_surface_area(70, 1.8, "invalid_formula")
 
 
 def test_t_o():
@@ -1227,3 +1266,23 @@ def test_e_pmv():
         e_pmv([24, 30], 30, vr=0.22, rh=50, met=1.4, clo=0.5, e_coefficient=0.6),
         [0.29, 0.91],
     )
+
+
+def test_v_relative():
+    # Test case when met is equal to or lower than 1
+    v = 2.0
+    met = 1.0
+    expected_result = v
+    assert np.allclose(v_relative(v, met), expected_result)
+
+    # Test case when met is greater than 1
+    v = np.array([1.0, 2.0, 3.0])
+    met = 2.0
+    expected_result = np.array([1.3, 2.3, 3.3])
+    assert np.allclose(v_relative(v, met), expected_result, atol=1e-6)
+
+    # Test case with negative values for v
+    v = -1.5
+    met = 1.5
+    expected_result = -1.5 + 0.3 * 0.5
+    assert np.allclose(v_relative(v, met), expected_result, atol=1e-6)
