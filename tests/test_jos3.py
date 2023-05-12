@@ -1,23 +1,15 @@
 import pytest
-from pythermalcomfort.jos3_functions.thermoregulation import conv_coef
-
-def test_conv_coef():
-    # Default test
-    result = conv_coef(posture="standing", v=0.1, tdb=28.8, t_skin=34.0)
-    print("Default test results", result)
-
-    # Test valuables
-    postures = ["standing", "sitting", "lying", "sedentary", "supine"]
-    velocities = [0.1, 0.3]
-    air_temps = [28.8, 30.0]
-    skin_temps = [34.0, 35.0]
-
-    for posture in postures:
-        for velocity in velocities:
-            for air_temp in air_temps:
-                for skin_temp in skin_temps:
-                    result = conv_coef(posture=posture, v=velocity, tdb=air_temp, t_skin=skin_temp)
-                    print(f"Results（posture={posture}, v={velocity}, tdb={air_temp}, t_skin={skin_temp}）: {result}")
+from pythermalcomfort.jos3_functions.construction import bsa_rate
 
 
-test_conv_coef()
+def test_bsa_rate_with_defaults():
+    assert bsa_rate() == pytest.approx(1.00051943)
+
+
+def test_bsa_rate_with_custom_height_weight():
+    assert bsa_rate(height=1.80, weight=80.0) == pytest.approx(1.0662, rel=1e-4)
+
+
+def test_bsa_rate_with_invalid_formula():
+    with pytest.raises(ValueError):
+        bsa_rate(height=1.72, weight=74.43, formula="ciao")

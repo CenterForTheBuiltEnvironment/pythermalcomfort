@@ -229,6 +229,10 @@ def body_surface_area(weight, height, formula="dubois"):
         return 0.1882 * (weight**0.444) * (height**0.663)
     elif formula == "kurazumi":
         return 0.2440 * (weight**0.383) * (height**0.693)
+    else:
+        raise ValueError(
+            f"This {formula} to calculate the body_surface_area does not exists."
+        )
 
 
 def f_svv(w, h, d):
