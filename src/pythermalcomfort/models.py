@@ -3350,29 +3350,6 @@ class JOS3:
 
         Parameters
         ----------
-        tdb : float or array-like
-            dry bulb air temperature [°C].
-        tr : float or list-like
-            Mean radiant temperature [°C].
-        to : float or list-like
-            Operative temperature [°C].
-        v : float or list-like
-            Air speed [m/s].
-        rh : float or list-like
-            Relative humidity [%].
-        clo : float or list-like
-            Clothing insulation [clo].
-            Note: If you want to input clothing insulation to each body part,
-            it can be input using the dictionary in utilities.py.
-            :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
-        par : float
-            Physical activity ratio [-].
-            This equals the ratio of metabolic rate to basal metabolic rate.
-            The par of sitting quietly is 1.2.
-        posture : str
-            Choose a posture from standing, sitting or lying.
-        bodytemp : numpy.ndarray (85,)
-            All segment temperatures of JOS-3
         height : float, optional
             body height, in [m]. The default is 1.72.
         weight : float, optional
@@ -3400,6 +3377,32 @@ class JOS3:
             If the parameters other than the default output parameters are needed,
             specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
             If you want to display all output results, set ex_output is "all".
+
+        Attributes
+        ----------
+        tdb : float or array-like
+            dry bulb air temperature [°C].
+        tr : float or list-like
+            Mean radiant temperature [°C].
+        to : float or list-like
+            Operative temperature [°C].
+        v : float or list-like
+            Air speed [m/s].
+        rh : float or list-like
+            Relative humidity [%].
+        clo : float or list-like
+            Clothing insulation [clo].
+            Note: If you want to input clothing insulation to each body part,
+            it can be input using the dictionary in utilities.py.
+            :py:meth:`pythermalcomfort.utilities.local_clo_typical_ensembles`.
+        par : float
+            Physical activity ratio [-].
+            This equals the ratio of metabolic rate to basal metabolic rate.
+            The par of sitting quietly is 1.2.
+        posture : str
+            Choose a posture from standing, sitting or lying.
+        bodytemp : numpy.ndarray (85,)
+            All segment temperatures of JOS-3
 
 
         Methods
