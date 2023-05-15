@@ -115,7 +115,7 @@ ALL_OUT_PARAMS = {
         "suffix": "Body name",
         "unit": "W",
     },
-    "met_base_fat": {
+    "Q_bmr_fat": {
         "ex_output": True,
         "meaning": "fat heat production by basal metabolism (each body part)",
         "suffix": "Body name",
@@ -245,13 +245,13 @@ ALL_OUT_PARAMS = {
         "suffix": "Body name",
         "unit": "W",
     },
-    "t_core_set": {
+    "t_skin_set": {
         "ex_output": True,
         "meaning": "skin set point temperature (each body part)",
         "suffix": "Body name",
         "unit": "°C",
     },
-    "t_skin_set": {
+    "t_core_set": {
         "ex_output": True,
         "meaning": "core set point temperature (each body part)",
         "suffix": "Body name",
