@@ -431,7 +431,7 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et = r_ea / fcl + r_ecl
     return r_et
 
-def error_signals(err_sk=0):
+def error_signals(err_sk=0.0):
     """Calculate WRMS and CLDS signals of thermoregulation.
 
     Parameters
@@ -448,6 +448,8 @@ def error_signals(err_sk=0):
     clds : array
         Cold signal (CLDS) [°C].
     """
+    # Convert err_sk to float if it's not already
+    err_sk = np.array(err_sk, dtype=float)
 
     # SKINR (Distribution coefficients of thermal receptor) [-]
     receptor = np.array(
