@@ -79,7 +79,7 @@ def _to17array(inp):
 def bsa_rate(
     height=1.72,
     weight=74.43,
-    formula="dubois",
+    bsa_equation="dubois",
 ):
     """Calculate the rate of bsa to standard body.
 
@@ -89,7 +89,7 @@ def bsa_rate(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    formula : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
 
@@ -101,7 +101,7 @@ def bsa_rate(
     bsa_all = body_surface_area(
         height=height,
         weight=weight,
-        formula=formula,
+        formula=bsa_equation,
     )
     return bsa_all / _BSAst.sum()  # The bsa ratio to the standard body (1.87m2)
 
@@ -109,7 +109,7 @@ def bsa_rate(
 def local_bsa(
     height=1.72,
     weight=74.43,
-    formula="dubois",
+    bsa_equation="dubois",
 ):
     """Calculate local body surface area (bsa) [m2].
 
@@ -124,7 +124,7 @@ def local_bsa(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    formula : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
 
@@ -136,7 +136,7 @@ def local_bsa(
     _bsa_rate = bsa_rate(
         height=height,
         weight=weight,
-        formula=formula,
+        bsa_equation=bsa_equation,
     )  # The bsa ratio to the standard body (1.87m2)
     local_bsa = _BSAst * _bsa_rate
     return local_bsa
@@ -173,7 +173,7 @@ def weight_rate(
 def bfb_rate(
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -186,7 +186,7 @@ def bfb_rate(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -212,14 +212,14 @@ def bfb_rate(
     else:  # age >= 70
         ci *= 0.7
 
-    bfb_all = ci * bsa_rate(height, weight, equation) * _BSAst.sum()  # [L/h]
+    bfb_all = ci * bsa_rate(height, weight, bsa_equation) * _BSAst.sum()  # [L/h]
     return bfb_all / 290
 
 
 def conductance(
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     fat=15,
 ):
     """Calculate thermal conductance between layers [W/K].
@@ -230,7 +230,7 @@ def conductance(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     fat : float, optional
@@ -443,7 +443,7 @@ def conductance(
 
     # Changes values by body size based on the standard body.
     wr = weight_rate(weight)
-    bsar = bsa_rate(height, weight, equation)
+    bsar = bsa_rate(height, weight, bsa_equation)
     # head, neck (Sphere shape)
     cdt_cr_sk[:2] *= wr / bsar
     cdt_cr_ms[:2] *= wr / bsar
@@ -491,7 +491,7 @@ def conductance(
     return cdt_whole.copy()
 
 
-def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
+def capacity(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59):
     """Calculate the thermal capacity [J/K].
 
     The values of vascular and central blood capacity have been derived from
@@ -504,7 +504,7 @@ def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -683,7 +683,7 @@ def capacity(height=1.72, weight=74.43, equation="dubois", age=20, ci=2.59):
     )
 
     # Changes the values based on the standard body
-    bfbr = bfb_rate(height, weight, equation, age, ci)
+    bfbr = bfb_rate(height, weight, bsa_equation, age, ci)
     wr = weight_rate(weight)
     cap_art *= bfbr
     cap_vein *= bfbr

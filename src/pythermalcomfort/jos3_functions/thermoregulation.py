@@ -501,7 +501,7 @@ def evaporation(
     ret,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
 ):
     """Calculate evaporative heat loss.
@@ -522,7 +522,7 @@ def evaporation(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -546,7 +546,7 @@ def evaporation(
     bsar = cons.bsa_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
     )  # bsa rate
     bsa = _BSAst * bsar  # bsa
     p_a = antoine(tdb) * rh / 100  # Saturated vapor pressure of ambient [kPa]
@@ -620,7 +620,7 @@ def skin_blood_flow(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -634,7 +634,7 @@ def skin_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -761,7 +761,7 @@ def skin_blood_flow(
     bfb_rate = cons.bfb_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
         age,
         ci,
     )
@@ -774,7 +774,7 @@ def ava_blood_flow(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -789,7 +789,7 @@ def ava_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -823,7 +823,7 @@ def ava_blood_flow(
     bfb_rate = cons.bfb_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
         age,
         ci,
     )
@@ -834,7 +834,7 @@ def ava_blood_flow(
 
 
 def basal_met(
-    height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
+    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
 ):
     """Calculate basal metabolic rate [W].
 
@@ -848,7 +848,7 @@ def basal_met(
         age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
-    equation : str, optional
+    bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
     Returns
@@ -857,19 +857,19 @@ def basal_met(
         Basal metabolic rate [W].
     """
 
-    if equation == "harris-benedict":
+    if bmr_equation == "harris-benedict":
         if sex == "male":
             bmr = 88.362 + 13.397 * weight + 500.3 * height - 5.677 * age
         else:
             bmr = 447.593 + 9.247 * weight + 479.9 * height - 4.330 * age
 
-    elif equation == "harris-benedict_origin":
+    elif bmr_equation == "harris-benedict_origin":
         if sex == "male":
             bmr = 66.4730 + 13.7516 * weight + 500.33 * height - 6.7550 * age
         else:
             bmr = 655.0955 + 9.5634 * weight + 184.96 * height - 4.6756 * age
 
-    elif equation == "japanese" or equation == "ganpule":
+    elif bmr_equation == "japanese" or bmr_equation == "ganpule":
         # Ganpule et al., 2007, https://doi.org/10.1038/sj.ejcn.1602645
         if sex == "male":
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.4235
@@ -879,7 +879,7 @@ def basal_met(
     else:
         valid_equations = ["harris-benedict", "harris-benedict_origin", "japanese", "ganpule"]
         raise ValueError(
-            f"Invalid equation: '{equation}'. Must be one of {valid_equations}"
+            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}"
         )
 
     bmr *= 0.048  # [kcal/day] to [W]
@@ -888,7 +888,7 @@ def basal_met(
 
 
 def local_mbase(
-    height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
+    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -902,7 +902,7 @@ def local_mbase(
         age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
-    equation : str, optional
+    bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
     Returns
@@ -911,7 +911,7 @@ def local_mbase(
         Local basal metabolic rate (Mbase) [W].
     """
 
-    mbase_all = basal_met(height, weight, age, sex, equation)
+    mbase_all = basal_met(height, weight, age, sex, bmr_equation)
     # Distribution coefficient of basal metabolic rate
     mbf_cr = np.array(
         [
@@ -1058,7 +1058,7 @@ def shivering(
     t_skin,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     sex="male",
     dtime=60,
@@ -1076,7 +1076,7 @@ def shivering(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1167,7 +1167,7 @@ def shivering(
         sd_shiv = np.ones(17) * 0.82597
 
     # Ratio of body surface area to the standard body [-]
-    bsar = cons.bsa_rate(height, weight, equation)
+    bsar = cons.bsa_rate(height, weight, bsa_equation)
 
     # Local heat production by shivering [W]
     q_shiv = shivf * bsar * sd_shiv * sig_shiv
@@ -1177,7 +1177,7 @@ def nonshivering(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     cold_acclimation=False,
     batpositive=True,
@@ -1192,7 +1192,7 @@ def nonshivering(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1272,7 +1272,7 @@ def nonshivering(
     )
 
     # Ratio of body surface area to the standard body [-]
-    bsar = cons.bsa_rate(height, weight, equation)
+    bsar = cons.bsa_rate(height, weight, bsa_equation)
 
     # Local heat production by non-shivering [W]
     q_nst = bsar * nstf * sig_nst
@@ -1319,7 +1319,7 @@ def cr_ms_fat_blood_flow(
     q_shiv,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -1335,7 +1335,7 @@ def cr_ms_fat_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1416,7 +1416,7 @@ def cr_ms_fat_blood_flow(
         ]
     )
 
-    bfb_rate = cons.bfb_rate(height, weight, equation, age, ci)
+    bfb_rate = cons.bfb_rate(height, weight, bsa_equation, age, ci)
     bf_core = bfb_core * bfb_rate
     bf_muscle = bfb_muscle * bfb_rate
     bf_fat = bfb_fat * bfb_rate
