@@ -3418,13 +3418,13 @@ class JOS3:
 
         Returns
         -------
-        Q_total : total heat production of the whole body [W]
+        q_thermogenesis_total : total thermogenesis of the whole body [W]
         cardiac_output: cardiac output (the sum of the whole blood flow) [L/h]
         cycle_time: the counts of executing one cycle calculation [-]
         dt      : time step [sec]
         pythermalcomfort_version: version of pythermalcomfort [-]
         q_res   : heat loss by respiration [W]
-        q_skin  : total heat loss from the skin (each body part) [W]
+        q_skin_to_env  : total heat loss from the skin (each body part) [W]
         simulation_time: simulation times [sec]
         t_core  : core temperature (each body part) [°C]
         t_skin  : skin temperature (each body part) [°C]
@@ -3433,17 +3433,17 @@ class JOS3:
         w_mean  : mean skin wettedness [-]
         weight_loss_by_evap_and_res: weight loss by the evaporation and respiration of the whole body [g/sec]
         OPTIONAL PARAMETERS : the paramters listed below are returned if ex_output = "all"
-        Q_bmr_core: core heat production by basal metabolism (each body part) [W]
-        Q_bmr_fat: fat heat production by basal metabolism (each body part) [W]
-        Q_bmr_muscle: muscle heat production by basal metabolism (each body part) [W]
-        Q_bmr_skin: skin heat production by basal metabolism (each body part) [W]
-        Q_core  : core total heat production (each body part) [W]
-        Q_fat   : fat total heat production (each body part) [W]
-        Q_muscle: muscle total heat production (each body part) [W]
-        Q_nst   : core heat production by non-shivering thermogenesis (each body part) [W]
-        Q_shiv  : core or muscle heat production by shivering thermogenesis (each body part) [W]
-        Q_skin  : skin total heat production (each body part) [W]
-        Q_work  : core or muscle heat production by work (each body part) [W]
+        q_bmr_core: core thermogenesis by basal metabolism (each body part) [W]
+        q_bmr_fat: fat thermogenesis by basal metabolism (each body part) [W]
+        q_bmr_muscle: muscle thermogenesis by basal metabolism (each body part) [W]
+        q_bmr_skin: skin thermogenesis by basal metabolism (each body part) [W]
+        q_thermogenesis_core  : core total thermogenesis (each body part) [W]
+        q_thermogenesis_fat   : fat total thermogenesis (each body part) [W]
+        q_thermogenesis_muscle: muscle total thermogenesis (each body part) [W]
+        q_nst   : core thermogenesis by non-shivering thermogenesis (each body part) [W]
+        q_shiv  : core or muscle thermogenesis by shivering thermogenesis (each body part) [W]
+        q_thermogenesis_skin  : skin total thermogenesis (each body part) [W]
+        q_work  : core or muscle thermogenesis by work (each body part) [W]
         Ret     : total clothing evaporative heat resistance (each body part) [(m2*kPa)/W]
         Rt      : total clothing heat resistance (each body part) [(m2*K)/W]
         age     : age [years]
@@ -3464,8 +3464,8 @@ class JOS3:
         par     : physical activity ratio [-]
         q_res_latent: latent heat loss by respiration (each body part) [W]
         q_res_sensible: sensible heat loss by respiration (each body part) [W]
-        q_skin_latent: latent heat loss from the skin (each body part) [W]
-        q_skin_sensible: sensible heat loss from the skin (each body part) [W]
+        q_skin2env_latent: latent heat loss from the skin (each body part) [W]
+        q_skin2env_sensible: sensible heat loss from the skin (each body part) [W]
         rh      : relative humidity (each body part) [%]
         sex     : sex [-]
         t_artery: arterial temperature (each body part) [°C]
@@ -3650,7 +3650,7 @@ class JOS3:
         self._posture = "standing"  # Body posture [-]
         self._hc = None  # Convective heat transfer coefficient
         self._hr = None  # Radiative heat transfer coefficient
-        self.ex_q = np.zeros(NUM_NODES)  # External heat production
+        self.ex_q = np.zeros(NUM_NODES)  # External heat gain
         self._t = dt.timedelta(0)  # Elapsed time
         self._cycle = 0  # Cycle time
         self.model_name = "JOS3"  # Model name
@@ -3791,7 +3791,7 @@ class JOS3:
         It then calculates the new body temperature by solving the matrices using numpy's linalg library.
 
         Finally, the function returns a dictionary of the simulation results.
-        The output parameters include cycle time, model time, t_skin_mean, t_skin, t_core, w_mean, w, weight_loss_by_evap_and_res, cardiac_output, Q_total, q_res, and q_skin.
+        The output parameters include cycle time, model time, t_skin_mean, t_skin, t_core, w_mean, w, weight_loss_by_evap_and_res, cardiac_output, q_thermogenesis_total, q_res, and q_skin_env.
 
         Additionally, if the _ex_output variable is set to "all" or is a list of keys,
         the function also returns a detailed dictionary of all the thermoregulation parameters
@@ -3957,7 +3957,7 @@ class JOS3:
         # ------------------------------------------------------------------
 
         # Calculate local basal metabolic rate (BMR) [W]
-        m_base = threg.local_mbase(
+        q_bmr_local = threg.local_mbase(
             self._height,
             self._weight,
             self._age,
@@ -3965,19 +3965,19 @@ class JOS3:
             self._bmr_equation,
         )
         # Calculate overall basal metabolic rate (BMR) [W]
-        m_base_all = sum([m.sum() for m in m_base])
+        q_bmr_total = sum([m.sum() for m in q_bmr_local])
 
         # Calculate thermogenesis by work [W]
-        q_work = threg.local_q_work(m_base_all, self._par)
+        q_work = threg.local_q_work(q_bmr_total, self._par)
 
         # Calculate the sum of thermogenesis in core, muscle, fat, skin [W]
-        q_core, q_muscle, q_fat, q_skin = threg.sum_m(
-            m_base,
+        q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin = threg.sum_m(
+            q_bmr_local,
             q_work,
             q_shiv,
             q_nst,
         )
-        qall = q_core.sum() + q_muscle.sum() + q_fat.sum() + q_skin.sum()
+        q_thermogenesis_total = q_thermogenesis_core.sum() + q_thermogenesis_muscle.sum() + q_thermogenesis_fat.sum() + q_thermogenesis_skin.sum()
 
         # ------------------------------------------------------------------
         # Others
@@ -3995,10 +3995,10 @@ class JOS3:
 
         # Calculate heat loss by respiratory
         p_a = threg.antoine(self._ta) * self._rh / 100
-        res_sh, res_lh = threg.resp_heat_loss(self._ta[0], p_a[0], qall)
+        res_sh, res_lh = threg.resp_heat_loss(self._ta[0], p_a[0], q_thermogenesis_total)
 
         # Calculate sensible heat loss [W]
-        shlsk = (tsk - to) / r_t * self._bsa
+        shl_sk = (tsk - to) / r_t * self._bsa
 
         # Calculate cardiac output [L/h]
         co = threg.sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot)
@@ -4071,10 +4071,10 @@ class JOS3:
         # Matrix Q [W] / [J/K] * [sec] = [-]
         # Thermogensis
         arr_q = np.zeros(NUM_NODES)
-        arr_q[INDEX["core"]] += q_core
-        arr_q[INDEX["muscle"]] += q_muscle[VINDEX["muscle"]]
-        arr_q[INDEX["fat"]] += q_fat[VINDEX["fat"]]
-        arr_q[INDEX["skin"]] += q_skin
+        arr_q[INDEX["core"]] += q_thermogenesis_core
+        arr_q[INDEX["muscle"]] += q_thermogenesis_muscle[VINDEX["muscle"]]
+        arr_q[INDEX["fat"]] += q_thermogenesis_fat[VINDEX["fat"]]
+        arr_q[INDEX["skin"]] += q_thermogenesis_skin
 
         # Respiratory [W]
         arr_q[INDEX["core"][2]] -= res_sh + res_lh  # chest core
@@ -4117,9 +4117,9 @@ class JOS3:
             dict_out["w"] = wet
             dict_out["weight_loss_by_evap_and_res"] = wlesk.sum() + wleres
             dict_out["cardiac_output"] = co
-            dict_out["Q_total"] = qall
+            dict_out["q_thermogenesis_total"] = q_thermogenesis_total
             dict_out["q_res"] = res_sh + res_lh
-            dict_out["q_skin"] = shlsk + e_sk
+            dict_out["q_skin2env"] = shl_sk + e_sk
 
         detail_out = {}
         if self._ex_output and output:
@@ -4156,19 +4156,19 @@ class JOS3:
             detail_out["bf_skin"] = bf_skin
             detail_out["bf_ava_hand"] = bf_ava_hand
             detail_out["bf_ava_foot"] = bf_ava_foot
-            detail_out["Q_bmr_core"] = m_base[0]
-            detail_out["Q_bmr_muscle"] = m_base[1][VINDEX["muscle"]]
-            detail_out["Q_bmr_fat"] = m_base[2][VINDEX["fat"]]
-            detail_out["Q_bmr_skin"] = m_base[3]
-            detail_out["Q_work"] = q_work
-            detail_out["Q_shiv"] = q_shiv
-            detail_out["Q_nst"] = q_nst
-            detail_out["Q_core"] = q_core
-            detail_out["Q_muscle"] = q_muscle[VINDEX["muscle"]]
-            detail_out["Q_fat"] = q_fat[VINDEX["fat"]]
-            detail_out["Q_skin"] = q_skin
-            dict_out["q_skin_sensible"] = shlsk
-            dict_out["q_skin_latent"] = e_sk
+            detail_out["q_bmr_core"] = q_bmr_local[0]
+            detail_out["q_bmr_muscle"] = q_bmr_local[1][VINDEX["muscle"]]
+            detail_out["q_bmr_fat"] = q_bmr_local[2][VINDEX["fat"]]
+            detail_out["q_bmr_skin"] = q_bmr_local[3]
+            detail_out["q_work"] = q_work
+            detail_out["q_shiv"] = q_shiv
+            detail_out["q_nst"] = q_nst
+            detail_out["q_thermogenesis_core"] = q_thermogenesis_core
+            detail_out["q_thermogenesis_muscle"] = q_thermogenesis_muscle[VINDEX["muscle"]]
+            detail_out["q_thermogenesis_fat"] = q_thermogenesis_fat[VINDEX["fat"]]
+            detail_out["q_thermogenesis_skin"] = q_thermogenesis_skin
+            dict_out["q_skin2env_sensible"] = shl_sk
+            dict_out["q_skin2env_latent"] = e_sk
             dict_out["q_res_sensible"] = res_sh
             dict_out["q_res_latent"] = res_lh
 

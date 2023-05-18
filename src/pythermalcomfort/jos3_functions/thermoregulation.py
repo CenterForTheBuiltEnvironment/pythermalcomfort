@@ -1006,7 +1006,7 @@ def local_mbase(
 
 
 def local_q_work(bmr, par):
-    """Calculate local heat production by work [W]
+    """Calculate local thermogenesis by work [W]
 
     Parameters
     ----------
@@ -1017,12 +1017,12 @@ def local_q_work(bmr, par):
 
     Returns
     -------
-    Q_work : array
-        Local heat production by work [W].
+    q_work : array
+        Local thermogenesis by work [W].
     """
     q_work_all = (par - 1) * bmr
 
-    # Distribution coefficient of heat production by work
+    # Distribution coefficient of thermogenesis by work
     workf = np.array(
         [
             0,
@@ -1064,7 +1064,7 @@ def shivering(
     dtime=60,
     options={},
 ):
-    """Calculate local heat production by shivering [W].
+    """Calculate local thermogenesis by shivering [W].
 
     Parameters
     ----------
@@ -1088,13 +1088,13 @@ def shivering(
 
     Returns
     -------
-    Q_shiv : array
-        Local heat production by shivering [W].
+    q_shiv : array
+        Local thermogenesis by shivering [W].
     """
     # Integrated error signal in the warm and cold receptors
     wrms, clds = error_signals(err_sk)
 
-    # Distribution coefficient of heat production by shivering
+    # Distribution coefficient of thermogenesis by shivering
     shivf = np.array(
         [
             0.0339,
@@ -1169,7 +1169,7 @@ def shivering(
     # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, bsa_equation)
 
-    # Local heat production by shivering [W]
+    # Local thermogenesis by shivering [W]
     q_shiv = shivf * bsar * sd_shiv * sig_shiv
     return q_shiv
 
@@ -1206,7 +1206,7 @@ def nonshivering(
 
     Returns
     -------
-    Q_nst : array
+    q_nst : array
         Local metabolic rate by non-shivering [W].
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
@@ -1248,7 +1248,7 @@ def nonshivering(
     sig_nst = 2.8 * clds  # [W]
     sig_nst = min(sig_nst, thres)
 
-    # Distribution coefficient of heat production by non-shivering
+    # Distribution coefficient of thermogenesis by non-shivering
     nstf = np.array(
         [
             0.000,
@@ -1274,44 +1274,44 @@ def nonshivering(
     # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, bsa_equation)
 
-    # Local heat production by non-shivering [W]
+    # Local thermogenesis by non-shivering [W]
     q_nst = bsar * nstf * sig_nst
     return q_nst
 
 
 def sum_m(mbase, q_work, q_shiv, q_nst):
-    """Calculate total heat production in each layer [W].
+    """Calculate total thermogenesis in each layer [W].
 
     Parameters
     ----------
     mbase : array
         Local basal metabolic rate (Mbase) [W].
     q_work : array
-        Local heat production by work [W].
+        Local thermogenesis by work [W].
     q_shiv : array
-        Local heat production by shivering [W].
+        Local thermogenesis by shivering [W].
     q_nst : array
-        Local heat production by non-shivering [W].
+        Local thermogenesis by non-shivering [W].
 
     Returns
     -------
-    q_core, q_muscle, q_fat, q_skin : array
-        Total heat production in core, muscle, fat, skin layers [W].
+    q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin : array
+        Total thermogenesis in core, muscle, fat, skin layers [W].
     """
-    q_core = mbase[0].copy()
-    q_muscle = mbase[1].copy()
-    q_fat = mbase[2].copy()
-    q_skin = mbase[3].copy()
+    q_thermogenesis_core = mbase[0].copy()
+    q_thermogenesis_muscle = mbase[1].copy()
+    q_thermogenesis_fat = mbase[2].copy()
+    q_thermogenesis_skin = mbase[3].copy()
 
     for i, bn in enumerate(BODY_NAMES):
-        # If the segment has a muscle layer, muscle heat production increases by the activity.
+        # If the segment has a muscle layer, muscle thermogenesis increases by the activity.
         if IDICT[bn]["muscle"] is not None:
-            q_muscle[i] += q_work[i] + q_shiv[i]
-        # In other segments, core heat production increase, instead of muscle.
+            q_thermogenesis_muscle[i] += q_work[i] + q_shiv[i]
+        # In other segments, core thermogenesis increase, instead of muscle.
         else:
-            q_core[i] += q_work[i] + q_shiv[i]
-    q_core += q_nst  # Non-shivering thermogenesis occurs in core layers
-    return q_core, q_muscle, q_fat, q_skin
+            q_thermogenesis_core[i] += q_work[i] + q_shiv[i]
+    q_thermogenesis_core += q_nst  # Non-shivering thermogenesis occurs in core layers
+    return q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin
 
 
 def cr_ms_fat_blood_flow(
@@ -1466,7 +1466,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     return co
 
 
-def resp_heat_loss(tdb, p_a, q_total):
+def resp_heat_loss(tdb, p_a, q_thermogenesis_total):
     """
     Calculate heat loss by respiration [W].
 
@@ -1476,14 +1476,14 @@ def resp_heat_loss(tdb, p_a, q_total):
         Dry bulb air temperature [oC].
     p_a : float
         Water vapor pressure in the ambient air  [kPa].
-    q_total: float
-        Total heat production [W].
+    q_thermogenesis_total: float
+        Total thermogenesis [W].
 
     Returns
     -------
     res_sh, res_lh : float
         Sensible and latent heat loss by respiration [W].
     """
-    res_sh = 0.0014 * q_total * (34 - tdb)  # sensible heat loss
-    res_lh = 0.0173 * q_total * (5.87 - p_a)  # latent heat loss
+    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # sensible heat loss
+    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # latent heat loss
     return res_sh, res_lh
