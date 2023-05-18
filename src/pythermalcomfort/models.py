@@ -3444,8 +3444,8 @@ class JOS3:
         q_shiv  : core or muscle thermogenesis by shivering thermogenesis (each body part) [W]
         q_thermogenesis_skin  : skin total thermogenesis (each body part) [W]
         q_work  : core or muscle thermogenesis by work (each body part) [W]
-        Ret     : total clothing evaporative heat resistance (each body part) [(m2*kPa)/W]
-        Rt      : total clothing heat resistance (each body part) [(m2*K)/W]
+        r_et     : total clothing evaporative heat resistance (each body part) [(m2*kPa)/W]
+        r_t      : total clothing heat resistance (each body part) [(m2*K)/W]
         age     : age [years]
         bf_ava_foot: AVA blood flow rate of one foot [L/h]
         bf_ava_hand: AVA blood flow rate of one hand [L/h]
@@ -4139,8 +4139,8 @@ class JOS3:
             detail_out["t_muscle"] = self.t_muscle
             detail_out["t_fat"] = self.t_fat
             detail_out["to"] = to
-            detail_out["Rt"] = r_t
-            detail_out["Ret"] = r_et
+            detail_out["r_t"] = r_t
+            detail_out["r_et"] = r_et
             detail_out["tdb"] = self._ta.copy()
             detail_out["tr"] = self._tr.copy()
             detail_out["rh"] = self._rh.copy()

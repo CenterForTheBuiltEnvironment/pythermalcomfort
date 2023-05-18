@@ -227,13 +227,13 @@ ALL_OUT_PARAMS = {
         "suffix": "Body name",
         "unit": "%",
     },
-    "Ret": {
+    "r_et": {
         "ex_output": True,
         "meaning": "total clothing evaporative heat resistance (each body part)",
         "suffix": "Body name",
         "unit": "(m2*kPa)/W",
     },
-    "Rt": {
+    "r_t": {
         "ex_output": True,
         "meaning": "total clothing heat resistance (each body part)",
         "suffix": "Body name",
