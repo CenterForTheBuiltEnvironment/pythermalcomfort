@@ -103,46 +103,46 @@ ALL_OUT_PARAMS = {
         "suffix": "Body name",
         "unit": "clo",
     },
-    "q_skin_latent": {
+    "q_skin2env_latent": {
         "ex_output": True,
         "meaning": "latent heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_bmr_core": {
+    "q_bmr_core": {
         "ex_output": True,
-        "meaning": "core heat production by basal metabolism (each body part)",
+        "meaning": "core thermogenesis by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "met_base_fat": {
+    "q_bmr_fat": {
         "ex_output": True,
-        "meaning": "fat heat production by basal metabolism (each body part)",
+        "meaning": "fat thermogenesis by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_bmr_muscle": {
+    "q_bmr_muscle": {
         "ex_output": True,
-        "meaning": "muscle heat production by basal metabolism (each body part)",
+        "meaning": "muscle thermogenesis by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_bmr_skin": {
+    "q_bmr_skin": {
         "ex_output": True,
-        "meaning": "skin heat production by basal metabolism (each body part)",
+        "meaning": "skin thermogenesis by basal metabolism (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_total": {
+    "q_thermogenesis_total": {
         "ex_output": False,
-        "meaning": "total heat production of the whole body",
+        "meaning": "total thermogenesis of the whole body",
         "suffix": None,
         "unit": "W",
     },
-    "Q_nst": {
+    "q_nst": {
         "ex_output": True,
         "meaning": (
-            "core heat production by non-shivering thermogenesis (each body part)"
+            "core thermogenesis by non-shivering (each body part)"
         ),
         "suffix": "Body name",
         "unit": "W",
@@ -153,17 +153,17 @@ ALL_OUT_PARAMS = {
         "suffix": None,
         "unit": "sec",
     },
-    "Q_shiv": {
+    "q_shiv": {
         "ex_output": True,
         "meaning": (
-            "core or muscle heat production by shivering thermogenesis (each body part)"
+            "core or muscle thermogenesis by shivering (each body part)"
         ),
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_work": {
+    "q_work": {
         "ex_output": True,
-        "meaning": "core or muscle heat production by work (each body part)",
+        "meaning": "core or muscle thermogenesis by work (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
@@ -179,27 +179,27 @@ ALL_OUT_PARAMS = {
         "suffix": None,
         "unit": "-",
     },
-    "Q_core": {
+    "q_thermogenesis_core": {
         "ex_output": True,
-        "meaning": "core total heat production (each body part)",
+        "meaning": "core total thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_fat": {
+    "q_thermogenesis_fat": {
         "ex_output": True,
-        "meaning": "fat total heat production (each body part)",
+        "meaning": "fat total thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_muscle": {
+    "q_thermogenesis_muscle": {
         "ex_output": True,
-        "meaning": "muscle total heat production (each body part)",
+        "meaning": "muscle total thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "Q_skin": {
+    "q_thermogenesis_skin": {
         "ex_output": True,
-        "meaning": "skin total heat production (each body part)",
+        "meaning": "skin total thermogenesis (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
@@ -227,31 +227,31 @@ ALL_OUT_PARAMS = {
         "suffix": "Body name",
         "unit": "%",
     },
-    "Ret": {
+    "r_et": {
         "ex_output": True,
         "meaning": "total clothing evaporative heat resistance (each body part)",
         "suffix": "Body name",
         "unit": "(m2*kPa)/W",
     },
-    "Rt": {
+    "r_t": {
         "ex_output": True,
         "meaning": "total clothing heat resistance (each body part)",
         "suffix": "Body name",
         "unit": "(m2*K)/W",
     },
-    "q_skin_sensible": {
+    "q_skin2env_sensible": {
         "ex_output": True,
         "meaning": "sensible heat loss from the skin (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
-    "t_core_set": {
+    "t_skin_set": {
         "ex_output": True,
         "meaning": "skin set point temperature (each body part)",
         "suffix": "Body name",
         "unit": "°C",
     },
-    "t_skin_set": {
+    "t_core_set": {
         "ex_output": True,
         "meaning": "core set point temperature (each body part)",
         "suffix": "Body name",
@@ -263,7 +263,7 @@ ALL_OUT_PARAMS = {
         "suffix": None,
         "unit": "-",
     },
-    "q_skin": {
+    "q_skin2env": {
         "ex_output": False,
         "meaning": "total heat loss from the skin (each body part)",
         "suffix": "Body name",

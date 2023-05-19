@@ -431,7 +431,7 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et = r_ea / fcl + r_ecl
     return r_et
 
-def error_signals(err_sk=0):
+def error_signals(err_sk=0.0):
     """Calculate WRMS and CLDS signals of thermoregulation.
 
     Parameters
@@ -448,6 +448,8 @@ def error_signals(err_sk=0):
     clds : array
         Cold signal (CLDS) [°C].
     """
+    # Convert err_sk to float if it's not already
+    err_sk = np.array(err_sk, dtype=float)
 
     # SKINR (Distribution coefficients of thermal receptor) [-]
     receptor = np.array(
@@ -499,7 +501,7 @@ def evaporation(
     ret,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
 ):
     """Calculate evaporative heat loss.
@@ -520,7 +522,7 @@ def evaporation(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -544,7 +546,7 @@ def evaporation(
     bsar = cons.bsa_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
     )  # bsa rate
     bsa = _BSAst * bsar  # bsa
     p_a = antoine(tdb) * rh / 100  # Saturated vapor pressure of ambient [kPa]
@@ -618,7 +620,7 @@ def skin_blood_flow(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -632,7 +634,7 @@ def skin_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -759,7 +761,7 @@ def skin_blood_flow(
     bfb_rate = cons.bfb_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
         age,
         ci,
     )
@@ -772,7 +774,7 @@ def ava_blood_flow(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -787,7 +789,7 @@ def ava_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -821,7 +823,7 @@ def ava_blood_flow(
     bfb_rate = cons.bfb_rate(
         height,
         weight,
-        equation,
+        bsa_equation,
         age,
         ci,
     )
@@ -832,7 +834,7 @@ def ava_blood_flow(
 
 
 def basal_met(
-    height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
+    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
 ):
     """Calculate basal metabolic rate [W].
 
@@ -846,7 +848,7 @@ def basal_met(
         age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
-    equation : str, optional
+    bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
     Returns
@@ -855,19 +857,19 @@ def basal_met(
         Basal metabolic rate [W].
     """
 
-    if equation == "harris-benedict":
+    if bmr_equation == "harris-benedict":
         if sex == "male":
             bmr = 88.362 + 13.397 * weight + 500.3 * height - 5.677 * age
         else:
             bmr = 447.593 + 9.247 * weight + 479.9 * height - 4.330 * age
 
-    elif equation == "harris-benedict_origin":
+    elif bmr_equation == "harris-benedict_origin":
         if sex == "male":
             bmr = 66.4730 + 13.7516 * weight + 500.33 * height - 6.7550 * age
         else:
             bmr = 655.0955 + 9.5634 * weight + 184.96 * height - 4.6756 * age
 
-    elif equation == "japanese" or equation == "ganpule":
+    elif bmr_equation == "japanese" or bmr_equation == "ganpule":
         # Ganpule et al., 2007, https://doi.org/10.1038/sj.ejcn.1602645
         if sex == "male":
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.4235
@@ -877,7 +879,7 @@ def basal_met(
     else:
         valid_equations = ["harris-benedict", "harris-benedict_origin", "japanese", "ganpule"]
         raise ValueError(
-            f"Invalid equation: '{equation}'. Must be one of {valid_equations}"
+            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}"
         )
 
     bmr *= 0.048  # [kcal/day] to [W]
@@ -886,7 +888,7 @@ def basal_met(
 
 
 def local_mbase(
-    height=1.72, weight=74.43, age=20, sex="male", equation="harris-benedict"
+    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -900,7 +902,7 @@ def local_mbase(
         age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".
-    equation : str, optional
+    bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
     Returns
@@ -909,7 +911,7 @@ def local_mbase(
         Local basal metabolic rate (Mbase) [W].
     """
 
-    mbase_all = basal_met(height, weight, age, sex, equation)
+    mbase_all = basal_met(height, weight, age, sex, bmr_equation)
     # Distribution coefficient of basal metabolic rate
     mbf_cr = np.array(
         [
@@ -1004,7 +1006,7 @@ def local_mbase(
 
 
 def local_q_work(bmr, par):
-    """Calculate local heat production by work [W]
+    """Calculate local thermogenesis by work [W]
 
     Parameters
     ----------
@@ -1015,12 +1017,12 @@ def local_q_work(bmr, par):
 
     Returns
     -------
-    Q_work : array
-        Local heat production by work [W].
+    q_work : array
+        Local thermogenesis by work [W].
     """
     q_work_all = (par - 1) * bmr
 
-    # Distribution coefficient of heat production by work
+    # Distribution coefficient of thermogenesis by work
     workf = np.array(
         [
             0,
@@ -1056,13 +1058,13 @@ def shivering(
     t_skin,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     sex="male",
     dtime=60,
     options={},
 ):
-    """Calculate local heat production by shivering [W].
+    """Calculate local thermogenesis by shivering [W].
 
     Parameters
     ----------
@@ -1074,7 +1076,7 @@ def shivering(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1086,13 +1088,13 @@ def shivering(
 
     Returns
     -------
-    Q_shiv : array
-        Local heat production by shivering [W].
+    q_shiv : array
+        Local thermogenesis by shivering [W].
     """
     # Integrated error signal in the warm and cold receptors
     wrms, clds = error_signals(err_sk)
 
-    # Distribution coefficient of heat production by shivering
+    # Distribution coefficient of thermogenesis by shivering
     shivf = np.array(
         [
             0.0339,
@@ -1165,9 +1167,9 @@ def shivering(
         sd_shiv = np.ones(17) * 0.82597
 
     # Ratio of body surface area to the standard body [-]
-    bsar = cons.bsa_rate(height, weight, equation)
+    bsar = cons.bsa_rate(height, weight, bsa_equation)
 
-    # Local heat production by shivering [W]
+    # Local thermogenesis by shivering [W]
     q_shiv = shivf * bsar * sd_shiv * sig_shiv
     return q_shiv
 
@@ -1175,7 +1177,7 @@ def nonshivering(
     err_sk,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     cold_acclimation=False,
     batpositive=True,
@@ -1190,7 +1192,7 @@ def nonshivering(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1204,7 +1206,7 @@ def nonshivering(
 
     Returns
     -------
-    Q_nst : array
+    q_nst : array
         Local metabolic rate by non-shivering [W].
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
@@ -1246,7 +1248,7 @@ def nonshivering(
     sig_nst = 2.8 * clds  # [W]
     sig_nst = min(sig_nst, thres)
 
-    # Distribution coefficient of heat production by non-shivering
+    # Distribution coefficient of thermogenesis by non-shivering
     nstf = np.array(
         [
             0.000,
@@ -1270,46 +1272,46 @@ def nonshivering(
     )
 
     # Ratio of body surface area to the standard body [-]
-    bsar = cons.bsa_rate(height, weight, equation)
+    bsar = cons.bsa_rate(height, weight, bsa_equation)
 
-    # Local heat production by non-shivering [W]
+    # Local thermogenesis by non-shivering [W]
     q_nst = bsar * nstf * sig_nst
     return q_nst
 
 
 def sum_m(mbase, q_work, q_shiv, q_nst):
-    """Calculate total heat production in each layer [W].
+    """Calculate total thermogenesis in each layer [W].
 
     Parameters
     ----------
     mbase : array
         Local basal metabolic rate (Mbase) [W].
     q_work : array
-        Local heat production by work [W].
+        Local thermogenesis by work [W].
     q_shiv : array
-        Local heat production by shivering [W].
+        Local thermogenesis by shivering [W].
     q_nst : array
-        Local heat production by non-shivering [W].
+        Local thermogenesis by non-shivering [W].
 
     Returns
     -------
-    q_core, q_muscle, q_fat, q_skin : array
-        Total heat production in core, muscle, fat, skin layers [W].
+    q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin : array
+        Total thermogenesis in core, muscle, fat, skin layers [W].
     """
-    q_core = mbase[0].copy()
-    q_muscle = mbase[1].copy()
-    q_fat = mbase[2].copy()
-    q_skin = mbase[3].copy()
+    q_thermogenesis_core = mbase[0].copy()
+    q_thermogenesis_muscle = mbase[1].copy()
+    q_thermogenesis_fat = mbase[2].copy()
+    q_thermogenesis_skin = mbase[3].copy()
 
     for i, bn in enumerate(BODY_NAMES):
-        # If the segment has a muscle layer, muscle heat production increases by the activity.
+        # If the segment has a muscle layer, muscle thermogenesis increases by the activity.
         if IDICT[bn]["muscle"] is not None:
-            q_muscle[i] += q_work[i] + q_shiv[i]
-        # In other segments, core heat production increase, instead of muscle.
+            q_thermogenesis_muscle[i] += q_work[i] + q_shiv[i]
+        # In other segments, core thermogenesis increase, instead of muscle.
         else:
-            q_core[i] += q_work[i] + q_shiv[i]
-    q_core += q_nst  # Non-shivering thermogenesis occurs in core layers
-    return q_core, q_muscle, q_fat, q_skin
+            q_thermogenesis_core[i] += q_work[i] + q_shiv[i]
+    q_thermogenesis_core += q_nst  # Non-shivering thermogenesis occurs in core layers
+    return q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin
 
 
 def cr_ms_fat_blood_flow(
@@ -1317,7 +1319,7 @@ def cr_ms_fat_blood_flow(
     q_shiv,
     height=1.72,
     weight=74.43,
-    equation="dubois",
+    bsa_equation="dubois",
     age=20,
     ci=2.59,
 ):
@@ -1333,7 +1335,7 @@ def cr_ms_fat_blood_flow(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    equation : str, optional
+    bsa_equation : str, optional
         The equation name (str) of bsa calculation. Choose a name from "dubois",
         "takahira", "fujimoto", or "kurazumi". The default is "dubois".
     age : float, optional
@@ -1414,7 +1416,7 @@ def cr_ms_fat_blood_flow(
         ]
     )
 
-    bfb_rate = cons.bfb_rate(height, weight, equation, age, ci)
+    bfb_rate = cons.bfb_rate(height, weight, bsa_equation, age, ci)
     bf_core = bfb_core * bfb_rate
     bf_muscle = bfb_muscle * bfb_rate
     bf_fat = bfb_fat * bfb_rate
@@ -1464,7 +1466,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     return co
 
 
-def resp_heat_loss(tdb, p_a, q_total):
+def resp_heat_loss(tdb, p_a, q_thermogenesis_total):
     """
     Calculate heat loss by respiration [W].
 
@@ -1474,14 +1476,14 @@ def resp_heat_loss(tdb, p_a, q_total):
         Dry bulb air temperature [oC].
     p_a : float
         Water vapor pressure in the ambient air  [kPa].
-    q_total: float
-        Total heat production [W].
+    q_thermogenesis_total: float
+        Total thermogenesis [W].
 
     Returns
     -------
     res_sh, res_lh : float
         Sensible and latent heat loss by respiration [W].
     """
-    res_sh = 0.0014 * q_total * (34 - tdb)  # sensible heat loss
-    res_lh = 0.0173 * q_total * (5.87 - p_a)  # latent heat loss
+    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # sensible heat loss
+    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # latent heat loss
     return res_sh, res_lh

@@ -90,7 +90,7 @@ def p_sat(tdb):
     Returns
     -------
     p_sat: float
-        operative temperature, [Pa]
+        saturation vapor pressure, [Pa]
     """
 
     ta_k = tdb + c_to_k
