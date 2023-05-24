@@ -1922,7 +1922,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     theta : float, default 0
         angle between walking direction and wind direction [degrees]
     acclimatized : float, default 100
-        100 if acclimatised subject, 0 otherwise
+        100 if acclimatized subject, 0 otherwise
     duration : float, default 480
         duration of the work sequence, [minutes]
     f_r : float, default 0.97
@@ -1942,6 +1942,14 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     -------
     t_re : float
         rectal temperature, [°C]
+    t_sk : float
+        skin temperature, [°C]
+    t_cr : float
+        core temperature, [°C]
+    t_cr_eq : float
+        core temperature as a function of the metabolic rate, [°C]
+    t_sk_t_cr_wg : float
+        fraction of the body mass at the skin temperature
     d_lim_loss_50 : float
         maximum allowable exposure time for water loss, mean subject, [minutes]
     d_lim_loss_95 : float
@@ -1949,6 +1957,8 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         [minutes]
     d_lim_t_re : float
         maximum allowable exposure time for heat storage, [minutes]
+    water_loss_watt : float
+        maximum water loss in watts, [W]
     water_loss : float
         maximum water loss, [g]
 
@@ -2057,16 +2067,16 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
 
     if kwargs["round"]:
         return {
+            "t_re": round(t_re, 1),
+            "t_sk": round(t_sk, 1),
+            "t_cr": round(t_cr, 1),
+            "t_cr_eq": round(t_cr_eq, 1),
+            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 2),
             "d_lim_loss_50": round(d_lim_loss_50, 1),
             "d_lim_loss_95": round(d_lim_loss_95, 1),
             "d_lim_t_re": round(d_lim_t_re, 1),
-            "water_loss": round(sw_tot_g, 1),
-            "t_re": round(t_re, 1),
-            "t_cr": round(t_cr, 1),
-            "t_sk": round(t_sk, 1),
-            "t_cr_eq": round(t_cr_eq, 1),
-            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 2),
             "water_loss_watt": round(sweat_rate, 1),
+            "water_loss": round(sw_tot_g, 1),
         }
     else:
         return {
@@ -3971,13 +3981,23 @@ class JOS3:
         q_work = threg.local_q_work(q_bmr_total, self._par)
 
         # Calculate the sum of thermogenesis in core, muscle, fat, skin [W]
-        q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin = threg.sum_m(
+        (
+            q_thermogenesis_core,
+            q_thermogenesis_muscle,
+            q_thermogenesis_fat,
+            q_thermogenesis_skin,
+        ) = threg.sum_m(
             q_bmr_local,
             q_work,
             q_shiv,
             q_nst,
         )
-        q_thermogenesis_total = q_thermogenesis_core.sum() + q_thermogenesis_muscle.sum() + q_thermogenesis_fat.sum() + q_thermogenesis_skin.sum()
+        q_thermogenesis_total = (
+            q_thermogenesis_core.sum()
+            + q_thermogenesis_muscle.sum()
+            + q_thermogenesis_fat.sum()
+            + q_thermogenesis_skin.sum()
+        )
 
         # ------------------------------------------------------------------
         # Others
@@ -3995,7 +4015,9 @@ class JOS3:
 
         # Calculate heat loss by respiratory
         p_a = threg.antoine(self._ta) * self._rh / 100
-        res_sh, res_lh = threg.resp_heat_loss(self._ta[0], p_a[0], q_thermogenesis_total)
+        res_sh, res_lh = threg.resp_heat_loss(
+            self._ta[0], p_a[0], q_thermogenesis_total
+        )
 
         # Calculate sensible heat loss [W]
         shl_sk = (tsk - to) / r_t * self._bsa
@@ -4164,7 +4186,9 @@ class JOS3:
             detail_out["q_shiv"] = q_shiv
             detail_out["q_nst"] = q_nst
             detail_out["q_thermogenesis_core"] = q_thermogenesis_core
-            detail_out["q_thermogenesis_muscle"] = q_thermogenesis_muscle[VINDEX["muscle"]]
+            detail_out["q_thermogenesis_muscle"] = q_thermogenesis_muscle[
+                VINDEX["muscle"]
+            ]
             detail_out["q_thermogenesis_fat"] = q_thermogenesis_fat[VINDEX["fat"]]
             detail_out["q_thermogenesis_skin"] = q_thermogenesis_skin
             dict_out["q_skin2env_sensible"] = shl_sk
