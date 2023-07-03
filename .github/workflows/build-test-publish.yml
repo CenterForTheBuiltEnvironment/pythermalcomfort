@@ -5,6 +5,8 @@ name: Test and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
