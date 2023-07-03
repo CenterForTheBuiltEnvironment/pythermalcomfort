@@ -8,17 +8,14 @@ env:
 matrix:
   include:
     - env:
-        - TOXENV=py36,codecov
-      python: '3.6'
-    - env:
-        - TOXENV=py37,codecov
-      python: '3.7'
-    - env:
         - TOXENV=py38,codecov
       python: '3.8'
     - env:
         - TOXENV=py39,codecov
       python: '3.9'
+    - env:
+        - TOXENV=py39,codecov
+      python: '3.10'
 before_install:
   - python --version
   - uname -a
