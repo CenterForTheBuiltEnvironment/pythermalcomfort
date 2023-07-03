@@ -149,7 +149,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         )
 
     try:
-        ce = optimize.brentq(function, 0.0, 15)
+        ce = optimize.brentq(function, 0.0, 40)
     except ValueError:
         ce = 0
 
