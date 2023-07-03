@@ -12,4 +12,4 @@ def test_bsa_rate_with_custom_height_weight():
 
 def test_bsa_rate_with_invalid_formula():
     with pytest.raises(ValueError):
-        bsa_rate(height=1.72, weight=74.43, formula="ciao")
+        bsa_rate(height=1.72, weight=74.43, bsa_equation="ciao")
