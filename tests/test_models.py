@@ -630,6 +630,9 @@ def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.41
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.05
 
+    # test what happens when the cooling effect cannot be calculated
+    assert (cooling_effect(tdb=0, tr=80, vr=5, rh=60, met=3, clo=1)) == 0
+
     assert (
         cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
     ) == 3.95
