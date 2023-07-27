@@ -39,6 +39,9 @@ from pythermalcomfort.jos3_functions.construction import _BSAst, _to17array
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
+# Test Aki
+from pythermalcomfort.comfort_model_functions import thermal_sensation_calculator_v2
+
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
@@ -3685,7 +3688,7 @@ class JOS3:
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
-        dictout = self._reset_setpt()
+        dictout = self._reset_setpt(par=self.par)
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(
@@ -3722,7 +3725,7 @@ class JOS3:
                 to = to - vpmv / 3
         return to
 
-    def _reset_setpt(self):
+    def _reset_setpt(self, par: float = 1.25):
         """Reset set-point temperature under steady state calculation. Be
         careful, input parameters (tdb, tr, rh, v, clo, par) and body
         temperatures are also reset.
@@ -3735,12 +3738,12 @@ class JOS3:
         # Set operative temperature under PMV=0 environment
         # par = 1.25
         # 1 met = 58.15 W/m2
-        met = self.bmr * 1.25 / 58.15  # [met]
+        met = self.bmr * par / 58.15  # [met]
         self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
         self.rh = 50  # Relative humidity
         self.v = 0.1  # Air velocity
         self.clo = 0  # Clothing insulation
-        self.par = 1.25  # Physical activity ratio
+        self.par = par  # Physical activity ratio
 
         # Steady-calculation
         self.options["ava_zero"] = True
@@ -4558,6 +4561,10 @@ class JOS3:
         """t_skin : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
         return self._bodytemp[INDEX["skin"]].copy()
 
+    @t_skin.setter
+    def t_skin(self, inp):
+        self._bodytemp[INDEX["skin"]] = _to17array(inp)
+
     @property
     def t_core(self):
         """t_core : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
@@ -4618,5 +4625,4 @@ class JOS3:
     @property
     def version(self):
         """version : float The current version of pythermalcomfort."""
-
         return self._version
