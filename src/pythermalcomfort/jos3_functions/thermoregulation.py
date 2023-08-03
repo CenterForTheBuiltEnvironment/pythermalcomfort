@@ -606,7 +606,6 @@ def evaporation(
                 0.40,
             ]
         )
-
     e_sweat = skin_sweat * sig_sweat * sd_sweat * 2 ** (err_sk / 10)
     wet = 0.06 + 0.94 * (e_sweat / e_max)
     wet = np.minimum(wet, 1)  # Wettedness' upper limit
@@ -811,8 +810,8 @@ def ava_blood_flow(
     err_msk = np.average(err_sk, weights=bsa)
 
     # Openbess of AVA [-]
-    sig_ava_hand = 0.265 * (err_bcr + 0.43) + 0.953 * (err_msk + 0.1905) + 0.9126
-    sig_ava_foot = 0.265 * (err_bcr - 0.97) + 0.953 * (err_msk - 0.0095) + 0.9126
+    sig_ava_hand = 0.265 * (err_msk + 0.43) + 0.953 * (err_bcr + 0.1905) + 0.9126
+    sig_ava_foot = 0.265 * (err_msk - 0.997) + 0.953 * (err_bcr + 0.0095) + 0.9126
 
     sig_ava_hand = min(sig_ava_hand, 1)
     sig_ava_hand = max(sig_ava_hand, 0)
