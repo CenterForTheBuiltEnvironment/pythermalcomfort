@@ -802,7 +802,7 @@ def ava_blood_flow(
         AVA blood flow rate at hand and foot [L/h].
     """
     # Cal. mean error body core temp.
-    cap_bcr = [10.2975, 9.3935, 13.834]  # Thermal capacity at chest, back and pelvis
+    cap_bcr = [10.2975, 9.3935, 4.488]  # Thermal capacity at chest, back and pelvis
     err_bcr = np.average(err_cr[2:5], weights=cap_bcr)
 
     # Cal. mean error skin temp.
