@@ -38,6 +38,51 @@ _BSAst = np.array(
     ]
 )
 
+# Anthropomorphic data for a standard body
+default_height = 1.72
+default_weight = 74.43
+default_age = 20
+default_body_fat = 15
+default_cardiac_index = 2.59 # [L/min/㎡]
+
+def validate_body_parameters(
+    height=default_height,
+    weight=default_weight,
+    age=default_age,
+    body_fat=default_body_fat
+):
+    """
+    Validate the parameters: height, weight, age, and body fat percentage.
+
+    Parameters
+    ----------
+    height : float
+        The height of the person in meters.
+    weight : float
+        The weight of the person in kilograms.
+    age : int
+        The age of the person in years.
+    body_fat : float
+        The body fat percentage as a fraction of total body mass.
+
+    Raises
+    ------
+    ValueError
+        If any of the parameters are out of the specified range.
+    """
+
+    if not (0.5 <= height <= 3.0):
+        raise ValueError("Height must be in the range [0.5, 3.0] meters.")
+
+    if not (20.0 <= weight <= 200.0):
+        raise ValueError("Weight must be in the range [20.0, 200.0] kilograms.")
+
+    if not (5 <= age <= 100):
+        raise ValueError("Age must be in the range [5, 100] years.")
+
+    if not (1 <= body_fat <= 90):
+        raise ValueError("Body Fat must be in the range [1, 90] (1% to 90%).")
+
 
 def _to17array(inp):
     """Create a NumPy array of shape (17,) with the given input.
@@ -77,8 +122,8 @@ def _to17array(inp):
 
 
 def bsa_rate(
-    height=1.72,
-    weight=74.43,
+    height=default_height,
+    weight=default_weight,
     bsa_equation="dubois",
 ):
     """Calculate the rate of bsa to standard body.
@@ -98,6 +143,11 @@ def bsa_rate(
     bsa_rate : float
         The ratio of bsa to the standard body [-].
     """
+    validate_body_parameters(
+        height=height,
+        weight=weight
+    )
+
     bsa_all = body_surface_area(
         height=height,
         weight=weight,
@@ -107,8 +157,8 @@ def bsa_rate(
 
 
 def local_bsa(
-    height=1.72,
-    weight=74.43,
+    height=default_height,
+    weight=default_weight,
     bsa_equation="dubois",
 ):
     """Calculate local body surface area (bsa) [m2].
@@ -133,6 +183,10 @@ def local_bsa(
     local_bsa : ndarray(17,)
         Local body surface area (bsa) [m2].
     """
+    validate_body_parameters(
+        height=height,
+        weight=weight
+    )
     _bsa_rate = bsa_rate(
         height=height,
         weight=weight,
@@ -143,7 +197,7 @@ def local_bsa(
 
 
 def weight_rate(
-    weight=74.43,
+    weight=default_weight,
 ):
     """Calculate the ratio of the body weight to the standard body (74.43 kg).
 
@@ -167,15 +221,18 @@ def weight_rate(
         The ratio of the body weight to the standard body (74.43 kg).
         weight_rate = weight / 74.43
     """
-    return weight / 74.43
+    validate_body_parameters(
+        weight=weight
+    )
+    return weight / default_weight
 
 
 def bfb_rate(
-    height=1.72,
-    weight=74.43,
+    height=default_height,
+    weight=default_weight,
     bsa_equation="dubois",
-    age=20,
-    ci=2.59,
+    age=default_age,
+    ci=default_cardiac_index,
 ):
     """Calculate the ratio of basal blood flow (BFB) of the standard body (290
     L/h).
@@ -199,6 +256,11 @@ def bfb_rate(
     bfb_rate : float
         Basal blood flow rate.
     """
+    validate_body_parameters(
+        height=height,
+        weight=weight,
+        age=age,
+    )
 
     ci *= 60  # Change unit [L/min/㎡] to [L/h/㎡]
 
@@ -217,10 +279,10 @@ def bfb_rate(
 
 
 def conductance(
-    height=1.72,
-    weight=74.43,
+    height=default_height,
+    weight=default_weight,
     bsa_equation="dubois",
-    fat=15,
+    fat=default_body_fat,
 ):
     """Calculate thermal conductance between layers [W/K].
 
@@ -242,6 +304,12 @@ def conductance(
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
     """
+
+    validate_body_parameters(
+        height=height,
+        weight=weight,
+        body_fat=fat,
+    )
 
     if fat < 12.5:
         cdt_cr_sk = np.array(
@@ -491,7 +559,13 @@ def conductance(
     return cdt_whole.copy()
 
 
-def capacity(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59):
+def capacity(
+    height=default_height,
+    weight=default_weight,
+    bsa_equation="dubois",
+    age=default_age,
+    ci=default_cardiac_index
+    ):
     """Calculate the thermal capacity [J/K].
 
     The values of vascular and central blood capacity have been derived from
@@ -518,6 +592,11 @@ def capacity(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59):
         Thermal capacity [W/K].
         The shape is (NUM_NODES).
     """
+    validate_body_parameters(
+        height=height,
+        weight=weight,
+        age=age,
+    )
     # artery [Wh/K]
     cap_art = np.array(
         [
