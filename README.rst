@@ -105,5 +105,6 @@ Contributions are welcome, and they are greatly appreciated! Every little bit he
 Deployment
 ==========
 
-I am using travis to test the code. In addition, I have enabled GitHub actions. Every time a commit containing the message `bump version` is pushed to master then the GitHub action tests the code and if the tests pass, a new version of the package is published automatically on PyPI. See file in `.github/workflows/` for more information.
-
+I am using travis to test the code. In addition, I have enabled GitHub actions.
+Every time the code is pushed or pulled to the `master` repository then the GitHub action tests the code and if the tests pass, a new version of the package is published automatically on PyPI.
+See file in `.github/workflows/` for more information.

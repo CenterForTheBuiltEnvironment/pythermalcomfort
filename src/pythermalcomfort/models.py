@@ -152,7 +152,7 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
         )
 
     try:
-        ce = optimize.brentq(function, 0.0, 15)
+        ce = optimize.brentq(function, 0.0, 40)
     except ValueError:
         ce = 0
 
@@ -160,7 +160,9 @@ def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
 
     if ce == 0:
         warnings.warn(
-            "The cooling effect could not be calculated, assuming ce = 0", UserWarning
+            "Assuming cooling effect = 0 since it could not be calculated for this set"
+            f" of inputs {tdb=}, {tr=}, {rh=}, {vr=}, {clo=}, {met=}",
+            UserWarning,
         )
 
     if units.lower() == "ip":

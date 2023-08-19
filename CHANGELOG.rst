@@ -1,6 +1,12 @@
-
 Changelog
 =========
+
+2.8.0 (2023-07-03)
+-------------------
+
+* allowing the cooling effect to range from 0 to 40
+* fixed PHS documentation
+* improved JOS3 documentation
 
 2.7.0 (2023-02-16)
 -------------------

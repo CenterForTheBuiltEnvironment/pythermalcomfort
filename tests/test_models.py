@@ -3,6 +3,7 @@ import numpy as np
 import json
 import warnings
 import requests
+from itertools import product
 
 from pythermalcomfort.optimized_functions import pmv_ppd_optimized, utci_optimized
 from pythermalcomfort.models import (
@@ -59,6 +60,8 @@ reference_tables = json.loads(resp.text)
 # fmt: off
 data_test_set_ip = [  # I have commented the lines of code that don't pass the test
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 74.9},
+    {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 53.7},
+    {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.3},
     {'tdb': 59, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 66.5},
     {'tdb': 68, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 70.7},
     {'tdb': 86, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 79.6},
@@ -71,13 +74,13 @@ data_test_set_ip = [  # I have commented the lines of code that don't pass the t
     {'tdb': 77, 'tr': 77, 'v': 590.6 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 65.6},
     {'tdb': 77, 'tr': 50, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 59.6},
     {'tdb': 77, 'tr': 104, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 88.9},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 1, 'set': 81.0},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.4},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 2, 'set': 90.3},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 4, 'set': 99.7},
     {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 0.8, 'clo': 0.5, 'set': 73.9},
-    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.1, 'set': 69.3},
-    {'tdb': 50, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 62.3},
-    {'tdb': 32, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 1, 'clo': 0.5, 'set': 53.7},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 2, 'clo': 0.5, 'set': 78.7},
+    {'tdb': 77, 'tr': 77, 'v': 29.5 / 60, 'rh': 50, 'met': 4, 'clo': 0.5, 'set': 86.8},
     ]
 
 data_test_pmv_ip = [  # I have commented the lines of code that don't pass the test
@@ -337,20 +340,17 @@ def test_set():
 
     for row in data_test_set_ip:
         assert (
-            abs(
-                set_tmp(
-                    row["tdb"],
-                    row["tr"],
-                    row["v"],
-                    row["rh"],
-                    row["met"],
-                    row["clo"],
-                    units="IP",
-                    limit_inputs=False,
-                )
-                - row["set"]
+            set_tmp(
+                row["tdb"],
+                row["tr"],
+                row["v"],
+                row["rh"],
+                row["met"],
+                row["clo"],
+                units="IP",
+                limit_inputs=False,
             )
-            < 0.11
+            == row["set"]
         )
 
     # checking that returns np.nan when outside standard applicability limits
@@ -555,6 +555,63 @@ def test_psy_ta_rh():
 
 
 def test_cooling_effect():
+
+    t_range = np.arange(10, 40, 10)
+    rh_range = np.arange(10, 75, 25)
+    v_range = np.arange(0.1, 4, 1)
+    all_combinations = list(product(t_range, rh_range, v_range))
+    results = [
+        0,
+        8.19,
+        10.94,
+        12.54,
+        0,
+        8.05,
+        10.77,
+        12.35,
+        0,
+        7.91,
+        10.6,
+        12.16,
+        0,
+        5.04,
+        6.62,
+        7.51,
+        0,
+        4.84,
+        6.37,
+        7.24,
+        0,
+        4.64,
+        6.12,
+        6.97,
+        0,
+        3.64,
+        4.32,
+        4.69,
+        0,
+        3.55,
+        4.25,
+        4.61,
+        0,
+        3.4,
+        4.1,
+        4.46,
+    ]
+    for ix, comb in enumerate(all_combinations):
+        pytest.approx(
+            cooling_effect(
+                tdb=comb[0],
+                tr=comb[0],
+                rh=comb[1],
+                vr=comb[2],
+                met=1,
+                clo=0.5,
+            )
+            == results[ix],
+            0.1,
+        )
+
     assert (cooling_effect(tdb=25, tr=25, vr=0.05, rh=50, met=1, clo=0.6)) == 0
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 2.17
     assert (cooling_effect(tdb=27, tr=25, vr=0.5, rh=50, met=1, clo=0.6)) == 1.85
@@ -572,6 +629,9 @@ def test_cooling_effect():
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1.6, clo=0.6)) == 3.5
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=0.3)) == 2.41
     assert (cooling_effect(tdb=25, tr=25, vr=0.5, rh=60, met=1, clo=1)) == 2.05
+
+    # test what happens when the cooling effect cannot be calculated
+    assert (cooling_effect(tdb=0, tr=80, vr=5, rh=60, met=3, clo=1)) == 0
 
     assert (
         cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")

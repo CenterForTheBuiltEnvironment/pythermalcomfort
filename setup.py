@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.7.2",
+    version="2.8.1",
     license="MIT",
     description=(
         "Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET,"
@@ -86,7 +86,7 @@ setup(
         "thermal environment",
         "built environment",
     ],
-    python_requires=">=3.6.0",
+    python_requires=">=3.8.0",
     install_requires=[
         "scipy",
         "numba",
