@@ -398,6 +398,9 @@ def dry_r(hc, hr, clo):
     r_t : float or array
         Total sensible thermal resistance between skin and ambient.
     """
+    if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
+        raise ValueError("Input parameters hc and hr must be non-negative.")
+
     fcl = clo_area_factor(clo)
     r_a = 1 / (hc + hr)
     r_cl = 0.155 * clo
@@ -424,6 +427,9 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et : float or array
         Total evaporative thermal resistance.
     """
+    if (np.array(hc) < 0).any():
+        raise ValueError("Input parameters hc must be non-negative.")
+
     fcl = clo_area_factor(clo)
     r_cl = 0.155 * clo
     r_ea = 1 / (lewis_rate * hc)
@@ -809,7 +815,7 @@ def ava_blood_flow(
     bsa = _BSAst
     err_msk = np.average(err_sk, weights=bsa)
 
-    # Openbess of AVA [-]
+    # Openness of AVA [-]
     sig_ava_hand = 0.265 * (err_msk + 0.43) + 0.953 * (err_bcr + 0.1905) + 0.9126
     sig_ava_foot = 0.265 * (err_msk - 0.997) + 0.953 * (err_bcr + 0.0095) + 0.9126
 
@@ -1018,7 +1024,16 @@ def local_q_work(bmr, par):
     -------
     q_work : array
         Local thermogenesis by work [W].
+
+    Raises
+    ------
+    ValueError
+        If par is less than 1.
     """
+
+    if par < 1:
+        raise ValueError("par must be 1 or more")
+
     q_work_all = (par - 1) * bmr
 
     # Distribution coefficient of thermogenesis by work
