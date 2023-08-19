@@ -39,8 +39,6 @@ from pythermalcomfort.jos3_functions.construction import _BSAst, _to17array
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
-# Test Aki
-from pythermalcomfort.comfort_model_functions import thermal_sensation_calculator_v2
 
 
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
