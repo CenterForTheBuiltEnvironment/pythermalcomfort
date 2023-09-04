@@ -3062,13 +3062,15 @@ def pet_steady(
         lr = 16.7 * 10 ** (-1)  # [K/hPa] Lewis ratio
         he_diff = hc * lr  # diffusion coefficient of air layer
         fecl = 1 / (1 + 0.92 * hc * r_cl)  # Burton efficiency factor
-        emax = he_diff * fecl * (p_v_sk - vpa)  # maximum diffusion at skin surface
-        w = esw / emax  # skin wettedness
+        e_max = he_diff * fecl * (p_v_sk - vpa)  # maximum diffusion at skin surface
+        if e_max == 0:  # added this otherwise e_req / e_max cannot be calculated
+            e_max = 0.001
+        w = esw / e_max  # skin wettedness
         if w > 1:
             w = 1
-            delta = esw - emax
+            delta = esw - e_max
             if delta < 0:
-                esw = emax
+                esw = e_max
         if esw < 0:
             esw = 0
         # i_m= Woodcock's ratio (see above)
