@@ -3,7 +3,6 @@ import pytest
 from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import *
-from pythermalcomfort.jos3_functions.construction import _BSAst
 from pythermalcomfort.jos3_functions.matrix import *
 from pythermalcomfort.jos3_functions.thermoregulation import *
 
@@ -506,8 +505,8 @@ def test_fixed_hc():
     assert fixed_hc_values.shape == hc.shape
 
     # Check if the function returns expected values (based on the formula)
-    mean_hc = np.average(hc, weights=_BSAst)
-    mean_va = np.average(v, weights=_BSAst)
+    mean_hc = np.average(hc, weights=Default.local_bsa)
+    mean_va = np.average(v, weights=Default.local_bsa)
     mean_hc_whole = max(3, 8.600001 * (mean_va ** 0.53))
     expected_fixed_hc = hc * mean_hc_whole / mean_hc
     assert np.allclose(fixed_hc_values, expected_fixed_hc)
@@ -526,7 +525,7 @@ def test_fixed_hr():
     assert fixed_hr_values.shape == hr.shape
 
     # Check if the function returns expected values (based on the formula)
-    mean_hr = np.average(hr, weights=_BSAst)
+    mean_hr = np.average(hr, weights=Default.local_bsa)
     expected_fixed_hr = hr * 4.7 / mean_hr
     assert np.allclose(fixed_hr_values, expected_fixed_hr)
 

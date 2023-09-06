@@ -12,11 +12,24 @@ following order: "head", "neck", "chest", "back", "pelvis",
 """
 
 import numpy as np
+from dataclasses import dataclass
 from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.utilities import body_surface_area
 
-# Body surface area of the standard body [m2]
-_BSAst = np.array(
+
+# Anthropomorphic data for a default body
+@dataclass
+class Default:
+     height: float = 1.72
+     weight: float = 74.43
+     age: int = 20
+     body_fat: float = 15
+     cardiac_index: float = 2.59  # [L/min/m2]
+     sex: str = "male"
+     posture: str = "standing"
+     bmr_equation: str = "harris-benedict"
+     bsa_equation: str = "dubois"
+     local_bsa: float = np.array( # body surface area [m2]
     [
         0.110,
         0.029,
@@ -38,18 +51,11 @@ _BSAst = np.array(
     ]
 )
 
-# Anthropomorphic data for a standard body
-default_height = 1.72
-default_weight = 74.43
-default_age = 20
-default_body_fat = 15
-default_cardiac_index = 2.59 # [L/min/㎡]
-
 def validate_body_parameters(
-    height=default_height,
-    weight=default_weight,
-    age=default_age,
-    body_fat=default_body_fat
+    height=Default.height,
+    weight=Default.weight,
+    age=Default.age,
+    body_fat=Default.body_fat
 ):
     """
     Validate the parameters: height, weight, age, and body fat percentage.
@@ -122,9 +128,9 @@ def _to17array(inp):
 
 
 def bsa_rate(
-    height=default_height,
-    weight=default_weight,
-    bsa_equation="dubois",
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
 ):
     """Calculate the rate of bsa to standard body.
 
@@ -153,13 +159,13 @@ def bsa_rate(
         weight=weight,
         formula=bsa_equation,
     )
-    return bsa_all / _BSAst.sum()  # The bsa ratio to the standard body (1.87m2)
+    return bsa_all / Default.local_bsa.sum()  # The bsa ratio to the standard body (1.87m2)
 
 
 def local_bsa(
-    height=default_height,
-    weight=default_weight,
-    bsa_equation="dubois",
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
 ):
     """Calculate local body surface area (bsa) [m2].
 
@@ -192,12 +198,12 @@ def local_bsa(
         weight=weight,
         bsa_equation=bsa_equation,
     )  # The bsa ratio to the standard body (1.87m2)
-    local_bsa = _BSAst * _bsa_rate
+    local_bsa = Default.local_bsa * _bsa_rate
     return local_bsa
 
 
 def weight_rate(
-    weight=default_weight,
+    weight=Default.weight,
 ):
     """Calculate the ratio of the body weight to the standard body (74.43 kg).
 
@@ -224,15 +230,15 @@ def weight_rate(
     validate_body_parameters(
         weight=weight
     )
-    return weight / default_weight
+    return weight / Default.weight
 
 
 def bfb_rate(
-    height=default_height,
-    weight=default_weight,
-    bsa_equation="dubois",
-    age=default_age,
-    ci=default_cardiac_index,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    ci=Default.cardiac_index,
 ):
     """Calculate the ratio of basal blood flow (BFB) of the standard body (290
     L/h).
@@ -274,15 +280,15 @@ def bfb_rate(
     else:  # age >= 70
         ci *= 0.7
 
-    bfb_all = ci * bsa_rate(height, weight, bsa_equation) * _BSAst.sum()  # [L/h]
+    bfb_all = ci * bsa_rate(height, weight, bsa_equation) * Default.local_bsa.sum()  # [L/h]
     return bfb_all / 290
 
 
 def conductance(
-    height=default_height,
-    weight=default_weight,
-    bsa_equation="dubois",
-    fat=default_body_fat,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    fat=Default.body_fat,
 ):
     """Calculate thermal conductance between layers [W/K].
 
@@ -560,11 +566,11 @@ def conductance(
 
 
 def capacity(
-    height=default_height,
-    weight=default_weight,
-    bsa_equation="dubois",
-    age=default_age,
-    ci=default_cardiac_index
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    ci=Default.cardiac_index
     ):
     """Calculate the thermal capacity [J/K].
 

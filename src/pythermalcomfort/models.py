@@ -35,7 +35,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions import construction as cons
-from pythermalcomfort.jos3_functions.construction import _BSAst, _to17array
+from pythermalcomfort.jos3_functions.construction import Default, _to17array
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
@@ -3346,14 +3346,14 @@ class JOS3:
 
     def __init__(
         self,
-        height=1.72,
-        weight=74.43,
-        fat=15,
-        age=20,
-        sex="male",
-        ci=2.59,
-        bmr_equation="harris-benedict",
-        bsa_equation="dubois",
+        height=Default.height,
+        weight=Default.weight,
+        fat=Default.body_fat,
+        age=Default.age,
+        sex=Default.sex,
+        ci=Default.cardiac_index,
+        bmr_equation=Default.bmr_equation,
+        bsa_equation=Default.bsa_equation,
         ex_output=None,
     ):
         """Initialize a new instance of JOS3 class, which is designed to model
@@ -4138,7 +4138,7 @@ class JOS3:
             dict_out["t_skin_mean"] = self.t_skin_mean
             dict_out["t_skin"] = self.t_skin
             dict_out["t_core"] = self.t_core
-            dict_out["w_mean"] = np.average(wet, weights=_BSAst)
+            dict_out["w_mean"] = np.average(wet, weights=Default.local_bsa)
             dict_out["w"] = wet
             dict_out["weight_loss_by_evap_and_res"] = wlesk.sum() + wleres
             dict_out["cardiac_output"] = co
@@ -4549,12 +4549,12 @@ class JOS3:
     def w_mean(self):
         """w_mean : float Mean skin wettedness of the whole body [-]."""
         wet = self.w
-        return np.average(wet, weights=_BSAst)
+        return np.average(wet, weights=Default.local_bsa)
 
     @property
     def t_skin_mean(self):
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
-        return np.average(self._bodytemp[INDEX["skin"]], weights=_BSAst)
+        return np.average(self._bodytemp[INDEX["skin"]], weights=Default.local_bsa)
 
     @property
     def t_skin(self):
