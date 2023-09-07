@@ -3726,9 +3726,10 @@ class JOS3:
         return to
 
     def _reset_setpt(self, par: float = 1.25):
-        """Reset set-point temperature under steady state calculation. Be
-        careful, input parameters (tdb, tr, rh, v, clo, par) and body
-        temperatures are also reset.
+        """Reset set-point temperatures under steady state calculation.
+        Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state (similar to room set-point temperature for air conditioning).
+        This function is used during initialization to calculate the set-point temperatures as a reference for thermoregulation.
+        Be careful, input parameters (tdb, tr, rh, v, clo, par) and body temperatures are also reset.
 
         Returns
         -------
