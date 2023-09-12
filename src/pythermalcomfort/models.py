@@ -3688,7 +3688,7 @@ class JOS3:
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
-        dictout = self._reset_setpt(par=self.par)
+        dictout = self._reset_setpt(par= 1.25)
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(
@@ -3727,7 +3727,8 @@ class JOS3:
 
     def _reset_setpt(self, par: float = 1.25):
         """Reset set-point temperatures under steady state calculation.
-        Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state (similar to room set-point temperature for air conditioning).
+        Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
+        when at rest (similar to room set-point temperature for air conditioning).
         This function is used during initialization to calculate the set-point temperatures as a reference for thermoregulation.
         Be careful, input parameters (tdb, tr, rh, v, clo, par) and body temperatures are also reset.
 
@@ -4114,7 +4115,7 @@ class JOS3:
         arr_q /= self._cap  # Change unit [W]/[J/K] to [K/sec]
         arr_q *= dtime  # Change unit [K/sec] to [K]
 
-        # Boundary batrix [℃]
+        # Boundary batrix [°C]
         arr_to = np.zeros(NUM_NODES)
         arr_to[INDEX["skin"]] += to
 
