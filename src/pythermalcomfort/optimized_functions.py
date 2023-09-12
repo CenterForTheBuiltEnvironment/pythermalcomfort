@@ -177,6 +177,8 @@ def two_nodes_optimized(
         e_max = (math.exp(18.6686 - 4030.183 / (t_skin + 235.0)) - vapor_pressure) / (
             r_ea + r_ecl
         )
+        if e_max == 0:  # added this otherwise e_rsw / e_max cannot be calculated
+            e_max = 0.001
         p_rsw = e_rsw / e_max  # ratio heat loss sweating to max heat loss sweating
         w = 0.06 + 0.94 * p_rsw  # skin wetness
         e_diff = w * e_max - e_rsw  # vapor diffusion through skin
@@ -1019,6 +1021,8 @@ def phs_optimized(*args):
         radiation = fcl * h_r * (t_cl - tr)
         # maximum evaporative heat flow at the skin surface [W/m2]
         e_max = (p_sk - p_a) / r_t_dyn
+        if e_max == 0:  # added this otherwise e_req / e_max cannot be calculated
+            e_max = 0.001
         # required evaporative heat flow [W/m2]
         e_req = met - d_stored_eq - wme - c_res - e_res - convection - radiation
         # required skin wettedness
