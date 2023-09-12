@@ -1,4 +1,6 @@
 import numpy as np
+import os
+import pandas as pd
 import pytest
 from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
 from pythermalcomfort.jos3_functions import construction
@@ -9,75 +11,92 @@ from pythermalcomfort.jos3_functions.thermoregulation import *
 
 """test JOS-3 class"""
 def test_JOS3_class():
-    # Test 1: Check the initialization of the JOS3 class
-    # Instantiate the JOS3 class
+    # Test for the initialization of JOS3 class
+    # Instantiate JOS3 class
     model = JOS3()
     # Check if the object is of type JOS3
     assert isinstance(model, JOS3)
 
-
-    # Test 2: Check the methods
+    # Test for the methods of JOS3 class
     # Instantiate the JOS3 class
     model = JOS3()
 
     # Call the simulate method
     model.simulate(times=60)
 
-    # Test 2.1: _calculate_operative_temp_when_pmv_is_zero()
+    # Test: _calculate_operative_temp_when_pmv_is_zero()
     to_neutral = model._calculate_operative_temp_when_pmv_is_zero()
     expected_result = 28.8
     assert to_neutral == pytest.approx(expected_result, rel=1e-3)
 
-    # Test 2.2 _reset_setpt()
-    # Call the _reset_setpt method
-    # Replace '...' with actual arguments required by the _reset_setpt method
-    par = 1.2
-    result = model._reset_setpt(par=par)
-
+    # Test: _reset_setpt()
+    result = model._reset_setpt()
     # Check if the _reset_setpt method returns the expected type (e.g., dict)
     assert isinstance(result, dict)
-
     # Check if the result contains specific keys (e.g., 't_core', 't_skin')
     assert 't_core' in result
     assert 't_skin' in result
-
     # Check if the attributes of the JOS3 object have been updated as expected
     assert model.to is not None
     assert np.all(model.rh == 50)
     assert np.all(model.v == 0.1)
     assert np.all(model.clo == 0)
-    assert model.par == par
-
+    assert model.par == 1.25
     # Check if the new set-point temperatures for core and skin have been set
     assert np.all(model.setpt_cr == model.t_core)
     assert np.all(model.setpt_sk == model.t_skin)
 
-    # Test 2.3 simulate()
-    result = model.dict_results()
+    # Test: simulate()
+    model = JOS3(height=1.7, weight=60, age=30)
+    # Set the first phase
+    model.to = 28  # Operative temperature [°C]
+    model.rh = 40  # Relative humidity [%]
+    model.v = 0.2  # Air velocity [m/s]
+    model.par = 1.2  # Physical activity ratio [-]
+    model.simulate(60)  # Exposure time = 60 [min]
+
+    # Set the next condition (You only need to change the parameters that you want to change)
+    model.to = 20  # Change only operative temperature
+    model.simulate(60)  # Additional exposure time = 60 [min]
+
+    # Define output dictionary
+    dict_output = model.dict_results()
+
+    # Results to compare (example data in csv file)
+    # Get the absolute path of the current script
+    current_script_path = os.path.abspath(__file__)
+    # Get the project directory by going up two levels from the current script path
+    project_directory = os.path.dirname(os.path.dirname(current_script_path))
+    # Specify the relative path to the CSV file
+    relative_path = 'examples\\jos3_output_example\\jos3_example1 (default output).csv'
+    # Generate the absolute path by combining the project directory and the relative path
+    file_path = os.path.join(project_directory, relative_path)
+
+    # Read the 't_skin_mean' column from the CSV file into a DataFrame
+    df_t_skin_mean = pd.read_csv(file_path, usecols=['t_skin_mean'])
+    # Drop the first 2 rows and convert the remaining rows into a Series
+    ser_t_skin_mean = df_t_skin_mean['t_skin_mean'].iloc[2:]
+
+    # Convert the Series to a list and make it float data
+    t_skin_mean_values = ser_t_skin_mean.tolist()
+    t_skin_mean_values_float = [float(x) for x in t_skin_mean_values]
 
     # Check if the simulate method returns the expected type (e.g., dict)
-    assert isinstance(result, dict)
+    assert isinstance(dict_output, dict)
+    assert dict_output["t_skin_mean"]==t_skin_mean_values_float
 
-    # Check if the result contains a specific key (e.g., 't_core_head')
-    assert 't_core_head' in result
-    assert 't_skin_chest' in result
-
-    # Test 2.4 _run()
+    # Test: _run()
     # Call the _run method
-    # Replace '...' with actual arguments required by the _run method
     model._run(dtime=60000, passive=True)
     result = model.dict_results()
-
     # Check if the _run method returns the expected type (e.g., dict)
     assert isinstance(result, dict)
 
-    # Test 3: Check property
+    # Test: Check property
     # Instantiate the JOS3 class
     model = JOS3()
-
     # Access the t_core property
     t_core = model.t_core
-
     # Check if t_core is of the expected type (e.g., numpy.ndarray)
     assert isinstance(t_core, np.ndarray)
 
