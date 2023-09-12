@@ -170,7 +170,7 @@ exp_dataset_path = os.path.join(jos3_example_directory, exp_dataset_name)
 exp_dataset = {}
 
 # List of sheet names and their respective header row indices to be read
-sheet_names = [("Werner1980", 0), ("Stolwijk1966", 0)]
+sheet_names = [("Stolwijk1966", 0), ("Werner1980", 0)]
 
 try:
     # Loop through each sheet name and read the data into a DataFrame
@@ -184,7 +184,7 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 # Concatenate all the individual data frames into a single DataFrame
-sim_dataset = {}  # Assuming simdataset is your final container
+sim_dataset = {}
 
 def sim_stolwijk_hardy(models, tolist, rhlist):
     result = []
