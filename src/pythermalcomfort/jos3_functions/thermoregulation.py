@@ -389,7 +389,12 @@ def dry_r(hc, hr, clo):
     return r_t
 
 
-def wet_r(hc, clo, i_clo=Default.clothing_vapor_permeation_efficiency, lewis_rate=Default.lewis_rate):
+def wet_r(
+    hc,
+    clo,
+    i_clo=Default.clothing_vapor_permeation_efficiency,
+    lewis_rate=Default.lewis_rate,
+):
     """Calculate total evaporative thermal resistance (between the skin and ambient air).
 
     Parameters

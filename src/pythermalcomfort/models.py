@@ -3693,7 +3693,11 @@ class JOS3:
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(
-        self, va=Default.air_speed, rh=Default.relative_humidity, met=Default.metabolic_rate, clo=Default.clothing_insulation
+        self,
+        va=Default.air_speed,
+        rh=Default.relative_humidity,
+        met=Default.metabolic_rate,
+        clo=Default.clothing_insulation,
     ) -> float:
         """Calculate operative temperature [°C] when PMV=0.
 

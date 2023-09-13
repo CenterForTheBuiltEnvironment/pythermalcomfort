@@ -17,8 +17,6 @@ from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.utilities import body_surface_area
 
 
-
-
 def validate_body_parameters(
     height=Default.height,
     weight=Default.weight,
