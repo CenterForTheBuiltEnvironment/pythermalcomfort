@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""This code defines a dictionary called ALL_OUT_PARAMS that contains
+"""This code defines a dataclass for default input and a dictionary called ALL_OUT_PARAMS that contains
 information about various output parameters related to human body properties,
 heat exchange, and environmental conditions.
 
@@ -13,6 +13,59 @@ It sorts the parameters alphabetically by key and formats each line with the par
 The resulting documentation string can be displayed or printed for user reference.
 """
 import textwrap
+from dataclasses import dataclass
+import numpy as np
+
+
+@dataclass
+class Default:
+    # Body information
+    height: float = 1.72 # [m]
+    weight: float = 74.43 # [kg]
+    age: int = 20 # [-]
+    body_fat: float = 15 # [%]
+    cardiac_index: float = 2.59  # [L/min/m2]
+    blood_flow_rate: int = 290  # [L/h]
+    physical_activity_ratio: float = 1.25 # [-]
+    metabolic_rate: float = 1.0 # [met]
+    sex: str = "male"
+    posture: str = "standing"
+    bmr_equation: str = "harris-benedict"
+    bsa_equation: str = "dubois"
+    local_bsa: np.ndarray = np.array(  # body surface area [m2]
+        [
+            0.110,
+            0.029,
+            0.175,
+            0.161,
+            0.221,
+            0.096,
+            0.063,
+            0.050,
+            0.096,
+            0.063,
+            0.050,
+            0.209,
+            0.112,
+            0.056,
+            0.209,
+            0.112,
+            0.056,
+        ]
+    )
+    # Environment information
+    core_temperature: float = 37 # [°C]
+    skin_temperature: float = 34 # [°C]
+    other_body_temperature: float = 36 # [°C]
+    dry_bulb_air_temperature: float = 28.8 # [°C]
+    mean_radiant_temperature: float = 28.8 # [°C]
+    relative_humidity: float = 50 # [%]
+    air_speed: float = 0.1 # [m/s]
+    # Clothing information
+    clothing_insulation: float = 0 # [clo]
+    clothing_vapor_permeation_efficiency: float = 0.45 # [-]
+    lewis_rate = 16.5  # [K/kPa]
+
 
 ALL_OUT_PARAMS = {
     "age": {"ex_output": True, "meaning": "age", "suffix": None, "unit": "years"},
@@ -141,9 +194,7 @@ ALL_OUT_PARAMS = {
     },
     "q_nst": {
         "ex_output": True,
-        "meaning": (
-            "core thermogenesis by non-shivering (each body part)"
-        ),
+        "meaning": ("core thermogenesis by non-shivering (each body part)"),
         "suffix": "Body name",
         "unit": "W",
     },
@@ -155,9 +206,7 @@ ALL_OUT_PARAMS = {
     },
     "q_shiv": {
         "ex_output": True,
-        "meaning": (
-            "core or muscle thermogenesis by shivering (each body part)"
-        ),
+        "meaning": ("core or muscle thermogenesis by shivering (each body part)"),
         "suffix": "Body name",
         "unit": "W",
     },
