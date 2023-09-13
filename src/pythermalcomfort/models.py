@@ -3646,22 +3646,22 @@ class JOS3:
         self._cap = cons.capacity(height, weight, bsa_equation, age, ci)
 
         # Set initial core and skin temperature set points [°C]
-        self.setpt_cr = np.ones(17) * 37  # core
-        self.setpt_sk = np.ones(17) * 34  # skin
+        self.setpt_cr = np.ones(17) * Default.core_temperature
+        self.setpt_sk = np.ones(17) * Default.skin_temperature
 
         # Initialize body temperature [°C]
-        self._bodytemp = np.ones(NUM_NODES) * 36
+        self._bodytemp = np.ones(NUM_NODES) * Default.other_body_temperature
 
         # Initialize environmental conditions and other factors
         # (Default values of input conditions)
-        self._ta = np.ones(17) * 28.8  # Air temperature [°C]
-        self._tr = np.ones(17) * 28.8  # Radiant temperature [°C]
-        self._rh = np.ones(17) * 50  # Relative humidity [%]
-        self._va = np.ones(17) * 0.1  # Air velocity [m/s]
-        self._clo = np.zeros(17)  # Clothing insulation
-        self._iclo = np.ones(17) * 0.45  # Clothing vapor permeation efficiency [-]
-        self._par = 1.25  # Physical activity ratio [-]
-        self._posture = "standing"  # Body posture [-]
+        self._ta = np.ones(17) * Default.dry_bulb_air_temperature
+        self._tr = np.ones(17) * Default.mean_radiant_temperature
+        self._rh = np.ones(17) * Default.relative_humidity
+        self._va = np.ones(17) * Default.air_speed
+        self._clo = np.ones(17) * Default.clothing_insulation
+        self._iclo = np.ones(17) * Default.clothing_vapor_permeation_efficiency
+        self._par = Default.physical_activity_ratio
+        self._posture = Default.posture
         self._hc = None  # Convective heat transfer coefficient
         self._hr = None  # Radiative heat transfer coefficient
         self.ex_q = np.zeros(NUM_NODES)  # External heat gain
@@ -3689,11 +3689,11 @@ class JOS3:
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
-        dictout = self._reset_setpt(par=1.25)
+        dictout = self._reset_setpt(par=Default.physical_activity_ratio)
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(
-        self, va: float = 0.1, rh: float = 50, met: float = 1, clo: float = 0
+        self, va=Default.air_speed, rh=Default.relative_humidity, met=Default.metabolic_rate, clo=Default.clothing_insulation
     ) -> float:
         """Calculate operative temperature [°C] when PMV=0.
 
@@ -3726,7 +3726,7 @@ class JOS3:
                 to = to - vpmv / 3
         return to
 
-    def _reset_setpt(self, par: float = 1.25):
+    def _reset_setpt(self, par=Default.physical_activity_ratio):
         """Reset set-point temperatures under steady state calculation.
         Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
         when at rest (similar to room set-point temperature for air conditioning).
@@ -3743,9 +3743,9 @@ class JOS3:
         # 1 met = 58.15 W/m2
         met = self.bmr * par / 58.15  # [met]
         self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
-        self.rh = 50  # Relative humidity
-        self.v = 0.1  # Air velocity
-        self.clo = 0  # Clothing insulation
+        self.rh = Default.relative_humidity
+        self.v = Default.air_speed
+        self.clo = Default.clothing_insulation
         self.par = par  # Physical activity ratio
 
         # Steady-calculation

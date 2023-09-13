@@ -20,9 +20,9 @@ from pythermalcomfort.jos3_functions.parameters import Default
 
 def conv_coef(
     posture=Default.posture,
-    v=0.1,
-    tdb=28.8,
-    t_skin=34.0,
+    v=Default.air_speed,
+    tdb=Default.dry_bulb_air_temperature,
+    t_skin=Default.skin_temperature,
 ):
     """Calculate convective heat transfer coefficient (hc) [W/(m2*K)]
 
@@ -389,7 +389,7 @@ def dry_r(hc, hr, clo):
     return r_t
 
 
-def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
+def wet_r(hc, clo, i_clo=Default.clothing_vapor_permeation_efficiency, lewis_rate=Default.lewis_rate):
     """Calculate total evaporative thermal resistance (between the skin and ambient air).
 
     Parameters
