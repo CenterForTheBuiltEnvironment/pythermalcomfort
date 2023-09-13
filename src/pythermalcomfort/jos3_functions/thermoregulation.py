@@ -15,36 +15,14 @@ import math
 
 from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.jos3_functions import construction as cons
-
-
-_BSAst = np.array(
-    [
-        0.110,
-        0.029,
-        0.175,
-        0.161,
-        0.221,
-        0.096,
-        0.063,
-        0.050,
-        0.096,
-        0.063,
-        0.050,
-        0.209,
-        0.112,
-        0.056,
-        0.209,
-        0.112,
-        0.056,
-    ]
-)
+from pythermalcomfort.jos3_functions.parameters import Default
 
 
 def conv_coef(
-    posture="standing",
-    v=0.1,
-    tdb=28.8,
-    t_skin=34.0,
+    posture=Default.posture,
+    v=Default.air_speed,
+    tdb=Default.dry_bulb_air_temperature,
+    t_skin=Default.skin_temperature,
 ):
     """Calculate convective heat transfer coefficient (hc) [W/(m2*K)]
 
@@ -170,7 +148,9 @@ def conv_coef(
             hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
         else:
             valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
-            raise ValueError(f"Invalid posture: '{posture}'. Must be one of {valid_postures}")
+            raise ValueError(
+                f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
+            )
         return hc_natural
 
     # Forced convection
@@ -233,7 +213,8 @@ def conv_coef(
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
 
-def rad_coef(posture="standing"):
+
+def rad_coef(posture=Default.posture):
     """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
 
     Parameters
@@ -327,8 +308,8 @@ def rad_coef(posture="standing"):
 
 def fixed_hc(hc, v):
     """Fixes hc values to fit two-node-model's values."""
-    mean_hc = np.average(hc, weights=_BSAst)
-    mean_va = np.average(v, weights=_BSAst)
+    mean_hc = np.average(hc, weights=cons.Default.local_bsa)
+    mean_va = np.average(v, weights=cons.Default.local_bsa)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
     _fixed_hc = hc * mean_hc_whole / mean_hc
     return _fixed_hc
@@ -336,7 +317,7 @@ def fixed_hc(hc, v):
 
 def fixed_hr(hr):
     """Fixes hr values to fit two-node-model's values."""
-    mean_hr = np.average(hr, weights=_BSAst)
+    mean_hr = np.average(hr, weights=cons.Default.local_bsa)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
 
@@ -398,6 +379,9 @@ def dry_r(hc, hr, clo):
     r_t : float or array
         Total sensible thermal resistance between skin and ambient.
     """
+    if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
+        raise ValueError("Input parameters hc and hr must be non-negative.")
+
     fcl = clo_area_factor(clo)
     r_a = 1 / (hc + hr)
     r_cl = 0.155 * clo
@@ -405,7 +389,12 @@ def dry_r(hc, hr, clo):
     return r_t
 
 
-def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
+def wet_r(
+    hc,
+    clo,
+    i_clo=Default.clothing_vapor_permeation_efficiency,
+    lewis_rate=Default.lewis_rate,
+):
     """Calculate total evaporative thermal resistance (between the skin and ambient air).
 
     Parameters
@@ -424,12 +413,16 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et : float or array
         Total evaporative thermal resistance.
     """
+    if (np.array(hc) < 0).any():
+        raise ValueError("Input parameters hc must be non-negative.")
+
     fcl = clo_area_factor(clo)
     r_cl = 0.155 * clo
     r_ea = 1 / (lewis_rate * hc)
     r_ecl = r_cl / (lewis_rate * i_clo)
     r_et = r_ea / fcl + r_ecl
     return r_et
+
 
 def error_signals(err_sk=0.0):
     """Calculate WRMS and CLDS signals of thermoregulation.
@@ -499,10 +492,10 @@ def evaporation(
     tdb,
     rh,
     ret,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
 ):
     """Calculate evaporative heat loss.
 
@@ -548,11 +541,14 @@ def evaporation(
         weight,
         bsa_equation,
     )  # bsa rate
-    bsa = _BSAst * bsar  # bsa
+    bsa = Default.local_bsa * bsar  # bsa
     p_a = antoine(tdb) * rh / 100  # Saturated vapor pressure of ambient [kPa]
     p_sk_s = antoine(t_skin)  # Saturated vapor pressure at the skin [kPa]
 
     e_max = (p_sk_s - p_a) / ret * bsa  # Maximum evaporative heat loss
+
+    # Replace any zero values in the e_max array with 0.001 to avoid causing a divide by 0 error
+    e_max = np.where(e_max == 0, 0.001, e_max)
 
     # SKINS
     skin_sweat = np.array(
@@ -606,7 +602,6 @@ def evaporation(
                 0.40,
             ]
         )
-
     e_sweat = skin_sweat * sig_sweat * sd_sweat * 2 ** (err_sk / 10)
     wet = 0.06 + 0.94 * (e_sweat / e_max)
     wet = np.minimum(wet, 1)  # Wettedness' upper limit
@@ -618,11 +613,11 @@ def evaporation(
 def skin_blood_flow(
     err_cr,
     err_sk,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
-    ci=2.59,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    ci=Default.cardiac_index,
 ):
     """Calculate skin blood flow rate (bf_skin) [L/h].
 
@@ -772,11 +767,11 @@ def skin_blood_flow(
 def ava_blood_flow(
     err_cr,
     err_sk,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
-    ci=2.59,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    ci=Default.cardiac_index,
 ):
     """Calculate areteriovenous anastmoses (AVA) blood flow rate [L/h] based on
     Takemori's model, 1995.
@@ -803,16 +798,16 @@ def ava_blood_flow(
         AVA blood flow rate at hand and foot [L/h].
     """
     # Cal. mean error body core temp.
-    cap_bcr = [10.2975, 9.3935, 13.834]  # Thermal capacity at chest, back and pelvis
+    cap_bcr = [10.2975, 9.3935, 4.488]  # Thermal capacity at chest, back and pelvis
     err_bcr = np.average(err_cr[2:5], weights=cap_bcr)
 
     # Cal. mean error skin temp.
-    bsa = _BSAst
+    bsa = cons.Default.local_bsa
     err_msk = np.average(err_sk, weights=bsa)
 
-    # Openbess of AVA [-]
-    sig_ava_hand = 0.265 * (err_bcr + 0.43) + 0.953 * (err_msk + 0.1905) + 0.9126
-    sig_ava_foot = 0.265 * (err_bcr - 0.97) + 0.953 * (err_msk - 0.0095) + 0.9126
+    # Openness of AVA [-]
+    sig_ava_hand = 0.265 * (err_msk + 0.43) + 0.953 * (err_bcr + 0.1905) + 0.9126
+    sig_ava_foot = 0.265 * (err_msk - 0.997) + 0.953 * (err_bcr + 0.0095) + 0.9126
 
     sig_ava_hand = min(sig_ava_hand, 1)
     sig_ava_hand = max(sig_ava_hand, 0)
@@ -834,7 +829,11 @@ def ava_blood_flow(
 
 
 def basal_met(
-    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
+    height=Default.height,
+    weight=Default.weight,
+    age=Default.age,
+    sex=Default.sex,
+    bmr_equation=Default.bmr_equation,
 ):
     """Calculate basal metabolic rate [W].
 
@@ -877,7 +876,12 @@ def basal_met(
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
         bmr *= 1000 / 4.186
     else:
-        valid_equations = ["harris-benedict", "harris-benedict_origin", "japanese", "ganpule"]
+        valid_equations = [
+            "harris-benedict",
+            "harris-benedict_origin",
+            "japanese",
+            "ganpule",
+        ]
         raise ValueError(
             f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}"
         )
@@ -888,7 +892,11 @@ def basal_met(
 
 
 def local_mbase(
-    height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
+    height=Default.height,
+    weight=Default.weight,
+    age=Default.age,
+    sex=Default.sex,
+    bmr_equation=Default.bmr_equation,
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -1019,7 +1027,16 @@ def local_q_work(bmr, par):
     -------
     q_work : array
         Local thermogenesis by work [W].
+
+    Raises
+    ------
+    ValueError
+        If par is less than 1.
     """
+
+    if par < 1:
+        raise ValueError("par must be 1 or more")
+
     q_work_all = (par - 1) * bmr
 
     # Distribution coefficient of thermogenesis by work
@@ -1056,11 +1073,11 @@ def shivering(
     err_sk,
     t_core,
     t_skin,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
-    sex="male",
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    sex=Default.sex,
     dtime=60,
     options={},
 ):
@@ -1124,7 +1141,7 @@ def shivering(
         if options["shivering_threshold"]:
             # Asaka, 2016
             # Threshold of starting shivering
-            tskm = np.average(t_skin, weights=_BSAst)  # Mean skin temp.
+            tskm = np.average(t_skin, weights=cons.Default.local_bsa)  # Mean skin temp.
             if tskm < 31:
                 thres = 36.6
             else:
@@ -1173,12 +1190,13 @@ def shivering(
     q_shiv = shivf * bsar * sd_shiv * sig_shiv
     return q_shiv
 
+
 def nonshivering(
     err_sk,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
     cold_acclimation=False,
     batpositive=True,
 ):
@@ -1231,13 +1249,13 @@ def nonshivering(
 
     if not batpositive:
         # incidence age factor: T.Yoneshiro 2011
-        if age < 30: # age = 20s or younger
+        if age < 30:  # age = 20s or younger
             bat *= 44 / 83
-        elif age < 40: # age = 30s
+        elif age < 40:  # age = 30s
             bat *= 15 / 38
-        elif age < 50: # age = 40s
+        elif age < 50:  # age = 40s
             bat *= 7 / 26
-        elif age < 60: # age = 50s
+        elif age < 60:  # age = 50s
             bat *= 1 / 8
         else:  # age > 60
             bat *= 0
@@ -1311,17 +1329,22 @@ def sum_m(mbase, q_work, q_shiv, q_nst):
         else:
             q_thermogenesis_core[i] += q_work[i] + q_shiv[i]
     q_thermogenesis_core += q_nst  # Non-shivering thermogenesis occurs in core layers
-    return q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin
+    return (
+        q_thermogenesis_core,
+        q_thermogenesis_muscle,
+        q_thermogenesis_fat,
+        q_thermogenesis_skin,
+    )
 
 
 def cr_ms_fat_blood_flow(
     q_work,
     q_shiv,
-    height=1.72,
-    weight=74.43,
-    bsa_equation="dubois",
-    age=20,
-    ci=2.59,
+    height=Default.height,
+    weight=Default.weight,
+    bsa_equation=Default.bsa_equation,
+    age=Default.age,
+    ci=Default.cardiac_index,
 ):
     """Calculate core, muscle and fat blood flow rate [L/h].
 
