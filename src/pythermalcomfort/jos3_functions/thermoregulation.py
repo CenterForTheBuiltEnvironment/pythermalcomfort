@@ -17,6 +17,7 @@ from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.construction import Default
 
+
 def conv_coef(
     posture=Default.posture,
     v=0.1,
@@ -147,7 +148,9 @@ def conv_coef(
             hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
         else:
             valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
-            raise ValueError(f"Invalid posture: '{posture}'. Must be one of {valid_postures}")
+            raise ValueError(
+                f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
+            )
         return hc_natural
 
     # Forced convection
@@ -209,6 +212,7 @@ def conv_coef(
     # if it is greater than 0.2 m/s, it is considered forced convection.
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
+
 
 def rad_coef(posture=Default.posture):
     """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
@@ -414,6 +418,7 @@ def wet_r(hc, clo, i_clo=0.45, lewis_rate=16.5):
     r_et = r_ea / fcl + r_ecl
     return r_et
 
+
 def error_signals(err_sk=0.0):
     """Calculate WRMS and CLDS signals of thermoregulation.
 
@@ -539,7 +544,6 @@ def evaporation(
 
     # Replace any zero values in the e_max array with 0.001 to avoid causing a divide by 0 error
     e_max[e_max == 0] = 0.001
-
 
     # SKINS
     skin_sweat = np.array(
@@ -824,7 +828,7 @@ def basal_met(
     weight=Default.weight,
     age=Default.age,
     sex=Default.sex,
-    bmr_equation=Default.bmr_equation
+    bmr_equation=Default.bmr_equation,
 ):
     """Calculate basal metabolic rate [W].
 
@@ -867,7 +871,12 @@ def basal_met(
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
         bmr *= 1000 / 4.186
     else:
-        valid_equations = ["harris-benedict", "harris-benedict_origin", "japanese", "ganpule"]
+        valid_equations = [
+            "harris-benedict",
+            "harris-benedict_origin",
+            "japanese",
+            "ganpule",
+        ]
         raise ValueError(
             f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}"
         )
@@ -882,7 +891,7 @@ def local_mbase(
     weight=Default.weight,
     age=Default.age,
     sex=Default.sex,
-    bmr_equation=Default.bmr_equation
+    bmr_equation=Default.bmr_equation,
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -1176,6 +1185,7 @@ def shivering(
     q_shiv = shivf * bsar * sd_shiv * sig_shiv
     return q_shiv
 
+
 def nonshivering(
     err_sk,
     height=Default.height,
@@ -1234,13 +1244,13 @@ def nonshivering(
 
     if not batpositive:
         # incidence age factor: T.Yoneshiro 2011
-        if age < 30: # age = 20s or younger
+        if age < 30:  # age = 20s or younger
             bat *= 44 / 83
-        elif age < 40: # age = 30s
+        elif age < 40:  # age = 30s
             bat *= 15 / 38
-        elif age < 50: # age = 40s
+        elif age < 50:  # age = 40s
             bat *= 7 / 26
-        elif age < 60: # age = 50s
+        elif age < 60:  # age = 50s
             bat *= 1 / 8
         else:  # age > 60
             bat *= 0
@@ -1314,7 +1324,12 @@ def sum_m(mbase, q_work, q_shiv, q_nst):
         else:
             q_thermogenesis_core[i] += q_work[i] + q_shiv[i]
     q_thermogenesis_core += q_nst  # Non-shivering thermogenesis occurs in core layers
-    return q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin
+    return (
+        q_thermogenesis_core,
+        q_thermogenesis_muscle,
+        q_thermogenesis_fat,
+        q_thermogenesis_skin,
+    )
 
 
 def cr_ms_fat_blood_flow(

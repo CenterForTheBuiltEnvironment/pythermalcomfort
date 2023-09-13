@@ -141,9 +141,7 @@ ALL_OUT_PARAMS = {
     },
     "q_nst": {
         "ex_output": True,
-        "meaning": (
-            "core thermogenesis by non-shivering (each body part)"
-        ),
+        "meaning": ("core thermogenesis by non-shivering (each body part)"),
         "suffix": "Body name",
         "unit": "W",
     },
@@ -155,9 +153,7 @@ ALL_OUT_PARAMS = {
     },
     "q_shiv": {
         "ex_output": True,
-        "meaning": (
-            "core or muscle thermogenesis by shivering (each body part)"
-        ),
+        "meaning": ("core or muscle thermogenesis by shivering (each body part)"),
         "suffix": "Body name",
         "unit": "W",
     },

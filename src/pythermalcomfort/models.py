@@ -40,7 +40,6 @@ from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
 
-
 def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
@@ -3690,7 +3689,7 @@ class JOS3:
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
-        dictout = self._reset_setpt(par= 1.25)
+        dictout = self._reset_setpt(par=1.25)
         self._history.append(dictout)
 
     def _calculate_operative_temp_when_pmv_is_zero(

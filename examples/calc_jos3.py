@@ -175,7 +175,9 @@ sheet_names = [("Stolwijk1966", 0), ("Werner1980", 0)]
 try:
     # Loop through each sheet name and read the data into a DataFrame
     for sheet_name, header in sheet_names:
-        exp_dataset[sheet_name] = pd.read_excel(exp_dataset_path, header=header, sheet_name=sheet_name)
+        exp_dataset[sheet_name] = pd.read_excel(
+            exp_dataset_path, header=header, sheet_name=sheet_name
+        )
 # Handle the case where the file is not found
 except FileNotFoundError:
     print(f"File {exp_dataset_path} not found.")
@@ -186,14 +188,31 @@ except Exception as e:
 # Concatenate all the individual data frames into a single DataFrame
 sim_dataset = {}
 
+
 def sim_stolwijk_hardy(models, tolist, rhlist):
     result = []
     for model in models:
-        model.icl = np.array([
-                    0, 0, 0, 0.3, 0.3,
-                    0, 0, 0, 0, 0, 0,
-                    0.3, 0.3, 0, 0.3, 0.3, 0,
-                    ])
+        model.icl = np.array(
+            [
+                0,
+                0,
+                0,
+                0.3,
+                0.3,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.3,
+                0.3,
+                0,
+                0.3,
+                0.3,
+                0,
+            ]
+        )
         model.par = 1.2
         model.posture = "sitting"
         # model.options["nonshivering_thermogenesis"] = True
@@ -217,7 +236,10 @@ def sim_stolwijk_hardy(models, tolist, rhlist):
         model.simulate(60)
 
         sim = pd.DataFrame(model.dict_results())
-        sim = sim.loc[10:, "t_skin_mean":,]
+        sim = sim.loc[
+            10:,
+            "t_skin_mean":,
+        ]
         result.append(sim.copy())
 
     avgsim = (result[0] + result[1] + result[2]) / 3
@@ -227,28 +249,47 @@ def sim_stolwijk_hardy(models, tolist, rhlist):
 
     return avgsim.copy()
 
+
 simdatas = {}
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # A : Stolwijk and Hardy, 1966
 # J.A.J. Stolwijk, J.D. Hardy, Partitional calorimetric studies of responses of man
 # to thermal transients, J. Appl. Physiol. 21 (3) (1966) 967–977,
 # https://doi.org/10.1152/jappl.1966.21.6.1799.
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 dnames = ["A-FIG.4", "A-FIG.5", "A-FIG.6", "A-FIG.7"]
 
 inputcons = {
-        "A-FIG.4": {"to": [28.0, 27.8, 33.3, 28.0], "rh": [40, 37, 34, 37]},
-        "A-FIG.5": {"to": [28.0, 28.5, 37.5, 28.5], "rh": [40, 40, 34, 41]},
-        "A-FIG.6": {"to": [28.0, 28.0, 42.5, 28.1], "rh": [40, 37, 34, 37]},
-        "A-FIG.7": {"to": [28.0, 28.1, 47.8, 28.3], "rh": [40, 43, 27, 44]},
-        }
+    "A-FIG.4": {"to": [28.0, 27.8, 33.3, 28.0], "rh": [40, 37, 34, 37]},
+    "A-FIG.5": {"to": [28.0, 28.5, 37.5, 28.5], "rh": [40, 40, 34, 41]},
+    "A-FIG.6": {"to": [28.0, 28.0, 42.5, 28.1], "rh": [40, 37, 34, 37]},
+    "A-FIG.7": {"to": [28.0, 28.1, 47.8, 28.3], "rh": [40, 43, 27, 44]},
+}
 
 for d in dnames:
     models = []
-    models.append(JOS3(height=1.95, weight=88.6, age=25,))
-    models.append(JOS3(height=1.84, weight=76.1, age=22,))
-    models.append(JOS3(height=1.75, weight=110, age=23,))
+    models.append(
+        JOS3(
+            height=1.95,
+            weight=88.6,
+            age=25,
+        )
+    )
+    models.append(
+        JOS3(
+            height=1.84,
+            weight=76.1,
+            age=22,
+        )
+    )
+    models.append(
+        JOS3(
+            height=1.75,
+            weight=110,
+            age=23,
+        )
+    )
 
     tolist = inputcons[d]["to"]
     rhlist = inputcons[d]["rh"]
@@ -257,27 +298,45 @@ for d in dnames:
 
     simdatas[d] = output
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # B : Stolwijk and Hardy, 1966
 #  J.D. Hardy, J.A.J. Stolwjk, Partitional exposures calorimetric studies of man
 # during exposures to thermal transients, J. Appl. Physiol. 21 (1966) 1799–1806,
 # https://doi.org/10.1152/jappl.1966.21.6.1799.
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 dnames = ["B-FIG.1", "B-FIG.2", "B-FIG.3", "B-FIG.4", "B-FIG.5"]
 
 inputcons = {
-        "B-FIG.1": {"to": [28.0, 29.0, 22.0, 29.0], "rh": [40, 44, 39, 41]},
-        "B-FIG.2": {"to": [28.0, 28.0, 18.0, 28.0], "rh": [40, 40, 40, 40]},
-        "B-FIG.3": {"to": [28.0, 22.3, 43.5, 22.6], "rh": [40, 40, 38, 36]},
-        "B-FIG.4": {"to": [28.0, 18.0, 42.0, 18.0], "rh": [40, 40, 40, 40]},
-        "B-FIG.5": {"to": [28.0, 43.0, 17.0, 43.0], "rh": [40, 40, 40, 40]},
-        }
+    "B-FIG.1": {"to": [28.0, 29.0, 22.0, 29.0], "rh": [40, 44, 39, 41]},
+    "B-FIG.2": {"to": [28.0, 28.0, 18.0, 28.0], "rh": [40, 40, 40, 40]},
+    "B-FIG.3": {"to": [28.0, 22.3, 43.5, 22.6], "rh": [40, 40, 38, 36]},
+    "B-FIG.4": {"to": [28.0, 18.0, 42.0, 18.0], "rh": [40, 40, 40, 40]},
+    "B-FIG.5": {"to": [28.0, 43.0, 17.0, 43.0], "rh": [40, 40, 40, 40]},
+}
 
 for d in dnames:
     models = []
-    models.append(JOS3(height=1.91, weight=77.2, age=25,))
-    models.append(JOS3(height=1.91, weight=84.5, age=26,))
-    models.append(JOS3(height=1.88, weight=92.7, age=22,))
+    models.append(
+        JOS3(
+            height=1.91,
+            weight=77.2,
+            age=25,
+        )
+    )
+    models.append(
+        JOS3(
+            height=1.91,
+            weight=84.5,
+            age=26,
+        )
+    )
+    models.append(
+        JOS3(
+            height=1.88,
+            weight=92.7,
+            age=22,
+        )
+    )
 
     tolist = inputcons[d]["to"]
     rhlist = inputcons[d]["rh"]
@@ -297,18 +356,30 @@ sim_dataset["Stolwijk1966"] = df.copy()
 gexp = exp_dataset["Stolwijk1966"].copy()
 gsim = sim_dataset["Stolwijk1966"].copy()
 dfdict = {}
-for dn in ["A-FIG.4", "A-FIG.5", "A-FIG.6", "A-FIG.7",
-           "B-FIG.1", "B-FIG.2", "B-FIG.3", "B-FIG.4", "B-FIG.5",]:
-    dfdict[dn] = pd.DataFrame({
-        "TreExp": gexp.loc[gexp["Condition"]==dn, "Tre"],
-        "TreSim": gsim.loc[gsim["Condition"]==dn, "t_core_pelvis"],
-        "TskExp": gexp.loc[gexp["Condition"]==dn, "Tsk"],
-        "TskSim": gsim.loc[gsim["Condition"]==dn, "t_skin_mean"],})
+for dn in [
+    "A-FIG.4",
+    "A-FIG.5",
+    "A-FIG.6",
+    "A-FIG.7",
+    "B-FIG.1",
+    "B-FIG.2",
+    "B-FIG.3",
+    "B-FIG.4",
+    "B-FIG.5",
+]:
+    dfdict[dn] = pd.DataFrame(
+        {
+            "TreExp": gexp.loc[gexp["Condition"] == dn, "Tre"],
+            "TreSim": gsim.loc[gsim["Condition"] == dn, "t_core_pelvis"],
+            "TskExp": gexp.loc[gexp["Condition"] == dn, "Tsk"],
+            "TskSim": gsim.loc[gsim["Condition"] == dn, "t_skin_mean"],
+        }
+    )
 
 dfs = []
 for key, value in dfdict.items():
     for seg in ["Tre", "Tsk"]:
-        df = value[[seg+"Exp", seg+"Sim"]].copy()
+        df = value[[seg + "Exp", seg + "Sim"]].copy()
         df.columns = ["Exp", "Sim"]
         df["Time"] = [i for i in range(0, 241, 5)]
         df["ExpName"] = key
@@ -320,16 +391,61 @@ dfstatic = pd.concat(dfs).reset_index(drop=True)
 def plotdata(ser, ax, color, markersize=7, legend=False):
     mk = None
     me = 1
-    if color=="black":
-        ser.plot(ax=ax, linewidth=2, color=(0.0, 0.0, 0.0, 0.7), marker="o", markersize=markersize, legend=legend, markerfacecolor=mk, markeredgewidth=me)
-    elif color=="blue":
-        ser.plot(ax=ax, linewidth=2, color=(0.1, 0.3, 1.0, 0.7), marker="^", markersize=markersize, legend=legend, markerfacecolor=mk, markeredgewidth=me)
-    elif color=="green":
-        ser.plot(ax=ax, linewidth=2, color=(0.2, 0.6, 0.2, 0.7), marker="s", markersize=markersize, legend=legend, markerfacecolor=mk, markeredgewidth=me)
-    elif color=="gray":
-        ser.plot(ax=ax, linewidth=2, color=(0.3, 0.3, 0.3, 0.7), marker="o", markersize=markersize, legend=legend, markerfacecolor=mk, markeredgewidth=me)
-    elif color=="lightblue":
-        ser.plot(ax=ax, linewidth=2, color=(0.3, 0.1, 0.7, 0.7), marker="^", markersize=markersize, legend=legend, markerfacecolor=mk, markeredgewidth=me)
+    if color == "black":
+        ser.plot(
+            ax=ax,
+            linewidth=2,
+            color=(0.0, 0.0, 0.0, 0.7),
+            marker="o",
+            markersize=markersize,
+            legend=legend,
+            markerfacecolor=mk,
+            markeredgewidth=me,
+        )
+    elif color == "blue":
+        ser.plot(
+            ax=ax,
+            linewidth=2,
+            color=(0.1, 0.3, 1.0, 0.7),
+            marker="^",
+            markersize=markersize,
+            legend=legend,
+            markerfacecolor=mk,
+            markeredgewidth=me,
+        )
+    elif color == "green":
+        ser.plot(
+            ax=ax,
+            linewidth=2,
+            color=(0.2, 0.6, 0.2, 0.7),
+            marker="s",
+            markersize=markersize,
+            legend=legend,
+            markerfacecolor=mk,
+            markeredgewidth=me,
+        )
+    elif color == "gray":
+        ser.plot(
+            ax=ax,
+            linewidth=2,
+            color=(0.3, 0.3, 0.3, 0.7),
+            marker="o",
+            markersize=markersize,
+            legend=legend,
+            markerfacecolor=mk,
+            markeredgewidth=me,
+        )
+    elif color == "lightblue":
+        ser.plot(
+            ax=ax,
+            linewidth=2,
+            color=(0.3, 0.1, 0.7, 0.7),
+            marker="^",
+            markersize=markersize,
+            legend=legend,
+            markerfacecolor=mk,
+            markeredgewidth=me,
+        )
 
 
 def graph(gexp, gsim, ax):
@@ -357,30 +473,43 @@ def graph(gexp, gsim, ax):
     ax.set_xlim((0, 240))
     ax.set_xticks([i for i in range(0, 241, 30)])
 
+
 inputcons = {
-        "A-FIG.4": {"to": [28.0, 27.8, 33.3, 28.0], "rh": [40, 37, 34, 37]},
-        "A-FIG.5": {"to": [28.0, 28.5, 37.5, 28.5], "rh": [40, 40, 34, 41]},
-        "A-FIG.6": {"to": [28.0, 28.0, 42.5, 28.1], "rh": [40, 37, 34, 37]},
-        "A-FIG.7": {"to": [28.0, 28.1, 47.8, 28.3], "rh": [40, 43, 27, 44]},
-        "B-FIG.1": {"to": [28.0, 29.0, 22.0, 29.0], "rh": [40, 44, 39, 41]},
-        "B-FIG.2": {"to": [28.0, 28.0, 18.0, 28.0], "rh": [40, 40, 40, 40]},
-        "B-FIG.3": {"to": [28.0, 22.3, 43.5, 22.6], "rh": [40, 40, 38, 36]},
-        "B-FIG.4": {"to": [28.0, 18.0, 42.0, 18.0], "rh": [40, 40, 40, 40]},
-        "B-FIG.5": {"to": [28.0, 43.0, 17.0, 43.0], "rh": [40, 40, 40, 40]},}
+    "A-FIG.4": {"to": [28.0, 27.8, 33.3, 28.0], "rh": [40, 37, 34, 37]},
+    "A-FIG.5": {"to": [28.0, 28.5, 37.5, 28.5], "rh": [40, 40, 34, 41]},
+    "A-FIG.6": {"to": [28.0, 28.0, 42.5, 28.1], "rh": [40, 37, 34, 37]},
+    "A-FIG.7": {"to": [28.0, 28.1, 47.8, 28.3], "rh": [40, 43, 27, 44]},
+    "B-FIG.1": {"to": [28.0, 29.0, 22.0, 29.0], "rh": [40, 44, 39, 41]},
+    "B-FIG.2": {"to": [28.0, 28.0, 18.0, 28.0], "rh": [40, 40, 40, 40]},
+    "B-FIG.3": {"to": [28.0, 22.3, 43.5, 22.6], "rh": [40, 40, 38, 36]},
+    "B-FIG.4": {"to": [28.0, 18.0, 42.0, 18.0], "rh": [40, 40, 40, 40]},
+    "B-FIG.5": {"to": [28.0, 43.0, 17.0, 43.0], "rh": [40, 40, 40, 40]},
+}
 
 gexp = exp_dataset["Stolwijk1966"].copy()
 gsim = sim_dataset["Stolwijk1966"].copy()
 fig, axes = plt.subplots(nrows=5, ncols=2, sharex=True, sharey=True, figsize=(8, 12))
 
 
-for i, dn in enumerate(["A-FIG.4", "A-FIG.5", "A-FIG.6", "A-FIG.7",
-        "B-FIG.1", "B-FIG.2", "B-FIG.3", "B-FIG.4", "B-FIG.5",]):
+for i, dn in enumerate(
+    [
+        "A-FIG.4",
+        "A-FIG.5",
+        "A-FIG.6",
+        "A-FIG.7",
+        "B-FIG.1",
+        "B-FIG.2",
+        "B-FIG.3",
+        "B-FIG.4",
+        "B-FIG.5",
+    ]
+):
     # if i >= 4:
     i += 1
-    yi = i%5
-    xi = i//5
+    yi = i % 5
+    xi = i // 5
     ax = axes[yi, xi]
-    graph(gexp.loc[gexp["Condition"]==dn], gsim.loc[gsim["Condition"]==dn], ax)
+    graph(gexp.loc[gexp["Condition"] == dn], gsim.loc[gsim["Condition"] == dn], ax)
 
     ax.set_title(dn)
 
@@ -398,12 +527,23 @@ for i, dn in enumerate(["A-FIG.4", "A-FIG.5", "A-FIG.6", "A-FIG.7",
 
 fig.delaxes(axes[0, 0])
 handles, labels = ax.get_legend_handles_labels()
-fig.legend(handles, labels, loc='upper left', bbox_to_anchor=(0.1, 0.95), frameon=False, fontsize=12)
+fig.legend(
+    handles,
+    labels,
+    loc="upper left",
+    bbox_to_anchor=(0.1, 0.95),
+    frameon=False,
+    fontsize=12,
+)
 
 fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, hspace=0.4)
 
-fig.text(0.03, 0.5, 'Body temperature [°C]', va='center', rotation='vertical', fontsize=12)
-fig.text(0.53, 0.03, 'Time [min]', ha='center', fontsize=12)
+fig.text(
+    0.03, 0.5, "Body temperature [°C]", va="center", rotation="vertical", fontsize=12
+)
+fig.text(0.53, 0.03, "Time [min]", ha="center", fontsize=12)
 
 plt.tight_layout(rect=[0.05, 0.05, 1, 1])
-fig.savefig(os.path.join(jos3_example_directory, "jos3_validation_with_Stolwijk1966.png"))
+fig.savefig(
+    os.path.join(jos3_example_directory, "jos3_validation_with_Stolwijk1966.png")
+)

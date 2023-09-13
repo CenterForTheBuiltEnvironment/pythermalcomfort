@@ -20,42 +20,43 @@ from pythermalcomfort.utilities import body_surface_area
 # Anthropomorphic data for a default body
 @dataclass
 class Default:
-     height: float = 1.72
-     weight: float = 74.43
-     age: int = 20
-     body_fat: float = 15
-     cardiac_index: float = 2.59  # [L/min/m2]
-     sex: str = "male"
-     posture: str = "standing"
-     bmr_equation: str = "harris-benedict"
-     bsa_equation: str = "dubois"
-     local_bsa: float = np.array( # body surface area [m2]
-    [
-        0.110,
-        0.029,
-        0.175,
-        0.161,
-        0.221,
-        0.096,
-        0.063,
-        0.050,
-        0.096,
-        0.063,
-        0.050,
-        0.209,
-        0.112,
-        0.056,
-        0.209,
-        0.112,
-        0.056,
-    ]
-)
+    height: float = 1.72
+    weight: float = 74.43
+    age: int = 20
+    body_fat: float = 15
+    cardiac_index: float = 2.59  # [L/min/m2]
+    sex: str = "male"
+    posture: str = "standing"
+    bmr_equation: str = "harris-benedict"
+    bsa_equation: str = "dubois"
+    local_bsa: float = np.array(  # body surface area [m2]
+        [
+            0.110,
+            0.029,
+            0.175,
+            0.161,
+            0.221,
+            0.096,
+            0.063,
+            0.050,
+            0.096,
+            0.063,
+            0.050,
+            0.209,
+            0.112,
+            0.056,
+            0.209,
+            0.112,
+            0.056,
+        ]
+    )
+
 
 def validate_body_parameters(
     height=Default.height,
     weight=Default.weight,
     age=Default.age,
-    body_fat=Default.body_fat
+    body_fat=Default.body_fat,
 ):
     """
     Validate the parameters: height, weight, age, and body fat percentage.
@@ -149,17 +150,16 @@ def bsa_rate(
     bsa_rate : float
         The ratio of bsa to the standard body [-].
     """
-    validate_body_parameters(
-        height=height,
-        weight=weight
-    )
+    validate_body_parameters(height=height, weight=weight)
 
     bsa_all = body_surface_area(
         height=height,
         weight=weight,
         formula=bsa_equation,
     )
-    return bsa_all / Default.local_bsa.sum()  # The bsa ratio to the standard body (1.87m2)
+    return (
+        bsa_all / Default.local_bsa.sum()
+    )  # The bsa ratio to the standard body (1.87m2)
 
 
 def local_bsa(
@@ -189,10 +189,7 @@ def local_bsa(
     local_bsa : ndarray(17,)
         Local body surface area (bsa) [m2].
     """
-    validate_body_parameters(
-        height=height,
-        weight=weight
-    )
+    validate_body_parameters(height=height, weight=weight)
     _bsa_rate = bsa_rate(
         height=height,
         weight=weight,
@@ -227,9 +224,7 @@ def weight_rate(
         The ratio of the body weight to the standard body (74.43 kg).
         weight_rate = weight / 74.43
     """
-    validate_body_parameters(
-        weight=weight
-    )
+    validate_body_parameters(weight=weight)
     return weight / Default.weight
 
 
@@ -280,7 +275,9 @@ def bfb_rate(
     else:  # age >= 70
         ci *= 0.7
 
-    bfb_all = ci * bsa_rate(height, weight, bsa_equation) * Default.local_bsa.sum()  # [L/h]
+    bfb_all = (
+        ci * bsa_rate(height, weight, bsa_equation) * Default.local_bsa.sum()
+    )  # [L/h]
     return bfb_all / 290
 
 
@@ -570,8 +567,8 @@ def capacity(
     weight=Default.weight,
     bsa_equation=Default.bsa_equation,
     age=Default.age,
-    ci=Default.cardiac_index
-    ):
+    ci=Default.cardiac_index,
+):
     """Calculate the thermal capacity [J/K].
 
     The values of vascular and central blood capacity have been derived from
