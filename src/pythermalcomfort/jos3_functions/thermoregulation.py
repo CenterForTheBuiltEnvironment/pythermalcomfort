@@ -548,7 +548,7 @@ def evaporation(
     e_max = (p_sk_s - p_a) / ret * bsa  # Maximum evaporative heat loss
 
     # Replace any zero values in the e_max array with 0.001 to avoid causing a divide by 0 error
-    e_max[e_max == 0] = 0.001
+    e_max = np.where(e_max == 0, 0.001, e_max)
 
     # SKINS
     skin_sweat = np.array(
