@@ -13,6 +13,59 @@ It sorts the parameters alphabetically by key and formats each line with the par
 The resulting documentation string can be displayed or printed for user reference.
 """
 import textwrap
+from dataclasses import dataclass
+import numpy as np
+
+
+# Anthropomorphic data for a default body
+@dataclass
+class Default:
+    # Body information
+    height: float = 1.72
+    weight: float = 74.43
+    age: int = 20
+    body_fat: float = 15
+    cardiac_index: float = 2.59  # [L/min/m2]
+    blood_flow_rate: int = 290  # [L/h]
+    physical_activity_ratio: float = 1.25
+    metabolic_rate: float = 1.25
+    sex: str = "male"
+    posture: str = "standing"
+    bmr_equation: str = "harris-benedict"
+    bsa_equation: str = "dubois"
+    local_bsa: np.ndarray = np.array(  # body surface area [m2]
+        [
+            0.110,
+            0.029,
+            0.175,
+            0.161,
+            0.221,
+            0.096,
+            0.063,
+            0.050,
+            0.096,
+            0.063,
+            0.050,
+            0.209,
+            0.112,
+            0.056,
+            0.209,
+            0.112,
+            0.056,
+        ]
+    )
+    # Environment information
+    core_temperature: float = 37
+    skin_temperature: float = 34
+    other_body_temperature: float = 36
+    dry_bulb_air_temperature: float = 28.8
+    mean_radiant_temperature: float = 28.8
+    relative_humidity: float = 50
+    air_speed: float = 0.1
+    # Clothing information
+    clothing_insulation: float = 0
+    clothing_vapor_permeation_efficiency: float = 0.45
+
 
 ALL_OUT_PARAMS = {
     "age": {"ex_output": True, "meaning": "age", "suffix": None, "unit": "years"},

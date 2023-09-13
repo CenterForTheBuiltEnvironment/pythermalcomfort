@@ -35,8 +35,8 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions import construction as cons
-from pythermalcomfort.jos3_functions.construction import Default, _to17array
-from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS
+from pythermalcomfort.jos3_functions.construction import _to17array
+from pythermalcomfort.jos3_functions.parameters import Default, ALL_OUT_PARAMS
 from pythermalcomfort.__init__ import __version__
 
 

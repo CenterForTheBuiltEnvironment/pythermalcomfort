@@ -12,45 +12,11 @@ following order: "head", "neck", "chest", "back", "pelvis",
 """
 
 import numpy as np
-from dataclasses import dataclass
 from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
+from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.utilities import body_surface_area
 
 
-# Anthropomorphic data for a default body
-@dataclass
-class Default:
-    height: float = 1.72
-    weight: float = 74.43
-    age: int = 20
-    body_fat: float = 15
-    cardiac_index: float = 2.59  # [L/min/m2]
-    blood_flow_rate: int = 290 # [L/h]
-    sex: str = "male"
-    posture: str = "standing"
-    bmr_equation: str = "harris-benedict"
-    bsa_equation: str = "dubois"
-    local_bsa: np.ndarray = np.array(  # body surface area [m2]
-        [
-            0.110,
-            0.029,
-            0.175,
-            0.161,
-            0.221,
-            0.096,
-            0.063,
-            0.050,
-            0.096,
-            0.063,
-            0.050,
-            0.209,
-            0.112,
-            0.056,
-            0.209,
-            0.112,
-            0.056,
-        ]
-    )
 
 
 def validate_body_parameters(

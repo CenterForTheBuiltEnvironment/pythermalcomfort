@@ -15,7 +15,7 @@ import math
 
 from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
 from pythermalcomfort.jos3_functions import construction as cons
-from pythermalcomfort.jos3_functions.construction import Default
+from pythermalcomfort.jos3_functions.parameters import Default
 
 
 def conv_coef(
