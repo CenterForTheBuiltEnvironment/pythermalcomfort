@@ -1,7 +1,6 @@
 import numpy as np
 import warnings
 import math
-import re
 from pythermalcomfort.psychrometrics import p_sat, t_o
 from pythermalcomfort.shared_functions import valid_range
 
