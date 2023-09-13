@@ -3743,9 +3743,9 @@ class JOS3:
             Parameters of JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
-        # par = 1.25
         # 1 met = 58.15 W/m2
-        met = self.bmr * par / 58.15  # [met]
+        w_per_m2_to_met = 1 / 58.15 # unit converter W/m2 to met
+        met = self.bmr * par * w_per_m2_to_met   # [met]
         self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
         self.rh = Default.relative_humidity
         self.v = Default.air_speed
