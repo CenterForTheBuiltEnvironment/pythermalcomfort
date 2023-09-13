@@ -25,6 +25,7 @@ class Default:
     age: int = 20
     body_fat: float = 15
     cardiac_index: float = 2.59  # [L/min/m2]
+    blood_flow_rate: int = 290 # [L/h]
     sex: str = "male"
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
@@ -278,7 +279,7 @@ def bfb_rate(
     bfb_all = (
         ci * bsa_rate(height, weight, bsa_equation) * Default.local_bsa.sum()
     )  # [L/h]
-    return bfb_all / 290
+    return bfb_all / Default.blood_flow_rate
 
 
 def conductance(
