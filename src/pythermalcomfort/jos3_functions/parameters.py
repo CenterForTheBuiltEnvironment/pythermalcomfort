@@ -28,7 +28,7 @@ class Default:
     cardiac_index: float = 2.59  # [L/min/m2]
     blood_flow_rate: int = 290  # [L/h]
     physical_activity_ratio: float = 1.25
-    metabolic_rate: float = 1.25
+    metabolic_rate: float = 1.0
     sex: str = "male"
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
@@ -65,6 +65,7 @@ class Default:
     # Clothing information
     clothing_insulation: float = 0
     clothing_vapor_permeation_efficiency: float = 0.45
+    lewis_rate = 16.5
 
 
 ALL_OUT_PARAMS = {
