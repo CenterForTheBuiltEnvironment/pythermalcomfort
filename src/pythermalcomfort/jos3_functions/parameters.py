@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""This code defines a dictionary called ALL_OUT_PARAMS that contains
+"""This code defines a dataclass for default input and a dictionary called ALL_OUT_PARAMS that contains
 information about various output parameters related to human body properties,
 heat exchange, and environmental conditions.
 
@@ -17,7 +17,6 @@ from dataclasses import dataclass
 import numpy as np
 
 
-# Anthropomorphic data for a default body
 @dataclass
 class Default:
     # Body information
