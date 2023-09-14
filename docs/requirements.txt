@@ -1,5 +1,4 @@
 sphinx
 sphinx-rtd-theme
-sphinx-pdj-theme
 docutils<0.18
 urllib3<2.0
