@@ -1,5 +1,6 @@
-import numpy as np
 import os
+from pprint import pprint
+
 import pandas as pd
 import pytest
 from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
@@ -26,8 +27,7 @@ def test_JOS3_class():
 
     # Test: _calculate_operative_temp_when_pmv_is_zero()
     to_neutral = model._calculate_operative_temp_when_pmv_is_zero()
-    expected_result = 28.8
-    assert to_neutral == pytest.approx(expected_result, rel=1e-3)
+    assert to_neutral == pytest.approx(28.8, rel=1e-3)
 
     # Test: _reset_setpt()
     result = model._reset_setpt()
@@ -68,22 +68,20 @@ def test_JOS3_class():
     # Get the project directory by going up two levels from the current script path
     project_directory = os.path.dirname(os.path.dirname(current_script_path))
     # Specify the relative path to the CSV file
-    relative_path = "examples\\jos3_output_example\\jos3_example1 (default output).csv"
+    relative_path = os.path.join(
+        "examples", "jos3_output_example", "jos3_example1 (default output).csv"
+    )
     # Generate the absolute path by combining the project directory and the relative path
     file_path = os.path.join(project_directory, relative_path)
 
     # Read the 't_skin_mean' column from the CSV file into a DataFrame
-    df_t_skin_mean = pd.read_csv(file_path, usecols=["t_skin_mean"])
-    # Drop the first 2 rows and convert the remaining rows into a Series
-    ser_t_skin_mean = df_t_skin_mean["t_skin_mean"].iloc[2:]
-
-    # Convert the Series to a list and make it float data
-    t_skin_mean_values = ser_t_skin_mean.tolist()
-    t_skin_mean_values_float = [float(x) for x in t_skin_mean_values]
+    df_t_skin_mean = (
+        pd.read_csv(file_path, skiprows=2)["mean skin temperature"]
+    ).tolist()
 
     # Check if the simulate method returns the expected type (e.g., dict)
     assert isinstance(dict_output, dict)
-    assert dict_output["t_skin_mean"] == t_skin_mean_values_float
+    assert np.allclose(dict_output["t_skin_mean"], df_t_skin_mean)
 
     # Test: _run()
     # Call the _run method
