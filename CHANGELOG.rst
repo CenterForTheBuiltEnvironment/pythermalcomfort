@@ -1,6 +1,23 @@
 Changelog
 =========
 
+2.8.3 (2023-09-14)
+-------------------
+
+* general improvements in the JOS3 model
+
+2.8.2 (2023-09-04)
+-------------------
+
+* general improvements in the JOS3 model
+* fixed error when e_max == 0
+
+2.8.1 (2023-07-05)
+-------------------
+
+* pythermalcomfort needs Python version > 3.8
+* fixed issue in Cooling Effect calculation
+
 2.8.0 (2023-07-03)
 -------------------
 
