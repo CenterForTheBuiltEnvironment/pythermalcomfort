@@ -336,7 +336,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     ce = 0.0
     if standard == "ashrae":
         ce = np.where(
-            vr >= 0.1,
+            vr > 0.1,
             np.vectorize(cooling_effect, cache=True)(tdb, tr, vr, rh, met, clo, wme),
             0.0,
         )
@@ -3744,8 +3744,8 @@ class JOS3:
         """
         # Set operative temperature under PMV=0 environment
         # 1 met = 58.15 W/m2
-        w_per_m2_to_met = 1 / 58.15 # unit converter W/m2 to met
-        met = self.bmr * par * w_per_m2_to_met   # [met]
+        w_per_m2_to_met = 1 / 58.15  # unit converter W/m2 to met
+        met = self.bmr * par * w_per_m2_to_met  # [met]
         self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
         self.rh = Default.relative_humidity
         self.v = Default.air_speed
