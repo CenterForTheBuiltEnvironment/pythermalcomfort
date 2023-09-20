@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.8.4 (2023-09-20)
+-------------------
+
+* calculation of cooling effect in pmv (standard='ashrae') triggered only when v>0.1 m/s
+
 2.8.3 (2023-09-14)
 -------------------
 
