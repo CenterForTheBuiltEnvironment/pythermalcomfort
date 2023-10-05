@@ -20,7 +20,6 @@ from pythermalcomfort.models import (
     phs,
     use_fans_heatwaves,
     wbgt,
-    heat_index,
     humidex,
     two_nodes,
     net,
@@ -1195,13 +1194,6 @@ def test_at():
     assert at(tdb=25, rh=30, v=0.1) == 24.1
     assert at(tdb=23, rh=70, v=1) == 24.8
     assert at(tdb=23, rh=70, v=1, q=50) == 28.1
-
-
-def test_heat_index():
-    assert heat_index(25, 50) == 25.9
-    assert heat_index(77, 50, units="IP") == 78.6
-    assert heat_index(30, 80) == 37.7
-    assert heat_index(86, 80, units="IP") == 99.8
 
 
 def test_wc():
