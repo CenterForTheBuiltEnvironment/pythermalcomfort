@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from pythermalcomfort import models
+from pythermalcomfort import atcs
 
 # Make "atcs_output_example" directory in the current directory
 directory_name = "atcs_output_example"
@@ -20,7 +20,7 @@ if not os.path.exists(atcs_example_directory):
 
 # Build a model and set a body built
 # Create an instance of the class with optional body parameters such as body height, weight, age, sex, etc.
-model = models.ATCS(height=1.7, weight=60, age=30)
+model = atcs.ATCS(height=1.7, weight=60, age=30)
 
 # Set the first phase
 model.to = 28  # Operative temperature [°C]
