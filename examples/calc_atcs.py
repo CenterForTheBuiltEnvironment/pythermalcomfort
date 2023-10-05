@@ -10,6 +10,14 @@ atcs_example_directory = os.path.join(current_directory, directory_name)
 if not os.path.exists(atcs_example_directory):
     os.makedirs(atcs_example_directory)
 
+# -------------------------------------------
+# EXAMPLE (simple simulation)
+# The following code simulates human thermal sensation in transient environment.
+# The simulated people is exposed to a warm environment and goes to cool environment.
+# This model can simulate the sudden changes in thermal sensations we usually experience
+# when the environmental step change happens.
+# -------------------------------------------
+
 # Build a model and set a body built
 # Create an instance of the class with optional body parameters such as body height, weight, age, sex, etc.
 model = models.ATCS(height=1.7, weight=60, age=30)
