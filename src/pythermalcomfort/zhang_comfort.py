@@ -1064,7 +1064,7 @@ def zhang_sensation_comfort(
     This model predicts thermal sensation and comfort based on physiological responses,
     such as skin temperature and its time variation.
 
-    It consists of four main helper functions that predict:
+    It consists of four main helper models that predict:
     1. Local thermal sensation
     2. Whole-body thermal sensation
     3. Local thermal comfort

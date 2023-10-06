@@ -1,4 +1,4 @@
-from pythermalcomfort.functions import heat_index
+from pythermalcomfort.models import heat_index
 
 
 def test_heat_index():

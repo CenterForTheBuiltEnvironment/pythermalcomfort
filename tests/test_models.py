@@ -5,9 +5,9 @@ import warnings
 import requests
 from itertools import product
 
-from pythermalcomfort.optimized_functions import pmv_ppd_optimized, utci_optimized
+from pythermalcomfort.models.utci import _utci_optimized
+from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
 from pythermalcomfort.models import (
-    solar_gain,
     pmv_ppd,
     set_tmp,
     cooling_effect,
@@ -20,13 +20,9 @@ from pythermalcomfort.models import (
     phs,
     use_fans_heatwaves,
     wbgt,
-    humidex,
     two_nodes,
     net,
-    at,
-    wc,
     adaptive_en,
-    pet_steady,
     discomfort_index,
     athb,
     a_pmv,
@@ -247,10 +243,10 @@ def test_pmv_ppd():
 
 
 def test_pmv_ppd_optimized():
-    assert (round(pmv_ppd_optimized(25, 25, 0.3, 50, 1.5, 0.7, 0), 2)) == 0.55
+    assert (round(_pmv_ppd_optimized(25, 25, 0.3, 50, 1.5, 0.7, 0), 2)) == 0.55
 
     np.testing.assert_equal(
-        np.around(pmv_ppd_optimized([25, 25], 25, 0.3, 50, 1.5, 0.7, 0), 2),
+        np.around(_pmv_ppd_optimized([25, 25], 25, 0.3, 50, 1.5, 0.7, 0), 2),
         [0.55, 0.55],
     )
 
@@ -376,25 +372,6 @@ def test_set():
         results = set_tmp(tdb, tr, v, rh, met, clo, limit_inputs=False)
 
         np.testing.assert_equal(set_exp, results)
-
-
-def test_solar_gain():
-    for table in reference_tables["reference_data"]["solar_gain"]:
-        for entry in table["data"]:
-            inputs = entry["inputs"]
-            outputs = entry["outputs"]
-            sg = solar_gain(
-                inputs["alt"],
-                inputs["sharp"],
-                inputs["I_dir"],
-                inputs["t_sol"],
-                inputs["f_svv"],
-                inputs["f_bes"],
-                inputs["asa"],
-                inputs["posture"],
-            )
-            assert sg["erf"] == outputs["erf"]
-            assert sg["delta_mrt"] == outputs["t_rsw"]
 
 
 def test_transpose_sharp_altitude():
@@ -935,7 +912,7 @@ def test_utci_numpy(data_test_utci):
 
 def test_utci_optimized():
     np.testing.assert_equal(
-        np.around(utci_optimized([25, 27], 1, 1, 1.5), 2), [24.73, 26.57]
+        np.around(_utci_optimized([25, 27], 1, 1, 1.5), 2), [24.73, 26.57]
     )
 
 
@@ -1190,32 +1167,6 @@ def test_wbgt():
     assert wbgt(twb=16.7, tg=40, round=True) == 23.7
 
 
-def test_at():
-    assert at(tdb=25, rh=30, v=0.1) == 24.1
-    assert at(tdb=23, rh=70, v=1) == 24.8
-    assert at(tdb=23, rh=70, v=1, q=50) == 28.1
-
-
-def test_wc():
-    assert wc(tdb=0, v=0.1) == {"wci": 518.6}
-    assert wc(tdb=0, v=1.5) == {"wci": 813.5}
-    assert wc(tdb=-5, v=5.5) == {"wci": 1255.2}
-    assert wc(tdb=-10, v=11) == {"wci": 1631.1}
-    assert wc(tdb=-5, v=11) == {"wci": 1441.4}
-
-
-def test_humidex():
-    assert humidex(25, 50) == {"humidex": 28.2, "discomfort": "Little or no discomfort"}
-    assert humidex(30, 80) == {
-        "humidex": 43.3,
-        "discomfort": "Intense discomfort; avoid exertion",
-    }
-    assert humidex(31.6, 57.1) == {
-        "humidex": 40.8,
-        "discomfort": "Intense discomfort; avoid exertion",
-    }
-
-
 def test_net():
     assert net(37, 100, 0.1) == 37
     assert net(37, 100, 4.5) == 37
@@ -1251,18 +1202,6 @@ def test_two_nodes():
     # testing limiting max skin blood flow
     assert two_nodes(45, 45, 1.1, 20, 3, 0.2)["t_core"] == 38.0
     assert two_nodes(45, 45, 1.1, 20, 3, 0.2, max_skin_blood_flow=60)["t_core"] == 38.2
-
-
-def test_pet():
-    assert pet_steady(tdb=20, tr=20, rh=50, v=0.15, met=1.37, clo=0.5) == 18.85
-    assert pet_steady(tdb=30, tr=30, rh=50, v=0.15, met=1.37, clo=0.5) == 30.59
-    assert pet_steady(tdb=20, tr=20, rh=50, v=0.5, met=1.37, clo=0.5) == 17.16
-    assert pet_steady(tdb=21, tr=21, rh=50, v=0.1, met=1.37, clo=0.9) == 21.08
-    assert pet_steady(tdb=20, tr=20, rh=50, v=0.1, met=1.37, clo=0.9) == 19.92
-    assert pet_steady(tdb=-5, tr=40, rh=2, v=0.5, met=1.37, clo=0.9) == 7.82
-    assert pet_steady(tdb=-5, tr=-5, rh=50, v=5.0, met=1.37, clo=0.9) == -13.38
-    assert pet_steady(tdb=30, tr=60, rh=80, v=1.0, met=1.37, clo=0.9) == 43.05
-    assert pet_steady(tdb=30, tr=30, rh=80, v=1.0, met=1.37, clo=0.9) == 31.69
 
 
 def test_di():

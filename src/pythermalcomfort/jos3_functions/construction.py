@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This code provides functions for calculating the surface area of different
+"""This code provides models for calculating the surface area of different
 body parts, weight ratio, basal blood flow ratio, and thermal conductance and
 thermal capacity.
 
