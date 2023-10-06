@@ -4487,7 +4487,14 @@ class JOS3:
         err_cr = self.t_core - self.setpt_cr
         err_sk = self.t_skin - self.setpt_sk
         wet, *_ = threg.evaporation(
-            err_cr, err_sk, self._ta, self._rh, self.r_et, self._bsa_rate, self._age
+            err_cr,
+            err_sk,
+            self.t_skin,
+            self._ta,
+            self._rh,
+            self.r_et,
+            self._bsa_rate,
+            self._age,
         )
         return wet
 
@@ -4572,3 +4579,6 @@ class JOS3:
     def version(self):
         """version : float The current version of pythermalcomfort."""
         return self._version
+
+
+
