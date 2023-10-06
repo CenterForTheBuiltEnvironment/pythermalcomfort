@@ -427,15 +427,33 @@ k1_array = np.array(list(k1.values()))
 c2_plus_array = np.array(list(c2_plus.values()))
 c2_minus_array = np.array(list(c2_minus.values()))
 c3_array = np.array(list(c3.values()))
-a_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(a_if_delta_sens_local_is_less_than_minus_2.values()))
-a_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(a_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-a_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(a_if_delta_sens_local_is_plus_2_or_more.values()))
-b_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(b_if_delta_sens_local_is_less_than_minus_2.values()))
-b_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(b_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-b_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(b_if_delta_sens_local_is_plus_2_or_more.values()))
-c_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(c_if_delta_sens_local_is_less_than_minus_2.values()))
-c_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(c_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-c_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(c_if_delta_sens_local_is_plus_2_or_more.values()))
+a_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(a_if_delta_sens_local_is_less_than_minus_2.values())
+)
+a_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(a_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+a_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(a_if_delta_sens_local_is_plus_2_or_more.values())
+)
+b_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(b_if_delta_sens_local_is_less_than_minus_2.values())
+)
+b_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(b_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+b_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(b_if_delta_sens_local_is_plus_2_or_more.values())
+)
+c_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(c_if_delta_sens_local_is_less_than_minus_2.values())
+)
+c_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(c_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+c_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(c_if_delta_sens_local_is_plus_2_or_more.values())
+)
 C31_array = np.array(list(C31.values()))
 C32_array = np.array(list(C32.values()))
 C6_array = np.array(list(C6.values()))

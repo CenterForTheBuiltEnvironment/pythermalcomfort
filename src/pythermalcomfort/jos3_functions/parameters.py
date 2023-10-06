@@ -20,14 +20,14 @@ import numpy as np
 @dataclass
 class Default:
     # Body information
-    height: float = 1.72 # [m]
-    weight: float = 74.43 # [kg]
-    age: int = 20 # [-]
-    body_fat: float = 15 # [%]
+    height: float = 1.72  # [m]
+    weight: float = 74.43  # [kg]
+    age: int = 20  # [-]
+    body_fat: float = 15  # [%]
     cardiac_index: float = 2.59  # [L/min/m2]
     blood_flow_rate: int = 290  # [L/h]
-    physical_activity_ratio: float = 1.25 # [-]
-    metabolic_rate: float = 1.0 # [met]
+    physical_activity_ratio: float = 1.25  # [-]
+    metabolic_rate: float = 1.0  # [met]
     sex: str = "male"
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
@@ -54,16 +54,16 @@ class Default:
         ]
     )
     # Environment information
-    core_temperature: float = 37 # [°C]
-    skin_temperature: float = 34 # [°C]
-    other_body_temperature: float = 36 # [°C]
-    dry_bulb_air_temperature: float = 28.8 # [°C]
-    mean_radiant_temperature: float = 28.8 # [°C]
-    relative_humidity: float = 50 # [%]
-    air_speed: float = 0.1 # [m/s]
+    core_temperature: float = 37  # [°C]
+    skin_temperature: float = 34  # [°C]
+    other_body_temperature: float = 36  # [°C]
+    dry_bulb_air_temperature: float = 28.8  # [°C]
+    mean_radiant_temperature: float = 28.8  # [°C]
+    relative_humidity: float = 50  # [%]
+    air_speed: float = 0.1  # [m/s]
     # Clothing information
-    clothing_insulation: float = 0 # [clo]
-    clothing_vapor_permeation_efficiency: float = 0.45 # [-]
+    clothing_insulation: float = 0  # [clo]
+    clothing_vapor_permeation_efficiency: float = 0.45  # [-]
     lewis_rate = 16.5  # [K/kPa]
 
 

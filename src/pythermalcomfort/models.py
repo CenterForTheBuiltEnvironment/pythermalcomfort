@@ -4579,6 +4579,3 @@ class JOS3:
     def version(self):
         """version : float The current version of pythermalcomfort."""
         return self._version
-
-
-

@@ -7,6 +7,7 @@ from pythermalcomfort import zhang_comfort
 # Set logging config as WARNING
 logging.basicConfig(level=logging.WARNING)
 
+
 class ATCS(JOS3):
     """ATCS (Advanced Thermal Comfort Simulator) is an integrated simulator that combines
     JOS-3 model for simulating human thermal physiology, with a thermal sensation and
