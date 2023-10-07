@@ -13,7 +13,7 @@ It sorts the parameters alphabetically by key and formats each line with the par
 The resulting documentation string can be displayed or printed for user reference.
 """
 import textwrap
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 
 
@@ -32,8 +32,8 @@ class Default:
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
     bsa_equation: str = "dubois"
-    local_bsa: np.ndarray = np.array(  # body surface area [m2]
-        [
+    local_bsa: np.ndarray = field(default_factory=lambda: np.array(
+        [  # body surface area [m2]
             0.110,
             0.029,
             0.175,
@@ -52,7 +52,7 @@ class Default:
             0.112,
             0.056,
         ]
-    )
+    ))
     # Environment information
     core_temperature: float = 37 # [°C]
     skin_temperature: float = 34 # [°C]
