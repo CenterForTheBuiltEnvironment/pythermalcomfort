@@ -72,7 +72,6 @@ def test_adaptive_ashrae():
         ]
     )
     for row in data_test_adaptive_ashrae:
-        print(row)
         assert (
             adaptive_ashrae(row["tdb"], row["tr"], row["t_running_mean"], row["v"])[
                 list(row["return"].keys())[0]
@@ -83,7 +82,7 @@ def test_adaptive_ashrae():
 
     # test limit_inputs and array input
     np.testing.assert_equal(
-        adaptive_ashrae(tdb=25, tr=25, t_running_mean=[9, 10], v=0.1),
+        adaptive_ashrae(tdb=25, tr=25, t_running_mean=[9, 10], v=0.1).__dict__,
         {
             "tmp_cmf": [np.nan, 20.9],
             "tmp_cmf_80_low": [np.nan, 17.4],
@@ -97,7 +96,7 @@ def test_adaptive_ashrae():
     np.testing.assert_equal(
         adaptive_ashrae(
             tdb=[77, 74], tr=77, t_running_mean=[48, 68], v=0.3, units="ip"
-        ),
+        ).__dict__,
         {
             "tmp_cmf": [np.nan, 75.2],
             "tmp_cmf_80_low": [np.nan, 68.9],

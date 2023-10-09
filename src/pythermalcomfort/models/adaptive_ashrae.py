@@ -19,6 +19,9 @@ class AdaptiveASHRAE:
     acceptability_80: np.array
     acceptability_90: np.array
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 def adaptive_ashrae(
     tdb, tr, t_running_mean, v, units="SI", limit_inputs=True
@@ -92,7 +95,7 @@ def adaptive_ashrae(
         'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': array(True),
         'acceptability_90': array(True)}
 
-        >>> print(results.acceptability_80)
+        >>> print(results.acceptability_80)  # or use print(results["acceptability_80"])
         True
         # The conditions you entered are considered to be comfortable for by 80% of the
         occupants
