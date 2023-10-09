@@ -1,8 +1,8 @@
 import logging
 import numpy as np
-from pythermalcomfort import JOS3
+from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort.models import zhang_sensation_comfort
+from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
 from pythermalcomfort.utilities import DefaultSkinTemperature
 
 # Set logging config as WARNING
