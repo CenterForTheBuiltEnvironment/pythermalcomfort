@@ -24,3 +24,5 @@ from pythermalcomfort.models.net import net
 from pythermalcomfort.models.discomfort_index import discomfort_index
 from pythermalcomfort.models.athb import athb
 from pythermalcomfort.models.jos3 import JOS3
+from pythermalcomfort.models.atcs import ATCS
+from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort

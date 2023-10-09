@@ -2,7 +2,8 @@ import logging
 import numpy as np
 from pythermalcomfort import JOS3
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort import zhang_comfort
+from pythermalcomfort.models import zhang_sensation_comfort
+from pythermalcomfort.utilities import DefaultSkinTemperature
 
 # Set logging config as WARNING
 logging.basicConfig(level=logging.WARNING)
@@ -13,29 +14,6 @@ class ATCS(JOS3):
     JOS-3 model for simulating human thermal physiology, with a thermal sensation and
     comfort model for predicting psychological parameters from the physiological parameters.
     """
-
-    # Default skin temperature in degree Celsius for 17 local body parts
-    # The data comes from Hui Zhang's experiments
-    # https://escholarship.org/uc/item/3f4599hx
-    dict_default_t_skin = {
-        "head": 35.3,
-        "neck": 35.6,
-        "chest": 35.1,
-        "back": 35.3,
-        "pelvis": 35.3,
-        "left_shoulder": 34.2,
-        "left_arm": 34.6,
-        "left_hand": 34.4,
-        "right_shoulder": 34.2,
-        "right_arm": 34.6,
-        "right_hand": 34.4,
-        "left_thigh": 34.3,
-        "left_leg": 32.8,
-        "left_foot": 33.3,
-        "right_thigh": 34.3,
-        "right_leg": 32.8,
-        "right_foot": 33.3,
-    }
 
     default_iteration_number_to_get_stable_condition = 600
 
@@ -116,10 +94,10 @@ class ATCS(JOS3):
         Examples
         -------
         .. code-block:: python
+        >>> from pythermalcomfort.models import atcs
         >>> import pandas as pd
         >>> import matplotlib.pyplot as plt
         >>> import os
-        >>> from pythermalcomfort import atcs
         >>>
         >>># Build a model and set a body built
         >>># Create an instance of the class with optional body parameters such as body height, weight, age, sex, etc.
@@ -153,7 +131,7 @@ class ATCS(JOS3):
         self.cached_overall_clo = np.average(self.cached_clo, weights=Default.local_bsa)
 
         # Initialize parent class
-        self.comfort_setpt_skin = np.array(list(ATCS.dict_default_t_skin.values()))
+        self.comfort_setpt_skin = np.array(list(DefaultSkinTemperature()._asdict()))
         self.t_skin_used = np.ones(17) * Default.skin_temperature
         self.t_skin_wet = np.ones(17) * Default.skin_temperature
         self.t_skin_previous_time_step = None
@@ -225,7 +203,7 @@ class ATCS(JOS3):
             logging.debug("Overall clo value:", overall_clo)
             logging.debug("Operative temperature when PMV=0", self.to)
 
-            for i in range(10):
+            for _ in range(10):
                 self._run(dtime=600, passive=False)
 
             self.comfort_setpt_skin = self.t_skin
@@ -347,7 +325,7 @@ class ATCS(JOS3):
         )
 
         # Calculate thermal sensations and comfort parameters
-        dict_sensation_and_comfort = zhang_comfort.zhang_sensation_comfort(
+        dict_sensation_and_comfort = zhang_sensation_comfort(
             t_skin_local=self.t_skin_used,
             dt_skin_local_dt=dt_skin,
             t_skin_local_set=comfort_setpt_skin,
