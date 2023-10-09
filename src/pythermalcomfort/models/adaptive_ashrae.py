@@ -1,4 +1,5 @@
 import numpy as np
+from dataclasses import dataclass
 
 from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
@@ -8,7 +9,20 @@ from pythermalcomfort.utilities import (
 )
 
 
-def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
+@dataclass
+class AdaptiveASHRAE:
+    tmp_cmf: float
+    tmp_cmf_80_low: float
+    tmp_cmf_80_up: float
+    tmp_cmf_90_low: float
+    tmp_cmf_90_up: float
+    acceptability_80: np.array
+    acceptability_90: np.array
+
+
+def adaptive_ashrae(
+    tdb, tr, t_running_mean, v, units="SI", limit_inputs=True
+) -> AdaptiveASHRAE:
     """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
     model relates indoor design temperatures or acceptable temperature ranges
     to outdoor meteorological or climatological parameters. The adaptive model
@@ -78,10 +92,17 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': array(True),
         'acceptability_90': array(True)}
 
-        >>> print(results['acceptability_80'])
+        >>> print(results.acceptability_80)
         True
         # The conditions you entered are considered to be comfortable for by 80% of the
         occupants
+
+        >>> # You can also pass arrays as input to the function
+        >>> results = adaptive_ashrae(tdb=[25, 26], tr=25, t_running_mean=20, v=0.1)
+        >>> print(results)
+        {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5,
+        'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': array(True),
+        'acceptability_90': array(True)}
 
         >>> # for users who want to use the IP system
         >>> results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
@@ -164,12 +185,12 @@ def adaptive_ashrae(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
             tmp_cmf_90_up=tmp_cmf_90_up,
         )
 
-    return {
-        "tmp_cmf": t_cmf,
-        "tmp_cmf_80_low": tmp_cmf_80_low,
-        "tmp_cmf_80_up": tmp_cmf_80_up,
-        "tmp_cmf_90_low": tmp_cmf_90_low,
-        "tmp_cmf_90_up": tmp_cmf_90_up,
-        "acceptability_80": acceptability_80,
-        "acceptability_90": acceptability_90,
-    }
+    return AdaptiveASHRAE(
+        tmp_cmf=t_cmf,
+        tmp_cmf_80_low=tmp_cmf_80_low,
+        tmp_cmf_80_up=tmp_cmf_80_up,
+        tmp_cmf_90_low=tmp_cmf_90_low,
+        tmp_cmf_90_up=tmp_cmf_90_up,
+        acceptability_80=acceptability_80,
+        acceptability_90=acceptability_90,
+    )
