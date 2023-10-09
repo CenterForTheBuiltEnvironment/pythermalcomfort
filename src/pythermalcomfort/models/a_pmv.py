@@ -68,9 +68,6 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
 
         >>> from pythermalcomfort.models import a_pmv
         >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
-        >>> tdb = 28
-        >>> tr = 28
-        >>> rh = 50
         >>> v = 0.1
         >>> met = 1.4
         >>> clo = 0.5
@@ -78,7 +75,7 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
         >>> v_r = v_relative(v=v, met=met)
         >>> # calculate dynamic clothing
         >>> clo_d = clo_dynamic(clo=clo, met=met)
-        >>> results = a_pmv(tdb, tr, v_r, rh, met, clo_d, a_coefficient=0.293)
+        >>> results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
         >>> print(results)
         0.74
     """
