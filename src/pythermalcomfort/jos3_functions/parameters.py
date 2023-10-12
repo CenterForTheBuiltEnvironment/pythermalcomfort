@@ -14,10 +14,12 @@ The resulting documentation string can be displayed or printed for user referenc
 """
 import textwrap
 from dataclasses import dataclass
+from typing import ClassVar
+
 import numpy as np
 
 
-@dataclass
+@dataclass(frozen=True)
 class Default:
     # Body information
     height: float = 1.72  # [m]
@@ -32,7 +34,7 @@ class Default:
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
     bsa_equation: str = "dubois"
-    local_bsa: np.ndarray = np.array(  # body surface area [m2]
+    local_bsa: ClassVar[list[float]] = np.array(  # body surface area [m2]
         [
             0.110,
             0.029,
@@ -53,6 +55,7 @@ class Default:
             0.056,
         ]
     )
+
     # Environment information
     core_temperature: float = 37  # [°C]
     skin_temperature: float = 34  # [°C]
@@ -194,7 +197,7 @@ ALL_OUT_PARAMS = {
     },
     "q_nst": {
         "ex_output": True,
-        "meaning": ("core thermogenesis by non-shivering (each body part)"),
+        "meaning": "core thermogenesis by non-shivering (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
@@ -206,7 +209,7 @@ ALL_OUT_PARAMS = {
     },
     "q_shiv": {
         "ex_output": True,
-        "meaning": ("core or muscle thermogenesis by shivering (each body part)"),
+        "meaning": "core or muscle thermogenesis by shivering (each body part)",
         "suffix": "Body name",
         "unit": "W",
     },
