@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This code includes some functions of jos-3 model to calculate human
+"""This code includes some models of jos-3 model to calculate human
 thermoregulation.
 
 The values of a NumPy array containing 17 elements correspond to the

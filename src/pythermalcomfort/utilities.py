@@ -1,6 +1,9 @@
-import numpy as np
-import warnings
 import math
+import warnings
+from typing import NamedTuple
+
+import numpy as np
+
 from pythermalcomfort.psychrometrics import p_sat, t_o
 from pythermalcomfort.shared_functions import valid_range
 
@@ -540,3 +543,27 @@ f_r_garments = {
     "Cotton vacuum metallized with aluminium": 0.05,
     "Glass fiber vacuum metallized with aluminium": 0.07,
 }
+
+
+class DefaultSkinTemperature(NamedTuple):
+    """Default skin temperature in degree Celsius for 17 local body parts
+    The data comes from Hui Zhang's experiments
+    https://escholarship.org/uc/item/3f4599hx"""
+
+    head: float = 35.3
+    neck: float = 35.6
+    chest: float = 35.1
+    back: float = 35.3
+    pelvis: float = 35.3
+    left_shoulder: float = 34.2
+    left_arm: float = 34.6
+    left_hand: float = 34.4
+    right_shoulder: float = 34.2
+    right_arm: float = 34.6
+    right_hand: float = 34.4
+    left_thigh: float = 34.3
+    left_leg: float = 32.8
+    left_foot: float = 33.3
+    right_thigh: float = 34.3
+    right_leg: float = 32.8
+    right_foot: float = 33.3

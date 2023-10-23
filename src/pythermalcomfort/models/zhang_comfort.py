@@ -1,5 +1,6 @@
 import numpy as np
 from pythermalcomfort.jos3_functions.parameters import Default
+from pythermalcomfort.utilities import DefaultSkinTemperature
 
 # Coefficients for sensation prediction
 c1_plus = {
@@ -21,6 +22,7 @@ c1_plus = {
     "right_leg": 0.4,
     "right_foot": 0.26,
 }
+
 c1_minus = {
     "head": 0.38,
     "neck": 0.38,
@@ -427,15 +429,33 @@ k1_array = np.array(list(k1.values()))
 c2_plus_array = np.array(list(c2_plus.values()))
 c2_minus_array = np.array(list(c2_minus.values()))
 c3_array = np.array(list(c3.values()))
-a_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(a_if_delta_sens_local_is_less_than_minus_2.values()))
-a_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(a_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-a_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(a_if_delta_sens_local_is_plus_2_or_more.values()))
-b_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(b_if_delta_sens_local_is_less_than_minus_2.values()))
-b_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(b_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-b_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(b_if_delta_sens_local_is_plus_2_or_more.values()))
-c_if_delta_sens_local_is_less_than_minus_2_array = np.array(list(c_if_delta_sens_local_is_less_than_minus_2.values()))
-c_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(list(c_if_delta_sens_local_is_between_minus_2_to_plus_2.values()))
-c_if_delta_sens_local_is_plus_2_or_more_array = np.array(list(c_if_delta_sens_local_is_plus_2_or_more.values()))
+a_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(a_if_delta_sens_local_is_less_than_minus_2.values())
+)
+a_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(a_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+a_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(a_if_delta_sens_local_is_plus_2_or_more.values())
+)
+b_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(b_if_delta_sens_local_is_less_than_minus_2.values())
+)
+b_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(b_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+b_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(b_if_delta_sens_local_is_plus_2_or_more.values())
+)
+c_if_delta_sens_local_is_less_than_minus_2_array = np.array(
+    list(c_if_delta_sens_local_is_less_than_minus_2.values())
+)
+c_if_delta_sens_local_is_between_minus_2_to_plus_2_array = np.array(
+    list(c_if_delta_sens_local_is_between_minus_2_to_plus_2.values())
+)
+c_if_delta_sens_local_is_plus_2_or_more_array = np.array(
+    list(c_if_delta_sens_local_is_plus_2_or_more.values())
+)
 C31_array = np.array(list(C31.values()))
 C32_array = np.array(list(C32.values()))
 C6_array = np.array(list(C6.values()))
@@ -1020,25 +1040,7 @@ def zhang_sensation_comfort(
     t_skin_local,
     dt_skin_local_dt,
     dt_core_local_dt,
-    t_skin_local_set={
-        "head": 35.3,
-        "neck": 35.6,
-        "chest": 35.1,
-        "back": 35.3,
-        "pelvis": 35.3,
-        "left_shoulder": 34.2,
-        "left_arm": 34.6,
-        "left_hand": 34.4,
-        "right_shoulder": 34.2,
-        "right_arm": 34.6,
-        "right_hand": 34.4,
-        "left_thigh": 34.3,
-        "left_leg": 32.8,
-        "left_foot": 33.3,
-        "right_thigh": 34.3,
-        "right_leg": 32.8,
-        "right_foot": 33.3,
-    },
+    t_skin_local_set=DefaultSkinTemperature()._asdict(),
     options=None,
 ):
     """Zhang's local and overall sensation and comfort model.
@@ -1046,7 +1048,7 @@ def zhang_sensation_comfort(
     This model predicts thermal sensation and comfort based on physiological responses,
     such as skin temperature and its time variation.
 
-    It consists of four main helper functions that predict:
+    It consists of four main helper models that predict:
     1. Local thermal sensation
     2. Whole-body thermal sensation
     3. Local thermal comfort
@@ -1126,8 +1128,8 @@ def zhang_sensation_comfort(
     Examples
     ---------
     .. code-block:: python
-    >>> from pythermalcomfort import zhang_comfort
-    >>> dict_results = zhang_comfort.zhang_sensation_comfort(
+    >>> from pythermalcomfort.models import zhang_sensation_comfort
+    >>> dict_results = zhang_sensation_comfort(
     >>>     t_skin_local={
     >>>         "head": 34.3,
     >>>         "neck": 34.6,

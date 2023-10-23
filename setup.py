@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.8.4",
+    version="2.8.7",
     license="MIT",
     description=(
         "Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET,"
@@ -63,6 +63,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Scientific/Engineering",

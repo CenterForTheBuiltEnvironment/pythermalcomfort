@@ -1,4 +1,4 @@
-from pythermalcomfort import zhang_comfort
+from pythermalcomfort.models import zhang_sensation_comfort
 from pprint import pprint
 
 # -------------------------------------------
@@ -14,7 +14,7 @@ from pprint import pprint
 # except in an extremely hot or cold environment.
 # -------------------------------------------
 
-dict_results = zhang_comfort.zhang_sensation_comfort(
+dict_results = zhang_sensation_comfort(
     t_skin_local={
         "head": 34.3,
         "neck": 34.6,

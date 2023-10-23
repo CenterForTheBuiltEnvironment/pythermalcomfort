@@ -17,6 +17,11 @@ environment:
       PYTHON_HOME: C:\Python310-x64
       PYTHON_VERSION: '3.10'
       PYTHON_ARCH: '64'
+    - TOXENV: py311,codecov
+      TOXPYTHON: C:\Python310-x64\python.exe
+      PYTHON_HOME: C:\Python310-x64
+      PYTHON_VERSION: '3.11'
+      PYTHON_ARCH: '64'
 init:
   - ps: echo $env:TOXENV
   - ps: ls C:\Python*
