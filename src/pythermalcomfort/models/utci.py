@@ -133,11 +133,11 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
         }
 
         return {
-            "utci": np.round_(utci_approx, 1),
+            "utci": np.round(utci_approx, 1),
             "stress_category": mapping(utci_approx, stress_categories),
         }
     else:
-        return np.round_(utci_approx, 1)
+        return np.round(utci_approx, 1)
 
 
 @vectorize(
