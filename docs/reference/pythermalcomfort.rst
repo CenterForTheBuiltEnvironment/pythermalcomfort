@@ -10,37 +10,37 @@ Comfort models
 Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 ------------------------------------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.pmv_ppd
+.. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
 
 Predicted Mean Vote (PMV)
 -------------------------
 
-.. autofunction:: pythermalcomfort.models.pmv
+.. autofunction:: pythermalcomfort.models.pmv.pmv
 
-Gagge et al. two-node model
----------------------------
+Two-node model (Gagge et al.)
+-----------------------------
 
-.. autofunction:: pythermalcomfort.models.two_nodes
+.. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
 
 Standard Effective Temperature (SET)
 ------------------------------------
 
-.. autofunction:: pythermalcomfort.models.set_tmp
+.. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
 Physiological Equivalent Temperature (PET)
 ------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.pet_steady
+.. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
 
 Cooling Effect (CE)
 -------------------
 
-.. autofunction:: pythermalcomfort.models.cooling_effect
+.. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
 
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-.. autoclass:: pythermalcomfort.models.JOS3
+.. autoclass:: pythermalcomfort.models.JOS3.JOS3
     :members:
     :undoc-members:
     :special-members: __init__
@@ -48,97 +48,97 @@ Joint system thermoregulation model (JOS-3)
 Adaptive Thermal Heat Balance (ATHB)
 ------------------------------------
 
-.. autofunction:: pythermalcomfort.models.athb
+.. autofunction:: pythermalcomfort.models.athb.athb
 
 Adaptive ASHRAE
 ---------------
 
-.. autofunction:: pythermalcomfort.models.adaptive_ashrae
+.. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
 Adaptive EN
 -----------
 
-.. autofunction:: pythermalcomfort.models.adaptive_en
+.. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
 
 Use Fans During Heatwaves
 -------------------------
 
-.. autofunction:: pythermalcomfort.models.use_fans_heatwaves
+.. autofunction:: pythermalcomfort.models.use_fans_heatwaves.use_fans_heatwaves
 
 Solar gain on people
 --------------------
 
-.. autofunction:: pythermalcomfort.models.solar_gain
+.. autofunction:: pythermalcomfort.models.solar_gain.solar_gain
 
 Universal Thermal Climate Index (UTCI)
 --------------------------------------
 
-.. autofunction:: pythermalcomfort.models.utci
+.. autofunction:: pythermalcomfort.models.utci.utci
 
 Clothing prediction
 -------------------
 
-.. autofunction:: pythermalcomfort.models.clo_tout
+.. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
 
 Vertical air temperature gradient
 ---------------------------------
 
-.. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd
+.. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd.vertical_tmp_grad_ppd
 
 Ankle draft
 -----------
 
-.. autofunction:: pythermalcomfort.models.ankle_draft
+.. autofunction:: pythermalcomfort.models.ankle_draft.ankle_draft
 
 Predicted Heat Strain (PHS) Index
 ---------------------------------
 
-.. autofunction:: pythermalcomfort.models.phs
+.. autofunction:: pythermalcomfort.models.phs.phs
 
 Wet Bulb Globe Temperature Index (WBGT)
 ---------------------------------------
 
-.. autofunction:: pythermalcomfort.models.wbgt
+.. autofunction:: pythermalcomfort.models.wbgt.wbgt
 
 Heat Index (HI)
 ---------------
 
-.. autofunction:: pythermalcomfort.models.heat_index
+.. autofunction:: pythermalcomfort.models.heat_index.heat_index
 
 Humidex
 -------
 
-.. autofunction:: pythermalcomfort.models.humidex
+.. autofunction:: pythermalcomfort.models.humidex.humidex
 
 Normal Effective Temperature (NET)
 ----------------------------------
 
-.. autofunction:: pythermalcomfort.models.net
+.. autofunction:: pythermalcomfort.models.net.net
 
 Wind chill index
 ----------------
 
-.. autofunction:: pythermalcomfort.models.wc
+.. autofunction:: pythermalcomfort.models.wc.wc
 
 Apparent Temperature (AT)
 -------------------------
 
-.. autofunction:: pythermalcomfort.models.at
+.. autofunction:: pythermalcomfort.models.at.at
 
 Adaptive Predicted Mean Vote (aPMV)
 -----------------------------------
 
-.. autofunction:: pythermalcomfort.models.a_pmv
+.. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
 
 Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 -----------------------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.e_pmv
+.. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
 
 Discomfort Index (DI)
 ---------------------
 
-.. autofunction:: pythermalcomfort.models.discomfort_index
+.. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
 
 Psychrometrics functions
 ========================
