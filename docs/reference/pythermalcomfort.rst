@@ -1,11 +1,6 @@
 Comfort models
 ==============
 
-.. testsetup::
-
-    from pythermalcomfort import *
-    from pythermalcomfort.models import *
-
 Adaptive ASHRAE
 ---------------
 
@@ -69,7 +64,7 @@ Humidex
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 
-.. autoclass:: pythermalcomfort.models.JOS3.JOS3
+.. autoclass:: pythermalcomfort.models.jos3.JOS3
     :members:
     :undoc-members:
     :special-members: __init__
@@ -109,8 +104,8 @@ Standard Effective Temperature (SET)
 
 .. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
-Two-node model (Gagge et al.)
------------------------------
+Two-node model
+--------------
 
 .. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
 

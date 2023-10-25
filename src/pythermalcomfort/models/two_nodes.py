@@ -23,31 +23,18 @@ def two_nodes(
     max_skin_blood_flow=90,
     **kwargs,
 ):
-    """Two-node model of human temperature regulation Gagge et al. (1986).
-
-    [10]_ This model it can be used to calculate a variety of indices,
+    """Two-node model of human temperature regulation Gagge et al. (1986). [10]_
+    This model it can be used to calculate a variety of indices,
     including:
 
-    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two node model
-    developed by Gagge et al. (1986) [10]_.
-
-    * PMV SET and the predicted thermal sensation based on SET [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however,
-    it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
-
-    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as:
-    comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of each
-    category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
-
+    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two node model developed by Gagge et al. (1986) [10]_.
+    * PMV SET and the predicted thermal sensation based on SET [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
+    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
     * Heat gains and losses via convection, radiation and conduction.
-
     * The Standard Effective Temperature (SET)
-
     * The New Effective Temperature (ET)
-
     * The Predicted  Thermal  Sensation  (TSENS)
-
     * The Predicted  Percent  Dissatisfied  Due  to  Draft  (PD)
-
     * Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"   (PS)
 
     Parameters

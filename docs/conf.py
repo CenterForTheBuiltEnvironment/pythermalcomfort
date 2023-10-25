@@ -28,11 +28,11 @@ templates_path = ["."]
 extlinks = {
     "issue": (
         "https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues/%s",
-        "#",
+        "issue %s",
     ),
     "pr": (
         "https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/pull/%s",
-        "PR #",
+        "PR %s",
     ),
 }
 # on_rtd is whether we are on readthedocs.org
