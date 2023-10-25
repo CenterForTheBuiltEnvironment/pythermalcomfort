@@ -6,50 +6,6 @@ Comfort models
     from pythermalcomfort import *
     from pythermalcomfort.models import *
 
-
-Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
-------------------------------------------------------------------------
-
-.. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
-
-Predicted Mean Vote (PMV)
--------------------------
-
-.. autofunction:: pythermalcomfort.models.pmv.pmv
-
-Two-node model (Gagge et al.)
------------------------------
-
-.. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
-
-Standard Effective Temperature (SET)
-------------------------------------
-
-.. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
-
-Physiological Equivalent Temperature (PET)
-------------------------------------------
-
-.. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
-
-Cooling Effect (CE)
--------------------
-
-.. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
-
-Joint system thermoregulation model (JOS-3)
--------------------------------------------
-
-.. autoclass:: pythermalcomfort.models.JOS3.JOS3
-    :members:
-    :undoc-members:
-    :special-members: __init__
-
-Adaptive Thermal Heat Balance (ATHB)
-------------------------------------
-
-.. autofunction:: pythermalcomfort.models.athb.athb
-
 Adaptive ASHRAE
 ---------------
 
@@ -60,45 +16,45 @@ Adaptive EN
 
 .. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
 
-Use Fans During Heatwaves
+Adaptive Predicted Mean Vote (aPMV)
+-----------------------------------
+
+.. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
+
+Adaptive Thermal Heat Balance (ATHB)
+------------------------------------
+
+.. autofunction:: pythermalcomfort.models.athb.athb
+
+Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
+-----------------------------------------------------------
+
+.. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
+
+Apparent Temperature (AT)
 -------------------------
 
-.. autofunction:: pythermalcomfort.models.use_fans_heatwaves.use_fans_heatwaves
-
-Solar gain on people
---------------------
-
-.. autofunction:: pythermalcomfort.models.solar_gain.solar_gain
-
-Universal Thermal Climate Index (UTCI)
---------------------------------------
-
-.. autofunction:: pythermalcomfort.models.utci.utci
-
-Clothing prediction
--------------------
-
-.. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
-
-Vertical air temperature gradient
----------------------------------
-
-.. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd.vertical_tmp_grad_ppd
+.. autofunction:: pythermalcomfort.models.at.at
 
 Ankle draft
 -----------
 
 .. autofunction:: pythermalcomfort.models.ankle_draft.ankle_draft
 
-Predicted Heat Strain (PHS) Index
----------------------------------
+Clothing prediction
+-------------------
 
-.. autofunction:: pythermalcomfort.models.phs.phs
+.. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
 
-Wet Bulb Globe Temperature Index (WBGT)
----------------------------------------
+Cooling Effect (CE)
+-------------------
 
-.. autofunction:: pythermalcomfort.models.wbgt.wbgt
+.. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
+
+Discomfort Index (DI)
+---------------------
+
+.. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
 
 Heat Index (HI)
 ---------------
@@ -110,35 +66,78 @@ Humidex
 
 .. autofunction:: pythermalcomfort.models.humidex.humidex
 
+Joint system thermoregulation model (JOS-3)
+-------------------------------------------
+
+.. autoclass:: pythermalcomfort.models.JOS3.JOS3
+    :members:
+    :undoc-members:
+    :special-members: __init__
+
 Normal Effective Temperature (NET)
 ----------------------------------
 
 .. autofunction:: pythermalcomfort.models.net.net
 
+Predicted Heat Strain (PHS) Index
+---------------------------------
+
+.. autofunction:: pythermalcomfort.models.phs.phs
+
+Physiological Equivalent Temperature (PET)
+------------------------------------------
+
+.. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
+
+Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+------------------------------------------------------------------------
+
+.. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
+
+Predicted Mean Vote (PMV)
+-------------------------
+
+.. autofunction:: pythermalcomfort.models.pmv.pmv
+
+Solar gain on people
+--------------------
+
+.. autofunction:: pythermalcomfort.models.solar_gain.solar_gain
+
+Standard Effective Temperature (SET)
+------------------------------------
+
+.. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
+
+Two-node model (Gagge et al.)
+-----------------------------
+
+.. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
+
+Universal Thermal Climate Index (UTCI)
+--------------------------------------
+
+.. autofunction:: pythermalcomfort.models.utci.utci
+
+Use Fans During Heatwaves
+-------------------------
+
+.. autofunction:: pythermalcomfort.models.use_fans_heatwaves.use_fans_heatwaves
+
+Vertical air temperature gradient
+---------------------------------
+
+.. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd.vertical_tmp_grad_ppd
+
+Wet Bulb Globe Temperature Index (WBGT)
+---------------------------------------
+
+.. autofunction:: pythermalcomfort.models.wbgt.wbgt
+
 Wind chill index
 ----------------
 
 .. autofunction:: pythermalcomfort.models.wc.wc
-
-Apparent Temperature (AT)
--------------------------
-
-.. autofunction:: pythermalcomfort.models.at.at
-
-Adaptive Predicted Mean Vote (aPMV)
------------------------------------
-
-.. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
-
-Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
------------------------------------------------------------
-
-.. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
-
-Discomfort Index (DI)
----------------------
-
-.. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
 
 Psychrometrics functions
 ========================
