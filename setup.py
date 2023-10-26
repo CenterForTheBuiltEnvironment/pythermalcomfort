@@ -43,9 +43,9 @@ setup(
     author="Federico Tartarini",
     author_email="cbecomforttool@gmail.com",
     url="https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort",
-    packages=find_packages("pythermalcomfort"),
-    package_dir={"": "pythermalcomfort"},
-    py_modules=[splitext(basename(path))[0] for path in glob("pythermalcomfort/*.py")],
+    # packages=find_packages("pythermalcomfort"),
+    # package_dir={"pythermalcomfort": "pythermalcomfort"},
+    # py_modules=[splitext(basename(path))[0] for path in glob("pythermalcomfort/*.py")],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
