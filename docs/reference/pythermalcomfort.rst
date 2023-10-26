@@ -1,10 +1,14 @@
 Comfort models
 ==============
 
+.. testsetup::
+
+    from pythermalcomfort import *
+
 Adaptive ASHRAE
 ---------------
 
-.. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
+.. autofunction:: src.pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
 Adaptive EN
 -----------
