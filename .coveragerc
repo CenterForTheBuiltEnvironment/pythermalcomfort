@@ -1,6 +1,6 @@
 [paths]
 source =
-   src
+   pythermalcomfort
    */site-packages
 
 [run]

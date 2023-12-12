@@ -54,11 +54,12 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
         "round": True,
     }
     kwargs = {**default_kwargs, **kwargs}
+
+    if with_solar_load and tdb is None:
+        raise ValueError("Please enter the dry bulb air temperature")
+
     if with_solar_load:
-        if tdb:
-            t_wbg = 0.7 * twb + 0.2 * tg + 0.1 * tdb
-        else:
-            raise ValueError("Please enter the dry bulb air temperature")
+        t_wbg = 0.7 * twb + 0.2 * tg + 0.1 * tdb
     else:
         t_wbg = 0.7 * twb + 0.3 * tg
 
