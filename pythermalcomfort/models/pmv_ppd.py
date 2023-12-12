@@ -142,12 +142,12 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     default_kwargs = {"units": "SI", "limit_inputs": True, "airspeed_control": True}
     kwargs = {**default_kwargs, **kwargs}
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     if kwargs["units"].lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
@@ -191,7 +191,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     pmv_array = _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
 
     ppd_array = 100.0 - 95.0 * np.exp(
-        -0.03353 * np.power(pmv_array, 4.0) - 0.2179 * np.power(pmv_array, 2.0)
+        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
@@ -231,7 +231,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     ],
 )
 def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
-    pa = rh * 10 * math.exp(16.6536 - 4030.183 / (tdb + 235))
+    pa = rh * 10 * np.exp(16.6536 - 4030.183 / (tdb + 235))
 
     icl = 0.155 * clo  # thermal insulation of the clothing in M2K/W
     m = met * 58.15  # metabolic rate in W/M2
@@ -244,7 +244,7 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
         f_cl = 1.05 + (0.645 * icl)
 
     # heat transfer coefficient by forced convection
-    hcf = 12.1 * math.sqrt(vr)
+    hcf = 12.1 * np.sqrt(vr)
     hc = hcf  # initialize variable
     taa = tdb + 273
     tra = tr + 273
@@ -260,9 +260,9 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     eps = 0.00015
 
     n = 0
-    while abs(xn - xf) > eps:
+    while np.abs(xn - xf) > eps:
         xf = (xf + xn) / 2
-        hcn = 2.38 * abs(100.0 * xf - taa) ** 0.25
+        hcn = 2.38 * np.abs(100.0 * xf - taa) ** 0.25
         if hcf > hcn:
             hc = hcf
         else:
@@ -290,7 +290,7 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     # heat loss by convection
     hl6 = f_cl * hc * (tcl - tdb)
 
-    ts = 0.303 * math.exp(-0.036 * m) + 0.028
+    ts = 0.303 * np.exp(-0.036 * m) + 0.028
     _pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
 
     return _pmv
