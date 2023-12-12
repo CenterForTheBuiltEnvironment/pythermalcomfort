@@ -25,6 +25,10 @@ jobs:
       - name: Run Tox
         run: |
           tox -e py310
+      - name: Run Black
+        run: |-
+          pip install black
+          black . --check
 
   deploy:
 
