@@ -38,6 +38,9 @@ def humidex(tdb, rh, **kwargs):
     }
     kwargs = {**default_kwargs, **kwargs}
 
+    if rh > 100 or rh < 0:
+        raise ValueError
+
     hi = tdb + 5 / 9 * ((6.112 * 10 ** (7.5 * tdb / (237.7 + tdb)) * rh / 100) - 10)
 
     if kwargs["round"]:
