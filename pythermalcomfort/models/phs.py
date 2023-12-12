@@ -230,6 +230,12 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         }
 
 
+# Constants
+const_t_eq = math.exp(-1 / 10)
+const_t_sk = math.exp(-1 / 3)
+const_sw = math.exp(-1 / 10)
+
+
 @jit(nopython=True)
 def _phs_optimized(*args):
     (
@@ -271,10 +277,6 @@ def _phs_optimized(*args):
     d_max_50 = 0.075 * weight * 1000
     # maximum water loss to protect 95 % of the working population [g]
     d_max_95 = 0.05 * weight * 1000
-    # exponential averaging constants
-    const_t_eq = math.exp(-1 / 10)
-    const_t_sk = math.exp(-1 / 3)
-    const_sw = math.exp(-1 / 10)
     sweat_rate = sw_tot
 
     def_dir = 0
