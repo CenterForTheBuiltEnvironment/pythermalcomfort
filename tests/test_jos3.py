@@ -1,13 +1,13 @@
 import os
-from pprint import pprint
 
 import pandas as pd
 import pytest
-from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
+
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import *
 from pythermalcomfort.jos3_functions.matrix import *
 from pythermalcomfort.jos3_functions.thermoregulation import *
+from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
 
 
 # test JOS-3 class
