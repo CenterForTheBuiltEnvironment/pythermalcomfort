@@ -1,6 +1,34 @@
 Changelog
 =========
 
+2.9.0 (2024-01-15)
+-------------------
+
+.. warning::
+    pythermalcomfort 2.9.0 is no longer compatible with Python 3.8
+
+* The PHS model accepts arrays as inputs
+
+2.8.11 (2023-10-26)
+-------------------
+
+* wrote more test and improved code
+
+2.8.11 (2023-10-26)
+-------------------
+
+* fixed issues with the documentation and sorted the models in alphabetical order
+
+2.8.7 (2023-10-23)
+-------------------
+
+* Adaptive ASHRAE now returns a dataclass
+
+2.8.6 (2023-10-09)
+-------------------
+
+* re-structured and linted the code
+
 2.8.4 (2023-09-20)
 -------------------
 
