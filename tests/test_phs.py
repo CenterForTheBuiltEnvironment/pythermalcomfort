@@ -1,7 +1,25 @@
+import numpy as np
 import pytest
-import warnings
 
 from pythermalcomfort.models import phs
+
+
+def test_phs_array():
+    np.testing.assert_equal(
+        phs(tdb=[40, 40], tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2),
+        {
+            "t_re": [37.5, 37.5],
+            "t_sk": [35.3, 35.3],
+            "t_cr": [37.5, 37.5],
+            "t_cr_eq": [37.1, 37.1],
+            "t_sk_t_cr_wg": [0.24, 0.24],
+            "d_lim_loss_50": [440.0, 440.0],
+            "d_lim_loss_95": [298.0, 298.0],
+            "d_lim_t_re": [480, 480],
+            "water_loss_watt": [266.1, 266.1],
+            "water_loss": [6166.4, 6166.4],
+        },
+    )
 
 
 def test_phs():
@@ -148,56 +166,92 @@ def test_phs():
 
 
 def test_check_standard_compliance():
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 air temperature applicability limits between 15 and 50 °C",
-    ):
-        warnings.warn(
-            phs(tdb=70, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2),
-            UserWarning,
+    # checking that returns correct values when inside standard applicability limits
+    np.testing.assert_equal(
+        phs(
+            [20, 20, 20, 20, 20, 20],
+            [20, 20, 20, 20, 20, 20],
+            [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            [
+                50,
+                50,
+                50,
+                50,
+                50,
+                50,
+            ],
+            [
+                150,
+                150,
+                150,
+                150,
+                150,
+                150,
+            ],
+            [0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+            posture=1,
+        )["t_re"],
+        [37.4, 37.4, 37.4, 37.4, 37.4, 37.4],
+    )
+
+    # same values as above but with one value outside the standard applicability limits
+    np.testing.assert_equal(
+        phs(
+            [51, 20, 20, 35, 20, 20],
+            [20, 61, 20, 20, 20, 20],
+            [0.1, 0.1, 3.1, 0.1, 0.1, 0.1],
+            [
+                50,
+                50,
+                50,
+                90,
+                50,
+                50,
+            ],
+            [
+                150,
+                150,
+                150,
+                150,
+                90,
+                150,
+            ],
+            [0.5, 0.5, 0.5, 0.5, 0.5, 1.1],
+            posture=1,
+        )["t_re"],
+        [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+    )
+
+
+def test_value_acclimatized():
+    with pytest.raises(ValueError):
+        phs(
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=150,
+            clo=0.5,
+            posture=2,
+            acclimatized=101,
         )
 
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 t_r - t_db applicability limits between 0 and 60 °C",
-    ):
-        warnings.warn(
-            phs(tdb=20, tr=0, rh=33.85, v=0.3, met=150, clo=0.5, posture=2),
-            UserWarning,
+    with pytest.raises(ValueError):
+        phs(
+            tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, acclimatized=-1
         )
 
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 air speed applicability limits between 0 and 3 m/s",
-    ):
-        warnings.warn(
-            phs(tdb=40, tr=40, rh=33.85, v=5, met=150, clo=0.5, posture=2),
-            UserWarning,
-        )
 
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 met applicability limits between 100 and 450 met",
-    ):
-        warnings.warn(
-            phs(tdb=40, tr=40, rh=33.85, v=2, met=1, clo=0.5, posture=2),
-            UserWarning,
-        )
+def test_value_weight():
+    with pytest.raises(ValueError):
+        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, weight=1001)
 
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 clo applicability limits between 0.1 and 1 clo",
-    ):
-        warnings.warn(
-            phs(tdb=40, tr=40, rh=33.85, v=2, met=150, clo=2, posture=2),
-            UserWarning,
-        )
+    with pytest.raises(ValueError):
+        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, weight=0)
 
-    with pytest.warns(
-        UserWarning,
-        match="ISO 7933:2004 rh applicability limits between 0 and",
-    ):
-        warnings.warn(
-            phs(tdb=40, tr=40, rh=61, v=2, met=150, clo=0.5, posture=2),
-            UserWarning,
-        )
+
+def test_value_drink():
+    with pytest.raises(ValueError):
+        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, drink=0.5)
+    with pytest.raises(ValueError):
+        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, drink=2)

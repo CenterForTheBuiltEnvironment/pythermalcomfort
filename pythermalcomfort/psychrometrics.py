@@ -108,20 +108,21 @@ def p_sat(tdb):
     c12 = -0.14452093 * 1e-7
     c13 = 6.5459673
 
-    if ta_k < c_to_k:
-        pascals = np.exp(
+    pascals = np.where(
+        ta_k < c_to_k,
+        np.exp(
             c1 / ta_k
             + c2
             + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k)))
             + c7 * np.log(ta_k)
-        )
-    else:
-        pascals = np.exp(
+        ),
+        np.exp(
             c8 / ta_k
             + c9
             + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
             + c13 * np.log(ta_k)
-        )
+        ),
+    )
 
     return np.around(pascals, 1)
 
