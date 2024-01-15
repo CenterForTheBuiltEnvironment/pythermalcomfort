@@ -2,11 +2,6 @@ version: '{branch}-{build}'
 build: off
 environment:
   matrix:
-    - TOXENV: py38,codecov
-      TOXPYTHON: C:\Python38-x64\python.exe
-      PYTHON_HOME: C:\Python38-x64
-      PYTHON_VERSION: '3.8'
-      PYTHON_ARCH: '64'
     - TOXENV: py39,codecov
       TOXPYTHON: C:\Python39-x64\python.exe
       PYTHON_HOME: C:\Python39-x64

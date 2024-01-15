@@ -88,8 +88,8 @@ class TestPmvPpd:
         result = pmv_ppd(tdb, tr, vr, rh, met, clo)
 
         # Assert
-        assert math.isclose(result["pmv"], -0.82)
-        assert math.isclose(result["ppd"], 19)
+        assert math.isclose(result["pmv"][0], -0.82)
+        assert math.isclose(result["ppd"][0], 19)
 
     #  Raises a ValueError if standard is not ISO or ASHRAE
     def test_raises_value_error_if_standard_is_not_iso_or_ashrae(self):

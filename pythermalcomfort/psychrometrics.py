@@ -96,34 +96,35 @@ def p_sat(tdb):
     ta_k = tdb + c_to_k
     c1 = -5674.5359
     c2 = 6.3925247
-    c3 = -0.9677843 * math.pow(10, -2)
-    c4 = 0.62215701 * math.pow(10, -6)
-    c5 = 0.20747825 * math.pow(10, -8)
-    c6 = -0.9484024 * math.pow(10, -12)
+    c3 = -0.9677843 * 1e-2
+    c4 = 0.62215701 * 1e-6
+    c5 = 0.20747825 * 1e-8
+    c6 = -0.9484024 * 1e-12
     c7 = 4.1635019
     c8 = -5800.2206
     c9 = 1.3914993
     c10 = -0.048640239
-    c11 = 0.41764768 * math.pow(10, -4)
-    c12 = -0.14452093 * math.pow(10, -7)
+    c11 = 0.41764768 * 1e-4
+    c12 = -0.14452093 * 1e-7
     c13 = 6.5459673
 
-    if ta_k < c_to_k:
-        pascals = math.exp(
+    pascals = np.where(
+        ta_k < c_to_k,
+        np.exp(
             c1 / ta_k
             + c2
             + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k)))
-            + c7 * math.log(ta_k)
-        )
-    else:
-        pascals = math.exp(
+            + c7 * np.log(ta_k)
+        ),
+        np.exp(
             c8 / ta_k
             + c9
             + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
-            + c13 * math.log(ta_k)
-        )
+            + c13 * np.log(ta_k)
+        ),
+    )
 
-    return round(pascals, 1)
+    return np.around(pascals, 1)
 
 
 def psy_ta_rh(tdb, rh, p_atm=101325):

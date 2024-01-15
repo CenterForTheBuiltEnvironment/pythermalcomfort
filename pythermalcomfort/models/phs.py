@@ -1,11 +1,11 @@
 import math
 
+import numpy as np
 from numba import jit
 
 from pythermalcomfort.psychrometrics import p_sat
 from pythermalcomfort.utilities import (
-    check_standard_compliance,
-    body_surface_area,
+    check_standard_compliance_array,
 )
 
 
@@ -25,30 +25,37 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, default in [°C]
-    tr : float
+    tr : float or array-like
         mean radiant temperature, default in [°C]
-    v : float
+    v : float or array-like
         air speed, default in [m/s]
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [W/(m2)]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
-    posture:
+    posture: int
         a numeric value presenting posture of person [sitting=1, standing=2, crouching=3]
-    wme : float
+    wme : float or array-like
         external work, [W/(m2)] default 0
 
     Other Parameters
     ----------------
+    limit_inputs : boolean default True
+        By default, if the inputs are outsude the standard applicability limits the
+        function returns nan. If False returns values even if input values are
+        outside the applicability limits of the model.
+
+        The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
+        0 < vr [m/s] < 3, 100 < met [met] < 450, and 0.1 < clo [clo] < 1.
     i_mst : float, default 0.38
         static moisture permeability index, [dimensionless]
     a_p : float, default 0.54
         fraction of the body surface covered by the reflective clothing, [dimensionless]
-    drink : float, default 1
+    drink : int, default 1
         1 if workers can drink freely, 0 otherwise
     weight : float, default 75
         body weight, [kg]
@@ -58,9 +65,9 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         walking speed, [m/s]
     theta : float, default 0
         angle between walking direction and wind direction [degrees]
-    acclimatized : float, default 100
+    acclimatized : int, default 100
         100 if acclimatized subject, 0 otherwise
-    duration : float, default 480
+    duration : int, default 480
         duration of the work sequence, [minutes]
     f_r : float, default 0.97
         emissivity of the reflective clothing, [dimensionless]
@@ -104,7 +111,7 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     .. code-block:: python
 
         >>> from pythermalcomfort.models import phs
-        >>> results = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2)
+        >>> results = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, wme=0)
         >>> print(results)
         {'t_re': 37.5, 'd_lim_loss_50': 440, 'd_lim_loss_95': 298, 'd_lim_t_re': 480,
         'water_loss': 6166.0}
@@ -127,8 +134,18 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         "t_sk_t_cr_wg": 0.3,
         "sweat_rate": 0,
         "round": True,
+        "limit_inputs": True,
     }
     kwargs = {**default_kwargs, **kwargs}
+
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
+    posture = np.array(posture)
 
     i_mst = kwargs["i_mst"]
     a_p = kwargs["a_p"]
@@ -146,18 +163,24 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
     t_cr_eq = kwargs["t_cr_eq"]
     t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
     sweat_rate = kwargs["sweat_rate"]
+    limit_inputs = kwargs["limit_inputs"]
 
     p_a = p_sat(tdb) / 1000 * rh / 100
 
-    check_standard_compliance(
-        standard="ISO7933",
-        tdb=tdb,
-        tr=tr,
-        v=v,
-        rh=rh,
-        met=met * body_surface_area(kwargs["weight"], kwargs["height"]),
-        clo=clo,
-    )
+    acclimatized = int(acclimatized)
+    if acclimatized < 0 or acclimatized > 100:
+        raise ValueError("Acclimatized should be between 0 and 100")
+
+    if drink not in [0, 1]:
+        raise ValueError("Drink should be 0 or 1")
+
+    if weight <= 0 or weight > 1000:
+        raise ValueError(
+            "The weight of the person should be in kg and it cannot exceed 1000"
+        )
+
+    # I needed to create this variable since vectorize accept no more than 34 inputs+outputs
+    combined_drink_acc_weight = drink * 1000000 + acclimatized * 1000 + weight
 
     if not t_re:
         t_re = t_cr
@@ -175,59 +198,74 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
-    ) = _phs_optimized(
-        tdb,
-        tr,
-        v,
-        p_a,
-        met,
-        clo,
-        posture,
-        wme,
-        i_mst,
-        a_p,
-        drink,
-        weight,
-        height,
-        walk_sp,
-        theta,
-        acclimatized,
-        duration,
-        f_r,
-        t_sk,
-        t_cr,
-        t_re,
-        t_cr_eq,
-        t_sk_t_cr_wg,
-        sweat_rate,
+    ) = np.vectorize(_phs_optimized, cache=True)(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        p_a=p_a,
+        met=met,
+        clo=clo,
+        posture=posture,
+        combined_drink_acc_weight=combined_drink_acc_weight,
+        wme=wme,
+        i_mst=i_mst,
+        a_p=a_p,
+        height=height,
+        walk_sp=walk_sp,
+        theta=theta,
+        duration=duration,
+        f_r=f_r,
+        t_sk=t_sk,
+        t_cr=t_cr,
+        t_re=t_re,
+        t_cr_eq=t_cr_eq,
+        t_sk_t_cr_wg=t_sk_t_cr_wg,
+        sw_tot=sweat_rate,
     )
 
+    output = {
+        "t_re": t_re,
+        "t_sk": t_sk,
+        "t_cr": t_cr,
+        "t_cr_eq": t_cr_eq,
+        "t_sk_t_cr_wg": t_sk_t_cr_wg,
+        "d_lim_loss_50": d_lim_loss_50,
+        "d_lim_loss_95": d_lim_loss_95,
+        "d_lim_t_re": d_lim_t_re,
+        "water_loss_watt": sweat_rate,
+        "water_loss": sw_tot_g,
+    }
+
+    if limit_inputs:
+        (
+            tdb_valid,
+            tr_valid,
+            v_valid,
+            p_a_valid,
+            met_valid,
+            clo_valid,
+        ) = check_standard_compliance_array(
+            "7933", tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
+        )
+        all_valid = ~(
+            np.isnan(tdb_valid)
+            | np.isnan(tr_valid)
+            | np.isnan(v_valid)
+            | np.isnan(p_a_valid)
+            | np.isnan(met_valid)
+            | np.isnan(clo_valid)
+        )
+        for key in output.keys():
+            output[key] = np.where(all_valid, output[key], np.nan)
+
     if kwargs["round"]:
-        return {
-            "t_re": round(t_re, 1),
-            "t_sk": round(t_sk, 1),
-            "t_cr": round(t_cr, 1),
-            "t_cr_eq": round(t_cr_eq, 1),
-            "t_sk_t_cr_wg": round(t_sk_t_cr_wg, 2),
-            "d_lim_loss_50": round(d_lim_loss_50, 1),
-            "d_lim_loss_95": round(d_lim_loss_95, 1),
-            "d_lim_t_re": round(d_lim_t_re, 1),
-            "water_loss_watt": round(sweat_rate, 1),
-            "water_loss": round(sw_tot_g, 1),
-        }
-    else:
-        return {
-            "t_re": t_re,
-            "t_sk": t_sk,
-            "t_cr": t_cr,
-            "t_cr_eq": t_cr_eq,
-            "t_sk_t_cr_wg": t_sk_t_cr_wg,
-            "d_lim_loss_50": d_lim_loss_50,
-            "d_lim_loss_95": d_lim_loss_95,
-            "d_lim_t_re": d_lim_t_re,
-            "water_loss_watt": sweat_rate,
-            "water_loss": sw_tot_g,
-        }
+        for key in output.keys():
+            if key != "t_sk_t_cr_wg":
+                output[key] = np.around(output[key], 1)
+            else:
+                output[key] = np.around(output[key], 2)
+
+    return output
 
 
 # Constants
@@ -237,33 +275,33 @@ const_sw = math.exp(-1 / 10)
 
 
 @jit(nopython=True)
-def _phs_optimized(*args):
-    (
-        tdb,
-        tr,
-        v,
-        p_a,
-        met,
-        clo,
-        posture,
-        wme,
-        i_mst,
-        a_p,
-        drink,
-        weight,
-        height,
-        walk_sp,
-        theta,
-        acclimatized,
-        duration,
-        f_r,
-        t_sk,
-        t_cr,
-        t_re,
-        t_cr_eq,
-        t_sk_t_cr_wg,
-        sw_tot,
-    ) = args
+def _phs_optimized(
+    tdb,
+    tr,
+    v,
+    p_a,
+    met,
+    clo,
+    posture,
+    combined_drink_acc_weight,
+    wme,
+    i_mst,
+    a_p,
+    height,
+    walk_sp,
+    theta,
+    duration,
+    f_r,
+    t_sk,
+    t_cr,
+    t_re,
+    t_cr_eq,
+    t_sk_t_cr_wg,
+    sw_tot,
+):
+    drink = int(combined_drink_acc_weight / 1000000)
+    acclimatized = int((combined_drink_acc_weight - drink * 1000000) / 1000)
+    weight = combined_drink_acc_weight - drink * 1000000 - acclimatized * 1000
 
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight**0.425) * (height**0.725)
@@ -500,7 +538,7 @@ def _phs_optimized(*args):
     if d_lim_t_re == 0:
         d_lim_t_re = duration
 
-    return [
+    return (
         t_re,
         t_sk,
         t_cr,
@@ -511,4 +549,4 @@ def _phs_optimized(*args):
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
-    ]
+    )

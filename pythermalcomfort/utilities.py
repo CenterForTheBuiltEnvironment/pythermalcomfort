@@ -104,41 +104,6 @@ def check_standard_compliance(standard, **kwargs):
                     UserWarning,
                 )
 
-    elif params["standard"] == "ISO7933":  # based on ISO 7933:2004 Annex A
-        if params["tdb"] > 50 or params["tdb"] < 15:
-            warnings.warn(
-                "ISO 7933:2004 air temperature applicability limits between 15 and"
-                " 50 °C",
-                UserWarning,
-            )
-        p_a = p_sat(params["tdb"]) / 1000 * params["rh"] / 100
-        rh_max = 4.5 * 100 * 1000 / p_sat(params["tdb"])
-        if p_a > 4.5 or p_a < 0:
-            warnings.warn(
-                f"ISO 7933:2004 rh applicability limits between 0 and {rh_max} %",
-                UserWarning,
-            )
-        if params["tr"] - params["tdb"] > 60 or params["tr"] - params["tdb"] < 0:
-            warnings.warn(
-                "ISO 7933:2004 t_r - t_db applicability limits between 0 and 60 °C",
-                UserWarning,
-            )
-        if params["v"] > 3 or params["v"] < 0:
-            warnings.warn(
-                "ISO 7933:2004 air speed applicability limits between 0 and 3 m/s",
-                UserWarning,
-            )
-        if params["met"] > 450 or params["met"] < 100:
-            warnings.warn(
-                "ISO 7933:2004 met applicability limits between 100 and 450 met",
-                UserWarning,
-            )
-        if params["clo"] > 1 or params["clo"] < 0.1:
-            warnings.warn(
-                "ISO 7933:2004 clo applicability limits between 0.1 and 1 clo",
-                UserWarning,
-            )
-
 
 def check_standard_compliance_array(standard, **kwargs):
     default_kwargs = {"airspeed_control": True}
@@ -183,6 +148,16 @@ def check_standard_compliance_array(standard, **kwargs):
 
         else:
             return tdb_valid, tr_valid, v_valid
+
+    if standard == "7933":  # based on ISO 7933:2004 Annex A
+        tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
+        p_a_valid = valid_range(params["p_a"], (0, 4.5))
+        tr_valid = valid_range(params["tr"], (0.0, 60.0))
+        v_valid = valid_range(params["v"], (0.0, 3))
+        met_valid = valid_range(params["met"], (100, 450))
+        clo_valid = valid_range(params["clo"], (0.1, 1))
+
+        return tdb_valid, tr_valid, v_valid, p_a_valid, met_valid, clo_valid
 
     if standard == "fan_heatwaves":
         tdb_valid = valid_range(params["tdb"], (20.0, 50.0))
