@@ -192,7 +192,7 @@ def pet_steady(
                 # In this case, Tbody<Tbody_set --> The sweat flow is 0
                 sig_body = 0.0
             # from Gagge's model
-            m_rsw = 304.94 * 10**-3 * sig_body
+            m_rsw = 304.94 * sig_body
             # 500 g/m^2/h is the upper sweat rate limit
             if m_rsw > 500:
                 m_rsw = 500

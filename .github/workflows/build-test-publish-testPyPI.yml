@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  build:
+  test:
 
     # I am only testing with py310 but travis is Testing the other versions of Python
     runs-on: ubuntu-latest
