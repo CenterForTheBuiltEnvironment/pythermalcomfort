@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.9.1 (2024-01-19)
+-------------------
+
+* Fixed error calculation of mass sweating in PET mode, the unit was incorrect
+
 2.9.0 (2024-01-15)
 -------------------
 
