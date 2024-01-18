@@ -87,6 +87,77 @@ def pet_steady(
     met_factor = 58.2  # met conversion factor
     met = met * met_factor  # metabolic rate
 
+    def vasomotricity(t_cr, t_sk):
+        """Defines the vasomotricity (blood flow) in function of the core
+        and skin temperatures.
+
+        Parameters
+        ----------
+        t_cr : float
+            The body core temperature, [°C]
+        t_sk : float
+            The body skin temperature, [°C]
+
+        Returns
+        -------
+        dict
+            "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
+            mass
+            between core and skin [].
+        """
+        # skin and core temperatures set values
+        tc_set = 36.6  # 36.8
+        tsk_set = 34  # 33.7
+        # Set value signals
+        sig_skin = tsk_set - t_sk
+        sig_core = t_cr - tc_set
+        if sig_core < 0:
+            # In this case, T_core<Tc_set --> the blood flow is reduced
+            sig_core = 0.0
+        if sig_skin < 0:
+            # In this case, Tsk>Tsk_set --> the blood flow is increased
+            sig_skin = 0.0
+        # 6.3 L/m^2/h is the set value of the blood flow
+        m_blood = (6.3 + 75.0 * sig_core) / (1.0 + 0.5 * sig_skin)
+        # 90 L/m^2/h is the blood flow upper limit
+        if m_blood > 90:
+            m_blood = 90.0
+        # in other models, alpha is used to update tbody
+        alpha = 0.0417737 + 0.7451833 / (m_blood + 0.585417)
+
+        return {"m_blood": m_blood, "alpha": alpha}
+
+    def sweat_rate(t_body):
+        """Defines the sweating mechanism depending on the body and core
+        temperatures.
+
+        Parameters
+        ----------
+        t_body : float
+            weighted average between skin and core temperatures, [°C]
+
+        Returns
+        -------
+        m_rsw : float
+            The sweating flow rate, [g/m2/h].
+        """
+        tc_set = 36.6  # 36.8
+        tsk_set = 34  # 33.7
+        tbody_set = 0.1 * tsk_set + 0.9 * tc_set  # Calculation of the body
+        # temperature
+        # through a weighted average
+        sig_body = t_body - tbody_set
+        if sig_body < 0:
+            # In this case, Tbody<Tbody_set --> The sweat flow is 0
+            sig_body = 0.0
+        # from Gagge's model
+        m_rsw = 304.94 * sig_body
+        # 500 g/m^2/h is the upper sweat rate limit
+        if m_rsw > 500:
+            m_rsw = 500
+
+        return m_rsw
+
     def solve_pet(
         t_arr,
         _tdb,
@@ -124,80 +195,9 @@ def pet_steady(
 
         Returns
         -------
-        float
+        float or list
             PET or energy balance.
         """
-
-        def vasomotricity(t_cr, t_sk):
-            """Defines the vasomotricity (blood flow) in function of the core
-            and skin temperatures.
-
-            Parameters
-            ----------
-            t_cr : float
-                The body core temperature, [°C]
-            t_sk : float
-                The body skin temperature, [°C]
-
-            Returns
-            -------
-            dict
-                "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
-                mass
-                between core and skin [].
-            """
-            # skin and core temperatures set values
-            tc_set = 36.6  # 36.8
-            tsk_set = 34  # 33.7
-            # Set value signals
-            sig_skin = tsk_set - t_sk
-            sig_core = t_cr - tc_set
-            if sig_core < 0:
-                # In this case, T_core<Tc_set --> the blood flow is reduced
-                sig_core = 0.0
-            if sig_skin < 0:
-                # In this case, Tsk>Tsk_set --> the blood flow is increased
-                sig_skin = 0.0
-            # 6.3 L/m^2/h is the set value of the blood flow
-            m_blood = (6.3 + 75.0 * sig_core) / (1.0 + 0.5 * sig_skin)
-            # 90 L/m^2/h is the blood flow upper limit
-            if m_blood > 90:
-                m_blood = 90.0
-            # in other models, alpha is used to update tbody
-            alpha = 0.0417737 + 0.7451833 / (m_blood + 0.585417)
-
-            return {"m_blood": m_blood, "alpha": alpha}
-
-        def sweat_rate(t_body):
-            """Defines the sweating mechanism depending on the body and core
-            temperatures.
-
-            Parameters
-            ----------
-            t_body : float
-                weighted average between skin and core temperatures, [°C]
-
-            Returns
-            -------
-            m_rsw : float
-                The sweating flow rate, [g/m2/h].
-            """
-            tc_set = 36.6  # 36.8
-            tsk_set = 34  # 33.7
-            tbody_set = 0.1 * tsk_set + 0.9 * tc_set  # Calculation of the body
-            # temperature
-            # through a weighted average
-            sig_body = t_body - tbody_set
-            if sig_body < 0:
-                # In this case, Tbody<Tbody_set --> The sweat flow is 0
-                sig_body = 0.0
-            # from Gagge's model
-            m_rsw = 304.94 * 10**-3 * sig_body
-            # 500 g/m^2/h is the upper sweat rate limit
-            if m_rsw > 500:
-                m_rsw = 500
-
-            return m_rsw
 
         e_skin = 0.99  # Skin emissivity
         e_clo = 0.95  # Clothing emissivity
@@ -205,10 +205,12 @@ def pet_steady(
         sbc = 5.67 * 10**-8  # Stefan-Boltzmann constant [W/(m2*K^(-4))]
         cb = 3640  # Blood specific heat [J/kg/k]
 
-        t_arr = np.reshape(t_arr, (3, 1))  # reshape to proper dimensions for fsolve
-        e_bal_vec = np.zeros(
-            (3, 1)
-        )  # required for the vectorial expression of the balance
+        t_cr, t_sk, t_clo = t_arr
+        e_bal_vec = [
+            0.0,
+            0.0,
+            0.0,
+        ]  # required for the vectorial expression of the balance
         # Area parameters of the body:
         a_dubois = body_surface_area(weight, height)
         # Base metabolism for men and women in [W]
@@ -282,8 +284,8 @@ def pet_steady(
         ere = c_res + q_res  # [W/m2]
 
         # Calculation of the equivalent thermal resistance of body tissues
-        alpha = vasomotricity(t_arr[0, 0], t_arr[1, 0])["alpha"]
-        tbody = alpha * t_arr[1, 0] + (1 - alpha) * t_arr[0, 0]
+        alpha = vasomotricity(t_cr, t_sk)["alpha"]
+        tbody = alpha * t_sk + (1 - alpha) * t_cr
 
         # Clothed fraction of the body approximation
         r_cl = _clo / 6.45  # Conversion in [m2.K/W]
@@ -313,7 +315,7 @@ def pet_steady(
         # g/m2/s]
         esw = h_vap / 1000 * qmsw / 3600  # [W/m2]
         # Saturation vapor pressure at temperature Tsk
-        p_v_sk = p_sat(t_arr[1, 0]) / 100  # hPa
+        p_v_sk = p_sat(t_sk) / 100  # hPa
         # Calculation of vapour transfer
         lr = 16.7 * 10 ** (-1)  # [K/hPa] Lewis ratio
         he_diff = hc * lr  # diffusion coefficient of air layer
@@ -342,7 +344,7 @@ def pet_steady(
             * (1.0 - f_a_cl)
             * e_skin
             * sbc
-            * ((_tr + 273.15) ** 4.0 - (t_arr[1, 0] + 273.15) ** 4.0)
+            * ((_tr + 273.15) ** 4.0 - (t_sk + 273.15) ** 4.0)
             / a_dubois
         )
         # ... for clothed area
@@ -351,43 +353,37 @@ def pet_steady(
             * a_clo
             * e_clo
             * sbc
-            * ((_tr + 273.15) ** 4.0 - (t_arr[2, 0] + 273.15) ** 4.0)
+            * ((_tr + 273.15) ** 4.0 - (t_clo + 273.15) ** 4.0)
             / a_dubois
         )
         r_sum = r_clo + r_bare  # radiation total
 
         # Convection losses for bare skin
-        c_bare = (
-            hc * (_tdb - t_arr[1, 0]) * a_dubois * (1.0 - f_a_cl) / a_dubois
-        )  # [W/m^2]
+        c_bare = hc * (_tdb - t_sk) * a_dubois * (1.0 - f_a_cl) / a_dubois  # [W/m^2]
         # ... for clothed area
-        c_clo = hc * (_tdb - t_arr[2, 0]) * a_clo / a_dubois  # [W/m^2]
+        c_clo = hc * (_tdb - t_clo) * a_clo / a_dubois  # [W/m^2]
         csum = c_clo + c_bare  # convection total
 
         # Balance equations of the 3-nodes model
-        e_bal_vec[0, 0] = (
+        e_bal_vec[0] = (
             h
             + ere
-            - (vasomotricity(t_arr[0, 0], t_arr[1, 0])["m_blood"] / 3600 * cb + 5.28)
-            * (t_arr[0, 0] - t_arr[1, 0])
+            - (vasomotricity(t_cr, t_sk)["m_blood"] / 3600 * cb + 5.28) * (t_cr - t_sk)
         )  # Core balance [W/m^2]
-        e_bal_vec[1, 0] = (
+        e_bal_vec[1] = (
             r_bare
             + c_bare
             + evap
-            + (vasomotricity(t_arr[0, 0], t_arr[1, 0])["m_blood"] / 3600 * cb + 5.28)
-            * (t_arr[0, 0] - t_arr[1, 0])
-            - htcl * (t_arr[1, 0] - t_arr[2, 0])
+            + (vasomotricity(t_cr, t_sk)["m_blood"] / 3600 * cb + 5.28) * (t_cr - t_sk)
+            - htcl * (t_sk - t_clo)
         )  # Skin balance [W/m^2]
-        e_bal_vec[2, 0] = (
-            c_clo + r_clo + htcl * (t_arr[1, 0] - t_arr[2, 0])
-        )  # Clothes balance [W/m^2]
+        e_bal_vec[2] = c_clo + r_clo + htcl * (t_sk - t_clo)  # Clothes balance [W/m^2]
         e_bal_scal = h + ere + r_sum + csum + evap
 
-        # returning either the calculated core,skin,clo temperatures or the PET
+        # returning either the calculated core, skin, clo temperatures or the PET
         if actual_environment:
             # if we solve for the system we need to return 3 temperatures
-            return [e_bal_vec[0, 0], e_bal_vec[1, 0], e_bal_vec[2, 0]]
+            return list(e_bal_vec)
         else:
             # solving for the PET requires the scalar balance only
             return e_bal_scal
