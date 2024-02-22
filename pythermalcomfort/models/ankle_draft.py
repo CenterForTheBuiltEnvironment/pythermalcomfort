@@ -7,7 +7,7 @@ from pythermalcomfort.utilities import (
 )
 
 
-def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units="SI"):
+def ankle_draft(tdb, tr, vr, rh, met, clo, v_ankle, units: str = "SI"):
     """
     Calculates the percentage of thermally dissatisfied people with the ankle draft (
     0.1 m) above floor level [23]_.

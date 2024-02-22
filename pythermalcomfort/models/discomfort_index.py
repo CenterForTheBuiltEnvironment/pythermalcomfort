@@ -1,3 +1,5 @@
+from typing import Union, List
+
 import numpy as np
 
 from pythermalcomfort.utilities import (
@@ -5,7 +7,10 @@ from pythermalcomfort.utilities import (
 )
 
 
-def discomfort_index(tdb, rh):
+def discomfort_index(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+):
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usuallly divided in 6 dicomfort categories and it only applies to
@@ -20,14 +25,14 @@ def discomfort_index(tdb, rh):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, [°C]
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
 
     Returns
     -------
-    di : float or array-like
+    di : float, int, or array-like
         Discomfort Index, [°C]
     discomfort_condition : str or array-like
         Classification of the thermal comfort conditions according to the discomfort index

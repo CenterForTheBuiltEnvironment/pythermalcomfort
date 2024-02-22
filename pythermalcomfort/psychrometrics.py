@@ -1,5 +1,8 @@
-import math
+from dataclasses import dataclass
+from typing import Union, List
+
 import numpy as np
+
 from pythermalcomfort.shared_functions import valid_range
 
 c_to_k = 273.15
@@ -11,12 +14,12 @@ r_air = 287.055
 g = 9.81  # m/s2
 
 
-def p_sat_torr(tdb):
+def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     """Estimates the saturation vapor pressure in [torr]
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, [C]
 
     Returns
@@ -27,16 +30,21 @@ def p_sat_torr(tdb):
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
-def t_o(tdb, tr, v, standard="ISO"):
+def t_o(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    standard: str = "ISO",
+):
     """Calculates operative temperature in accordance with ISO 7726:1998 [5]_
 
     Parameters
     ----------
-    tdb: float or array-like
+    tdb: float, int, or array-like
         air temperature, [°C]
-    tr: float or array-like
+    tr: float, int, or array-like
         mean radiant temperature, [°C]
-    v: float or array-like
+    v: float, int, or array-like
         air speed, [m/s]
     standard: str (default="ISO")
         either choose between ISO and ASHRAE
@@ -56,19 +64,22 @@ def t_o(tdb, tr, v, standard="ISO"):
         return a * tdb + (1 - a) * tr
 
 
-def enthalpy(tdb, hr):
+def enthalpy(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    hr: Union[float, int, np.ndarray, List[float], List[int]],
+):
     """Calculates air enthalpy
 
     Parameters
     ----------
-    tdb: float
+    tdb: float, int, or array-like
         air temperature, [°C]
-    hr: float
+    hr: float, int, or array-like
         humidity ratio, [kg water/kg dry air]
 
     Returns
     -------
-    enthalpy: float
+    enthalpy: float, int, or array-like
         enthalpy [J/kg dry air]
     """
 
@@ -79,17 +90,17 @@ def enthalpy(tdb, hr):
     return round(h, 2)
 
 
-def p_sat(tdb):
+def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     """Calculates vapour pressure of water at different temperatures
 
     Parameters
     ----------
-    tdb: float
+    tdb: float, int, or array-like
         air temperature, [°C]
 
     Returns
     -------
-    p_sat: float
+    p_sat: float, int, or array-like
         saturation vapor pressure, [Pa]
     """
 
@@ -127,36 +138,56 @@ def p_sat(tdb):
     return np.around(pascals, 1)
 
 
-def psy_ta_rh(tdb, rh, p_atm=101325):
+@dataclass
+class PsychrometricValues:
+    p_sat: Union[float, int, np.ndarray, List[float], List[int]]
+    p_vap: Union[float, int, np.ndarray, List[float], List[int]]
+    hr: Union[float, int, np.ndarray, List[float], List[int]]
+    t_wb: Union[float, int, np.ndarray, List[float], List[int]]
+    t_dp: Union[float, int, np.ndarray, List[float], List[int]]
+    h: Union[float, int, np.ndarray, List[float], List[int]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+def psy_ta_rh(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    p_atm=101325,
+) -> PsychrometricValues:
     """Calculates psychrometric values of air based on dry bulb air temperature and
     relative humidity.
-    For more accurate results we recommend the use of the the Python package
+    For more accurate results we recommend the use of the Python package
     `psychrolib`_.
 
     .. _psychrolib: https://pypi.org/project/PsychroLib/
 
     Parameters
     ----------
-    tdb: float
+    tdb: float, int, or array-like
         air temperature, [°C]
-    rh: float
+    rh: float, int, or array-like
         relative humidity, [%]
-    p_atm: float
+    p_atm: float, int, or array-like
         atmospheric pressure, [Pa]
 
     Returns
     -------
-    p_vap: float
+    p_vap: float, int, or array-like
         partial pressure of water vapor in moist air, [Pa]
-    hr: float
+    hr: float, int, or array-like
         humidity ratio, [kg water/kg dry air]
-    t_wb: float
+    t_wb: float, int, or array-like
         wet bulb temperature, [°C]
-    t_dp: float
+    t_dp: float, int, or array-like
         dew point temperature, [°C]
-    h: float
+    h: float, int, or array-like
         enthalpy [J/kg dry air]
     """
+    tdb = np.array(tdb)
+    rh = np.array(rh)
+
     p_saturation = p_sat(tdb)
     p_vap = rh / 100 * p_saturation
     hr = 0.62198 * p_vap / (p_atm - p_vap)
@@ -164,85 +195,101 @@ def psy_ta_rh(tdb, rh, p_atm=101325):
     twb = t_wb(tdb, rh)
     h = enthalpy(tdb, hr)
 
-    return {
-        "p_sat": p_saturation,
-        "p_vap": p_vap,
-        "hr": hr,
-        "t_wb": twb,
-        "t_dp": tdp,
-        "h": h,
-    }
+    return PsychrometricValues(
+        p_sat=p_saturation,
+        p_vap=p_vap,
+        hr=hr,
+        t_wb=twb,
+        t_dp=tdp,
+        h=h,
+    )
 
 
-def t_wb(tdb, rh):
+def t_wb(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+):
     """Calculates the wet-bulb temperature using the Stull equation [6]_
 
     Parameters
     ----------
-    tdb: float
+    tdb: float, int, or array-like
         air temperature, [°C]
-    rh: float
+    rh: float, int, or array-like
         relative humidity, [%]
 
     Returns
     -------
-    tdb: float
+    tdb: float, int, or array-like
         wet-bulb temperature, [°C]
     """
-    twb = round(
-        tdb * math.atan(0.151977 * (rh + 8.313659) ** (1 / 2))
-        + math.atan(tdb + rh)
-        - math.atan(rh - 1.676331)
-        + 0.00391838 * rh ** (3 / 2) * math.atan(0.023101 * rh)
-        - 4.686035,
-        1,
+    twb = (
+        tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
+        + np.arctan(tdb + rh)
+        - np.arctan(rh - 1.676331)
+        + 0.00391838 * rh**1.5 * np.arctan(0.023101 * rh)
+        - 4.686035
     )
-    return twb
+
+    return np.around(twb, 1)
 
 
-def t_dp(tdb, rh):
+def t_dp(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+):
     """Calculates the dew point temperature.
 
     Parameters
     ----------
-    tdb: float
+    tdb: float, int, or array-like
         dry bulb air temperature, [°C]
-    rh: float
+    rh: float, int, or array-like
         relative humidity, [%]
 
     Returns
     -------
-    t_dp: float
+    t_dp: float, int, or array-like
         dew point temperature, [°C]
     """
+    tdb = np.array(tdb)
+    rh = np.array(rh)
 
     c = 257.14
     b = 18.678
     d = 234.5
 
-    gamma_m = math.log(rh / 100 * math.exp((b - tdb / d) * (tdb / (c + tdb))))
+    gamma_m = np.log(rh / 100 * np.exp((b - tdb / d) * (tdb / (c + tdb))))
 
-    return round(c * gamma_m / (b - gamma_m), 1)
+    return np.round(c * gamma_m / (b - gamma_m), 1)
 
 
-def t_mrt(tg, tdb, v, d=0.15, emissivity=0.95, standard="Mixed Convection"):
+def t_mrt(
+    tg: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    d: Union[float, int, np.ndarray, List[float], List[int]] = 0.15,
+    emissivity: Union[float, int, np.ndarray, List[float], List[int]] = 0.95,
+    standard="Mixed Convection",
+):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
     7726:1998 Standard [5]_.
 
     Parameters
     ----------
-    tg : float or array-like
+    tg : float, int, or array-like
         globe temperature, [°C]
-    tdb : float or array-like
+    tdb : float, int, or array-like
         air temperature, [°C]
-    v : float or array-like
+    v : float, int, or array-like
         air speed, [m/s]
-    d : float or array-like
+    d : float, int, or array-like
         diameter of the globe, [m] default 0.15 m
-    emissivity : float or array-like
+    emissivity : float, int, or array-like
         emissivity of the globe temperature sensor, default 0.95
-    standard : {"Mixed Convection", "ISO"}
+    standard : str, optional
+        Supported values are 'Mixed Convection' and 'ISO'. Defaults to 'Mixed Convection'.
         either choose between the Mixed Convection and ISO formulations.
         The Mixed Convection formulation has been proposed by Teitelbaum E. et al. (2022)
         to better determine the free and forced convection coefficient used in the
@@ -253,7 +300,7 @@ def t_mrt(tg, tdb, v, d=0.15, emissivity=0.95, standard="Mixed Convection"):
 
     Returns
     -------
-    tr: float or array-like
+    tr: float, int, or array-like
         mean radiant temperature, [°C]
     """
     standard = standard.lower()

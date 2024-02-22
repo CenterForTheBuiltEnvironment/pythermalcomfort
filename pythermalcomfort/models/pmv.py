@@ -1,7 +1,23 @@
+from typing import Union, List
+
+import numpy as np
+
 from pythermalcomfort.models import pmv_ppd
 
 
-def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
+def pmv(
+    tdb: Union[float, int, np.ndarray, list[int | float]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    vr: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    met: Union[float, int, np.ndarray, List[float], List[int]],
+    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    standard="ISO",
+    units="SI",
+    limit_inputs=True,
+    airspeed_control=True,
+):
     """Returns Predicted Mean Vote (`PMV`_) calculated in accordance to main
     thermal comfort Standards. The PMV is an index that predicts the mean value
     of the thermal sensation votes (self-reported perceptions) of a large group
@@ -16,11 +32,11 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float or array-like
+    vr : float, int, or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -29,11 +45,11 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
@@ -43,10 +59,11 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
         can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float or array-like
+    wme : float, int, or array-like
         external work, [met] default 0
-    standard : {"ISO", "ASHRAE"}
-        comfort standard used for calculation
+    standard : str, optional
+        select comfort standard used for calculation.
+        Supported values are 'ASHRAE' and 'ISO'. Defaults to 'ISO'.
 
         - If "ISO", then the ISO Equation is used
         - If "ASHRAE", then the ASHRAE Equation is used
@@ -57,11 +74,9 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
-
-    Other Parameters
-    ----------------
-    units : {'SI', 'IP'}
+    units : str, optional
         select the SI (International System of Units) or the IP (Imperial Units) system.
+        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
@@ -81,7 +96,7 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
     Returns
     -------
-    pmv : float or array-like
+    pmv : float, int, or array-like
         Predicted Mean Vote
 
     Notes
@@ -97,17 +112,17 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
         >>> from pythermalcomfort.models import pmv
         >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
-        >>> tdb = 25
-        >>> tr = 25
-        >>> rh = 50
+        >>> t_db = 25
+        >>> t_r = 25
+        >>> relative_humidity = 50
         >>> v = 0.1
-        >>> met = 1.4
-        >>> clo = 0.5
+        >>> met_rate = 1.4
+        >>> clo_insulation = 0.5
         >>> # calculate relative air speed
-        >>> v_r = v_relative(v=v, met=met)
+        >>> v_r = v_relative(v=v, met=met_rate)
         >>> # calculate dynamic clothing
-        >>> clo_d = clo_dynamic(clo=clo, met=met)
-        >>> results = pmv(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)
+        >>> clo_d = clo_dynamic(clo=clo_insulation, met=met_rate)
+        >>> results = pmv(tdb=t_db, tr=t_r, vr=v_r, rh=relative_humidity, met=met_rate, clo=clo_d)
         >>> print(results)
         0.06
         >>> # you can also pass an array-like of inputs
@@ -115,7 +130,17 @@ def pmv(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         >>> print(results)
         array([-0.47,  0.06])
     """
-    default_kwargs = {"units": "SI", "limit_inputs": True, "airspeed_control": True}
-    kwargs = {**default_kwargs, **kwargs}
 
-    return pmv_ppd(tdb, tr, vr, rh, met, clo, wme, standard, **kwargs)["pmv"]
+    return pmv_ppd(
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        wme,
+        standard=standard,
+        units=units,
+        limit_inputs=limit_inputs,
+        airspeed_control=airspeed_control,
+    )["pmv"]

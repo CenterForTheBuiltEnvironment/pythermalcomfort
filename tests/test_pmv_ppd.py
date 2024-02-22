@@ -350,3 +350,8 @@ class TestPmvPpdOptimized:
         wme = 0
 
         assert math.isnan(_pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme))
+
+    #  Returns a dictionary with 'pmv' and 'ppd' keys
+    def test_check_wrong_input(self):
+        with pytest.raises(TypeError):
+            pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, stardard="random")

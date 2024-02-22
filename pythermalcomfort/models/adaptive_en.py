@@ -1,3 +1,5 @@
+from typing import Union, List
+
 import numpy as np
 
 from pythermalcomfort.psychrometrics import t_o
@@ -7,21 +9,28 @@ from pythermalcomfort.utilities import (
 )
 
 
-def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
+def adaptive_en(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    t_running_mean: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    units: str = "SI",
+    limit_inputs: bool = True,
+):
     """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    t_running_mean: float or array-like
+    t_running_mean: float, int, or array-like
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
 
         The running mean temperature can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
-    v : float or array-like
+    v : float, int, or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: Indoor operative temperature correction is applicable for buildings equipped
@@ -39,7 +48,7 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
 
     Returns
     -------
-    tmp_cmf : float or array-like
+    tmp_cmf : float, int, or array-like
         Comfort temperature at that specific running mean temperature, default in [°C]
         or in [°F]
     acceptability_cat_i : bol or array-like
@@ -48,15 +57,15 @@ def adaptive_en(tdb, tr, t_running_mean, v, units="SI", limit_inputs=True):
         If the indoor conditions comply with comfort category II
     acceptability_cat_iii : bol or array-like
         If the indoor conditions comply with comfort category III
-    tmp_cmf_cat_i_up : float or array-like
+    tmp_cmf_cat_i_up : float, int, or array-like
         Upper acceptable comfort temperature for category I, default in [°C] or in [°F]
-    tmp_cmf_cat_ii_up : float or array-like
+    tmp_cmf_cat_ii_up : float, int, or array-like
         Upper acceptable comfort temperature for category II, default in [°C] or in [°F]
-    tmp_cmf_cat_iii_up : float or array-like
+    tmp_cmf_cat_iii_up : float, int, or array-like
         Upper acceptable comfort temperature for category III, default in [°C] or in [°F]
-    tmp_cmf_cat_i_low : float or array-like
+    tmp_cmf_cat_i_low : float, int, or array-like
         Lower acceptable comfort temperature for category I, default in [°C] or in [°F]
-    tmp_cmf_cat_ii_low : float or array-like
+    tmp_cmf_cat_ii_low : float, int, or array-like
         Lower acceptable comfort temperature for category II, default in [°C] or in [°F]
     tmp_cmf_cat_iii_low : float or array-like
         Lower acceptable comfort temperature for category III, default in [°C] or in [°F]

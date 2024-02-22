@@ -245,14 +245,14 @@ def v_relative(v, met):
 
     Parameters
     ----------
-    v : float or array-like
+    v : float, int, or array-like
         air speed measured by the sensor, [m/s]
     met : float
         metabolic rate, [met]
 
     Returns
     -------
-    vr  : float or array-like
+    vr  : float, int, or array-like
         relative air speed, [m/s]
     """
 
@@ -269,16 +269,16 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
 
     Parameters
     ----------
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
     standard: str (default="ASHRAE")
         - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
 
     Returns
     -------
-    clo : float or array-like
+    clo : float, int, or array-like
         dynamic clothing insulation, [clo]
     """
 

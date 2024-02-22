@@ -50,7 +50,7 @@ def at(tdb, rh, v, q=None, **kwargs):
     kwargs = {**default_kwargs, **kwargs}
 
     # dividing it by 100 since the at eq. requires p_vap to be in hPa
-    p_vap = psy_ta_rh(tdb, rh)["p_vap"] / 100
+    p_vap = psy_ta_rh(tdb, rh).p_vap / 100
 
     # equation sources [16] and http://www.bom.gov.au/info/thermal_stress/#apparent
     if q:

@@ -8,6 +8,7 @@ from pythermalcomfort.psychrometrics import (
     p_sat,
     t_mrt,
     t_o,
+    PsychrometricValues,
 )
 
 
@@ -28,14 +29,14 @@ def test_enthalpy():
 
 
 def test_psy_ta_rh():
-    assert psy_ta_rh(25, 50, p_atm=101325) == {
-        "p_sat": 3169.2,
-        "p_vap": 1584.6,
-        "hr": 0.009881547577511219,
-        "t_wb": 18.0,
-        "t_dp": 13.8,
-        "h": 50259.66,
-    }
+    assert psy_ta_rh(25, 50, p_atm=101325) == PsychrometricValues(
+        p_sat=3169.2,
+        p_vap=1584.6,
+        hr=0.009881547577511219,
+        t_wb=18.0,
+        t_dp=13.8,
+        h=50259.66,
+    )
 
 
 def test_t_o():
