@@ -1,9 +1,22 @@
+from typing import Union, List
+
 import numpy as np
 
 from pythermalcomfort.models import pmv
 
 
-def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
+def a_pmv(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    vr: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    met: Union[float, int, np.ndarray, List[float], List[int]],
+    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    a_coefficient: float,
+    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    units="SI",
+    limit_inputs=True,
+):
     """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was
     developed by Yao, R. et al. (2009). The model takes into account factors
     such as culture, climate, social, psychological and behavioural
@@ -13,11 +26,11 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float or array-like
+    vr : float, int, or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -26,11 +39,11 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
@@ -42,13 +55,11 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     a_coefficient : float
         adaptive coefficient
-    wme : float or array-like
+    wme : float, int, or array-like
         external work, [met] default 0
-
-    Other Parameters
-    ----------------
-    units : {'SI', 'IP'}
+    units : str, optional
         select the SI (International System of Units) or the IP (Imperial Units) system.
+        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
@@ -59,7 +70,7 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
 
     Returns
     -------
-    pmv : float or array-like
+    pmv : float, int, or array-like
         Predicted Mean Vote
 
     Examples
@@ -79,9 +90,23 @@ def a_pmv(tdb, tr, vr, rh, met, clo, a_coefficient, wme=0, **kwargs):
         >>> print(results)
         0.74
     """
-    default_kwargs = {"units": "SI", "limit_inputs": True}
-    kwargs = {**default_kwargs, **kwargs}
 
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **kwargs)
+    # Validate units string
+    valid_units: List[str] = ["SI", "IP"]
+    if units.upper() not in valid_units:
+        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
+
+    _pmv = pmv(
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        wme,
+        standard="ISO",
+        units=units,
+        limit_inputs=limit_inputs,
+    )
 
     return np.around(_pmv / (1 + a_coefficient * _pmv), 2)

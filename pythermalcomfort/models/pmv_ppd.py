@@ -1,4 +1,4 @@
-import math
+from typing import Union, List
 
 import numpy as np
 from numba import vectorize, float64
@@ -11,7 +11,19 @@ from pythermalcomfort.utilities import (
 )
 
 
-def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
+def pmv_ppd(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    vr: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    met: Union[float, int, np.ndarray, List[float], List[int]],
+    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    standard: str = "ISO",
+    units: str = "SI",
+    limit_inputs: bool = True,
+    airspeed_control: bool = True,
+):
     """Returns Predicted Mean Vote (`PMV`_) and Predicted Percentage of
     Dissatisfied ( `PPD`_) calculated in accordance to main thermal comfort
     Standards. The PMV is an index that predicts the mean value of the thermal
@@ -27,11 +39,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float or array-like
+    vr : float, int, or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -40,11 +52,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
@@ -54,10 +66,11 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
         can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float or array-like
+    wme : float, int, or array-like
         external work, [met] default 0
-    standard : {"ISO", "ASHRAE"}
-        comfort standard used for calculation
+    standard : str, optional
+        select comfort standard used for calculation.
+        Supported values are 'ASHRAE' and 'ISO'. Defaults to 'ISO'.
 
         - If "ISO", then the ISO Equation is used
         - If "ASHRAE", then the ASHRAE Equation is used
@@ -68,11 +81,9 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         When air speeds exceed 0.10 m/s (20 fpm), the comfort zone boundaries are
         adjusted based on the SET model.
         This change was indroduced by the `Addendum C to Standard 55-2020`_
-
-    Other Parameters
-    ----------------
-    units : {'SI', 'IP'}
+    units : str, optional
         select the SI (International System of Units) or the IP (Imperial Units) system.
+        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
@@ -85,16 +96,16 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     airspeed_control : boolean default True
         This only applies if standard = "ASHRAE". By default it is assumed that the
         occupant has control over the airspeed. In this case the ASHRAE 55 Standard does
-        not imposes any airspeed limits. On the other hand, if the occupant has no control
+        not impose any airspeed limits. On the other hand, if the occupant has no control
         over the airspeed the ASHRAE 55 imposes an upper limit for v which varies as a
         function of the operative temperature, for more information please consult the
         Standard.
 
     Returns
     -------
-    pmv : float or array-like
+    pmv : float, int, or array-like
         Predicted Mean Vote
-    ppd : float or array-like
+    ppd : float, int, or array-like
         Predicted Percentage of Dissatisfied occupants, [%]
 
     Notes
@@ -139,8 +150,6 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     ValueError
         The 'standard' function input parameter can only be 'ISO' or 'ASHRAE'
     """
-    default_kwargs = {"units": "SI", "limit_inputs": True, "airspeed_control": True}
-    kwargs = {**default_kwargs, **kwargs}
 
     tdb = np.asarray(tdb)
     tr = np.asarray(tr)
@@ -149,7 +158,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     clo = np.asarray(clo)
     wme = np.asarray(wme)
 
-    if kwargs["units"].lower() == "ip":
+    if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     standard = standard.lower()
@@ -172,7 +181,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
         v=vr,
         met=met,
         clo=clo,
-        airspeed_control=kwargs["airspeed_control"],
+        airspeed_control=airspeed_control,
     )
 
     # if v_r is higher than 0.1 follow methodology ASHRAE Appendix H, H3
@@ -195,7 +204,7 @@ def pmv_ppd(tdb, tr, vr, rh, met, clo, wme=0, standard="ISO", **kwargs):
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
-    if kwargs["limit_inputs"]:
+    if limit_inputs:
         pmv_valid = valid_range(pmv_array, (-2, 2))  # this is the ISO limit
         if standard == "ashrae":
             pmv_valid = valid_range(pmv_array, (-100, 100))

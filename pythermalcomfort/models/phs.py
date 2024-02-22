@@ -1,4 +1,5 @@
 import math
+from typing import List, Union
 
 import numpy as np
 from numba import jit
@@ -9,7 +10,17 @@ from pythermalcomfort.utilities import (
 )
 
 
-def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
+def phs(
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    met: Union[float, int, np.ndarray, List[float], List[int]],
+    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    posture,
+    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    **kwargs
+):
     """Calculates the Predicted Heat Strain (PHS) index based in compliace with
     the ISO 7933:2004 Standard [8]_. The ISO 7933 provides a method for the
     analytical evaluation and interpretation of the thermal stress experienced
@@ -25,21 +36,21 @@ def phs(tdb, tr, v, rh, met, clo, posture, wme=0, **kwargs):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C]
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C]
-    v : float or array-like
+    v : float, int, or array-like
         air speed, default in [m/s]
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [W/(m2)]
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
     posture: int
         a numeric value presenting posture of person [sitting=1, standing=2, crouching=3]
-    wme : float or array-like
+    wme : float, int, or array-like
         external work, [W/(m2)] default 0
 
     Other Parameters

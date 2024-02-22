@@ -15,11 +15,11 @@ def e_pmv(tdb, tr, vr, rh, met, clo, e_coefficient, wme=0, **kwargs):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float or array-like
+    vr : float, int, or array-like
         relative air speed, default in [m/s] in [fps] if `units` = 'IP'
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -28,11 +28,11 @@ def e_pmv(tdb, tr, vr, rh, met, clo, e_coefficient, wme=0, **kwargs):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
-    clo : float or array-like
+    clo : float, int, or array-like
         clothing insulation, [clo]
 
         Note: The activity as well as the air speed modify the insulation characteristics
@@ -44,7 +44,7 @@ def e_pmv(tdb, tr, vr, rh, met, clo, e_coefficient, wme=0, **kwargs):
         :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     e_coefficient : float
         expectacy factor
-    wme : float or array-like
+    wme : float, int, or array-like
         external work, [met] default 0
 
     Other Parameters
@@ -61,7 +61,7 @@ def e_pmv(tdb, tr, vr, rh, met, clo, e_coefficient, wme=0, **kwargs):
 
     Returns
     -------
-    pmv : float or array-like
+    pmv : float, int, or array-like
         Predicted Mean Vote
 
     Examples

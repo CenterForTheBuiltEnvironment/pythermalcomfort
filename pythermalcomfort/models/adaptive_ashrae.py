@@ -1,5 +1,7 @@
-import numpy as np
 from dataclasses import dataclass
+from typing import Union, List
+
+import numpy as np
 
 from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
@@ -11,20 +13,25 @@ from pythermalcomfort.utilities import (
 
 @dataclass
 class AdaptiveASHRAE:
-    tmp_cmf: float
-    tmp_cmf_80_low: float
-    tmp_cmf_80_up: float
-    tmp_cmf_90_low: float
-    tmp_cmf_90_up: float
-    acceptability_80: np.array
-    acceptability_90: np.array
+    tmp_cmf: Union[float, int, np.ndarray, List[float], List[int]]
+    tmp_cmf_80_low: Union[float, int, np.ndarray, List[float], List[int]]
+    tmp_cmf_80_up: Union[float, int, np.ndarray, List[float], List[int]]
+    tmp_cmf_90_low: Union[float, int, np.ndarray, List[float], List[int]]
+    tmp_cmf_90_up: Union[float, int, np.ndarray, List[float], List[int]]
+    acceptability_80: Union[float, int, np.ndarray, List[float], List[int]]
+    acceptability_90: Union[float, int, np.ndarray, List[float], List[int]]
 
     def __getitem__(self, item):
         return getattr(self, item)
 
 
 def adaptive_ashrae(
-    tdb, tr, t_running_mean, v, units="SI", limit_inputs=True
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    t_running_mean: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    units: str = "SI",
+    limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
     """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
     model relates indoor design temperatures or acceptable temperature ranges
@@ -39,19 +46,20 @@ def adaptive_ashrae(
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    t_running_mean: float or array-like
+    t_running_mean: float, int, or array-like
         running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
 
         The running mean temperature can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
-    v : float or array-like
+    v : float, int, or array-like
         air speed, default in [m/s] in [fps] if `units` = 'IP'
-    units : {'SI', 'IP'}
+    units : str, optional
         select the SI (International System of Units) or the IP (Imperial Units) system.
+        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
     limit_inputs : boolean default True
         By default, if the inputs are outsude the standard applicability limits the
         function returns nan. If False returns pmv and ppd values even if input values are
@@ -62,16 +70,16 @@ def adaptive_ashrae(
 
     Returns
     -------
-    tmp_cmf : float or array-like
+    tmp_cmf : float, int, or array-like
         Comfort temperature a that specific running mean temperature, default in [°C]
         or in [°F]
-    tmp_cmf_80_low : float or array-like
+    tmp_cmf_80_low : float, int, or array-like
         Lower acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
-    tmp_cmf_80_up : float or array-like
+    tmp_cmf_80_up : float, int, or array-like
         Upper acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
-    tmp_cmf_90_low : float or array-like
+    tmp_cmf_90_low : float, int, or array-like
         Lower acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
-    tmp_cmf_90_up : float or array-like
+    tmp_cmf_90_up : float, int, or array-like
         Upper acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
     acceptability_80 : bol or array-like
         Acceptability for 80% occupants
@@ -125,6 +133,11 @@ def adaptive_ashrae(
     t_running_mean = np.array(t_running_mean)
     v = np.array(v)
     standard = "ashrae"
+
+    # Validate units string
+    valid_units: List[str] = ["SI", "IP"]
+    if units.upper() not in valid_units:
+        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
 
     if units.lower() == "ip":
         tdb, tr, t_running_mean, v = units_converter(

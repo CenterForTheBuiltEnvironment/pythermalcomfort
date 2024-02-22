@@ -14,11 +14,11 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, in [°C]
-    tr : float or array-like
+    tr : float, int, or array-like
         mean radiant temperature, in [°C]
-    vr : float or array-like
+    vr : float, int, or array-like
         relative air speed, in [m/s]
 
         Note: vr is the relative air speed caused by body movement and not the air
@@ -27,9 +27,9 @@ def athb(tdb, tr, vr, rh, met, t_running_mean):
         (Vag). Where Vag is the activity-generated air speed caused by motion of
         individual body parts. vr can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float or array-like
+    rh : float, int, or array-like
         relative humidity, [%]
-    met : float or array-like
+    met : float, int, or array-like
         metabolic rate, [met]
     t_running_mean: float or array-like
         running mean temperature, in [°C]

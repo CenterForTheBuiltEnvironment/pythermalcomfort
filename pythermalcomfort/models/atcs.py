@@ -53,17 +53,17 @@ class ATCS(JOS3):
 
         Attributes
         ----------
-        tdb : float or array-like
+        tdb : float, int, or array-like
             Dry bulb air temperature [°C].
-        tr : float or array-like
+        tr : float, int, or array-like
             Mean radiant temperature [°C].
-        to : float or array-like
+        to : float, int, or array-like
             Operative temperature [°C].
-        v : float or array-like
+        v : float, int, or array-like
             Air speed [m/s].
-        rh : float or array-like
+        rh : float, int, or array-like
             Relative humidity [%].
-        clo : float or array-like
+        clo : float, int, or array-like
             Clothing insulation [clo].
             Note: If you want to input clothing insulation to each body part,
             it can be input using the dictionaly in "utilities.py" in "jos3_function" folder.

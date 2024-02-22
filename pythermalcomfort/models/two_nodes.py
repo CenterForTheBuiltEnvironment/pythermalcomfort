@@ -1,3 +1,4 @@
+from typing import Union, List
 import math
 
 import numpy as np
@@ -10,13 +11,13 @@ from pythermalcomfort.utilities import (
 
 
 def two_nodes(
-    tdb,
-    tr,
-    v,
-    rh,
-    met,
-    clo,
-    wme=0,
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
+    tr: Union[float, int, np.ndarray, List[float], List[int]],
+    v: Union[float, int, np.ndarray, List[float], List[int]],
+    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    met: Union[float, int, np.ndarray, List[float], List[int]],
+    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
     body_surface_area=1.8258,
     p_atmospheric=101325,
     body_position="standing",
@@ -39,7 +40,7 @@ def two_nodes(
 
     Parameters
     ----------
-    tdb : float or array-like
+    tdb : float, int, or array-like
         dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
     tr : float or array-like
         mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
