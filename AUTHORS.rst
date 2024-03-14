@@ -22,4 +22,4 @@ Authors
 .. _pythermalcomfort: https://pypi.org/project/pythermalcomfort/
 .. _CBE Comfort Tool: https://comfort.cbe.berkeley.edu
 .. _ladybug-comfort: https://pypi.org/project/ladybug-comfort/
-.. _UTCI: http://www.utci.org/index.php
+.. _UTCI: https://www.utci.org/
