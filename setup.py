@@ -84,7 +84,7 @@ setup(
         "thermal environment",
         "built environment",
     ],
-    python_requires=">=3.9.0",
+    python_requires=">=3.7.0",
     install_requires=[
         "scipy",
         "numba",
