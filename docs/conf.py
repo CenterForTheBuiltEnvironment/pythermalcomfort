@@ -26,6 +26,7 @@ author = "Federico Tartarini"
 copyright = "{0}, {1}".format(year, author)
 version = release = "2.9.2"
 
+autodoc_typehints = "none"
 pygments_style = "trac"
 templates_path = ["."]
 extlinks = {
