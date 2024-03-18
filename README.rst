@@ -14,13 +14,16 @@ Overview
     * - downloads
       - |downloads|
     * - tests
-      - | |appveyor| |codecov| |Python Tests|
+      - | |appveyor|
+        | |codecov|
+        | |tests|
     * - package
       - | |version| |wheel|
         | |supported-ver|
         | |package-health|
 
-.. |Python Tests| image::https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish-testPyPI.yml/badge.svg
+.. |tests| image:: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish.yml/badge.svg
+    :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish.yml
     :alt: Tests to make sure pythermalcomfort works on different Python versions and OS
 
 .. |package-health| image:: https://snyk.io/advisor/python/pythermalcomfort/badge.svg
