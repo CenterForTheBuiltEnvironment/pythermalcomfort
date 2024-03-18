@@ -6,7 +6,7 @@ from pythermalcomfort.models import pmv_ppd
 
 
 def pmv(
-    tdb: Union[float, int, np.ndarray, list[int | float]],
+    tdb: Union[float, int, np.ndarray, List[float], List[int]],
     tr: Union[float, int, np.ndarray, List[float], List[int]],
     vr: Union[float, int, np.ndarray, List[float], List[int]],
     rh: Union[float, int, np.ndarray, List[float], List[int]],

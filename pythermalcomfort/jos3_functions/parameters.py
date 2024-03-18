@@ -12,6 +12,8 @@ for both regular output parameters and extra output parameters.
 It sorts the parameters alphabetically by key and formats each line with the parameter's name, meaning, and unit.
 The resulting documentation string can be displayed or printed for user reference.
 """
+from typing import List
+
 import textwrap
 from dataclasses import dataclass
 from typing import ClassVar
@@ -34,7 +36,7 @@ class Default:
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
     bsa_equation: str = "dubois"
-    local_bsa: ClassVar[list[float]] = np.array(  # body surface area [m2]
+    local_bsa: ClassVar[List[float]] = np.array(  # body surface area [m2]
         [
             0.110,
             0.029,

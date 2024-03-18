@@ -1,4 +1,5 @@
 import warnings
+from typing import Union
 
 from scipy import optimize
 
@@ -8,7 +9,16 @@ from pythermalcomfort.utilities import (
 from pythermalcomfort.models.set_tmp import set_tmp
 
 
-def cooling_effect(tdb, tr, vr, rh, met, clo, wme=0, units="SI"):
+def cooling_effect(
+    tdb: Union[float, int],
+    tr: Union[float, int],
+    vr: Union[float, int],
+    rh: Union[float, int],
+    met: Union[float, int],
+    clo: Union[float, int],
+    wme=0,
+    units="SI",
+):
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air

@@ -52,7 +52,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
     You can use this function to calculate the Universal Thermal Climate Index (`UTCI`)
     The applicability wind speed value must be between 0.5 and 17 m/s.
 
-    .. _UTCI: http://www.utci.org/utcineu/utcineu.php
+    .. _UTCI: https://www.utci.org/
 
     Examples
     --------

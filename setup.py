@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import print_function
+from __future__ import annotations
 
 import io
 import re
@@ -24,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.9.2",
+    version="2.10.0",
     license="MIT",
     description=(
         "Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET,"
@@ -84,11 +85,12 @@ setup(
         "thermal environment",
         "built environment",
     ],
-    python_requires=">=3.9.0",
+    python_requires=">=3.8.0",
     install_requires=[
         "scipy",
         "numba",
         "numpy",
+        "setuptools",
     ],  # eg: 'aspectlib==1.1.1', 'six>=1.7',
     extras_require={
         # eg:
