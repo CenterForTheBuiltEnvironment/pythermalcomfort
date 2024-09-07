@@ -6,8 +6,8 @@ import numpy as np
 # Fixtures defined in a conftest.py can be used by any test in that package 
 # without needing to import them (pytest will automatically discover them).
 
-unit_test_data_prefox = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
-test_adaptive_en_url = unit_test_data_prefox + "ts_adaptive_en.json"
+unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
+test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 
 def retrieve_data(url):
     try:
@@ -31,6 +31,4 @@ def is_equal():
 # get test data for adaptove_en()
 @pytest.fixture
 def get_adaptive_en_test_data():
-    response = requests.get(test_adaptive_en_url)
-    data = json.loads(response.text)
-    return data
+    return retrieve_data(test_adaptive_en_url)
