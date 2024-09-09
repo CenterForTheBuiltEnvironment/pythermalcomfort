@@ -1,23 +1,23 @@
 import numpy as np
-
 from pythermalcomfort.models import adaptive_en
 
-
-def test_adaptive_en():
-    np.testing.assert_equal(
-        adaptive_en(
-            tdb=[25, 25, 23.5], tr=[25, 25, 23.5], t_running_mean=[9, 20, 28], v=0.1
-        ),
-        {
-            "tmp_cmf": [np.nan, 25.4, 28.0],
-            "acceptability_cat_i": [False, True, False],
-            "acceptability_cat_ii": [False, True, False],
-            "acceptability_cat_iii": [False, True, True],
-            "tmp_cmf_cat_i_up": [np.nan, 27.4, 30.0],
-            "tmp_cmf_cat_ii_up": [np.nan, 28.4, 31.0],
-            "tmp_cmf_cat_iii_up": [np.nan, 29.4, 32.0],
-            "tmp_cmf_cat_i_low": [np.nan, 22.4, 25.0],
-            "tmp_cmf_cat_ii_low": [np.nan, 21.4, 24.0],
-            "tmp_cmf_cat_iii_low": [np.nan, 20.4, 23.0],
-        },
-    )
+def test_adaptive_en(get_adaptive_en_test_data, is_equal):
+    for entry in get_adaptive_en_test_data["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = adaptive_en(
+            inputs["tdb"],
+            inputs["tr"],
+            inputs["t_running_mean"],
+            inputs["v"]
+        )
+        assert is_equal(result["tmp_cmf"] , outputs["tmp_cmf"])
+        assert is_equal(result["acceptability_cat_i"] , outputs["acceptability_cat_i"])
+        assert is_equal(result["acceptability_cat_ii"] , outputs["acceptability_cat_ii"])
+        assert is_equal(result["acceptability_cat_iii"] , outputs["acceptability_cat_iii"])
+        assert is_equal(result["tmp_cmf_cat_i_up"] , outputs["tmp_cmf_cat_i_up"])
+        assert is_equal(result["tmp_cmf_cat_ii_up"] , outputs["tmp_cmf_cat_ii_up"])
+        assert is_equal(result["tmp_cmf_cat_iii_up"] , outputs["tmp_cmf_cat_iii_up"])
+        assert is_equal(result["tmp_cmf_cat_i_low"] , outputs["tmp_cmf_cat_i_low"])
+        assert is_equal(result["tmp_cmf_cat_ii_low"] , outputs["tmp_cmf_cat_ii_low"])
+        assert is_equal(result["tmp_cmf_cat_iii_low"] , outputs["tmp_cmf_cat_iii_low"])
