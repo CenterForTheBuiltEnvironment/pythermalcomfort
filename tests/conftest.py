@@ -10,6 +10,7 @@ import numpy as np
 unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
 test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
+test_ankle_draft_url = unit_test_data_prefix + "ts_ankle_draft.json"
 
 @pytest.fixture
 def retrieve_data():
@@ -46,3 +47,8 @@ def get_adaptive_en_url():
 @pytest.fixture
 def get_adaptive_ashrae_url():
     return test_adaptive_ashrae_url
+
+
+@pytest.fixture
+def get_ankle_draft_url():
+    return test_ankle_draft_url
