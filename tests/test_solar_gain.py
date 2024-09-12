@@ -24,4 +24,5 @@ def test_solar_gain():
                 inputs["posture"],
             )
             assert sg["erf"] == outputs["erf"]
-            assert sg["delta_mrt"] == outputs["t_rsw"]
+            assert sg["delta_mrt"] == outputs["delta_mrt"]
+ 
