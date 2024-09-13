@@ -10,6 +10,9 @@ import numpy as np
 unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
 test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
+test_a_pmv_url = unit_test_data_prefix + "ts_a_pmv.json"
+test_two_nodes_url = unit_test_data_prefix + "ts_two_nodes.json"
+test_solar_gain_url = unit_test_data_prefix + "ts_solar_gain.json"
 
 
 @pytest.fixture
@@ -53,7 +56,18 @@ def is_equal():
 def get_adaptive_en_url():
     return test_adaptive_en_url
 
-
 @pytest.fixture
 def get_adaptive_ashrae_url():
     return test_adaptive_ashrae_url
+
+@pytest.fixture
+def get_a_pmv_url():
+    return test_a_pmv_url
+
+@pytest.fixture
+def get_two_nodes_url():
+    return test_two_nodes_url
+
+@pytest.fixture
+def get_solar_gain_url():
+    return test_solar_gain_url
