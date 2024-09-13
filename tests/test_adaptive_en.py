@@ -10,15 +10,12 @@ def test_adaptive_en(get_adaptive_en_url, retrieve_data, is_equal):
         result = adaptive_en(
             inputs["tdb"], inputs["tr"], inputs["t_running_mean"], inputs["v"]
         )
-        assert is_equal(result["tmp_cmf"], outputs["tmp_cmf"])
-        assert is_equal(result["acceptability_cat_i"], outputs["acceptability_cat_i"])
-        assert is_equal(result["acceptability_cat_ii"], outputs["acceptability_cat_ii"])
-        assert is_equal(
-            result["acceptability_cat_iii"], outputs["acceptability_cat_iii"]
-        )
-        assert is_equal(result["tmp_cmf_cat_i_up"], outputs["tmp_cmf_cat_i_up"])
-        assert is_equal(result["tmp_cmf_cat_ii_up"], outputs["tmp_cmf_cat_ii_up"])
-        assert is_equal(result["tmp_cmf_cat_iii_up"], outputs["tmp_cmf_cat_iii_up"])
-        assert is_equal(result["tmp_cmf_cat_i_low"], outputs["tmp_cmf_cat_i_low"])
-        assert is_equal(result["tmp_cmf_cat_ii_low"], outputs["tmp_cmf_cat_ii_low"])
-        assert is_equal(result["tmp_cmf_cat_iii_low"], outputs["tmp_cmf_cat_iii_low"])
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result[key], outputs[key])
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise
