@@ -34,8 +34,6 @@ def retrieve_data():
 
     return _retrieve_data
 
-
-
 @pytest.fixture
 def is_equal():
     def compare(a, b):
@@ -49,6 +47,7 @@ def is_equal():
             return True
         else:
             return a == b
+    return compare
 
 @pytest.fixture
 def get_adaptive_en_url():
