@@ -20,4 +20,4 @@ def test_adaptive_ashrae(get_adaptive_ashrae_url, retrieve_data, is_equal):
                 print(
                     f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
                 )
-            raise
+                raise
