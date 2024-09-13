@@ -7,6 +7,7 @@ import numpy as np
 # Fixtures defined in a conftest.py can be used by any test in that package
 # without needing to import them (pytest will automatically discover them).
 
+
 unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
 test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
@@ -34,9 +35,7 @@ def retrieve_data():
     return _retrieve_data
 
 
-# Custom equal method
-## Json null equal to np.nan
-## np.ndarry compare with list
+
 @pytest.fixture
 def is_equal():
     def compare(a, b):
@@ -51,10 +50,6 @@ def is_equal():
         else:
             return a == b
 
-    return compare
-
-
-# get test data for adaptove_en()
 @pytest.fixture
 def get_adaptive_en_url():
     return test_adaptive_en_url
@@ -82,7 +77,6 @@ def get_ankle_draft_url():
 @pytest.fixture
 def get_phs_url():
     return test_phs_url
-
 
 @pytest.fixture
 def get_vertical_tmp_grad_ppd_url():
