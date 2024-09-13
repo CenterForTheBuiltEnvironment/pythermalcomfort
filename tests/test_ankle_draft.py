@@ -3,7 +3,7 @@ from pythermalcomfort.models import ankle_draft
 
 def test_ankle_draft(get_ankle_draft_url, retrieve_data):
     test_data = retrieve_data(get_ankle_draft_url)
-    
+
     if test_data is None:
         pytest.skip("Failed to retrieve test data")
 
