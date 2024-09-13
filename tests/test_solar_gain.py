@@ -1,28 +1,18 @@
 from pythermalcomfort.models import solar_gain
-import json
-import requests
-
-# get file containing validation tables
-url = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/validation_data.json"
-resp = requests.get(url)
-reference_tables = json.loads(resp.text)
 
 
-def test_solar_gain():
-    for table in reference_tables["reference_data"]["solar_gain"]:
-        for entry in table["data"]:
-            inputs = entry["inputs"]
-            outputs = entry["outputs"]
-            sg = solar_gain(
-                inputs["alt"],
-                inputs["sharp"],
-                inputs["I_dir"],
-                inputs["t_sol"],
-                inputs["f_svv"],
-                inputs["f_bes"],
-                inputs["asa"],
-                inputs["posture"],
-            )
-            assert sg["erf"] == outputs["erf"]
-            assert sg["delta_mrt"] == outputs["delta_mrt"]
- 
+def test_solar_gain(get_solar_gain_url, retrieve_data, is_equal):
+    reference_table = retrieve_data(get_solar_gain_url)
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = solar_gain(**inputs)
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result[key], outputs[key])
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise
