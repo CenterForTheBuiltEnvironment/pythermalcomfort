@@ -3,9 +3,6 @@ __pycache__
 Pipfile
 Pipfile.lock
 
-# Ignore virtual environment folder
-.venv/
-
 # C extensions
 *.so
 
