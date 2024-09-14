@@ -7,6 +7,7 @@ import numpy as np
 # Fixtures defined in a conftest.py can be used by any test in that package
 # without needing to import them (pytest will automatically discover them).
 
+
 unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
 test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
@@ -15,11 +16,15 @@ test_two_nodes_url = unit_test_data_prefix + "ts_two_nodes.json"
 test_solar_gain_url = unit_test_data_prefix + "ts_solar_gain.json"
 test_ankle_draft_url = unit_test_data_prefix + "ts_ankle_draft.json"
 test_phs_url = unit_test_data_prefix + "ts_phs.json"
+<<<<<<< HEAD
 test_e_pmv_url = unit_test_data_prefix + "ts_e_pmv.json"
 test_at_url = unit_test_data_prefix + "ts_at.json"
 test_athb_url = unit_test_data_prefix + "ts_athb.json"
 test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
 test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
+=======
+test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
+>>>>>>> 16acfcea3f1b315d99e55997f96f7440e72cc45b
 
 
 @pytest.fixture
@@ -37,10 +42,6 @@ def retrieve_data():
 
     return _retrieve_data
 
-
-# Custom equal method
-## Json null equal to np.nan
-## np.ndarry compare with list
 @pytest.fixture
 def is_equal():
     def compare(a, b):
@@ -54,11 +55,8 @@ def is_equal():
             return True
         else:
             return a == b
-
     return compare
 
-
-# get test data for adaptove_en()
 @pytest.fixture
 def get_adaptive_en_url():
     return test_adaptive_en_url
@@ -93,6 +91,9 @@ def get_ankle_draft_url():
 def get_phs_url():
     return test_phs_url
 
+@pytest.fixture
+def get_vertical_tmp_grad_ppd_url():
+    return test_vertical_tmp_grad_ppd_url
 
 @pytest.fixture
 def get_e_pmv_url():
@@ -113,3 +114,4 @@ def get_clo_tout_url():
 @pytest.fixture
 def get_cooling_effect_url():
     return test_cooling_effect_url
+
