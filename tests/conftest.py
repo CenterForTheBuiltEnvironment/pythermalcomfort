@@ -23,6 +23,7 @@ test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
 test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
 test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
 
+
 @pytest.fixture
 def retrieve_data():
     def _retrieve_data(url):
