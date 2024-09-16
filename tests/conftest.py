@@ -23,7 +23,10 @@ test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
 test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
 test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
 test_wbgt_url = unit_test_data_prefix + "ts_wbgt.json"
-
+test_heat_index_url = unit_test_data_prefix + "ts_heat_index.json"
+test_net_url = unit_test_data_prefix + "ts_net.json"
+test_pmv_pdd_url = unit_test_data_prefix + "ts_pmv_pdd.json"
+test_pmv_url = unit_test_data_prefix + "ts_pmv.json"
 
 @pytest.fixture
 def retrieve_data():
@@ -117,3 +120,18 @@ def get_clo_tout_url():
 def get_cooling_effect_url():
     return test_cooling_effect_url
 
+@pytest.fixture
+def get_heat_index_url():
+    return test_heat_index_url
+
+@pytest.fixture
+def get_net_url():
+    return test_net_url
+
+@pytest.fixture
+def get_pmv_pdd_url():
+    return test_pmv_pdd_url
+
+@pytest.fixture
+def get_pmv_url():
+    return test_pmv_url
