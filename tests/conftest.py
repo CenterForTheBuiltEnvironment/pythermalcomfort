@@ -22,6 +22,7 @@ test_athb_url = unit_test_data_prefix + "ts_athb.json"
 test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
 test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
 test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
+test_humidex_url = unit_test_data_prefix + "ts_humidex.json"
 
 
 @pytest.fixture
@@ -92,6 +93,10 @@ def get_phs_url():
 def get_vertical_tmp_grad_ppd_url():
     return test_vertical_tmp_grad_ppd_url
 
+
+@pytest.fixture
+def get_humidex_url():
+    return test_humidex_url
 @pytest.fixture
 def get_e_pmv_url():
     return test_e_pmv_url
