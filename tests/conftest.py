@@ -17,6 +17,7 @@ test_solar_gain_url = unit_test_data_prefix + "ts_solar_gain.json"
 test_ankle_draft_url = unit_test_data_prefix + "ts_ankle_draft.json"
 test_phs_url = unit_test_data_prefix + "ts_phs.json"
 test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
+test_wbgt_url = unit_test_data_prefix + "ts_wbgt.json"
 
 
 @pytest.fixture
@@ -80,3 +81,7 @@ def get_phs_url():
 @pytest.fixture
 def get_vertical_tmp_grad_ppd_url():
     return test_vertical_tmp_grad_ppd_url
+
+@pytest.fixture
+def get_wbgt_url():
+    return test_wbgt_url
