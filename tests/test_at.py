@@ -1,7 +1,25 @@
 from pythermalcomfort.models import at
 
+def test_at(get_at_url, retrieve_data, is_equal):
+    
+    reference_table = retrieve_data(get_at_url)
+    
+    
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        expected_output = entry["outputs"]["at"]
+        
+        
+        result = at(
+            tdb=inputs["tdb"],
+            rh=inputs["rh"],
+            v=inputs["v"],
+            q=inputs.get("q", None)  # q is elective
+        )
+        
 
-def test_at():
-    assert at(tdb=25, rh=30, v=0.1) == 24.1
-    assert at(tdb=23, rh=70, v=1) == 24.8
-    assert at(tdb=23, rh=70, v=1, q=50) == 28.1
+        try:
+            assert is_equal(result, expected_output)
+        except AssertionError as e:
+            print(f"Assertion failed for at. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}")
+            raise
