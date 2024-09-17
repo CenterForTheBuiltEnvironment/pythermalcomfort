@@ -27,6 +27,7 @@ test_heat_index_url = unit_test_data_prefix + "ts_heat_index.json"
 test_net_url = unit_test_data_prefix + "ts_net.json"
 test_pmv_pdd_url = unit_test_data_prefix + "ts_pmv_pdd.json"
 test_pmv_url = unit_test_data_prefix + "ts_pmv.json"
+test_set_url = unit_test_data_prefix + "ts_set.json"
 
 @pytest.fixture
 def retrieve_data():
@@ -135,3 +136,7 @@ def get_pmv_pdd_url():
 @pytest.fixture
 def get_pmv_url():
     return test_pmv_url
+
+@pytest.fixture
+def get_set_url():
+    return test_set_url
