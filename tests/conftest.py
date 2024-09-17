@@ -32,6 +32,8 @@ test_humidex_url = unit_test_data_prefix + "ts_humidex.json"
 test_use_fans_heatwaves_url = unit_test_data_prefix + "ts_use_fans_heatwaves.json"
 test_utci_url = unit_test_data_prefix + "ts_utci.json"
 test_wind_chill_url = unit_test_data_prefix + "ts_wind_chill.json"
+test_pet_steady_url = unit_test_data_prefix + "ts_pet_steady.json"
+
 
 @pytest.fixture
 def retrieve_data():
@@ -55,12 +57,12 @@ def is_equal():
         if isinstance(a, np.ndarray):
             if not isinstance(b, np.ndarray):
                 b = np.array(b, dtype=a.dtype)
-            if a.dtype.kind in 'UOS':  # U = unicode, O = objects, S = string
+            if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
                 return np.array_equal(a, b)
             else:
-              b = np.where(b == None, np.nan, b)  # Replace None with np.nan
-              # Return True if arrays are close enough, including handling of NaN values
-              return np.allclose(a, b, equal_nan=True)
+                b = np.where(b == None, np.nan, b)  # Replace None with np.nan
+                # Return True if arrays are close enough, including handling of NaN values
+                return np.allclose(a, b, equal_nan=True)
         elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
             return True
         else:
@@ -168,14 +170,22 @@ def get_pmv_url():
 def get_set_url():
     return test_set_url
 
+
 @pytest.fixture
 def get_use_fans_heatwaves_url():
     return test_use_fans_heatwaves_url
+
 
 @pytest.fixture
 def get_utci_url():
     return test_utci_url
 
+
 @pytest.fixture
 def get_wind_chill_url():
     return test_wind_chill_url
+
+
+@pytest.fixture
+def get_pet_steady_url():
+    return test_pet_steady_url
