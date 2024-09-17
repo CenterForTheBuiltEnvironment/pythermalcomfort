@@ -5,12 +5,24 @@ import pytest
 class TestWc:
 
     #  Calculates the wind chill index (WCI) for given dry bulb air temperature and wind speed
-    def test_calculates_wci(self):
-        assert wc(tdb=0, v=0.1) == {"wci": 518.6}
-        assert wc(tdb=0, v=1.5) == {"wci": 813.5}
-        assert wc(tdb=-5, v=5.5) == {"wci": 1255.2}
-        assert wc(tdb=-10, v=11) == {"wci": 1631.1}
-        assert wc(tdb=-5, v=11) == {"wci": 1441.4}
+    def test_calculates_wci(self, get_wind_chill_url, retrieve_data, is_equal):
+        reference_table = retrieve_data(get_wind_chill_url)
+        for entry in reference_table["data"]:
+            inputs = entry["inputs"]
+            outputs = entry["outputs"]
+            result = wc(**inputs)
+            for key in outputs:
+                # Use the custom is_equal for other types
+                try:
+                    if(inputs.get("round", True)):
+                        assert is_equal(result[key], outputs[key])
+                    else:
+                        assert abs(result["wci"] - 518.587) < 0.01
+                except AssertionError as e:
+                    print(
+                        f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                    )
+                    raise
 
     #  Returns the WCI value in a dictionary format
     def test_returns_wci_dictionary(self):
@@ -19,12 +31,6 @@ class TestWc:
         assert isinstance(wc(tdb=-5, v=5.5), dict)
         assert isinstance(wc(tdb=-10, v=11), dict)
         assert isinstance(wc(tdb=-5, v=11), dict)
-
-    #  Rounds the output value if round=True
-    def test_rounds_output_value(self):
-        assert wc(tdb=0, v=0.1, round=True) == {"wci": 518.6}
-        result = wc(tdb=0, v=0.1, round=False)
-        assert abs(result["wci"] - 518.587) < 0.01
 
     #  Raises TypeError if tdb parameter is not provided
     def test_raises_type_error_tdb_not_provided(self):
