@@ -1,84 +1,46 @@
-from pythermalcomfort.models import humidex
+import numpy as np
 import pytest
+from pythermalcomfort.models import humidex
 
 
-class TestHumidex:
+def test_humidex(get_humidex_url, retrieve_data, is_equal):
+    test_data = retrieve_data(get_humidex_url)
 
-    #  Calculate humidex for a given dry bulb air temperature and relative humidity
-    def test_calculate_humidex(self):
-        result = humidex(25, 50)
-        assert result["humidex"] == pytest.approx(28.2, abs=0.1)
+    if test_data is None:
+        pytest.skip("Failed to retrieve test data")
 
-    #  Return the humidex and discomfort level for a given dry bulb air temperature and relative humidity
-    def test_return_humidex_and_discomfort(self):
-        result = humidex(25, 50)
-        assert "humidex" in result
-        assert "discomfort" in result
+    for case in test_data.get("data", []):
+        inputs = case["inputs"]
+        expected_outputs = case["outputs"]
 
-    #  Round the output humidex value if the 'round' parameter is set to True
-    def test_round_output_humidex(self):
-        result = humidex(25, 50, round=True)
-        assert isinstance(result["humidex"], int) or isinstance(
-            result["humidex"], float
-        )
+        if isinstance(inputs, list):
+            for inp, expected in zip(inputs, expected_outputs):
+                result = humidex(inp["tdb"], inp["rh"])
+                assert result["discomfort"] == expected["discomfort"]
+                if "humidex" in expected:
+                    assert result["humidex"] == pytest.approx(
+                        expected["humidex"], abs=0.1
+                    )
+        else:
+            if "round" in inputs:
+                result = humidex(inputs["tdb"], inputs["rh"], round=inputs["round"])
+            else:
+                result = humidex(inputs["tdb"], inputs["rh"])
 
-    #  Return an error if the input dry bulb air temperature is not a float
-    def test_input_temperature_not_float(self):
-        with pytest.raises(TypeError):
-            humidex("25", 50)
+            for key, expected_value in expected_outputs.items():
+                if key == "humidex":
+                    assert result[key] == pytest.approx(expected_value, abs=0.1)
+                else:
+                    assert result[key] == expected_value
 
-    #  Return an error if the input relative humidity is not a float
-    def test_input_humidity_not_float(self):
-        with pytest.raises(TypeError):
-            humidex(25, "50")
+    with pytest.raises(TypeError):
+        humidex("25", 50)
 
-    #  Return "Evident discomfort" if the calculated humidex is between 35 and 40
-    def test_humidex_evident_discomfort(self):
-        result = humidex(10, 50)
-        assert result["discomfort"] == "Little or no discomfort"
+    with pytest.raises(TypeError):
+        humidex(25, "50")
 
-        result = humidex(28, 50)
-        assert result["discomfort"] == "Noticeable discomfort"
+    with pytest.raises(ValueError):
+        humidex(tdb=25, rh=110)
 
-        result = humidex(30, 50)
-        assert result["discomfort"] == "Evident discomfort"
-
-        result = humidex(35, 50)
-        assert result["discomfort"] == "Intense discomfort; avoid exertion"
-
-        result = humidex(40, 50)
-        assert result["discomfort"] == "Heat stroke probable"
-
-    #  Return an error if the input relative humidity is greater than 100%
-    def test_humidex_invalid_rh(self):
-        with pytest.raises(ValueError):
-            humidex(tdb=25, rh=110)
-
-    #  Return an error if the input relative humidity is less than 0%
-    def test_input_relative_humidity_less_than_zero(self):
-        with pytest.raises(ValueError):
-            humidex(25, -10)
-
-    #  Return "Little or no discomfort" if the calculated humidex is exactly 30
-    def test_humidex_discomfort_30(self):
-        result = humidex(25, 50)
-        assert result["discomfort"] == "Little or no discomfort"
-
-    #  Return "Dangerous discomfort" if the calculated humidex is exactly 54
-    def test_humidex_dangerous_discomfort(self):
-        result = humidex(30, 100)
-        assert result["discomfort"] == "Dangerous discomfort"
-
-    def test_humidex(self):
-        assert humidex(25, 50) == {
-            "humidex": 28.2,
-            "discomfort": "Little or no discomfort",
-        }
-        assert humidex(30, 80) == {
-            "humidex": 43.3,
-            "discomfort": "Intense discomfort; avoid exertion",
-        }
-        assert humidex(31.6, 57.1) == {
-            "humidex": 40.8,
-            "discomfort": "Intense discomfort; avoid exertion",
-        }
+    with pytest.raises(ValueError):
+        humidex(25, -10)
