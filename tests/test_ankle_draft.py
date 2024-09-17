@@ -10,7 +10,6 @@ def test_ankle_draft(get_ankle_draft_url, retrieve_data):
     # Tests using data from URL
     for case in test_data.get("data", []):
         inputs = case["inputs"]
-        print(case["outputs"])
         expected_output = case["outputs"]["PPD_ad"]
         result = ankle_draft(
             inputs["tdb"], inputs["tr"], inputs["v"], inputs["rh"],
