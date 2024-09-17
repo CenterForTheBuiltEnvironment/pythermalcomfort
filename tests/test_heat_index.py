@@ -1,8 +1,20 @@
 from pythermalcomfort.models import heat_index
 
 
-def test_heat_index():
-    assert heat_index(25, 50) == 25.9
-    assert heat_index(77, 50, units="IP") == 78.6
-    assert heat_index(30, 80) == 37.7
-    assert heat_index(86, 80, units="IP") == 99.8
+def test_heat_index(get_heat_index_url, retrieve_data, is_equal):
+    reference_table = retrieve_data(get_heat_index_url)
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = heat_index(
+            **inputs
+        )
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result, outputs[key])
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise

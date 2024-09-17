@@ -22,6 +22,12 @@ test_athb_url = unit_test_data_prefix + "ts_athb.json"
 test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
 test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
 test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
+test_wbgt_url = unit_test_data_prefix + "ts_wbgt.json"
+test_heat_index_url = unit_test_data_prefix + "ts_heat_index.json"
+test_net_url = unit_test_data_prefix + "ts_net.json"
+test_pmv_pdd_url = unit_test_data_prefix + "ts_pmv_pdd.json"
+test_pmv_url = unit_test_data_prefix + "ts_pmv.json"
+test_set_url = unit_test_data_prefix + "ts_set.json"
 test_humidex_url = unit_test_data_prefix + "ts_humidex.json"
 
 
@@ -40,6 +46,7 @@ def retrieve_data():
 
     return _retrieve_data
 
+
 @pytest.fixture
 def is_equal():
     def compare(a, b):
@@ -53,7 +60,9 @@ def is_equal():
             return True
         else:
             return a == b
+
     return compare
+
 
 @pytest.fixture
 def get_adaptive_en_url():
@@ -89,6 +98,7 @@ def get_ankle_draft_url():
 def get_phs_url():
     return test_phs_url
 
+
 @pytest.fixture
 def get_vertical_tmp_grad_ppd_url():
     return test_vertical_tmp_grad_ppd_url
@@ -97,23 +107,58 @@ def get_vertical_tmp_grad_ppd_url():
 @pytest.fixture
 def get_humidex_url():
     return test_humidex_url
+
+
+@pytest.fixture
+def get_wbgt_url():
+    return test_wbgt_url
+
+
 @pytest.fixture
 def get_e_pmv_url():
     return test_e_pmv_url
+
 
 @pytest.fixture
 def get_at_url():
     return test_at_url
 
+
 @pytest.fixture
 def get_athb_url():
     return test_athb_url
+
 
 @pytest.fixture
 def get_clo_tout_url():
     return test_clo_tout_url
 
+
 @pytest.fixture
 def get_cooling_effect_url():
     return test_cooling_effect_url
 
+
+@pytest.fixture
+def get_heat_index_url():
+    return test_heat_index_url
+
+
+@pytest.fixture
+def get_net_url():
+    return test_net_url
+
+
+@pytest.fixture
+def get_pmv_pdd_url():
+    return test_pmv_pdd_url
+
+
+@pytest.fixture
+def get_pmv_url():
+    return test_pmv_url
+
+
+@pytest.fixture
+def get_set_url():
+    return test_set_url
