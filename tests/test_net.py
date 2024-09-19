@@ -1,10 +1,18 @@
 from pythermalcomfort.models import net
 
 
-def test_net():
-    assert net(37, 100, 0.1) == 37
-    assert net(37, 100, 4.5) == 37
-    assert net(25, 100, 4.5) == 20
-    assert net(25, 100, 0.1) == 25.4
-    assert net(40, 48.77, 0.1) == 33.8
-    assert net(36, 50.196, 0.1) == 30.9
+def test_net(get_net_url, retrieve_data, is_equal):
+    reference_table = retrieve_data(get_net_url)
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = net(**inputs)
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result, outputs[key])
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise

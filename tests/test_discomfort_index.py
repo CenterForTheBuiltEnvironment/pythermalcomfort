@@ -3,28 +3,18 @@ import numpy as np
 from pythermalcomfort.models import discomfort_index
 
 
-def test_discomfort_index():
-    np.testing.assert_equal(
-        discomfort_index([21, 23.5, 29, 32, 35, 40], 50),
-        {
-            "di": [19.2, 21.0, 25.0, 27.2, 29.4, 33.0],
-            "discomfort_condition": [
-                "No discomfort",
-                "Less than 50% feels discomfort",
-                "More than 50% feels discomfort",
-                "Most of the population feels discomfort",
-                "Everyone feels severe stress",
-                "State of medical emergency",
-            ],
-        },
-    )
-    np.testing.assert_equal(
-        discomfort_index([35, 35], [10, 90]),
-        {
-            "di": [24.9, 33.9],
-            "discomfort_condition": [
-                "More than 50% feels discomfort",
-                "State of medical emergency",
-            ],
-        },
-    )
+def test_discomfort_index(get_discomfort_index_url, retrieve_data, is_equal):
+    reference_table = retrieve_data(get_discomfort_index_url)
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = discomfort_index(**inputs)
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result[key], outputs[key])
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise
