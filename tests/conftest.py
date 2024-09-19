@@ -33,7 +33,7 @@ test_use_fans_heatwaves_url = unit_test_data_prefix + "ts_use_fans_heatwaves.jso
 test_utci_url = unit_test_data_prefix + "ts_utci.json"
 test_wind_chill_url = unit_test_data_prefix + "ts_wind_chill.json"
 test_pet_steady_url = unit_test_data_prefix + "ts_pet_steady.json"
-
+test_discomfort_index_url = unit_test_data_prefix + "ts_discomfort_index.json"
 
 @pytest.fixture
 def retrieve_data():
@@ -189,3 +189,7 @@ def get_wind_chill_url():
 @pytest.fixture
 def get_pet_steady_url():
     return test_pet_steady_url
+
+@pytest.fixture
+def get_discomfort_index_url():
+    return test_discomfort_index_url
