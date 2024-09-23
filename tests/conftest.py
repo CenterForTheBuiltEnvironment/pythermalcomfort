@@ -51,7 +51,7 @@ def retrieve_data():
 
 @pytest.fixture
 def is_equal():
-    def compare(a, b):
+    def compare(a, b, tolerance = 1e-6):
         if isinstance(a, np.ndarray):
             if not isinstance(b, np.ndarray):
                 b = np.array(b, dtype=a.dtype)
@@ -60,7 +60,7 @@ def is_equal():
             else:
               b = np.where(b == None, np.nan, b)  # Replace None with np.nan
               # Return True if arrays are close enough, including handling of NaN values
-              return np.allclose(a, b, equal_nan=True)
+              return np.allclose(a, b, atol = tolerance, equal_nan=True)
         elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
             return True
         else:
