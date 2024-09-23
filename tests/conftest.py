@@ -65,6 +65,9 @@ def is_equal():
               return np.allclose(a, b, atol = tolerance, equal_nan=True)
         elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
             return True
+        elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            # Compare scalar values with tolerance
+            return np.isclose(a, b, atol=tolerance)
         else:
             return a == b
 
