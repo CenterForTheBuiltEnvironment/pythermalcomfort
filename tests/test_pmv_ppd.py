@@ -24,8 +24,8 @@ class TestPmvPpd:
         with pytest.raises(ValueError):
             pmv_ppd(tdb, tr, vr, rh, met, clo, standard="Invalid")
 
-    def test_pmv_ppd(self, retrieve_data, get_pmv_pdd_url, is_equal):
-        reference_table = retrieve_data(get_pmv_pdd_url)
+    def test_pmv_ppd(self, retrieve_data, get_pmv_ppd_url, is_equal):
+        reference_table = retrieve_data(get_pmv_ppd_url)
         tolerance = reference_table["tolerance"]
         for entry in reference_table["data"]:
             inputs = entry["inputs"]

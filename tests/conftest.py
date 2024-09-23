@@ -25,7 +25,7 @@ test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_p
 test_wbgt_url = unit_test_data_prefix + "ts_wbgt.json"
 test_heat_index_url = unit_test_data_prefix + "ts_heat_index.json"
 test_net_url = unit_test_data_prefix + "ts_net.json"
-test_pmv_pdd_url = unit_test_data_prefix + "ts_pmv_pdd.json"
+test_pmv_ppd_url = unit_test_data_prefix + "ts_pmv_ppd.json"
 test_pmv_url = unit_test_data_prefix + "ts_pmv.json"
 test_set_url = unit_test_data_prefix + "ts_set.json"
 test_humidex_url = unit_test_data_prefix + "ts_humidex.json"
@@ -160,8 +160,8 @@ def get_net_url():
 
 
 @pytest.fixture
-def get_pmv_pdd_url():
-    return test_pmv_pdd_url
+def get_pmv_ppd_url():
+    return test_pmv_ppd_url
 
 
 @pytest.fixture
