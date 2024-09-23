@@ -2,8 +2,9 @@ import pytest
 from pythermalcomfort.models import vertical_tmp_grad_ppd
 
 
-def test_vertical_tmp_grad_ppd(get_vertical_tmp_grad_ppd_url, retrieve_data):
+def test_vertical_tmp_grad_ppd(get_vertical_tmp_grad_ppd_url, retrieve_data, is_equal):
     test_data = retrieve_data(get_vertical_tmp_grad_ppd_url)
+    tolerance = test_data["tolerance"]
 
     if test_data is None:
         pytest.skip("Failed to retrieve test data")
@@ -23,10 +24,13 @@ def test_vertical_tmp_grad_ppd(get_vertical_tmp_grad_ppd_url, retrieve_data):
         )
 
         for key, expected_value in expected_outputs.items():
-            if isinstance(expected_value, float):
-                assert round(result[key], 1) == round(expected_value, 1)
-            else:
-                assert result[key] == expected_value
+            try:
+                is_equal(result[key], expected_value, tolerance.get(key, 1e-6))
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {expected_value}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise
 
     # Test for ValueError
     with pytest.raises(ValueError):

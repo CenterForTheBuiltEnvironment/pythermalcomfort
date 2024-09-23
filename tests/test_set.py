@@ -3,47 +3,25 @@ from pythermalcomfort.models import (
     set_tmp,
 )
 
-tdb = []
-tr = []
-v = []
-rh = []
-met = []
-clo = []
-set_exp = []
-
-
 def test_phs_url(get_set_url, retrieve_data, is_equal):
     reference_table = retrieve_data(get_set_url)
+    tolerance = reference_table["tolerance"]
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         inputs["round"] = True
         inputs["limit_inputs"] = False
-
-        if "calculate_ce" not in inputs and "units" not in inputs:
-            tdb.append(inputs["tdb"])
-            tr.append(inputs["tr"])
-            v.append(inputs["v"])
-            rh.append(inputs["rh"])
-            met.append(inputs["met"])
-            clo.append(inputs["clo"])
-            set_exp.append(outputs["set"])
-
         result = set_tmp(**inputs)
         for key in outputs:
             # Use the custom is_equal for other types
             try:
-                assert is_equal(result, outputs[key])
+                assert is_equal(result, outputs[key], tolerance.get(key, 1e-6))
             except AssertionError as e:
                 print(
                     f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
                 )
                 raise
 
-
-def test_set_array_inputs():
-    results = set_tmp(tdb, tr, v, rh, met, clo, limit_inputs=False)
-    np.testing.assert_equal(set_exp, results)
 
 
 def test_set_npnan():

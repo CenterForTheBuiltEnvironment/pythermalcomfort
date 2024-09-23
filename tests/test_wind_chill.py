@@ -7,6 +7,7 @@ class TestWc:
     #  Calculates the wind chill index (WCI) for given dry bulb air temperature and wind speed
     def test_calculates_wci(self, get_wind_chill_url, retrieve_data, is_equal):
         reference_table = retrieve_data(get_wind_chill_url)
+        tolerance = reference_table["tolerance"]
         for entry in reference_table["data"]:
             inputs = entry["inputs"]
             outputs = entry["outputs"]
@@ -14,10 +15,7 @@ class TestWc:
             for key in outputs:
                 # Use the custom is_equal for other types
                 try:
-                    if(inputs.get("round", True)):
-                        assert is_equal(result[key], outputs[key])
-                    else:
-                        assert abs(result["wci"] - 518.587) < 0.01
+                    assert is_equal(result[key], outputs[key], tolerance.get(key, 1e-6))
                 except AssertionError as e:
                     print(
                         f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
