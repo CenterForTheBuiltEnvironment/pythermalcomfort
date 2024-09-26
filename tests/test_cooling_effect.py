@@ -22,7 +22,7 @@ def test_cooling_effect(get_cooling_effect_url, retrieve_data, is_equal):
 
         # To determine whether the result is as expected, use np.allclose for arrays and np.isclose for single
         try:
-            is_equal(result, expected_output, tolerance.get("cooling_effect"))
+            is_equal(result, expected_output, tolerance.get("cooling_effect", 1e-6))
         except AssertionError as e:
             print(
                 f"Assertion failed for cooling_effect. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
