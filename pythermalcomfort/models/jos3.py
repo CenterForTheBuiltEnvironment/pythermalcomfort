@@ -20,45 +20,10 @@ from pythermalcomfort.jos3_functions.matrix import (
 from pythermalcomfort.jos3_functions.parameters import Default, ALL_OUT_PARAMS
 from pythermalcomfort.models import pmv
 
-# # testing morris equation
-# from scipy import optimize
-# import matplotlib.pyplot as plt
-# import numpy as np
-# f, ax = plt.subplots()
-# for person in ["young", "old", "meds"]:
-#     t_lim = []
-#     rh_array = list(range(5, 100))
-#     for rh in rh_array:
-#
-#         def function(x):
-#             return use_fans_morris(x, 3.5, rh, 70, target_person=person)
-#
-#         t_lim.append(optimize.brentq(function, 30, 70))
-#
-#     z = np.polyfit(rh_array, t_lim, 4)
-#     p = np.poly1d(z)
-#     y_new = p(rh_array)
-#     # plt.plot(rh_array, t_lim, "o")
-#     plt.plot(rh_array, y_new, "-", label=person)
-# ax.set(
-#     ylabel="Temperature [°C]",
-#     xlabel="Relative Humidity [Rh]",
-#     ylim=(24, 52),
-#     xlim=(5, 70),
-# )
-# plt.legend()
-
-
-# include also the following models:
-#  radiant_tmp_asymmetry
-#  draft
-#  floor_surface_tmp
-#  Perceived temperature (Blazejczyk2012)
-#  Physiological subjective temperature and physiological strain (Blazejczyk2012)
-#  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
-#  more models here: https://rdrr.io/cran/comf/man/
-#  to print the R source code use comf::pmv
-
+# Set up logging with a level of WARNING
+import logging
+logging.basicConfig(level=logging.WARN)
+logger = logging.getLogger(__name__)
 
 class JOS3:
     """JOS-3 model simulates human thermal physiology including skin
@@ -451,7 +416,8 @@ class JOS3:
         met=Default.metabolic_rate,
         clo=Default.clothing_insulation,
     ) -> float:
-        """Calculate operative temperature [°C] when PMV=0.
+        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry logic.
+
 
         Parameters
         ----------
@@ -464,22 +430,55 @@ class JOS3:
         clo : float, optional
             Clothing insulation [clo]. The default is 0.
 
+
         Returns
         -------
         to : float
             Operative temperature [°C].
         """
+        # Default parameters
+        initial_to = 28
+        tolerance = 0.001
+        max_iterations = 100
+        adjustment_factor = 3
+        retry_adjustment_factor = 100
+        retry_attempts = 100
 
-        to = 28  # initial operative temperature
-        # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
-        for _ in range(100):
-            vpmv = pmv(tdb=to, tr=to, vr=va, rh=rh, met=met, clo=clo)
-            # Break the loop if the absolute value of PMV is less than 0.001
-            if abs(vpmv) < 0.001:
-                break
-            # Update the temperature based on the PMV value
-            else:
-                to = to - vpmv / 3
+        to = initial_to
+
+        # Main loop for finding PMV=0
+        for i in range(max_iterations):
+            pmv_value = pmv(to, to, va, rh, met, clo)
+
+            # Check for NaN and handle retries
+            if np.isnan(pmv_value):
+                logger.warning(f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step.")
+                for retry in range(retry_attempts):
+                    adjustment_factor = retry_adjustment_factor
+                    to = initial_to  # Reset to initial temperature for retry
+                    pmv_value = pmv(to, to, va, rh, met, clo)
+                    logger.info(f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}")
+
+                    if abs(pmv_value) < tolerance:
+                        logger.info(f"Converged to PMV=0 at to={to:.2f}°C during retry.")
+                        return to
+
+                    # Adjust the temperature during retry
+                    to = to - pmv_value / adjustment_factor
+
+                # If retries fail, log a warning and stop the loop
+                logger.error("Retries failed to achieve convergence after NaN detection.")
+                return to
+
+            # Check if the PMV is within tolerance
+            if abs(pmv_value) < tolerance:
+                logger.info(f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations.")
+                return to
+
+            # Adjust the operative temperature using the adjustment factor
+            to = to - pmv_value / adjustment_factor
+
+        logger.warning("Maximum iterations reached without achieving convergence.")
         return to
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
