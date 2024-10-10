@@ -60,7 +60,7 @@ def detailed_simulation():
         weight=60,
         fat=20,
         age=30,
-        sex="female",
+        sex="male",
         bmr_equation="japanese",
         bsa_equation="fujimoto",
         ex_output="all",
