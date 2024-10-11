@@ -161,6 +161,30 @@ def detailed_simulation():
     # Exporting the results as csv
     model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
 
+def female_simulation():
+    """Run a simple simulation example."""
+    model = JOS3(height=1.7, weight=60, age=30, sex="female", bmr_equation="japanese")
+
+    # Set the first phase
+    model.to = 28  # Operative temperature [°C]
+    model.rh = 40  # Relative humidity [%]
+    model.v = 0.2  # Air velocity [m/s]
+    model.par = 1.2  # Physical activity ratio [-]
+    model.simulate(60)  # Exposure time = 60 [min]
+
+    # Show the results
+    df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
+    df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
+    plt.ylabel("Mean skin temperature [°C]")  # Set y-label as 'Mean skin temperature [°C]'
+    plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
+    plt.savefig(
+        os.path.join(jos3_example_directory, "jos3_example3_mean_skin_temperature.png")
+    )  # Save plot at the current directory
+    plt.show()  # Show the plot
+
+    # Exporting the results as csv
+    model.to_csv(os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv"))
+
 def validation_simulation():
     """Run validation simulation using Stolwijk and Hardy dataset."""
     """
@@ -557,12 +581,15 @@ def main():
     # Simulation switch (Please change as needed)
     run_simple_simulation = True
     run_detailed_simulation = True
+    run_female_simulation = True
     run_validation_simulation = True
 
     if run_simple_simulation:
         simple_simulation()
     if run_detailed_simulation:
         detailed_simulation()
+    if run_female_simulation:
+        female_simulation()
     if run_validation_simulation:
         validation_simulation()
 
