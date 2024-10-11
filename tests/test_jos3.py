@@ -46,6 +46,13 @@ def test_JOS3_class():
     assert np.all(model.setpt_cr == model.t_core)
     assert np.all(model.setpt_sk == model.t_skin)
 
+    # Test: JOS3 class with sex="female"
+    model = JOS3(sex="female", bmr_equation="japanese")
+    model.simulate(times=60)
+    # Check if mean skin temperature is not NaN
+    dict_output = model.dict_results()
+    assert not np.isnan(dict_output["t_skin_mean"]).any()
+
     # Test: simulate()
     model = JOS3(height=1.7, weight=60, age=30)
     # Set the first phase
