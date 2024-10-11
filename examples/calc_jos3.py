@@ -166,21 +166,26 @@ def female_simulation():
     model = JOS3(height=1.7, weight=60, age=30, sex="female", bmr_equation="japanese")
 
     # Set the first phase
-    model.to = 28  # Operative temperature [°C]
-    model.rh = 40  # Relative humidity [%]
-    model.v = 0.2  # Air velocity [m/s]
-    model.par = 1.2  # Physical activity ratio [-]
-    model.simulate(60)  # Exposure time = 60 [min]
+    model.to = 28
+    model.rh = 40
+    model.v = 0.2
+    model.par = 1.2
+    model.clo = 0.3
+    model.simulate(60)
+
+    # Set the next condition
+    model.to = 20
+    model.simulate(60)
 
     # Show the results
-    df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
-    df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
-    plt.ylabel("Mean skin temperature [°C]")  # Set y-label as 'Mean skin temperature [°C]'
-    plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
+    df = pd.DataFrame(model.dict_results()
+    df.t_skin_mean.plot()
+    plt.ylabel("Mean skin temperature [°C]")
+    plt.xlabel("Time [min]")
     plt.savefig(
         os.path.join(jos3_example_directory, "jos3_example3_mean_skin_temperature.png")
-    )  # Save plot at the current directory
-    plt.show()  # Show the plot
+    )
+    plt.show()
 
     # Exporting the results as csv
     model.to_csv(os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv"))
