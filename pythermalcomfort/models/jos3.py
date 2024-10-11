@@ -441,7 +441,7 @@ class JOS3:
         tolerance = 0.001
         max_iterations = 100
         adjustment_factor = 3
-        retry_adjustment_factor = 100
+        retry_adjustment_factor = adjustment_factor * 200
         retry_attempts = 100
 
         to = initial_to
