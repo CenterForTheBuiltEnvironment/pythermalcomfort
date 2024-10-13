@@ -6,10 +6,12 @@ Authors
 * `Stefano Schiavon`_
 * `Tyler Hoyt`_
 * Chris Mackey
+* `Jonas Kittner`_
 
 .. _Federico Tartarini: https://www.linkedin.com/in/federico-tartarini-3991995b/
 .. _Stefano Schiavon: https://www.linkedin.com/in/stefanoschiavon/
 .. _Tyler Hoyt: https://www.linkedin.com/in/tyler-hoyt1/
+.. _Jonas Kittner: https://github.com/jkittner/
 
 **Derivative work**
 

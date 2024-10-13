@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.10.0 (unreleased)
+-------------------
+
+* allow n-dimensional arrays for ``pet_steady`` and speedup ``p_sat`` calculation
+
+
 2.9.1 (2024-01-19)
 -------------------
 
