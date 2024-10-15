@@ -4,6 +4,7 @@ from pythermalcomfort.models import (
     use_fans_heatwaves,
 )
 
+
 def test_use_fans_heatwaves(get_use_fans_heatwaves_url, retrieve_data, is_equal):
     reference_table = retrieve_data(get_use_fans_heatwaves_url)
     for entry in reference_table["data"]:

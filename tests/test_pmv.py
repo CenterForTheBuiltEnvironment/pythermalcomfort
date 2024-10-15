@@ -4,6 +4,7 @@ from pythermalcomfort.models import (
     pmv,
 )
 
+
 def test_pmv(get_pmv_url, retrieve_data, is_equal):
     reference_table = retrieve_data(get_pmv_url)
     for entry in reference_table["data"]:

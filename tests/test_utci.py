@@ -5,6 +5,7 @@ from pythermalcomfort.models import (
 )
 from pythermalcomfort.models.utci import _utci_optimized
 
+
 def test_utci(get_utci_url, retrieve_data, is_equal):
     reference_table = retrieve_data(get_utci_url)
     for entry in reference_table["data"]:
@@ -23,6 +24,7 @@ def test_utci(get_utci_url, retrieve_data, is_equal):
                     f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
                 )
                 raise
+
 
 def test_utci_optimized():
     np.testing.assert_equal(
