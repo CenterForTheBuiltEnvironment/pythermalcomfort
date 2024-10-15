@@ -10,14 +10,7 @@ def test_athb(get_athb_url, retrieve_data, is_equal):
         inputs = entry["inputs"]
         outputs = entry["outputs"]
 
-        result = athb(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            vr=inputs["vr"],
-            rh=inputs["rh"],
-            met=inputs["met"],
-            t_running_mean=inputs["t_running_mean"],
-        )
+        result = athb(**inputs)
 
         for key in outputs:
             # Use the custom is_equal for other types

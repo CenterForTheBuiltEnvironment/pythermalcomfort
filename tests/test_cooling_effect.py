@@ -8,23 +8,14 @@ def test_cooling_effect(get_cooling_effect_url, retrieve_data, is_equal):
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["cooling_effect"]
-
-        result = cooling_effect(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            rh=inputs["rh"],
-            vr=inputs["vr"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-            units=inputs.get("units", "SI"),
-        )
-
-        # To determine whether the result is as expected, use np.allclose for arrays and np.isclose for single
-        try:
-            is_equal(result, expected_output, tolerance.get("cooling_effect", 1e-6))
-        except AssertionError as e:
-            print(
-                f"Assertion failed for cooling_effect. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        outputs = entry["outputs"]
+        result = cooling_effect(**inputs)
+        for key in outputs:
+          # To determine whether the result is as expected, use np.allclose for arrays and np.isclose for single
+          try:
+              is_equal(result, outputs[key], tolerance.get("cooling_effect", 1e-6))
+          except AssertionError as e:
+              print(
+                  f"Assertion failed for cooling_effect. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
+              )
+              raise
