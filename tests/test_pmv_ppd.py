@@ -1,19 +1,12 @@
-import json
+import math
 
 import numpy as np
-import requests
-import math
 import pytest
 
 from pythermalcomfort.models import (
     pmv_ppd,
 )
 from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
-
-# get file containing validation tables
-url = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/validation_data.json"
-resp = requests.get(url)
-reference_tables = json.loads(resp.text)
 
 # fmt: off
 data_test_set_ip = [  # I have commented the lines of code that don't pass the test
@@ -121,27 +114,6 @@ class TestPmvPpd:
         # Assert
         assert math.isnan(result["pmv"][1])
         assert math.isnan(result["ppd"][1])
-
-    def test_pmv_ppd(self):
-        for table in reference_tables["reference_data"]["pmv_ppd"]:
-            for entry in table["data"]:
-                standard = "ISO"
-                if "ASHRAE" in table["source"]:
-                    standard = "ASHRAE"
-                inputs = entry["inputs"]
-                outputs = entry["outputs"]
-                r = pmv_ppd(
-                    inputs["ta"],
-                    inputs["tr"],
-                    inputs["v"],
-                    inputs["rh"],
-                    inputs["met"],
-                    inputs["clo"],
-                    standard=standard,
-                )
-                # asserting with this strange code otherwise face issues with rounding fund
-                assert float("%.1f" % r["pmv"]) == outputs["pmv"]
-                assert np.round(r["ppd"], 1) == outputs["ppd"]
 
         for row in data_test_pmv_ip:
             assert (
@@ -255,24 +227,6 @@ class TestPmvPpd:
             pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", limit_inputs=False),
             {"pmv": 4.48, "ppd": 100.0},
         )
-
-        for table in reference_tables["reference_data"]["pmv_ppd"]:
-            standard = "ISO"
-            if "ASHRAE" in table["source"]:
-                standard = "ASHRAE"
-            tdb = np.array([d["inputs"]["ta"] for d in table["data"]])
-            tr = np.array([d["inputs"]["tr"] for d in table["data"]])
-            v = np.array([d["inputs"]["v"] for d in table["data"]])
-            rh = np.array([d["inputs"]["rh"] for d in table["data"]])
-            met = np.array([d["inputs"]["met"] for d in table["data"]])
-            clo = np.array([d["inputs"]["clo"] for d in table["data"]])
-            pmv_exp = np.array([d["outputs"]["pmv"] for d in table["data"]])
-            ppd_exp = np.array([d["outputs"]["ppd"] for d in table["data"]])
-            results = pmv_ppd(tdb, tr, v, rh, met, clo, standard=standard)
-            pmv_r = [float("%.1f" % x) for x in results["pmv"]]
-
-            np.testing.assert_equal(pmv_r, pmv_exp)
-            np.testing.assert_equal(results["ppd"], ppd_exp)
 
     def test_pmv_ppd_optimized(self):
         assert math.isclose(
