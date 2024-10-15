@@ -333,7 +333,7 @@ class JOS3:
         version_string = (
             __version__  # get the current version of pythermalcomfort package
         )
-        version_number_string = re.findall("\d+\.\d+\.\d+", version_string)[0]
+        version_number_string = re.findall(r"\d+\.\d+\.\d+", version_string)[0]
         self._version = version_number_string  # (ex. 'X.Y.Z')
 
         # Initialize basic attributes
