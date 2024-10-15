@@ -178,7 +178,7 @@ def female_simulation():
     model.simulate(60)
 
     # Show the results
-    df = pd.DataFrame(model.dict_results()
+    df = pd.DataFrame(model.dict_results())
     df.t_skin_mean.plot()
     plt.ylabel("Mean skin temperature [°C]")
     plt.xlabel("Time [min]")
