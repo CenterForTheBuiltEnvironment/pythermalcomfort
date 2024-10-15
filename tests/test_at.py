@@ -7,19 +7,14 @@ def test_at(get_at_url, retrieve_data, is_equal):
     tolerance = reference_table["tolerance"]
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["at"]
-
-        result = at(
-            tdb=inputs["tdb"],
-            rh=inputs["rh"],
-            v=inputs["v"],
-            q=inputs.get("q", None),  # q is elective
-        )
-
-        try:
-            assert is_equal(result, expected_output, tolerance.get("at", 1e-6))
-        except AssertionError as e:
-            print(
-                f"Assertion failed for at. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        outputs = entry["outputs"]
+        result = at(**inputs)
+        for key in outputs:
+            # Use the custom is_equal for other types
+            try:
+                assert is_equal(result, outputs[key], tolerance.get(key, 1e-6))
+            except AssertionError as e:
+                print(
+                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
+                )
+                raise

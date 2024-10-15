@@ -7,22 +7,14 @@ def test_e_pmv(get_e_pmv_url, retrieve_data, is_equal):
     tolerance = reference_table["tolerance"]
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_outputs = entry["outputs"]["pmv"]
+        outputs = entry["outputs"]
+        result = e_pmv(**inputs)
 
-        result = e_pmv(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            vr=inputs["vr"],
-            rh=inputs["rh"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-            e_coefficient=inputs["e_coefficient"],
-        )
-
-        try:
-            assert is_equal(result, expected_outputs, tolerance.get("pmv", 1e-6))
-        except AssertionError as e:
-            print(
-                f"Assertion failed for e_pmv. Expected {expected_outputs}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        for key in outputs:
+          try:
+              assert is_equal(result, outputs[key], tolerance.get("pmv", 1e-6))
+          except AssertionError as e:
+              print(
+                  f"Assertion failed for e_pmv. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
+              )
+              raise
