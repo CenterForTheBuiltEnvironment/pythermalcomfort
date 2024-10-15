@@ -6,9 +6,7 @@ def test_heat_index(get_heat_index_url, retrieve_data, is_equal):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = heat_index(
-            **inputs
-        )
+        result = heat_index(**inputs)
         for key in outputs:
             # Use the custom is_equal for other types
             try:

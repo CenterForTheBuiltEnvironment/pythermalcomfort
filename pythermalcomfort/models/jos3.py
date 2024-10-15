@@ -22,8 +22,10 @@ from pythermalcomfort.models import pmv
 
 # Set up logging with a level of WARNING
 import logging
+
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
+
 
 class JOS3:
     """JOS-3 model simulates human thermal physiology including skin
@@ -452,27 +454,37 @@ class JOS3:
 
             # Check for NaN and handle retries
             if np.isnan(pmv_value):
-                logger.warning(f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step.")
+                logger.warning(
+                    f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step."
+                )
                 for retry in range(retry_attempts):
                     adjustment_factor = retry_adjustment_factor
                     to = initial_to  # Reset to initial temperature for retry
                     pmv_value = pmv(to, to, va, rh, met, clo)
-                    logger.info(f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}")
+                    logger.info(
+                        f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}"
+                    )
 
                     if abs(pmv_value) < tolerance:
-                        logger.info(f"Converged to PMV=0 at to={to:.2f}°C during retry.")
+                        logger.info(
+                            f"Converged to PMV=0 at to={to:.2f}°C during retry."
+                        )
                         return to
 
                     # Adjust the temperature during retry
                     to = to - pmv_value / adjustment_factor
 
                 # If retries fail, log a warning and stop the loop
-                logger.error("Retries failed to achieve convergence after NaN detection.")
+                logger.error(
+                    "Retries failed to achieve convergence after NaN detection."
+                )
                 return to
 
             # Check if the PMV is within tolerance
             if abs(pmv_value) < tolerance:
-                logger.info(f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations.")
+                logger.info(
+                    f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations."
+                )
                 return to
 
             # Adjust the operative temperature using the adjustment factor
@@ -940,17 +952,19 @@ class JOS3:
             detail_out["bf_ava_hand"] = np.round(bf_ava_hand, 2)
             detail_out["bf_ava_foot"] = np.round(bf_ava_foot, 2)
             detail_out["q_bmr_core"] = np.round(q_bmr_local[0], 2)
-            detail_out["q_bmr_muscle"] = np.round(q_bmr_local[1][VINDEX["muscle"]],2)
+            detail_out["q_bmr_muscle"] = np.round(q_bmr_local[1][VINDEX["muscle"]], 2)
             detail_out["q_bmr_fat"] = np.round(q_bmr_local[2][VINDEX["fat"]], 2)
             detail_out["q_bmr_skin"] = np.round(q_bmr_local[3], 2)
             detail_out["q_work"] = np.round(q_work, 2)
             detail_out["q_shiv"] = np.round(q_shiv, 2)
             detail_out["q_nst"] = np.round(q_nst, 2)
             detail_out["q_thermogenesis_core"] = np.round(q_thermogenesis_core, 2)
-            detail_out["q_thermogenesis_muscle"] = np.round(q_thermogenesis_muscle[
-                VINDEX["muscle"]
-            ],2)
-            detail_out["q_thermogenesis_fat"] = np.round(q_thermogenesis_fat[VINDEX["fat"]],2)
+            detail_out["q_thermogenesis_muscle"] = np.round(
+                q_thermogenesis_muscle[VINDEX["muscle"]], 2
+            )
+            detail_out["q_thermogenesis_fat"] = np.round(
+                q_thermogenesis_fat[VINDEX["fat"]], 2
+            )
             detail_out["q_thermogenesis_skin"] = np.round(q_thermogenesis_skin, 2)
             dict_out["q_skin2env_sensible"] = np.round(shl_sk, 2)
             dict_out["q_skin2env_latent"] = np.round(e_sk, 2)

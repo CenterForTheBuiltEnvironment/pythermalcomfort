@@ -14,7 +14,7 @@ class TestWc:
             for key in outputs:
                 # Use the custom is_equal for other types
                 try:
-                    if(inputs.get("round", True)):
+                    if inputs.get("round", True):
                         assert is_equal(result[key], outputs[key])
                     else:
                         assert abs(result["wci"] - 518.587) < 0.01

@@ -89,6 +89,7 @@ def enthalpy(
 
     return round(h, 2)
 
+
 # pre-calculated constants for p_sat
 c1 = -5674.5359
 c2 = 6.3925247
@@ -131,10 +132,7 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
             + c7 * log_ta_k
         ),
         np.exp(
-            c8 / ta_k
-            + c9
-            + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
-            + c13 * log_ta_k
+            c8 / ta_k + c9 + ta_k * (c10 + ta_k * (c11 + ta_k * c12)) + c13 * log_ta_k
         ),
     )
 

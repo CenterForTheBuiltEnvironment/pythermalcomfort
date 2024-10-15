@@ -1,4 +1,4 @@
-from typing import  Literal, Any, Union
+from typing import Literal, Any, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -251,9 +251,7 @@ def pet_steady(
         fcl = (
             1 + 0.31 * _clo
         )  # Increase heat exchange surface depending on clothing level
-        f_a_cl = (
-            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0
-        ) / 100
+        f_a_cl = (173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
         f_eff = 0.696 if position == 2 else 0.725  # effective radiation factor

@@ -30,6 +30,7 @@ def test_pet_steady(get_pet_steady_url, retrieve_data, is_equal):
             )
             raise
 
+
 PET_TEST_MATRIX = (
     # 'tdb', 'tr', 'rh', 'v', 'met', 'clo', 'exp'
     (20, 20, 50, 0.15, 1.37, 0.5, 18.85),
@@ -43,12 +44,13 @@ PET_TEST_MATRIX = (
     (30, 30, 80, 1.0, 1.37, 0.9, 32.21),
 )
 
-@pytest.mark.parametrize('shape', ((10, 10), 10, (3, 3, 3)))
-@pytest.mark.parametrize(('tdb', 'tr', 'rh', 'v', 'met', 'clo', 'exp'), PET_TEST_MATRIX)
+
+@pytest.mark.parametrize("shape", ((10, 10), 10, (3, 3, 3)))
+@pytest.mark.parametrize(("tdb", "tr", "rh", "v", "met", "clo", "exp"), PET_TEST_MATRIX)
 def test_pet_array(shape, tdb, tr, rh, v, met, clo, exp):
-    tdb_arr=np.full(shape, tdb)
-    tr_arr=np.full(shape, tr)
-    rh_arr=np.full(shape, rh)
-    v_arr=np.full(shape, v)
+    tdb_arr = np.full(shape, tdb)
+    tr_arr = np.full(shape, tr)
+    rh_arr = np.full(shape, rh)
+    v_arr = np.full(shape, v)
     res = pet_steady(tdb=tdb_arr, tr=tr_arr, rh=rh_arr, v=v_arr, met=met, clo=clo)
     np.testing.assert_array_equal(actual=res, desired=np.full(shape, exp))
