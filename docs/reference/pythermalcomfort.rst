@@ -6,6 +6,9 @@ Adaptive ASHRAE
 
 .. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
+.. autoclass:: pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE
+    :members:
+
 Adaptive EN
 -----------
 

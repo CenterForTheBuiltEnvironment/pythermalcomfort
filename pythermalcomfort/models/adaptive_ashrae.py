@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
+import numpy.typing as npt
 
 from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
@@ -13,31 +14,49 @@ from pythermalcomfort.utilities import (
 
 @dataclass
 class AdaptiveASHRAE:
-    tmp_cmf: Union[float, int, np.ndarray, List[float], List[int]]
-    tmp_cmf_80_low: Union[float, int, np.ndarray, List[float], List[int]]
-    tmp_cmf_80_up: Union[float, int, np.ndarray, List[float], List[int]]
-    tmp_cmf_90_low: Union[float, int, np.ndarray, List[float], List[int]]
-    tmp_cmf_90_up: Union[float, int, np.ndarray, List[float], List[int]]
-    acceptability_80: Union[float, int, np.ndarray, List[float], List[int]]
-    acceptability_90: Union[float, int, np.ndarray, List[float], List[int]]
+    """
+    A dataclass to store the results of the adaptive thermal comfort model based on ASHRAE 55.
+
+    Attributes
+    ----------
+    tmp_cmf : float, int, or array-like
+        Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
+    tmp_cmf_80_low : float, int, or array-like
+        Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
+    tmp_cmf_80_up : float, int, or array-like
+        Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
+    tmp_cmf_90_low : float, int, or array-like
+        Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
+    tmp_cmf_90_up : float, int, or array-like
+        Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
+    acceptability_80 : bool or array-like
+        Acceptability for 80% occupants.
+    acceptability_90 : bool or array-like
+        Acceptability for 90% occupants.
+    """
+
+    tmp_cmf: Union[float, int, npt.ArrayLike]
+    tmp_cmf_80_low: Union[float, int, npt.ArrayLike]
+    tmp_cmf_80_up: Union[float, int, npt.ArrayLike]
+    tmp_cmf_90_low: Union[float, int, npt.ArrayLike]
+    tmp_cmf_90_up: Union[float, int, npt.ArrayLike]
+    acceptability_80: Union[float, int, npt.ArrayLike]
+    acceptability_90: Union[float, int, npt.ArrayLike]
 
     def __getitem__(self, item):
         return getattr(self, item)
 
 
 def adaptive_ashrae(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    t_running_mean: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, int, npt.ArrayLike],
+    tr: Union[float, int, npt.ArrayLike],
+    t_running_mean: Union[float, int, npt.ArrayLike],
+    v: Union[float, int, npt.ArrayLike],
     units: str = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
-    """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
-    model relates indoor design temperatures or acceptable temperature ranges
-    to outdoor meteorological or climatological parameters. The adaptive model
-    can only be used in occupant-controlled naturally conditioned spaces that
-    meet all the following criteria:
+    """
+    Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model relates indoor design temperatures or acceptable temperature ranges to outdoor meteorological or climatological parameters. The adaptive model can only be used in occupant-controlled naturally conditioned spaces that meet all the following criteria:
 
     * There is no mechanical cooling or heating system in operation.
     * Occupants have a metabolic rate between 1.0 and 1.5 met.
@@ -63,28 +82,24 @@ def adaptive_ashrae(
     limit_inputs : bool, optional
         If True, returns nan for inputs outside standard limits. Defaults to True.
 
-        ASHRAE 55 2020 limits: 10 < tdb [°C] < 40, 10 < tr [°C] < 40, 0 < vr [m/s] < 2, 10 < t_running_mean [°C] < 33.5.
+        .. warning::
+            ASHRAE 55 2020 limits: 10 < tdb [°C] < 40, 10 < tr [°C] < 40, 0 < vr [m/s] < 2, 10 < t_running_mean [°C] < 33.5.
 
     Returns
     -------
-    tmp_cmf : float, int, or array-like
-        Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
-    tmp_cmf_80_low : float, int, or array-like
-        Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_80_up : float, int, or array-like
-        Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_90_low : float, int, or array-like
-        Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-    tmp_cmf_90_up : float, int, or array-like
-        Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-    acceptability_80 : bool or array-like
-        Acceptability for 80% occupants.
-    acceptability_90 : bool or array-like
-        Acceptability for 90% occupants.
+    AdaptiveASHRAE
+        An instance of the :py:class:`pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE` dataclass containing comfort temperature and acceptability for 80% and 90% occupants.
 
-    Notes
-    -----
-    You can use this function to calculate if your conditions are within the `adaptive thermal comfort region`. Calculations comply with the ASHRAE 55 2020 Standard [1]_.
+        .. note::
+            The returned `AdaptiveASHRAE` instance has the following attributes:
+
+            * **tmp_cmf**: Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
+            * **tmp_cmf_80_low**: Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
+            * **tmp_cmf_80_up**: Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
+            * **tmp_cmf_90_low**: Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
+            * **tmp_cmf_90_up**: Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
+            * **acceptability_80**: Acceptability for 80% occupants.
+            * **acceptability_90**: Acceptability for 90% occupants.
 
     Examples
     --------
@@ -131,16 +146,14 @@ def adaptive_ashrae(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
-    (
-        tdb_valid,
-        tr_valid,
-        v_valid,
-    ) = check_standard_compliance_array(standard, tdb=tdb, tr=tr, v=v)
+    tdb_valid, tr_valid, v_valid = check_standard_compliance_array(
+        standard, tdb=tdb, tr=tr, v=v
+    )
     trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
     to = t_o(tdb, tr, v, standard=standard)
 
-    # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
+    # Calculate cooling effect (ce) of elevated air speed when top > 25 degC.
     ce = np.where((v >= 0.6) & (to >= 25.0), 999, 0)
     ce = np.where((v < 0.9) & (ce == 999), 1.2, ce)
     ce = np.where((v < 1.2) & (ce == 999), 1.8, ce)
@@ -165,27 +178,19 @@ def adaptive_ashrae(
     tmp_cmf_80_up = t_cmf + 3.5 + ce
     tmp_cmf_90_up = t_cmf + 2.5 + ce
 
-    acceptability_80 = np.where(
-        (tmp_cmf_80_low <= to) & (to <= tmp_cmf_80_up), True, False
-    )
-    acceptability_90 = np.where(
-        (tmp_cmf_90_low <= to) & (to <= tmp_cmf_90_up), True, False
-    )
+    acceptability_80 = (tmp_cmf_80_low <= to) & (to <= tmp_cmf_80_up)
+    acceptability_90 = (tmp_cmf_90_low <= to) & (to <= tmp_cmf_90_up)
 
     if units.lower() == "ip":
-        (
-            t_cmf,
-            tmp_cmf_80_low,
-            tmp_cmf_80_up,
-            tmp_cmf_90_low,
-            tmp_cmf_90_up,
-        ) = units_converter(
-            from_units="si",
-            tmp_cmf=t_cmf,
-            tmp_cmf_80_low=tmp_cmf_80_low,
-            tmp_cmf_80_up=tmp_cmf_80_up,
-            tmp_cmf_90_low=tmp_cmf_90_low,
-            tmp_cmf_90_up=tmp_cmf_90_up,
+        t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, tmp_cmf_90_low, tmp_cmf_90_up = (
+            units_converter(
+                from_units="si",
+                tmp_cmf=t_cmf,
+                tmp_cmf_80_low=tmp_cmf_80_low,
+                tmp_cmf_80_up=tmp_cmf_80_up,
+                tmp_cmf_90_low=tmp_cmf_90_low,
+                tmp_cmf_90_up=tmp_cmf_90_up,
+            )
         )
 
     return AdaptiveASHRAE(
