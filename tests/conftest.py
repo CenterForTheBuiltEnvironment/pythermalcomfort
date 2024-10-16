@@ -29,7 +29,7 @@ class Urls(Enum):
     WBGT = "ts_wbgt.json"
     HEAT_INDEX = "ts_heat_index.json"
     NET = "ts_net.json"
-    PMV_PDD = "ts_pmv_pdd.json"
+    PMV_PPD = "ts_pmv_ppd.json"
     PMV = "ts_pmv.json"
     SET = "ts_set.json"
     HUMIDEX = "ts_humidex.json"
