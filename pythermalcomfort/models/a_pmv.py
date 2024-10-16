@@ -27,68 +27,53 @@ def a_pmv(
     Parameters
     ----------
     tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
     tr : float, int, or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+        Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
     vr : float, int, or array-like
-        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
-
-        Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor. The relative air speed is the sum of the
-        average air speed measured by the sensor plus the activity-generated air speed
-        (Vag). Where Vag is the activity-generated air speed caused by motion of
-        individual body parts. vr can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.v_relative`.
+        Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
+        Note: vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
     rh : float, int, or array-like
-        relative humidity, [%]
+        Relative humidity, [%].
     met : float, int, or array-like
-        metabolic rate, [met]
+        Metabolic rate, [met].
     clo : float, int, or array-like
-        clothing insulation, [clo]
-
-        Note: The activity as well as the air speed modify the insulation characteristics
-        of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
-        for the effect of the body movement for met equal or higher than 1.2 met using
-        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-        can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+        Clothing insulation, [clo].
+        Note: Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
     a_coefficient : float
-        adaptive coefficient
-    wme : float, int, or array-like
-        external work, [met] default 0
+        Adaptive coefficient.
+    wme : float, int, or array-like, optional
+        External work, [met], default is 0.
     units : str, optional
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns pmv and ppd values even if input values are
-        outside the applicability limits of the model.
-
-        The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
-        0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
+        Units system, 'SI' or 'IP'. Defaults to 'SI'.
+    limit_inputs : bool, optional
+        If True, returns nan for inputs outside standard limits. Defaults to True.
+        Note: ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, -2 < PMV < 2.
 
     Returns
     -------
     pmv : float, int, or array-like
-        Predicted Mean Vote
+        Predicted Mean Vote.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import a_pmv
-        >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
-        >>> v = 0.1
-        >>> met = 1.4
-        >>> clo = 0.5
-        >>> # calculate relative air speed
-        >>> v_r = v_relative(v=v, met=met)
-        >>> # calculate dynamic clothing
-        >>> clo_d = clo_dynamic(clo=clo, met=met)
-        >>> results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
-        >>> print(results)
-        0.74
+        from pythermalcomfort.models import a_pmv
+        from pythermalcomfort.utilities import v_relative, clo_dynamic
+
+        v = 0.1
+        met = 1.4
+        clo = 0.5
+
+        # Calculate relative air speed
+        v_r = v_relative(v=v, met=met)
+
+        # Calculate dynamic clothing
+        clo_d = clo_dynamic(clo=clo, met=met)
+
+        results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
+        print(results)  # 0.74
     """
 
     # Validate units string
