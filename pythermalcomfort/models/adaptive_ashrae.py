@@ -12,7 +12,7 @@ from pythermalcomfort.utilities import (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class AdaptiveASHRAE:
     """
     A dataclass to store the results of the adaptive thermal comfort model based on ASHRAE 55.
@@ -35,23 +35,23 @@ class AdaptiveASHRAE:
         Acceptability for 90% occupants.
     """
 
-    tmp_cmf: Union[float, int, npt.ArrayLike]
-    tmp_cmf_80_low: Union[float, int, npt.ArrayLike]
-    tmp_cmf_80_up: Union[float, int, npt.ArrayLike]
-    tmp_cmf_90_low: Union[float, int, npt.ArrayLike]
-    tmp_cmf_90_up: Union[float, int, npt.ArrayLike]
-    acceptability_80: Union[float, int, npt.ArrayLike]
-    acceptability_90: Union[float, int, npt.ArrayLike]
+    tmp_cmf: Union[float, npt.ArrayLike]
+    tmp_cmf_80_low: Union[float, npt.ArrayLike]
+    tmp_cmf_80_up: Union[float, npt.ArrayLike]
+    tmp_cmf_90_low: Union[float, npt.ArrayLike]
+    tmp_cmf_90_up: Union[float, npt.ArrayLike]
+    acceptability_80: Union[bool, npt.ArrayLike]
+    acceptability_90: Union[bool, npt.ArrayLike]
 
     def __getitem__(self, item):
         return getattr(self, item)
 
 
 def adaptive_ashrae(
-    tdb: Union[float, int, npt.ArrayLike],
-    tr: Union[float, int, npt.ArrayLike],
-    t_running_mean: Union[float, int, npt.ArrayLike],
-    v: Union[float, int, npt.ArrayLike],
+    tdb: Union[float, npt.ArrayLike],
+    tr: Union[float, npt.ArrayLike],
+    t_running_mean: Union[float, npt.ArrayLike],
+    v: Union[float, npt.ArrayLike],
     units: str = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
