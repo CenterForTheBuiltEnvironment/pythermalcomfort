@@ -1,15 +1,18 @@
 import numpy as np
 import pytest
 from pythermalcomfort.models import pet_steady
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_pet_steady(get_pet_steady_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_pet_steady_url)
+def test_pet_steady(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.PET_STEADY.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["PET"]
-
+        outputs = entry["outputs"]
         result = pet_steady(
             tdb=inputs["tdb"],
             tr=inputs["tr"],
@@ -19,16 +22,7 @@ def test_pet_steady(get_pet_steady_url, retrieve_data, is_equal):
             clo=inputs["clo"],
         )
 
-        try:
-            if isinstance(expected_output, list):
-                np.testing.assert_equal(result, expected_output)
-            else:
-                assert np.isclose(result, expected_output, atol=0.1)
-        except AssertionError as e:
-            print(
-                f"Assertion failed for pet_steady. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        validate_result(result, outputs, tolerance)
 
 
 PET_TEST_MATRIX = (

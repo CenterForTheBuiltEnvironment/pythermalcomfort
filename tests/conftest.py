@@ -9,7 +9,7 @@ from enum import Enum
 # without needing to import them (pytest will automatically discover them).
 
 
-unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
+unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/"
 
 
 class Urls(Enum):
@@ -67,21 +67,64 @@ def retrieve_data():
     return _retrieve_data
 
 
-@pytest.fixture
-def is_equal():
-    def compare(a, b):
-        if isinstance(a, np.ndarray):
-            if not isinstance(b, np.ndarray):
-                b = np.array(b, dtype=a.dtype)
-            if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
-                return np.array_equal(a, b)
-            else:
-                b = np.where(b == None, np.nan, b)  # Replace None with np.nan
-                # Return True if arrays are close enough, including handling of NaN values
-                return np.allclose(a, b, equal_nan=True)
-        elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
-            return True
+def is_equal(a, b, tolerance=1e-6):
+    if isinstance(a, np.ndarray):
+        if not isinstance(b, np.ndarray):
+            b = np.array(b, dtype=a.dtype)
+        if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
+            return np.array_equal(a, b)
         else:
-            return a == b
+            b = np.where(b is None, np.nan, b)  # Replace None with np.nan
+            # Return True if arrays are close enough, including handling of NaN values
+            return np.allclose(a, b, atol=tolerance, equal_nan=True)
+    elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
+        return True
+    elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        # Compare scalar values with tolerance
+        return np.isclose(a, b, atol=tolerance)
+    else:
+        return a == b
 
-    return compare
+
+def retrieve_reference_table(get_test_url, retrieve_data, url_name):
+    reference_table = retrieve_data(get_test_url(url_name))
+    if reference_table is None:
+        pytest.fail(f"Failed to retrieve reference table for {url_name.lower()}")
+    return reference_table
+
+
+def validate_result(result, expected_output, tolerance: dict):
+    """
+
+    Parameters
+    ----------
+    result this is the result of the function that is being tested
+    expected_output this is the expected output of the function that is being tested
+    tolerance this is the tolerance that is used to compare the result with the expected output
+
+    Returns
+    -------
+    None
+
+    """
+
+    for key in expected_output:
+        _expected_output = expected_output[key]
+
+        # some functions return a dictionary or class with multiple values while others return a single value
+        try:
+            _result = result[key]
+        except (IndexError, KeyError, TypeError):
+            _result = result
+
+        # if the key is not in the tolerance dictionary we set the tolerance to 1e-6
+        try:
+            _tolerance = tolerance[key]
+        except KeyError:
+            _tolerance = 1e-6
+
+        try:
+            assert is_equal(_result, _expected_output, _tolerance)
+        except Exception as e:
+            print(f"Expected {_expected_output}, got {_result}\nError: {str(e)}")
+            raise

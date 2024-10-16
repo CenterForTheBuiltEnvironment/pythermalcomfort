@@ -1,15 +1,12 @@
-import pytest
 from pythermalcomfort.models import adaptive_en
-from tests.conftest import Urls
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_adaptive_en(get_test_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_test_url(Urls.ADAPTIVE_EN.name))
-
-    if reference_table is None:
-        pytest.fail(
-            f"Failed to retrieve reference table for {Urls.ADAPTIVE_EN.value.lower()}"
-        )
+def test_adaptive_en(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.ADAPTIVE_EN.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
@@ -17,11 +14,5 @@ def test_adaptive_en(get_test_url, retrieve_data, is_equal):
         result = adaptive_en(
             inputs["tdb"], inputs["tr"], inputs["t_running_mean"], inputs["v"]
         )
-        for key in outputs:
-            try:
-                assert is_equal(result[key], outputs[key])
-            except AssertionError as e:
-                print(
-                    f"Assertion failed for {Urls.ADAPTIVE_EN.value.lower()}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
-                )
-                raise
+
+        validate_result(result, outputs, tolerance)

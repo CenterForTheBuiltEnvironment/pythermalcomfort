@@ -1,15 +1,16 @@
-import numpy as np
 from pythermalcomfort.models import cooling_effect
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_cooling_effect(get_cooling_effect_url, retrieve_data):
-
-    reference_table = retrieve_data(get_cooling_effect_url)
+def test_cooling_effect(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.COOLING_EFFECT.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["cooling_effect"]
-
+        outputs = entry["outputs"]
         result = cooling_effect(
             tdb=inputs["tdb"],
             tr=inputs["tr"],
@@ -20,18 +21,4 @@ def test_cooling_effect(get_cooling_effect_url, retrieve_data):
             units=inputs.get("units", "SI"),
         )
 
-        # To determine whether the result is as expected, use np.allclose for arrays and np.isclose for single
-        try:
-            if isinstance(expected_output, list):
-                assert np.allclose(
-                    result, expected_output, atol=0.1
-                ), f"Expected {expected_output}, got {result}"
-            else:
-                assert np.isclose(
-                    result, expected_output, atol=0.1
-                ), f"Expected {expected_output}, got {result}"
-        except AssertionError as e:
-            print(
-                f"Assertion failed for cooling_effect. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        validate_result(result, outputs, tolerance)

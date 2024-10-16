@@ -1,31 +1,17 @@
-import numpy as np
 from pythermalcomfort.models import athb
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_athb(get_athb_url, retrieve_data, is_equal):
-
-    reference_table = retrieve_data(get_athb_url)
+def test_athb(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.ATHB.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["athb_pmv"]
+        outputs = entry["outputs"]
 
-        result = athb(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            vr=inputs["vr"],
-            rh=inputs["rh"],
-            met=inputs["met"],
-            t_running_mean=inputs["t_running_mean"],
-        )
+        result = athb(**inputs)
 
-        try:
-            if isinstance(expected_output, list):
-                np.testing.assert_equal(result, expected_output)
-            else:
-                assert is_equal(result, expected_output)
-        except AssertionError as e:
-            print(
-                f"Assertion failed for athb. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        validate_result(result, outputs, tolerance)

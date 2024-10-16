@@ -1,25 +1,16 @@
 from pythermalcomfort.models import at
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_at(get_at_url, retrieve_data, is_equal):
-
-    reference_table = retrieve_data(get_at_url)
+def test_at(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.AT.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["at"]
+        outputs = entry["outputs"]
+        result = at(**inputs)
 
-        result = at(
-            tdb=inputs["tdb"],
-            rh=inputs["rh"],
-            v=inputs["v"],
-            q=inputs.get("q", None),  # q is elective
-        )
-
-        try:
-            assert is_equal(result, expected_output)
-        except AssertionError as e:
-            print(
-                f"Assertion failed for at. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        validate_result(result, outputs, tolerance)
