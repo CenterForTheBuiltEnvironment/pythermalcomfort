@@ -1,19 +1,20 @@
 from typing import Union, List
 
 import numpy as np
+import numpy.typing as npt
 
 from pythermalcomfort.models import pmv
 
 
 def a_pmv(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    vr: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-    met: Union[float, int, np.ndarray, List[float], List[int]],
-    clo: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, int, npt.ArrayLike],
+    tr: Union[float, int, npt.ArrayLike],
+    vr: Union[float, int, npt.ArrayLike],
+    rh: Union[float, int, npt.ArrayLike],
+    met: Union[float, int, npt.ArrayLike],
+    clo: Union[float, int, npt.ArrayLike],
     a_coefficient: float,
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    wme: Union[float, int, npt.ArrayLike] = 0,
     units="SI",
     limit_inputs=True,
 ):
@@ -33,7 +34,7 @@ def a_pmv(
     vr : float, int, or array-like
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        .. note::
+        .. warning::
             vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
     rh : float, int, or array-like
@@ -66,6 +67,7 @@ def a_pmv(
     Examples
     --------
     .. code-block:: python
+        :emphasize-lines: 9,12,14
 
         from pythermalcomfort.models import a_pmv
         from pythermalcomfort.utilities import v_relative, clo_dynamic
