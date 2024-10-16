@@ -32,14 +32,20 @@ def a_pmv(
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
     vr : float, int, or array-like
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
-        Note: vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
+
+        .. note::
+            vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
+
     rh : float, int, or array-like
         Relative humidity, [%].
     met : float, int, or array-like
         Metabolic rate, [met].
     clo : float, int, or array-like
         Clothing insulation, [clo].
-        Note: Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+
+        .. warning::
+            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+
     a_coefficient : float
         Adaptive coefficient.
     wme : float, int, or array-like, optional
@@ -48,7 +54,9 @@ def a_pmv(
         Units system, 'SI' or 'IP'. Defaults to 'SI'.
     limit_inputs : bool, optional
         If True, returns nan for inputs outside standard limits. Defaults to True.
-        Note: ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, -2 < PMV < 2.
+
+        .. warning::
+            ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, -2 < PMV < 2.
 
     Returns
     -------
