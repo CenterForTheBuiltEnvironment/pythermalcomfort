@@ -1,6 +1,7 @@
-from typing import Union, List
+from typing import Union
 
 import numpy as np
+import numpy.typing as npt
 from numba import vectorize, float64
 
 from pythermalcomfort.models import cooling_effect
@@ -12,13 +13,13 @@ from pythermalcomfort.utilities import (
 
 
 def pmv_ppd(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    vr: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-    met: Union[float, int, np.ndarray, List[float], List[int]],
-    clo: Union[float, int, np.ndarray, List[float], List[int]],
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    tdb: Union[float, int, npt.ArrayLike],
+    tr: Union[float, int, npt.ArrayLike],
+    vr: Union[float, int, npt.ArrayLike],
+    rh: Union[float, int, npt.ArrayLike],
+    met: Union[float, int, npt.ArrayLike],
+    clo: Union[float, int, npt.ArrayLike],
+    wme: Union[float, int, npt.ArrayLike] = 0,
     standard: str = "ISO",
     units: str = "SI",
     limit_inputs: bool = True,
