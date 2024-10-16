@@ -39,93 +39,80 @@ def adaptive_ashrae(
     can only be used in occupant-controlled naturally conditioned spaces that
     meet all the following criteria:
 
-    * There is no mechianical cooling or heating system in operation
-    * Occupants have a metabolic rate between 1.0 and 1.5 met
-    * Occupants are free to adapt their clothing within a range as wide as 0.5 and 1.0 clo
-    * The prevailing mean (runnin mean) outdoor temperature is between 10 and 33.5 °C
+    * There is no mechanical cooling or heating system in operation.
+    * Occupants have a metabolic rate between 1.0 and 1.5 met.
+    * Occupants are free to adapt their clothing within a range as wide as 0.5 and 1.0 clo.
+    * The prevailing mean (running mean) outdoor temperature is between 10 and 33.5 °C.
 
     Parameters
     ----------
     tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
     tr : float, int, or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    t_running_mean: float, int, or array-like
-        running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
+        Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
+    t_running_mean : float, int, or array-like
+        Running mean temperature, default in [°C] or [°F] if `units` = 'IP'.
 
-        The running mean temperature can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
+        .. note::
+            The running mean temperature can be calculated using the function :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
+
     v : float, int, or array-like
-        air speed, default in [m/s] in [fps] if `units` = 'IP'
+        Air speed, default in [m/s] or [fps] if `units` = 'IP'.
     units : str, optional
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns pmv and ppd values even if input values are
-        outside the applicability limits of the model.
+        Units system, 'SI' or 'IP'. Defaults to 'SI'.
+    limit_inputs : bool, optional
+        If True, returns nan for inputs outside standard limits. Defaults to True.
 
-        The ASHRAE 55 2020 limits are 10 < tdb [°C] < 40, 10 < tr [°C] < 40,
-        0 < vr [m/s] < 2, 10 < t running mean [°C] < 33.5
+        ASHRAE 55 2020 limits: 10 < tdb [°C] < 40, 10 < tr [°C] < 40, 0 < vr [m/s] < 2, 10 < t_running_mean [°C] < 33.5.
 
     Returns
     -------
     tmp_cmf : float, int, or array-like
-        Comfort temperature a that specific running mean temperature, default in [°C]
-        or in [°F]
+        Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
     tmp_cmf_80_low : float, int, or array-like
-        Lower acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
+        Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
     tmp_cmf_80_up : float, int, or array-like
-        Upper acceptable comfort temperature for 80% occupants, default in [°C] or in [°F]
+        Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
     tmp_cmf_90_low : float, int, or array-like
-        Lower acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
+        Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
     tmp_cmf_90_up : float, int, or array-like
-        Upper acceptable comfort temperature for 90% occupants, default in [°C] or in [°F]
-    acceptability_80 : bol or array-like
-        Acceptability for 80% occupants
-    acceptability_90 : bol or array-like
-        Acceptability for 90% occupants
+        Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
+    acceptability_80 : bool or array-like
+        Acceptability for 80% occupants.
+    acceptability_90 : bool or array-like
+        Acceptability for 90% occupants.
 
     Notes
     -----
-    You can use this function to calculate if your conditions are within the `adaptive
-    thermal comfort region`.
-    Calculations with comply with the ASHRAE 55 2020 Standard [1]_.
+    You can use this function to calculate if your conditions are within the `adaptive thermal comfort region`. Calculations comply with the ASHRAE 55 2020 Standard [1]_.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import adaptive_ashrae
-        >>> results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(results)
-        {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5,
-        'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': array(True),
-        'acceptability_90': array(True)}
+        from pythermalcomfort.models import adaptive_ashrae
 
-        >>> print(results.acceptability_80)  # or use print(results["acceptability_80"])
-        True
-        # The conditions you entered are considered to be comfortable for by 80% of the
-        occupants
+        results = adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        print(results)
+        # AdaptiveASHRAE(tmp_cmf=np.float64(24.0), tmp_cmf_80_low=np.float64(20.5), tmp_cmf_80_up=np.float64(27.5), tmp_cmf_90_low=np.float64(21.5), tmp_cmf_90_up=np.float64(26.5), acceptability_80=array(True), acceptability_90=array(True))
 
-        >>> # You can also pass arrays as input to the function
-        >>> results = adaptive_ashrae(tdb=[25, 26], tr=25, t_running_mean=20, v=0.1)
-        >>> print(results)
-        {'tmp_cmf': 24.0, 'tmp_cmf_80_low': 20.5, 'tmp_cmf_80_up': 27.5,
-        'tmp_cmf_90_low': 21.5, 'tmp_cmf_90_up': 26.5, 'acceptability_80': array(True),
-        'acceptability_90': array(True)}
+        print(results.acceptability_80)  # or use print(results["acceptability_80"])
+        # True
+        # The conditions you entered are considered to be comfortable for 80% of the occupants.
 
-        >>> # for users who want to use the IP system
-        >>> results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(results)
-        {'tmp_cmf': 75.2, 'tmp_cmf_80_low': 68.9, 'tmp_cmf_80_up': 81.5,
-        'tmp_cmf_90_low': 70.7, 'tmp_cmf_90_up': 79.7, 'acceptability_80': array(True),
-        'acceptability_90': array(True)}
+        # You can also pass arrays as input to the function
+        results = adaptive_ashrae(tdb=[25, 26], tr=25, t_running_mean=20, v=0.1)
+        print(results)
+        # AdaptiveASHRAE(tmp_cmf=array([24., 24.]), tmp_cmf_80_low=array([20.5, 20.5]), tmp_cmf_80_up=array([27.5, 27.5]), tmp_cmf_90_low=array([21.5, 21.5]), tmp_cmf_90_up=array([26.5, 26.5]), acceptability_80=array([ True,  True]), acceptability_90=array([ True,  True]))
 
-        >>> adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
-        {'tmp_cmf': nan, 'tmp_cmf_80_low': nan, ... }
-        # The adaptive thermal comfort model can only be used
-        # if the running mean temperature is higher than 10°C
+        # For users who want to use the IP system
+        results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units='IP')
+        print(results)
+        # AdaptiveASHRAE(tmp_cmf=np.float64(75.2), tmp_cmf_80_low=np.float64(68.9), tmp_cmf_80_up=np.float64(81.5), tmp_cmf_90_low=np.float64(70.7), tmp_cmf_90_up=np.float64(79.7), acceptability_80=array(True), acceptability_90=array(True))
+
+        adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        # AdaptiveASHRAE(tmp_cmf=np.float64(nan), ... acceptability_90=array(False))
+        # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C.
     """
 
     tdb = np.array(tdb)
