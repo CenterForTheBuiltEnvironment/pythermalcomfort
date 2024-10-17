@@ -112,15 +112,16 @@ def validate_result(result, expected_output, tolerance: dict):
         _expected_output = expected_output[key]
 
         # some functions return a dictionary or class with multiple values while others return a single value
+        # todo remove this once all the functions return a dictionary or class
         try:
             _result = result[key]
         except (IndexError, KeyError, TypeError):
             _result = result
 
         # if the key is not in the tolerance dictionary we set the tolerance to 1e-6
-        try:
+        if key in tolerance:
             _tolerance = tolerance[key]
-        except KeyError:
+        else:
             _tolerance = 1e-6
 
         try:
