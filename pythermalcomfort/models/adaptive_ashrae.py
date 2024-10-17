@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List
+from typing import Union, List, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -52,7 +52,7 @@ def adaptive_ashrae(
     tr: Union[float, npt.ArrayLike],
     t_running_mean: Union[float, npt.ArrayLike],
     v: Union[float, npt.ArrayLike],
-    units: str = "SI",
+    units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
     """
@@ -88,18 +88,7 @@ def adaptive_ashrae(
     Returns
     -------
     AdaptiveASHRAE
-        An instance of the :py:class:`pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE` dataclass containing comfort temperature and acceptability for 80% and 90% occupants.
-
-        .. note::
-            The returned `AdaptiveASHRAE` instance has the following attributes:
-
-            * **tmp_cmf**: Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
-            * **tmp_cmf_80_low**: Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-            * **tmp_cmf_80_up**: Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-            * **tmp_cmf_90_low**: Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-            * **tmp_cmf_90_up**: Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-            * **acceptability_80**: Acceptability for 80% occupants.
-            * **acceptability_90**: Acceptability for 90% occupants.
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE` for more details.
 
     Examples
     --------
