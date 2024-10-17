@@ -19,6 +19,9 @@ Adaptive Predicted Mean Vote (aPMV)
 
 .. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
 
+.. autoclass:: pythermalcomfort.models.a_pmv.AdaptivePMV
+    :members:
+
 Adaptive Thermal Heat Balance (ATHB)
 ------------------------------------
 

@@ -1,47 +1,61 @@
-from typing import Union, List
-
+from dataclasses import dataclass
+from typing import Union, List, Literal
 import numpy as np
 import numpy.typing as npt
-
 from pythermalcomfort.models import pmv
 
 
+@dataclass(frozen=True)
+class AdaptivePMV:
+    """
+    A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV) model.
+
+    Attributes
+    ----------
+    a_pmv : float, or array-like
+        Predicted Mean Vote.
+    """
+
+    a_pmv: Union[float, npt.ArrayLike]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
 def a_pmv(
-    tdb: Union[float, int, npt.ArrayLike],
-    tr: Union[float, int, npt.ArrayLike],
-    vr: Union[float, int, npt.ArrayLike],
-    rh: Union[float, int, npt.ArrayLike],
-    met: Union[float, int, npt.ArrayLike],
-    clo: Union[float, int, npt.ArrayLike],
+    tdb: Union[float, npt.ArrayLike],
+    tr: Union[float, npt.ArrayLike],
+    vr: Union[float, npt.ArrayLike],
+    rh: Union[float, npt.ArrayLike],
+    met: Union[float, npt.ArrayLike],
+    clo: Union[float, npt.ArrayLike],
     a_coefficient: float,
-    wme: Union[float, int, npt.ArrayLike] = 0,
-    units="SI",
-    limit_inputs=True,
-):
-    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was
-    developed by Yao, R. et al. (2009). The model takes into account factors
-    such as culture, climate, social, psychological and behavioural
-    adaptations, which have an impact on the senses used to detect thermal
-    comfort. This model uses an adaptive coefficient (λ) representing the
-    adaptive factors that affect the sense of thermal comfort.
+    wme: Union[float, npt.ArrayLike] = 0,
+    units: Literal["SI", "IP"] = "SI",
+    limit_inputs: bool = True,
+) -> AdaptivePMV:
+    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was developed by Yao, R. et al. (2009).
+    The model takes into account factors such as culture, climate, social, psychological, and behavioral
+    adaptations, which have an impact on the senses used to detect thermal comfort. This model uses an
+    adaptive coefficient (λ) representing the adaptive factors that affect the sense of thermal comfort.
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float, or array-like
         Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
-    tr : float, int, or array-like
+    tr : float, or array-like
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
-    vr : float, int, or array-like
+    vr : float, or array-like
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
         .. warning::
             vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-    rh : float, int, or array-like
+    rh : float, or array-like
         Relative humidity, [%].
-    met : float, int, or array-like
+    met : float, or array-like
         Metabolic rate, [met].
-    clo : float, int, or array-like
+    clo : float, or array-like
         Clothing insulation, [clo].
 
         .. warning::
@@ -49,7 +63,7 @@ def a_pmv(
 
     a_coefficient : float
         Adaptive coefficient.
-    wme : float, int, or array-like, optional
+    wme : float, or array-like, optional
         External work, [met], default is 0.
     units : str, optional
         Units system, 'SI' or 'IP'. Defaults to 'SI'.
@@ -61,8 +75,9 @@ def a_pmv(
 
     Returns
     -------
-    pmv : float, int, or array-like
-        Predicted Mean Vote.
+    AdaptivePMV
+        A dataclass containing the Predicted Mean Vote (a_pmv). See :py:class:`~pythermalcomfort.models.a_pmv.AdaptivePMV` for more details.
+        To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance, e.g., `result.a_pmv`.
 
     Examples
     --------
@@ -83,7 +98,8 @@ def a_pmv(
         clo_d = clo_dynamic(clo=clo, met=met)
 
         results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
-        print(results)  # 0.74
+        print(results)  # AdaptivePMV(a_pmv=0.74)
+        print(results.a_pmv)  # 0.74
     """
 
     # Validate units string
@@ -104,4 +120,6 @@ def a_pmv(
         limit_inputs=limit_inputs,
     )
 
-    return np.around(_pmv / (1 + a_coefficient * _pmv), 2)
+    pmv_value = np.around(_pmv / (1 + a_coefficient * _pmv), 2)
+
+    return AdaptivePMV(a_pmv=pmv_value)
