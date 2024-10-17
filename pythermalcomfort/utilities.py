@@ -108,11 +108,16 @@ def check_standard_compliance(standard, **kwargs):
 def check_standard_compliance_array(standard, **kwargs):
     default_kwargs = {"airspeed_control": True}
     params = {**default_kwargs, **kwargs}
+    values_to_return = {}
 
     if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
         v_valid = valid_range(params["v"], (0.0, 2.0))
+
+        values_to_return["tdb"] = tdb_valid
+        values_to_return["tr"] = tr_valid
+        values_to_return["v"] = v_valid
 
         if not params["airspeed_control"]:
             v_valid = np.where(
@@ -140,14 +145,20 @@ def check_standard_compliance_array(standard, **kwargs):
                 v_valid,
             )
 
+            values_to_return["v"] = v_valid
+
         if "met" in params.keys():
             met_valid = valid_range(params["met"], (1.0, 4.0))
             clo_valid = valid_range(params["clo"], (0.0, 1.5))
 
-            return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+            values_to_return["met"] = met_valid
+            values_to_return["clo"] = clo_valid
 
-        else:
-            return tdb_valid, tr_valid, v_valid
+        if "v_limited" in params.keys():
+            valid = valid_range(params["v_limited"], (0.0, 0.2))
+            values_to_return["v_limited"] = valid
+
+        return values_to_return.values()
 
     if standard == "7933":  # based on ISO 7933:2004 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
