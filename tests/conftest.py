@@ -8,7 +8,7 @@ import numpy as np
 # without needing to import them (pytest will automatically discover them).
 
 
-unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
+unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/refs/heads/main/"
 test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
 test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
 test_a_pmv_url = unit_test_data_prefix + "ts_a_pmv.json"
