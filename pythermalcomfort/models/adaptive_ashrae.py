@@ -49,10 +49,10 @@ class AdaptiveASHRAE:
 
 @dataclass
 class ASHRAEInputs:
-    tdb: Union[float, npt.ArrayLike]
-    tr: Union[float, npt.ArrayLike]
-    t_running_mean: Union[float, npt.ArrayLike]
-    v: Union[float, npt.ArrayLike]
+    tdb: Union[float, int, npt.ArrayLike]
+    tr: Union[float, int, npt.ArrayLike]
+    t_running_mean: Union[float, int, npt.ArrayLike]
+    v: Union[float, int, npt.ArrayLike]
     units: Literal["SI", "IP"] = "SI"
 
     def __post_init__(self):
