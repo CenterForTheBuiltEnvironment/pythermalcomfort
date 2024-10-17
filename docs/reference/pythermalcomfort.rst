@@ -30,6 +30,9 @@ Adaptive Thermal Heat Balance (ATHB)
 
 .. autofunction:: pythermalcomfort.models.athb.athb
 
+.. autoclass:: pythermalcomfort.models.athb.ATHB
+    :members:
+
 Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 -----------------------------------------------------------
 
