@@ -19,15 +19,15 @@ class AdaptiveASHRAE:
 
     Attributes
     ----------
-    tmp_cmf : float, int, or array-like
+    tmp_cmf : float, or array-like
         Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
-    tmp_cmf_80_low : float, int, or array-like
+    tmp_cmf_80_low : float, or array-like
         Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_80_up : float, int, or array-like
+    tmp_cmf_80_up : float, or array-like
         Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_90_low : float, int, or array-like
+    tmp_cmf_90_low : float, or array-like
         Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-    tmp_cmf_90_up : float, int, or array-like
+    tmp_cmf_90_up : float, or array-like
         Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
     acceptability_80 : bool or array-like
         Acceptability for 80% occupants.
@@ -45,6 +45,30 @@ class AdaptiveASHRAE:
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+@dataclass
+class ASHRAEInputs:
+    tdb: Union[float, npt.ArrayLike]
+    tr: Union[float, npt.ArrayLike]
+    t_running_mean: Union[float, npt.ArrayLike]
+    v: Union[float, npt.ArrayLike]
+    units: Literal["SI", "IP"] = "SI"
+
+    def __post_init__(self):
+        valid_units: List[str] = ["SI", "IP"]
+        if self.units.upper() not in valid_units:
+            raise ValueError(
+                f"Invalid unit: {self.units}. Supported units are {valid_units}."
+            )
+        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
+            raise TypeError("tdb must be a float, int, or array-like.")
+        if not isinstance(self.tr, (float, int, np.ndarray, list)):
+            raise TypeError("tr must be a float, int, or array-like.")
+        if not isinstance(self.t_running_mean, (float, int, np.ndarray, list)):
+            raise TypeError("t_running_mean must be a float, int, or array-like.")
+        if not isinstance(self.v, (float, int, np.ndarray, list)):
+            raise TypeError("v must be a float, int, or array-like.")
 
 
 def adaptive_ashrae(
@@ -119,16 +143,20 @@ def adaptive_ashrae(
         # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C.
     """
 
+    # Validate inputs using the ASHRAEInputs class
+    ASHRAEInputs(
+        tdb=tdb,
+        tr=tr,
+        t_running_mean=t_running_mean,
+        v=v,
+        units=units,
+    )
+
     tdb = np.array(tdb)
     tr = np.array(tr)
     t_running_mean = np.array(t_running_mean)
     v = np.array(v)
     standard = "ashrae"
-
-    # Validate units string
-    valid_units: List[str] = ["SI", "IP"]
-    if units.upper() not in valid_units:
-        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
 
     if units.lower() == "ip":
         tdb, tr, t_running_mean, v = units_converter(

@@ -14,11 +14,11 @@ class AdaptivePMV:
 
     Attributes
     ----------
-    a_pmv : float, int, or array-like
+    a_pmv : float, or array-like
         Predicted Mean Vote.
     """
 
-    a_pmv: Union[float, int, npt.ArrayLike]
+    a_pmv: Union[float, npt.ArrayLike]
 
     def __getitem__(self, item):
         return getattr(self, item)
