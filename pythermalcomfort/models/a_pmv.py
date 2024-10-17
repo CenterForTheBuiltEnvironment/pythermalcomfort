@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from typing import Union, List, Literal
+from typing import Union, Literal
+
 import numpy as np
 import numpy.typing as npt
+
 from pythermalcomfort.models import pmv
 
 
@@ -12,25 +14,58 @@ class AdaptivePMV:
 
     Attributes
     ----------
-    a_pmv : float, or array-like
+    a_pmv : float, int, or array-like
         Predicted Mean Vote.
     """
 
-    a_pmv: Union[float, npt.ArrayLike]
+    a_pmv: Union[float, int, npt.ArrayLike]
 
     def __getitem__(self, item):
         return getattr(self, item)
 
 
+@dataclass
+class APMVInputs:
+    tdb: Union[float, int, npt.ArrayLike]
+    tr: Union[float, int, npt.ArrayLike]
+    vr: Union[float, int, npt.ArrayLike]
+    rh: Union[float, int, npt.ArrayLike]
+    met: Union[float, int, npt.ArrayLike]
+    clo: Union[float, int, npt.ArrayLike]
+    a_coefficient: float
+    wme: Union[float, int, npt.ArrayLike] = 0
+    units: Literal["SI", "IP"] = "SI"
+
+    def __post_init__(self):
+        if self.units not in ["SI", "IP"]:
+            raise ValueError("The units must be 'SI' or 'IP'.")
+        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
+            raise TypeError("tdb must be a float, int, or array-like.")
+        if not isinstance(self.tr, (float, int, np.ndarray, list)):
+            raise TypeError("tr must be a float, int, or array-like.")
+        if not isinstance(self.vr, (float, int, np.ndarray, list)):
+            raise TypeError("vr must be a float, int, or array-like.")
+        if not isinstance(self.rh, (float, int, np.ndarray, list)):
+            raise TypeError("rh must be a float, int, or array-like.")
+        if not isinstance(self.met, (float, int, np.ndarray, list)):
+            raise TypeError("met must be a float, int, or array-like.")
+        if not isinstance(self.clo, (float, int, np.ndarray, list)):
+            raise TypeError("clo must be a float, int, or array-like.")
+        if not isinstance(self.a_coefficient, (float, int)):
+            raise TypeError("a_coefficient must be a float or int.")
+        if not isinstance(self.wme, (float, int, np.ndarray, list)):
+            raise TypeError("wme must be a float, int, or array-like.")
+
+
 def a_pmv(
-    tdb: Union[float, npt.ArrayLike],
-    tr: Union[float, npt.ArrayLike],
-    vr: Union[float, npt.ArrayLike],
-    rh: Union[float, npt.ArrayLike],
-    met: Union[float, npt.ArrayLike],
-    clo: Union[float, npt.ArrayLike],
-    a_coefficient: float,
-    wme: Union[float, npt.ArrayLike] = 0,
+    tdb: Union[float, int, npt.ArrayLike],
+    tr: Union[float, int, npt.ArrayLike],
+    vr: Union[float, int, npt.ArrayLike],
+    rh: Union[float, int, npt.ArrayLike],
+    met: Union[float, int, npt.ArrayLike],
+    clo: Union[float, int, npt.ArrayLike],
+    a_coefficient: Union[float, int],
+    wme: Union[float, int, npt.ArrayLike] = 0,
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptivePMV:
@@ -41,21 +76,21 @@ def a_pmv(
 
     Parameters
     ----------
-    tdb : float, or array-like
+    tdb : float, int, or array-like
         Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
-    tr : float, or array-like
+    tr : float, int, or array-like
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
-    vr : float, or array-like
+    vr : float, int, or array-like
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
         .. warning::
             vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-    rh : float, or array-like
+    rh : float, int, or array-like
         Relative humidity, [%].
-    met : float, or array-like
+    met : float, int, or array-like
         Metabolic rate, [met].
-    clo : float, or array-like
+    clo : float, int, or array-like
         Clothing insulation, [clo].
 
         .. warning::
@@ -63,7 +98,7 @@ def a_pmv(
 
     a_coefficient : float
         Adaptive coefficient.
-    wme : float, or array-like, optional
+    wme : float, int, or array-like, optional
         External work, [met], default is 0.
     units : str, optional
         Units system, 'SI' or 'IP'. Defaults to 'SI'.
@@ -102,10 +137,18 @@ def a_pmv(
         print(results.a_pmv)  # 0.74
     """
 
-    # Validate units string
-    valid_units: List[str] = ["SI", "IP"]
-    if units.upper() not in valid_units:
-        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
+    # Validate inputs using the APMVInputs class
+    APMVInputs(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        a_coefficient=a_coefficient,
+        wme=wme,
+        units=units,
+    )
 
     _pmv = pmv(
         tdb,
