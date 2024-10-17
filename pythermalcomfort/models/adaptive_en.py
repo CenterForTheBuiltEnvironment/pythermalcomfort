@@ -1,104 +1,152 @@
-from typing import Union, List
-
+from dataclasses import dataclass
+from typing import Union, List, Literal
 import numpy as np
-
+import numpy.typing as npt
 from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import (
-    units_converter,
-)
+from pythermalcomfort.utilities import units_converter
+
+
+@dataclass
+class AdaptiveEN:
+    """
+    Dataclass to store the results of the adaptive thermal comfort calculation based on EN 16798-1 2019.
+
+    Attributes
+    ----------
+    tmp_cmf : float or array-like
+        Comfort temperature at that specific running mean temperature, default in [°C] or in [°F].
+    acceptability_cat_i : bool or array-like
+        If the indoor conditions comply with comfort category I.
+    acceptability_cat_ii : bool or array-like
+        If the indoor conditions comply with comfort category II.
+    acceptability_cat_iii : bool or array-like
+        If the indoor conditions comply with comfort category III.
+    tmp_cmf_cat_i_up : float or array-like
+        Upper acceptable comfort temperature for category I, default in [°C] or in [°F].
+    tmp_cmf_cat_ii_up : float or array-like
+        Upper acceptable comfort temperature for category II, default in [°C] or in [°F].
+    tmp_cmf_cat_iii_up : float or array-like
+        Upper acceptable comfort temperature for category III, default in [°C] or in [°F].
+    tmp_cmf_cat_i_low : float or array-like
+        Lower acceptable comfort temperature for category I, default in [°C] or in [°F].
+    tmp_cmf_cat_ii_low : float or array-like
+        Lower acceptable comfort temperature for category II, default in [°C] or in [°F].
+    tmp_cmf_cat_iii_low : float or array-like
+        Lower acceptable comfort temperature for category III, default in [°C] or in [°F].
+    """
+
+    tmp_cmf: Union[float, npt.ArrayLike]
+    acceptability_cat_i: Union[bool, npt.ArrayLike]
+    acceptability_cat_ii: Union[bool, npt.ArrayLike]
+    acceptability_cat_iii: Union[bool, npt.ArrayLike]
+    tmp_cmf_cat_i_up: Union[float, npt.ArrayLike]
+    tmp_cmf_cat_ii_up: Union[float, npt.ArrayLike]
+    tmp_cmf_cat_iii_up: Union[float, npt.ArrayLike]
+    tmp_cmf_cat_i_low: Union[float, npt.ArrayLike]
+    tmp_cmf_cat_ii_low: Union[float, npt.ArrayLike]
+    tmp_cmf_cat_iii_low: Union[float, npt.ArrayLike]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class ENInputs:
+    tdb: Union[float, int, npt.ArrayLike]
+    tr: Union[float, int, npt.ArrayLike]
+    t_running_mean: Union[float, int, npt.ArrayLike]
+    v: Union[float, int, npt.ArrayLike]
+    units: Literal["SI", "IP"] = "SI"
+
+    def __post_init__(self):
+        valid_units: List[str] = ["SI", "IP"]
+        if self.units.upper() not in valid_units:
+            raise ValueError(
+                f"Invalid unit: {self.units}. Supported units are {valid_units}."
+            )
+        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
+            raise TypeError("tdb must be a float, int, or array-like.")
+        if not isinstance(self.tr, (float, int, np.ndarray, list)):
+            raise TypeError("tr must be a float, int, or array-like.")
+        if not isinstance(self.t_running_mean, (float, int, np.ndarray, list)):
+            raise TypeError("t_running_mean must be a float, int, or array-like.")
+        if not isinstance(self.v, (float, int, np.ndarray, list)):
+            raise TypeError("v must be a float, int, or array-like.")
 
 
 def adaptive_en(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    t_running_mean: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
-    units: str = "SI",
+    tdb: Union[float, int, npt.ArrayLike],
+    tr: Union[float, int, npt.ArrayLike],
+    t_running_mean: Union[float, int, npt.ArrayLike],
+    v: Union[float, int, npt.ArrayLike],
+    units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
-):
-    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
+) -> AdaptiveEN:
+    """
+    Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
     ----------
     tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
     tr : float, int, or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+        Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
     t_running_mean: float, int, or array-like
-        running mean temperature, default in [°C] in [°C] in [°F] if `units` = 'IP'
+        Running mean temperature, default in [°C] or [°F] if `units` = 'IP'.
 
-        The running mean temperature can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
+        .. note::
+            The running mean temperature can be calculated using the function :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
+
     v : float, int, or array-like
-        air speed, default in [m/s] in [fps] if `units` = 'IP'
+        Air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        Note: Indoor operative temperature correction is applicable for buildings equipped
-        with fans or personal systems providing building occupants with personal
-        control over air speed at occupant level.
-        For operative temperatures above 25°C the comfort zone upper limit can be
-        increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C ( v
-        > 1.2 m/s)
+        .. note::
+            Indoor operative temperature correction is applicable for buildings equipped
+            with fans or personal systems providing building occupants with personal
+            control over air speed at occupant level.
+            For operative temperatures above 25°C the comfort zone upper limit can be
+            increased by 1.2 °C (0.6 < v < 0.9 m/s), 1.8 °C (0.9 < v < 1.2 m/s), 2.2 °C (v
+            > 1.2 m/s).
+
     units : {'SI', 'IP'}
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns pmv and ppd values even if input values are
-        outside the applicability limits of the model.
+        Select the SI (International System of Units) or the IP (Imperial Units) system.
+    limit_inputs : bool, default True
+        If True, returns NaN for inputs outside the standard applicability limits.
 
     Returns
     -------
-    tmp_cmf : float, int, or array-like
-        Comfort temperature at that specific running mean temperature, default in [°C]
-        or in [°F]
-    acceptability_cat_i : bol or array-like
-        If the indoor conditions comply with comfort category I
-    acceptability_cat_ii : bol or array-like
-        If the indoor conditions comply with comfort category II
-    acceptability_cat_iii : bol or array-like
-        If the indoor conditions comply with comfort category III
-    tmp_cmf_cat_i_up : float, int, or array-like
-        Upper acceptable comfort temperature for category I, default in [°C] or in [°F]
-    tmp_cmf_cat_ii_up : float, int, or array-like
-        Upper acceptable comfort temperature for category II, default in [°C] or in [°F]
-    tmp_cmf_cat_iii_up : float, int, or array-like
-        Upper acceptable comfort temperature for category III, default in [°C] or in [°F]
-    tmp_cmf_cat_i_low : float, int, or array-like
-        Lower acceptable comfort temperature for category I, default in [°C] or in [°F]
-    tmp_cmf_cat_ii_low : float, int, or array-like
-        Lower acceptable comfort temperature for category II, default in [°C] or in [°F]
-    tmp_cmf_cat_iii_low : float or array-like
-        Lower acceptable comfort temperature for category III, default in [°C] or in [°F]
+    AdaptiveEN
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_en.AdaptiveEN` for more details.
 
-    Notes
-    -----
-    You can use this function to calculate if your conditions are within the EN
-    adaptive thermal comfort region.
-    Calculations with comply with the EN 16798-1 2019 [3]_.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import adaptive_en
-        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
-        >>> print(results)
-        {'tmp_cmf': 25.4, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, ... }
+        from pythermalcomfort.models import adaptive_en
+        results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
+        print(results)
+        # AdaptiveEN(tmp_cmf=np.float64(25.4), acceptability_cat_i=np.True_, acceptability_cat_ii=np.True_, ...)
 
-        >>> print(results['acceptability_cat_i'])
-        True
+        print(results.acceptability_cat_i)  # or print(results["acceptability_cat_i"])
+        # True
         # The conditions you entered are considered to comply with Category I
 
-        >>> # for users who wants to use the IP system
-        >>> results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
-        >>> print(results)
-        {'tmp_cmf': 77.7, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, ... }
+        # For users who want to use the IP system
+        results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        print(results)
+        # AdaptiveEN(tmp_cmf=np.float64(77.7), acceptability_cat_i=np.True_, ...)
 
-        >>> results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
-        {'tmp_cmf': nan, 'acceptability_cat_i': True, 'acceptability_cat_ii': True, ... }
+        results = adaptive_en(tdb=25, tr=25, t_running_mean=9, v=0.1)
+        print(results)
+        # AdaptiveEN(tmp_cmf=np.float64(nan), acceptability_cat_i=np.False_, ...)
         # The adaptive thermal comfort model can only be used
-        # if the running mean temperature is between 10 °C and 30 °C
+        # if the running mean temperature is between 10 °C and 30 °C.
     """
+
+    # Validate inputs using the ENInputs class
+    ENInputs(tdb=tdb, tr=tr, t_running_mean=t_running_mean, v=v, units=units)
 
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -107,7 +155,7 @@ def adaptive_en(
     standard = "iso"
 
     if units.lower() == "ip":
-        tdb, tr, t_running_mean, vr = units_converter(
+        tdb, tr, t_running_mean, v = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
 
@@ -115,7 +163,7 @@ def adaptive_en(
 
     to = t_o(tdb, tr, v, standard=standard)
 
-    # calculate cooling effect (ce) of elevated air speed when top > 25 degC.
+    # Calculate cooling effect (ce) of elevated air speed when top > 25 degC.
     ce = np.where((v >= 0.6) & (to >= 25.0), 999, 0)
     ce = np.where((v < 0.9) & (ce == 999), 1.2, ce)
     ce = np.where((v < 1.2) & (ce == 999), 1.8, ce)
@@ -134,15 +182,9 @@ def adaptive_en(
     t_cmf_ii_upper = t_cmf + 3.0 + ce
     t_cmf_iii_upper = t_cmf + 4.0 + ce
 
-    acceptability_i = np.where(
-        (t_cmf_i_lower <= to) & (to <= t_cmf_i_upper), True, False
-    )
-    acceptability_ii = np.where(
-        (t_cmf_ii_lower <= to) & (to <= t_cmf_ii_upper), True, False
-    )
-    acceptability_iii = np.where(
-        (t_cmf_iii_lower <= to) & (to <= t_cmf_iii_upper), True, False
-    )
+    acceptability_i = (t_cmf_i_lower <= to) & (to <= t_cmf_i_upper)
+    acceptability_ii = (t_cmf_ii_lower <= to) & (to <= t_cmf_ii_upper)
+    acceptability_iii = (t_cmf_iii_lower <= to) & (to <= t_cmf_iii_upper)
 
     if units.lower() == "ip":
         t_cmf, t_cmf_i_upper, t_cmf_ii_upper, t_cmf_iii_upper = units_converter(
@@ -159,17 +201,15 @@ def adaptive_en(
             tmp_cmf_cat_iii_low=t_cmf_iii_lower,
         )
 
-    results = {
-        "tmp_cmf": np.around(t_cmf, 1),
-        "acceptability_cat_i": acceptability_i,
-        "acceptability_cat_ii": acceptability_ii,
-        "acceptability_cat_iii": acceptability_iii,
-        "tmp_cmf_cat_i_up": np.around(t_cmf_i_upper, 1),
-        "tmp_cmf_cat_ii_up": np.around(t_cmf_ii_upper, 1),
-        "tmp_cmf_cat_iii_up": np.around(t_cmf_iii_upper, 1),
-        "tmp_cmf_cat_i_low": np.around(t_cmf_i_lower, 1),
-        "tmp_cmf_cat_ii_low": np.around(t_cmf_ii_lower, 1),
-        "tmp_cmf_cat_iii_low": np.around(t_cmf_iii_lower, 1),
-    }
-
-    return results
+    return AdaptiveEN(
+        tmp_cmf=np.around(t_cmf, 1),
+        acceptability_cat_i=acceptability_i,
+        acceptability_cat_ii=acceptability_ii,
+        acceptability_cat_iii=acceptability_iii,
+        tmp_cmf_cat_i_up=np.around(t_cmf_i_upper, 1),
+        tmp_cmf_cat_ii_up=np.around(t_cmf_ii_upper, 1),
+        tmp_cmf_cat_iii_up=np.around(t_cmf_iii_upper, 1),
+        tmp_cmf_cat_i_low=np.around(t_cmf_i_lower, 1),
+        tmp_cmf_cat_ii_low=np.around(t_cmf_ii_lower, 1),
+        tmp_cmf_cat_iii_low=np.around(t_cmf_iii_lower, 1),
+    )

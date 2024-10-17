@@ -14,6 +14,9 @@ Adaptive EN
 
 .. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
 
+.. autoclass:: pythermalcomfort.models.adaptive_en.AdaptiveEN
+    :members:
+
 Adaptive Predicted Mean Vote (aPMV)
 -----------------------------------
 
