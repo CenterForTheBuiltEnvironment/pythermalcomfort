@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List, Literal
+from typing import Union, List
 
 import numpy as np
 import numpy.typing as npt
@@ -8,8 +8,7 @@ from pythermalcomfort.models import pmv
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
-    validate_units,
-    validate_type,
+    BaseInputs,
 )
 
 
@@ -34,25 +33,31 @@ class AnkleDraft:
 
 
 @dataclass
-class AnkleDraftInputs:
-    tdb: Union[float, int, npt.ArrayLike]
-    tr: Union[float, int, npt.ArrayLike]
-    vr: Union[float, int, npt.ArrayLike]
-    rh: Union[float, int, npt.ArrayLike]
-    met: Union[float, int, npt.ArrayLike]
-    clo: Union[float, int, npt.ArrayLike]
-    v_ankle: Union[float, int, npt.ArrayLike]
-    units: Literal["SI", "IP"] = "SI"
+class AnkleDraftInputs(BaseInputs):
+    """Child class that only requires specific attributes."""
 
-    def __post_init__(self):
-        validate_units(self.units)
-        validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
-        validate_type(self.tr, "tr", (float, int, np.ndarray, list))
-        validate_type(self.vr, "vr", (float, int, np.ndarray, list))
-        validate_type(self.rh, "rh", (float, int, np.ndarray, list))
-        validate_type(self.met, "met", (float, int, np.ndarray, list))
-        validate_type(self.clo, "clo", (float, int, np.ndarray, list))
-        validate_type(self.v_ankle, "v_ankle", (float, int, np.ndarray, list))
+    def __init__(
+        self,
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        v_ankle,
+        units="SI",
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            v_ankle=v_ankle,
+            units=units,
+        )
 
 
 def ankle_draft(
