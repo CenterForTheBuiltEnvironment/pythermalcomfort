@@ -9,6 +9,7 @@ from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
+    BaseInputs,
 )
 
 
@@ -48,27 +49,23 @@ class AdaptiveASHRAE:
 
 
 @dataclass
-class ASHRAEInputs:
-    tdb: Union[float, int, npt.ArrayLike]
-    tr: Union[float, int, npt.ArrayLike]
-    t_running_mean: Union[float, int, npt.ArrayLike]
-    v: Union[float, int, npt.ArrayLike]
-    units: Literal["SI", "IP"] = "SI"
+class ASHRAEInputs(BaseInputs):
 
-    def __post_init__(self):
-        valid_units: List[str] = ["SI", "IP"]
-        if self.units.upper() not in valid_units:
-            raise ValueError(
-                f"Invalid unit: {self.units}. Supported units are {valid_units}."
-            )
-        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
-            raise TypeError("tdb must be a float, int, or array-like.")
-        if not isinstance(self.tr, (float, int, np.ndarray, list)):
-            raise TypeError("tr must be a float, int, or array-like.")
-        if not isinstance(self.t_running_mean, (float, int, np.ndarray, list)):
-            raise TypeError("t_running_mean must be a float, int, or array-like.")
-        if not isinstance(self.v, (float, int, np.ndarray, list)):
-            raise TypeError("v must be a float, int, or array-like.")
+    def __init__(
+        self,
+        tdb,
+        tr,
+        t_running_mean,
+        v,
+        units,
+    ):
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            units=units,
+            t_running_mean=t_running_mean,
+        )
 
 
 def adaptive_ashrae(
