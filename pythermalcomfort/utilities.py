@@ -1,27 +1,66 @@
 import math
 import warnings
-from typing import NamedTuple, List
+from dataclasses import dataclass, field
+from typing import NamedTuple
+from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.psychrometrics import p_sat, t_o
+from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
 
 warnings.simplefilter("always")
 
 
-def validate_units(units: str, valid_units=None) -> None:
-    if valid_units is None:
-        valid_units = ["SI", "IP"]
-    if units.upper() not in valid_units:
-        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
+def validate_units(units: str) -> None:
+    """Validate the units parameter."""
+    if units.lower() not in ["si", "ip"]:
+        raise ValueError("Units must be either 'SI' or 'IP'")
 
 
-def validate_type(attribute, attribute_name: str, valid_types: tuple):
-    if not isinstance(attribute, valid_types):
-        raise TypeError(
-            f"{attribute_name} must be one of the following types: {valid_types}."
-        )
+def validate_type(value, name: str, allowed_types: tuple):
+    """Validate the type of a value against allowed types."""
+    if not isinstance(value, allowed_types):
+        raise TypeError(f"{name} must be one of the following types: {allowed_types}.")
+
+
+@dataclass
+class BaseInputs:
+    """Base class containing all possible input parameters."""
+
+    tdb: Union[float, int, np.ndarray, list] = field(default=None)
+    tr: Union[float, int, np.ndarray, list] = field(default=None)
+    vr: Union[float, int, np.ndarray, list] = field(default=None)
+    rh: Union[float, int, np.ndarray, list] = field(default=None)
+    met: Union[float, int, np.ndarray, list] = field(default=None)
+    clo: Union[float, int, np.ndarray, list] = field(default=None)
+    wme: Union[float, int, np.ndarray, list] = field(default=0)
+    units: str = field(default="SI")
+    a_coefficient: Union[float, int] = field(default=None)
+    v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
+
+    def __post_init__(self):
+        # Only validate attributes that are not None
+        validate_units(self.units)
+
+        if self.tdb is not None:
+            validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
+        if self.tr is not None:
+            validate_type(self.tr, "tr", (float, int, np.ndarray, list))
+        if self.vr is not None:
+            validate_type(self.vr, "vr", (float, int, np.ndarray, list))
+        if self.rh is not None:
+            validate_type(self.rh, "rh", (float, int, np.ndarray, list))
+        if self.met is not None:
+            validate_type(self.met, "met", (float, int, np.ndarray, list))
+        if self.clo is not None:
+            validate_type(self.clo, "clo", (float, int, np.ndarray, list))
+        if self.a_coefficient is not None:
+            validate_type(self.a_coefficient, "a_coefficient", (float, int))
+        if self.wme is not None:
+            validate_type(self.wme, "wme", (float, int, np.ndarray, list))
+        if self.v_ankle is not None:
+            validate_type(self.v_ankle, "v_ankle", (float, int, np.ndarray, list))
 
 
 def transpose_sharp_altitude(sharp, altitude):
