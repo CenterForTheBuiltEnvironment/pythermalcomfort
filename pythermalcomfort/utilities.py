@@ -42,6 +42,7 @@ class BaseInputs:
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
     t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
     q: Union[float, int, np.ndarray, list] = field(default=None)
+    tout: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         # Only validate attributes that are not None
@@ -75,6 +76,8 @@ class BaseInputs:
             validate_type(self.q, "q", (float, int, np.ndarray, list))
         if not isinstance(self.round_output, bool):
             raise TypeError("round must be either True or False.")
+        if self.tout is not None:
+            validate_type(self.tout, "tout", (float, int, np.ndarray, list))
 
 
 def transpose_sharp_altitude(sharp, altitude):

@@ -59,6 +59,9 @@ Clothing prediction
 
 .. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
 
+.. autoclass:: pythermalcomfort.models.clo_tout.CloTout
+    :members:
+
 Cooling Effect (CE)
 -------------------
 

@@ -1,33 +1,64 @@
-from typing import Union, List
-
+from typing import Union, List, Literal
+from dataclasses import dataclass
 import numpy as np
+from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import BaseInputs
 
-from pythermalcomfort.utilities import (
-    units_converter,
-)
+
+@dataclass(frozen=True)
+class CloTout:
+    """
+    Dataclass to represent the clothing insulation Icl as a function of outdoor air temperature.
+
+    Attributes
+    ----------
+    clo_tout : float or np.ndarray
+        Representative clothing insulation Icl.
+    """
+
+    clo_tout: Union[float, np.ndarray]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class CloToutInputs(BaseInputs):
+    def __init__(
+        self,
+        tout: Union[float, List[float]],
+        units: str = "SI",
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tout=tout,
+            units=units,
+        )
 
 
 def clo_tout(
-    tout: Union[float, int, np.ndarray, List[float], List[int]], units: str = "SI"
-) -> Union[float, np.ndarray]:
+    tout: Union[float, List[float]],
+    units: Literal["SI", "IP"] = "SI",
+) -> CloTout:
     """Representative clothing insulation Icl as a function of outdoor air
     temperature at 06:00 a.m [4]_.
 
     Parameters
     ----------
-    tout : float, int, or array-like
-        outdoor air temperature at 06:00 a.m., default in [°C] in [°F] if `units` = 'IP'
+    tout : float or list of floats
+        Outdoor air temperature at 06:00 a.m., default in [°C] or [°F] if `units` = 'IP'.
     units : str, optional
-        select the SI (International System of Units) or the IP (Imperial Units) system.
+        Select the SI (International System of Units) or the IP (Imperial Units) system.
         Supported values are 'SI' and 'IP'. Defaults to 'SI'.
 
     Returns
     -------
-    clo : float, int, or array-like
-         Representative clothing insulation Icl, [clo]
+    CloTout
+        A dataclass containing the representative clothing insulation Icl. See :py:class:`~pythermalcomfort.models.clo_tout.CloTout` for more details.
+        To access the `clo_tout` value, use the `clo_tout` attribute of the returned `CloTout` instance, e.g., `result.clo_tout`.
 
     Raises
-    -------
+    ------
     TypeError
         If `tout` is not a float, int, NumPy array, or a list of floats or integers.
     ValueError
@@ -35,45 +66,35 @@ def clo_tout(
 
     Notes
     -----
-    The ASHRAE 55 2020 states that it is acceptable to determine the clothing
-    insulation Icl using this equation in mechanically conditioned buildings [1]_.
+    .. note::
+        The ASHRAE 55 2020 states that it is acceptable to determine the clothing
+        insulation Icl using this equation in mechanically conditioned buildings [1]_.
 
-    Limitations:
+    .. warning::
+        Limitations:
         - This equation may not be accurate for extreme temperature ranges.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import clo_tout
-        >>> clo_tout(tout=27)  # Can be int or float
-        0.46
-        >>> clo_tout(tout=[27, 25])  # List of ints or floats
-        array([0.46, 0.47])
+        from pythermalcomfort.models import clo_tout
+
+        result = clo_tout(tout=27)
+        print(result.clo_tout)  # 0.46
+
+        result = clo_tout(tout=[27, 25])
+        print(result.clo_tout)  # array([0.46, 0.47])
     """
 
-    # Use explicit type hints for sequence
-    valid_types = (
-        float,
-        int,
-        np.ndarray,
-        list,
-    )  # Use 'list' instead of 'List[float]' or 'List[int]'
-    if not isinstance(tout, valid_types):
-        raise TypeError("tout must be a float, int, NumPy array, or a list.")
-
-    # Check for valid list elements separately
-    if isinstance(tout, list):
-        if not all(isinstance(item, (float, int)) for item in tout):
-            raise TypeError("Elements of tout list must be floats or integers.")
+    # Validate inputs using the CloToutInputs class
+    CloToutInputs(
+        tout=tout,
+        units=units,
+    )
 
     # Convert tout to NumPy array for vectorized operations
     tout = np.array(tout)
-
-    # Validate units string
-    valid_units: List[str] = ["SI", "IP"]
-    if units.upper() not in valid_units:
-        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
 
     # Convert units if necessary
     if units.lower() == "ip":
@@ -83,4 +104,4 @@ def clo_tout(
     clo = np.where(tout < 5, 0.818 - 0.0364 * tout, clo)
     clo = np.where(tout < -5, 1, clo)
 
-    return np.around(clo, 2)
+    return CloTout(clo_tout=np.around(clo, 2))
