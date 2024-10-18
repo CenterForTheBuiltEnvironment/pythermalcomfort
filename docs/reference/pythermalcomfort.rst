@@ -48,6 +48,9 @@ Ankle draft
 
 .. autofunction:: pythermalcomfort.models.ankle_draft.ankle_draft
 
+.. autoclass:: pythermalcomfort.models.ankle_draft.AnkleDraft
+    :members:
+
 Clothing prediction
 -------------------
 

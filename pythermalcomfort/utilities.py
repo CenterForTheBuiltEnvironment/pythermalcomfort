@@ -1,6 +1,6 @@
 import math
 import warnings
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 import numpy as np
 
@@ -8,6 +8,20 @@ from pythermalcomfort.psychrometrics import p_sat, t_o
 from pythermalcomfort.shared_functions import valid_range
 
 warnings.simplefilter("always")
+
+
+def validate_units(units: str, valid_units=None) -> None:
+    if valid_units is None:
+        valid_units = ["SI", "IP"]
+    if units.upper() not in valid_units:
+        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
+
+
+def validate_type(attribute, attribute_name: str, valid_types: tuple):
+    if not isinstance(attribute, valid_types):
+        raise TypeError(
+            f"{attribute_name} must be one of the following types: {valid_types}."
+        )
 
 
 def transpose_sharp_altitude(sharp, altitude):
