@@ -8,7 +8,7 @@ from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
 from pythermalcomfort.utilities import BaseInputs
 
 
-@dataclass
+@dataclass(frozen=True)
 class ATHB:
     """
     Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB) calculation.
