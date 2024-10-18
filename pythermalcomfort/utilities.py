@@ -31,6 +31,7 @@ class BaseInputs:
     tdb: Union[float, int, np.ndarray, list] = field(default=None)
     tr: Union[float, int, np.ndarray, list] = field(default=None)
     vr: Union[float, int, np.ndarray, list] = field(default=None)
+    v: Union[float, int, np.ndarray, list] = field(default=None)
     rh: Union[float, int, np.ndarray, list] = field(default=None)
     met: Union[float, int, np.ndarray, list] = field(default=None)
     clo: Union[float, int, np.ndarray, list] = field(default=None)
@@ -50,6 +51,8 @@ class BaseInputs:
             validate_type(self.tr, "tr", (float, int, np.ndarray, list))
         if self.vr is not None:
             validate_type(self.vr, "vr", (float, int, np.ndarray, list))
+        if self.v is not None:
+            validate_type(self.v, "v", (float, int, np.ndarray, list))
         if self.rh is not None:
             validate_type(self.rh, "rh", (float, int, np.ndarray, list))
         if self.met is not None:
