@@ -43,6 +43,9 @@ Apparent Temperature (AT)
 
 .. autofunction:: pythermalcomfort.models.at.at
 
+.. autoclass:: pythermalcomfort.models.at.AT
+    :members:
+
 Ankle draft
 -----------
 

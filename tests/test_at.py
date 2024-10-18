@@ -1,5 +1,5 @@
 from pythermalcomfort.models import at
-from tests.conftest import Urls, retrieve_reference_table, validate_result
+from tests.conftest import Urls, retrieve_reference_table, validate_result, is_equal
 
 
 def test_at(get_test_url, retrieve_data):
@@ -14,3 +14,13 @@ def test_at(get_test_url, retrieve_data):
         result = at(**inputs)
 
         validate_result(result, outputs, tolerance)
+
+
+def test_at_list_input():
+    result = at([25, 25, 25], [30, 30, 30], [0.1, 0.1, 0.1])
+    is_equal(result, [24.1, 24.1, 24.1], 0.1)
+
+
+def test_at_q():
+    result = at(25, 30, 0.1, 100)
+    is_equal(result, 25.3, 0.1)
