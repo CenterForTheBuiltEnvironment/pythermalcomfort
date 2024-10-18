@@ -11,6 +11,7 @@ from pythermalcomfort.psychrometrics import (
     t_o,
     PsychrometricValues,
 )
+from tests.conftest import is_equal
 
 
 def test_t_dp():
@@ -25,8 +26,8 @@ def test_t_wb():
 
 
 def test_enthalpy():
-    assert enthalpy(25, 0.01) == 50561.25
-    assert enthalpy(27.1, 0.01) == 52707.56
+    assert is_equal(enthalpy(25, 0.01), 50561.25, 0.1)
+    assert is_equal(enthalpy(27.1, 0.01), 52707.56, 0.1)
 
 
 def test_psy_ta_rh():

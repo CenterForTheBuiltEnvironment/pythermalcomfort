@@ -85,9 +85,7 @@ def enthalpy(
 
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
-    h = h_dry_air + hr * h_sat_vap
-
-    return round(h, 2)
+    return h_dry_air + hr * h_sat_vap
 
 
 # pre-calculated constants for p_sat
