@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from typing import Union, Literal
+from typing import Union, Literal, List
 
 import numpy as np
 import numpy.typing as npt
 
 from pythermalcomfort.models import pmv
+from pythermalcomfort.utilities import BaseInputs
 
 
 @dataclass(frozen=True)
@@ -25,47 +26,42 @@ class AdaptivePMV:
 
 
 @dataclass
-class APMVInputs:
-    tdb: Union[float, int, npt.ArrayLike]
-    tr: Union[float, int, npt.ArrayLike]
-    vr: Union[float, int, npt.ArrayLike]
-    rh: Union[float, int, npt.ArrayLike]
-    met: Union[float, int, npt.ArrayLike]
-    clo: Union[float, int, npt.ArrayLike]
-    a_coefficient: float
-    wme: Union[float, int, npt.ArrayLike] = 0
-    units: Literal["SI", "IP"] = "SI"
-
-    def __post_init__(self):
-        if self.units not in ["SI", "IP"]:
-            raise ValueError("The units must be 'SI' or 'IP'.")
-        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
-            raise TypeError("tdb must be a float, int, or array-like.")
-        if not isinstance(self.tr, (float, int, np.ndarray, list)):
-            raise TypeError("tr must be a float, int, or array-like.")
-        if not isinstance(self.vr, (float, int, np.ndarray, list)):
-            raise TypeError("vr must be a float, int, or array-like.")
-        if not isinstance(self.rh, (float, int, np.ndarray, list)):
-            raise TypeError("rh must be a float, int, or array-like.")
-        if not isinstance(self.met, (float, int, np.ndarray, list)):
-            raise TypeError("met must be a float, int, or array-like.")
-        if not isinstance(self.clo, (float, int, np.ndarray, list)):
-            raise TypeError("clo must be a float, int, or array-like.")
-        if not isinstance(self.a_coefficient, (float, int)):
-            raise TypeError("a_coefficient must be a float or int.")
-        if not isinstance(self.wme, (float, int, np.ndarray, list)):
-            raise TypeError("wme must be a float, int, or array-like.")
+class APMVInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        a_coefficient,
+        wme=0,
+        units="SI",
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            a_coefficient=a_coefficient,
+            wme=wme,
+            units=units,
+        )
 
 
 def a_pmv(
-    tdb: Union[float, int, npt.ArrayLike],
-    tr: Union[float, int, npt.ArrayLike],
-    vr: Union[float, int, npt.ArrayLike],
-    rh: Union[float, int, npt.ArrayLike],
-    met: Union[float, int, npt.ArrayLike],
-    clo: Union[float, int, npt.ArrayLike],
+    tdb: Union[float, List[float]],
+    tr: Union[float, List[float]],
+    vr: Union[float, List[float]],
+    rh: Union[float, List[float]],
+    met: Union[float, List[float]],
+    clo: Union[float, List[float]],
     a_coefficient: Union[float, int],
-    wme: Union[float, int, npt.ArrayLike] = 0,
+    wme: Union[float, List[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptivePMV:
@@ -76,21 +72,21 @@ def a_pmv(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
-    tr : float, int, or array-like
+    tr : float or list of floats
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
-    vr : float, int, or array-like
+    vr : float or list of floats
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
         .. warning::
             vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-    rh : float, int, or array-like
+    rh : float or list of floats
         Relative humidity, [%].
-    met : float, int, or array-like
+    met : float or list of floats
         Metabolic rate, [met].
-    clo : float, int, or array-like
+    clo : float or list of floats
         Clothing insulation, [clo].
 
         .. warning::
@@ -98,7 +94,7 @@ def a_pmv(
 
     a_coefficient : float
         Adaptive coefficient.
-    wme : float, int, or array-like, optional
+    wme : float or list of floats, optional
         External work, [met], default is 0.
     units : str, optional
         Units system, 'SI' or 'IP'. Defaults to 'SI'.

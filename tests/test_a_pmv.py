@@ -1,3 +1,5 @@
+import pytest
+
 from pythermalcomfort.models import a_pmv
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
@@ -14,3 +16,10 @@ def test_a_pmv(get_test_url, retrieve_data):
         result = a_pmv(**inputs)
 
         validate_result(result, outputs, tolerance)
+
+
+def test_a_pmv_wrong_input_type():
+    with pytest.raises(TypeError):
+        a_pmv("25", 25, 0.1, 50, 1.2, 0.5, 7)
+    with pytest.raises(ValueError):
+        a_pmv(25, 25, 0.1, 50, 1.2, 0.5, 7, units="celsius")
