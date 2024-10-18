@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List, Literal
+from typing import Union, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -86,17 +86,17 @@ def adaptive_ashrae(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
-    tr : float, int, or array-like
+    tr : float or list of floats
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
-    t_running_mean : float, int, or array-like
+    t_running_mean : float or list of floats
         Running mean temperature, default in [°C] or [°F] if `units` = 'IP'.
 
         .. note::
             The running mean temperature can be calculated using the function :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
 
-    v : float, int, or array-like
+    v : float or list of floats
         Air speed, default in [m/s] or [fps] if `units` = 'IP'.
     units : str, optional
         Units system, 'SI' or 'IP'. Defaults to 'SI'.

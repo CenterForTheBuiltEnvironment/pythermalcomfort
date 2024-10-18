@@ -1,10 +1,12 @@
 from dataclasses import dataclass
-from typing import Union, List, Literal
+from typing import Union, Literal
+
 import numpy as np
 import numpy.typing as npt
+
 from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import units_converter, BaseInputs
 
 
 @dataclass
@@ -52,34 +54,29 @@ class AdaptiveEN:
 
 
 @dataclass
-class ENInputs:
-    tdb: Union[float, int, npt.ArrayLike]
-    tr: Union[float, int, npt.ArrayLike]
-    t_running_mean: Union[float, int, npt.ArrayLike]
-    v: Union[float, int, npt.ArrayLike]
-    units: Literal["SI", "IP"] = "SI"
-
-    def __post_init__(self):
-        valid_units: List[str] = ["SI", "IP"]
-        if self.units.upper() not in valid_units:
-            raise ValueError(
-                f"Invalid unit: {self.units}. Supported units are {valid_units}."
-            )
-        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
-            raise TypeError("tdb must be a float, int, or array-like.")
-        if not isinstance(self.tr, (float, int, np.ndarray, list)):
-            raise TypeError("tr must be a float, int, or array-like.")
-        if not isinstance(self.t_running_mean, (float, int, np.ndarray, list)):
-            raise TypeError("t_running_mean must be a float, int, or array-like.")
-        if not isinstance(self.v, (float, int, np.ndarray, list)):
-            raise TypeError("v must be a float, int, or array-like.")
+class ENInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        t_running_mean,
+        v,
+        units,
+    ):
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            units=units,
+            t_running_mean=t_running_mean,
+        )
 
 
 def adaptive_en(
-    tdb: Union[float, int, npt.ArrayLike],
-    tr: Union[float, int, npt.ArrayLike],
-    t_running_mean: Union[float, int, npt.ArrayLike],
-    v: Union[float, int, npt.ArrayLike],
+    tdb: Union[float, npt.ArrayLike],
+    tr: Union[float, npt.ArrayLike],
+    t_running_mean: Union[float, npt.ArrayLike],
+    v: Union[float, npt.ArrayLike],
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveEN:
@@ -88,17 +85,17 @@ def adaptive_en(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
-    tr : float, int, or array-like
+    tr : float or list of floats
         Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
-    t_running_mean: float, int, or array-like
+    t_running_mean: float or list of floats
         Running mean temperature, default in [°C] or [°F] if `units` = 'IP'.
 
         .. note::
             The running mean temperature can be calculated using the function :py:meth:`pythermalcomfort.utilities.running_mean_outdoor_temperature`.
 
-    v : float, int, or array-like
+    v : float or list of floats
         Air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
         .. note::
