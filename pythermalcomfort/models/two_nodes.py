@@ -213,7 +213,7 @@ def two_nodes(
         "m_rsw": m_rsw,
         "w": w,
         "w_max": w_max,
-        "_set": _set,
+        "set": _set,
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
