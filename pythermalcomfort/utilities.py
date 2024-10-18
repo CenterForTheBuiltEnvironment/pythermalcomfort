@@ -38,6 +38,7 @@ class BaseInputs:
     units: str = field(default="SI")
     a_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
+    t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         # Only validate attributes that are not None
@@ -61,6 +62,10 @@ class BaseInputs:
             validate_type(self.wme, "wme", (float, int, np.ndarray, list))
         if self.v_ankle is not None:
             validate_type(self.v_ankle, "v_ankle", (float, int, np.ndarray, list))
+        if self.t_running_mean is not None:
+            validate_type(
+                self.t_running_mean, "t_running_mean", (float, int, np.ndarray, list)
+            )
 
 
 def transpose_sharp_altitude(sharp, altitude):

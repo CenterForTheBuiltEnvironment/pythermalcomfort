@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, List
 
 import numpy as np
 import numpy.typing as npt
 
 from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
+from pythermalcomfort.utilities import BaseInputs
 
 
 @dataclass
@@ -25,36 +26,34 @@ class ATHB:
 
 
 @dataclass
-class ATHBInputs:
-    tdb: Union[float, int, npt.ArrayLike]
-    tr: Union[float, int, npt.ArrayLike]
-    vr: Union[float, int, npt.ArrayLike]
-    rh: Union[float, int, npt.ArrayLike]
-    met: Union[float, int, npt.ArrayLike]
-    t_running_mean: Union[float, int, npt.ArrayLike]
+class ATHBInputs(BaseInputs):
 
-    def __post_init__(self):
-        if not isinstance(self.tdb, (float, int, np.ndarray, list)):
-            raise TypeError("tdb must be a float, int, or array-like.")
-        if not isinstance(self.tr, (float, int, np.ndarray, list)):
-            raise TypeError("tr must be a float, int, or array-like.")
-        if not isinstance(self.vr, (float, int, np.ndarray, list)):
-            raise TypeError("vr must be a float, int, or array-like.")
-        if not isinstance(self.rh, (float, int, np.ndarray, list)):
-            raise TypeError("rh must be a float, int, or array-like.")
-        if not isinstance(self.met, (float, int, np.ndarray, list)):
-            raise TypeError("met must be a float, int, or array-like.")
-        if not isinstance(self.t_running_mean, (float, int, np.ndarray, list)):
-            raise TypeError("t_running_mean must be a float, int, or array-like.")
+    def __init__(
+        self,
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        t_running_mean,
+    ):
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            t_running_mean=t_running_mean,
+        )
 
 
 def athb(
-    tdb: Union[float, int, npt.ArrayLike],
-    tr: Union[float, int, npt.ArrayLike],
-    vr: Union[float, int, npt.ArrayLike],
-    rh: Union[float, int, npt.ArrayLike],
-    met: Union[float, int, npt.ArrayLike],
-    t_running_mean: Union[float, int, npt.ArrayLike],
+    tdb: Union[float, List[float]],
+    tr: Union[float, List[float]],
+    vr: Union[float, List[float]],
+    rh: Union[float, List[float]],
+    met: Union[float, List[float]],
+    t_running_mean: Union[float, List[float]],
 ) -> ATHB:
     """
     Return the PMV value calculated with the Adaptive Thermal Heat Balance
@@ -67,11 +66,11 @@ def athb(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         Dry bulb air temperature, in [°C].
-    tr : float, int, or array-like
+    tr : float or list of floats
         Mean radiant temperature, in [°C].
-    vr : float, int, or array-like
+    vr : float or list of floats
         Relative air speed, in [m/s].
 
         .. note::
@@ -82,9 +81,9 @@ def athb(
             individual body parts. vr can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-    rh : float, int, or array-like
+    rh : float or list of floats
         Relative humidity, [%].
-    met : float, int, or array-like
+    met : float or list of floats
         Metabolic rate, [met].
     t_running_mean: float or array-like
         Running mean temperature, in [°C].
