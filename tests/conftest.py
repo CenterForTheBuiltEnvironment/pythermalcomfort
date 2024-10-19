@@ -9,7 +9,7 @@ from enum import Enum
 # without needing to import them (pytest will automatically discover them).
 
 
-unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/"
+unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/refs/heads/main/"
 
 
 class Urls(Enum):
@@ -74,7 +74,7 @@ def is_equal(a, b, tolerance=1e-6):
         if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
             return np.array_equal(a, b)
         else:
-            b = np.where(b is None, np.nan, b)  # Replace None with np.nan
+            b = np.where(b == None, np.nan, b)  # Replace None with np.nan
             # Return True if arrays are close enough, including handling of NaN values
             return np.allclose(a, b, atol=tolerance, equal_nan=True)
     elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):

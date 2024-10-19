@@ -15,7 +15,6 @@ def test_ankle_draft(get_test_url, retrieve_data):
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         result = ankle_draft(**inputs)
-
         validate_result(result, outputs, tolerance)
 
 

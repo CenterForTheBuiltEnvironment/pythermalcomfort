@@ -13,14 +13,7 @@ def test_pet_steady(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = pet_steady(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            rh=inputs["rh"],
-            v=inputs["v"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-        )
+        result = pet_steady(**inputs)
 
         validate_result(result, outputs, tolerance)
 
