@@ -9,7 +9,7 @@ from enum import Enum
 # without needing to import them (pytest will automatically discover them).
 
 
-unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/refs/heads/main/"
+unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/"
 
 
 class Urls(Enum):
