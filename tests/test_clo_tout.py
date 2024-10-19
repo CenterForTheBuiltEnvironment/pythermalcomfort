@@ -1,27 +1,16 @@
-import numpy as np
 from pythermalcomfort.models import clo_tout
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
-def test_clo_tout(get_clo_tout_url, retrieve_data, is_equal):
-    
-    reference_table = retrieve_data(get_clo_tout_url)
-    
-    
+
+def test_clo_tout(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.CLO_TOUT.name
+    )
+    tolerance = reference_table["tolerance"]
+
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_output = entry["outputs"]["clo_tout"]
-        
-        
-        result = clo_tout(
-            tout=inputs["tout"],
-            units=inputs.get("units", "SI")  
-        )
-        
-        
-        try:
-            if isinstance(expected_output, list):
-                np.testing.assert_equal(result, expected_output)
-            else:
-                assert is_equal(result, expected_output)
-        except AssertionError as e:
-            print(f"Assertion failed for clo_tout. Expected {expected_output}, got {result}, inputs={inputs}\nError: {str(e)}")
-            raise
+        outputs = entry["outputs"]
+        result = clo_tout(tout=inputs["tout"], units=inputs.get("units", "SI"))
+
+        validate_result(result, outputs, tolerance)

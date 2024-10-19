@@ -2,6 +2,8 @@ import numpy as np
 from pythermalcomfort.models import (
     set_tmp,
 )
+from tests.conftest import Urls, retrieve_reference_table, validate_result
+
 
 tdb = []
 tr = []
@@ -12,8 +14,11 @@ clo = []
 set_exp = []
 
 
-def test_phs_url(get_set_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_set_url)
+def test_set_url(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.SET.name
+    )
+    tolerance = reference_table["tolerance"]
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
@@ -30,15 +35,8 @@ def test_phs_url(get_set_url, retrieve_data, is_equal):
             set_exp.append(outputs["set"])
 
         result = set_tmp(**inputs)
-        for key in outputs:
-            # Use the custom is_equal for other types
-            try:
-                assert is_equal(result, outputs[key])
-            except AssertionError as e:
-                print(
-                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
-                )
-                raise
+
+        validate_result(result, outputs, tolerance)
 
 
 def test_set_array_inputs():

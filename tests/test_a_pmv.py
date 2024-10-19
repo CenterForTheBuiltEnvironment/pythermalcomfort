@@ -1,24 +1,25 @@
+import pytest
+
 from pythermalcomfort.models import a_pmv
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_a_pmv(get_a_pmv_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_a_pmv_url)
+def test_a_pmv(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.A_PMV.name
+    )
+    tolerance = reference_table["tolerance"]
+
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = a_pmv(
-            inputs["tdb"],
-            inputs["tr"],
-            inputs["vr"],
-            inputs["rh"],
-            inputs["met"],
-            inputs["clo"],
-            inputs["a_coefficient"],
-        )
-        try:
-            assert is_equal(result, outputs["a_pmv"])
-        except AssertionError as e:
-            print(
-                f"Assertion failed for a_pmv. Expected {outputs}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        result = a_pmv(**inputs)
+
+        validate_result(result, outputs, tolerance)
+
+
+def test_a_pmv_wrong_input_type():
+    with pytest.raises(TypeError):
+        a_pmv("25", 25, 0.1, 50, 1.2, 0.5, 7)
+    with pytest.raises(ValueError):
+        a_pmv(25, 25, 0.1, 50, 1.2, 0.5, 7, units="celsius")

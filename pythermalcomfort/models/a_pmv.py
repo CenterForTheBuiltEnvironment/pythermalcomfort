@@ -1,100 +1,150 @@
-from typing import Union, List
+from dataclasses import dataclass
+from typing import Union, Literal, List
 
 import numpy as np
+import numpy.typing as npt
 
 from pythermalcomfort.models import pmv
+from pythermalcomfort.utilities import BaseInputs
+
+
+@dataclass(frozen=True)
+class AdaptivePMV:
+    """
+    A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV) model.
+
+    Attributes
+    ----------
+    a_pmv : float, or array-like
+        Predicted Mean Vote.
+    """
+
+    a_pmv: Union[float, npt.ArrayLike]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class APMVInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        a_coefficient,
+        wme=0,
+        units="SI",
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            a_coefficient=a_coefficient,
+            wme=wme,
+            units=units,
+        )
 
 
 def a_pmv(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    vr: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-    met: Union[float, int, np.ndarray, List[float], List[int]],
-    clo: Union[float, int, np.ndarray, List[float], List[int]],
-    a_coefficient: float,
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
-    units="SI",
-    limit_inputs=True,
-):
-    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was
-    developed by Yao, R. et al. (2009). The model takes into account factors
-    such as culture, climate, social, psychological and behavioural
-    adaptations, which have an impact on the senses used to detect thermal
-    comfort. This model uses an adaptive coefficient (λ) representing the
-    adaptive factors that affect the sense of thermal comfort.
+    tdb: Union[float, List[float]],
+    tr: Union[float, List[float]],
+    vr: Union[float, List[float]],
+    rh: Union[float, List[float]],
+    met: Union[float, List[float]],
+    clo: Union[float, List[float]],
+    a_coefficient: Union[float, int],
+    wme: Union[float, List[float]] = 0,
+    units: Literal["SI", "IP"] = "SI",
+    limit_inputs: bool = True,
+) -> AdaptivePMV:
+    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was developed by Yao, R. et al. (2009).
+    The model takes into account factors such as culture, climate, social, psychological, and behavioral
+    adaptations, which have an impact on the senses used to detect thermal comfort. This model uses an
+    adaptive coefficient (λ) representing the adaptive factors that affect the sense of thermal comfort.
 
     Parameters
     ----------
-    tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float, int, or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    vr : float, int, or array-like
-        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
+    tdb : float or list of floats
+        Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
+    tr : float or list of floats
+        Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
+    vr : float or list of floats
+        Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor. The relative air speed is the sum of the
-        average air speed measured by the sensor plus the activity-generated air speed
-        (Vag). Where Vag is the activity-generated air speed caused by motion of
-        individual body parts. vr can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.v_relative`.
-    rh : float, int, or array-like
-        relative humidity, [%]
-    met : float, int, or array-like
-        metabolic rate, [met]
-    clo : float, int, or array-like
-        clothing insulation, [clo]
+        .. warning::
+            vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-        Note: The activity as well as the air speed modify the insulation characteristics
-        of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
-        for the effect of the body movement for met equal or higher than 1.2 met using
-        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-        can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+    rh : float or list of floats
+        Relative humidity, [%].
+    met : float or list of floats
+        Metabolic rate, [met].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+
+        .. warning::
+            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+
     a_coefficient : float
-        adaptive coefficient
-    wme : float, int, or array-like
-        external work, [met] default 0
+        Adaptive coefficient.
+    wme : float or list of floats, optional
+        External work, [met], default is 0.
     units : str, optional
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns pmv and ppd values even if input values are
-        outside the applicability limits of the model.
+        Units system, 'SI' or 'IP'. Defaults to 'SI'.
+    limit_inputs : bool, optional
+        If True, returns nan for inputs outside standard limits. Defaults to True.
 
-        The ISO 7730 2005 limits are 10 < tdb [°C] < 30, 10 < tr [°C] < 40,
-        0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, and -2 < PMV < 2.
+        .. warning::
+            ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, -2 < PMV < 2.
 
     Returns
     -------
-    pmv : float, int, or array-like
-        Predicted Mean Vote
+    AdaptivePMV
+        A dataclass containing the Predicted Mean Vote (a_pmv). See :py:class:`~pythermalcomfort.models.a_pmv.AdaptivePMV` for more details.
+        To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance, e.g., `result.a_pmv`.
 
     Examples
     --------
     .. code-block:: python
+        :emphasize-lines: 9,12,14
 
-        >>> from pythermalcomfort.models import a_pmv
-        >>> from pythermalcomfort.utilities import v_relative, clo_dynamic
-        >>> v = 0.1
-        >>> met = 1.4
-        >>> clo = 0.5
-        >>> # calculate relative air speed
-        >>> v_r = v_relative(v=v, met=met)
-        >>> # calculate dynamic clothing
-        >>> clo_d = clo_dynamic(clo=clo, met=met)
-        >>> results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
-        >>> print(results)
-        0.74
+        from pythermalcomfort.models import a_pmv
+        from pythermalcomfort.utilities import v_relative, clo_dynamic
+
+        v = 0.1
+        met = 1.4
+        clo = 0.5
+
+        # Calculate relative air speed
+        v_r = v_relative(v=v, met=met)
+
+        # Calculate dynamic clothing
+        clo_d = clo_dynamic(clo=clo, met=met)
+
+        results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
+        print(results)  # AdaptivePMV(a_pmv=0.74)
+        print(results.a_pmv)  # 0.74
     """
 
-    # Validate units string
-    valid_units: List[str] = ["SI", "IP"]
-    if units.upper() not in valid_units:
-        raise ValueError(f"Invalid unit: {units}. Supported units are {valid_units}.")
+    # Validate inputs using the APMVInputs class
+    APMVInputs(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        a_coefficient=a_coefficient,
+        wme=wme,
+        units=units,
+    )
 
     _pmv = pmv(
         tdb,
@@ -109,4 +159,6 @@ def a_pmv(
         limit_inputs=limit_inputs,
     )
 
-    return np.around(_pmv / (1 + a_coefficient * _pmv), 2)
+    pmv_value = np.around(_pmv / (1 + a_coefficient * _pmv), 2)
+
+    return AdaptivePMV(a_pmv=pmv_value)

@@ -20,44 +20,11 @@ from pythermalcomfort.jos3_functions.matrix import (
 from pythermalcomfort.jos3_functions.parameters import Default, ALL_OUT_PARAMS
 from pythermalcomfort.models import pmv
 
-# # testing morris equation
-# from scipy import optimize
-# import matplotlib.pyplot as plt
-# import numpy as np
-# f, ax = plt.subplots()
-# for person in ["young", "old", "meds"]:
-#     t_lim = []
-#     rh_array = list(range(5, 100))
-#     for rh in rh_array:
-#
-#         def function(x):
-#             return use_fans_morris(x, 3.5, rh, 70, target_person=person)
-#
-#         t_lim.append(optimize.brentq(function, 30, 70))
-#
-#     z = np.polyfit(rh_array, t_lim, 4)
-#     p = np.poly1d(z)
-#     y_new = p(rh_array)
-#     # plt.plot(rh_array, t_lim, "o")
-#     plt.plot(rh_array, y_new, "-", label=person)
-# ax.set(
-#     ylabel="Temperature [°C]",
-#     xlabel="Relative Humidity [Rh]",
-#     ylim=(24, 52),
-#     xlim=(5, 70),
-# )
-# plt.legend()
+# Set up logging with a level of WARNING
+import logging
 
-
-# include also the following models:
-#  radiant_tmp_asymmetry
-#  draft
-#  floor_surface_tmp
-#  Perceived temperature (Blazejczyk2012)
-#  Physiological subjective temperature and physiological strain (Blazejczyk2012)
-#  more models here: https://www.rdocumentation.org/packages/comf/versions/0.1.9
-#  more models here: https://rdrr.io/cran/comf/man/
-#  to print the R source code use comf::pmv
+logging.basicConfig(level=logging.WARN)
+logger = logging.getLogger(__name__)
 
 
 class JOS3:
@@ -368,7 +335,7 @@ class JOS3:
         version_string = (
             __version__  # get the current version of pythermalcomfort package
         )
-        version_number_string = re.findall("\d+\.\d+\.\d+", version_string)[0]
+        version_number_string = re.findall(r"\d+\.\d+\.\d+", version_string)[0]
         self._version = version_number_string  # (ex. 'X.Y.Z')
 
         # Initialize basic attributes
@@ -451,7 +418,8 @@ class JOS3:
         met=Default.metabolic_rate,
         clo=Default.clothing_insulation,
     ) -> float:
-        """Calculate operative temperature [°C] when PMV=0.
+        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry logic.
+
 
         Parameters
         ----------
@@ -464,22 +432,65 @@ class JOS3:
         clo : float, optional
             Clothing insulation [clo]. The default is 0.
 
+
         Returns
         -------
         to : float
             Operative temperature [°C].
         """
+        # Default parameters
+        initial_to = 28
+        tolerance = 0.001
+        max_iterations = 100
+        adjustment_factor = 3
+        retry_adjustment_factor = adjustment_factor * 200
+        retry_attempts = 100
 
-        to = 28  # initial operative temperature
-        # Iterate until the PMV (Predicted Mean Vote) value is less than 0.001
-        for _ in range(100):
-            vpmv = pmv(tdb=to, tr=to, vr=va, rh=rh, met=met, clo=clo)
-            # Break the loop if the absolute value of PMV is less than 0.001
-            if abs(vpmv) < 0.001:
-                break
-            # Update the temperature based on the PMV value
-            else:
-                to = to - vpmv / 3
+        to = initial_to
+
+        # Main loop for finding PMV=0
+        for i in range(max_iterations):
+            pmv_value = pmv(to, to, va, rh, met, clo)
+
+            # Check for NaN and handle retries
+            if np.isnan(pmv_value):
+                logger.warning(
+                    f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step."
+                )
+                for retry in range(retry_attempts):
+                    adjustment_factor = retry_adjustment_factor
+                    to = initial_to  # Reset to initial temperature for retry
+                    pmv_value = pmv(to, to, va, rh, met, clo)
+                    logger.info(
+                        f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}"
+                    )
+
+                    if abs(pmv_value) < tolerance:
+                        logger.info(
+                            f"Converged to PMV=0 at to={to:.2f}°C during retry."
+                        )
+                        return to
+
+                    # Adjust the temperature during retry
+                    to = to - pmv_value / adjustment_factor
+
+                # If retries fail, log a warning and stop the loop
+                logger.error(
+                    "Retries failed to achieve convergence after NaN detection."
+                )
+                return to
+
+            # Check if the PMV is within tolerance
+            if abs(pmv_value) < tolerance:
+                logger.info(
+                    f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations."
+                )
+                return to
+
+            # Adjust the operative temperature using the adjustment factor
+            to = to - pmv_value / adjustment_factor
+
+        logger.warning("Maximum iterations reached without achieving convergence.")
         return to
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
@@ -894,16 +905,16 @@ class JOS3:
             dict_out["cycle_time"] = self._cycle
             dict_out["simulation_time"] = self._t
             dict_out["dt"] = dtime
-            dict_out["t_skin_mean"] = self.t_skin_mean
-            dict_out["t_skin"] = self.t_skin
-            dict_out["t_core"] = self.t_core
-            dict_out["w_mean"] = np.average(wet, weights=Default.local_bsa)
-            dict_out["w"] = wet
-            dict_out["weight_loss_by_evap_and_res"] = wlesk.sum() + wleres
-            dict_out["cardiac_output"] = co
-            dict_out["q_thermogenesis_total"] = q_thermogenesis_total
-            dict_out["q_res"] = res_sh + res_lh
-            dict_out["q_skin2env"] = shl_sk + e_sk
+            dict_out["t_skin_mean"] = np.round(self.t_skin_mean, 2)
+            dict_out["t_skin"] = np.round(self.t_skin, 2)
+            dict_out["t_core"] = np.round(self.t_core, 2)
+            dict_out["w_mean"] = round(np.average(wet, weights=Default.local_bsa), 2)
+            dict_out["w"] = np.round(wet, 2)
+            dict_out["weight_loss_by_evap_and_res"] = round(wlesk.sum() + wleres, 5)
+            dict_out["cardiac_output"] = round(co, 1)
+            dict_out["q_thermogenesis_total"] = round(q_thermogenesis_total, 2)
+            dict_out["q_res"] = round(res_sh + res_lh, 2)
+            dict_out["q_skin2env"] = np.round(shl_sk + e_sk, 2)
 
         detail_out = {}
         if self._ex_output and output:
@@ -914,49 +925,51 @@ class JOS3:
             detail_out["fat"] = self._fat
             detail_out["sex"] = self._sex
             detail_out["age"] = self._age
-            detail_out["t_core_set"] = setpt_cr
-            detail_out["t_skin_set"] = setpt_sk
-            detail_out["t_cb"] = self.t_cb
-            detail_out["t_artery"] = self.t_artery
-            detail_out["t_vein"] = self.t_vein
-            detail_out["t_superficial_vein"] = self.t_superficial_vein
-            detail_out["t_muscle"] = self.t_muscle
-            detail_out["t_fat"] = self.t_fat
-            detail_out["to"] = to
-            detail_out["r_t"] = r_t
-            detail_out["r_et"] = r_et
-            detail_out["tdb"] = self._ta.copy()
-            detail_out["tr"] = self._tr.copy()
+            detail_out["t_core_set"] = np.round(setpt_cr, 2)
+            detail_out["t_skin_set"] = np.round(setpt_sk, 2)
+            detail_out["t_cb"] = round(self.t_cb, 2)
+            detail_out["t_artery"] = np.round(self.t_artery)
+            detail_out["t_vein"] = np.round(self.t_vein)
+            detail_out["t_superficial_vein"] = np.round(self.t_superficial_vein)
+            detail_out["t_muscle"] = np.round(self.t_muscle)
+            detail_out["t_fat"] = np.round(self.t_fat)
+            detail_out["to"] = np.round(to, 2)
+            detail_out["r_t"] = np.round(r_t, 3)
+            detail_out["r_et"] = np.round(r_et, 3)
+            detail_out["tdb"] = np.round(self._ta.copy(), 2)
+            detail_out["tr"] = np.round(self._tr.copy(), 2)
             detail_out["rh"] = self._rh.copy()
             detail_out["v"] = self._va.copy()
             detail_out["par"] = self._par
             detail_out["clo"] = self._clo.copy()
-            detail_out["e_skin"] = e_sk
-            detail_out["e_max"] = e_max
-            detail_out["e_sweat"] = e_sweat
-            detail_out["bf_core"] = bf_core
-            detail_out["bf_muscle"] = bf_muscle[VINDEX["muscle"]]
-            detail_out["bf_fat"] = bf_fat[VINDEX["fat"]]
-            detail_out["bf_skin"] = bf_skin
-            detail_out["bf_ava_hand"] = bf_ava_hand
-            detail_out["bf_ava_foot"] = bf_ava_foot
-            detail_out["q_bmr_core"] = q_bmr_local[0]
-            detail_out["q_bmr_muscle"] = q_bmr_local[1][VINDEX["muscle"]]
-            detail_out["q_bmr_fat"] = q_bmr_local[2][VINDEX["fat"]]
-            detail_out["q_bmr_skin"] = q_bmr_local[3]
-            detail_out["q_work"] = q_work
-            detail_out["q_shiv"] = q_shiv
-            detail_out["q_nst"] = q_nst
-            detail_out["q_thermogenesis_core"] = q_thermogenesis_core
-            detail_out["q_thermogenesis_muscle"] = q_thermogenesis_muscle[
-                VINDEX["muscle"]
-            ]
-            detail_out["q_thermogenesis_fat"] = q_thermogenesis_fat[VINDEX["fat"]]
-            detail_out["q_thermogenesis_skin"] = q_thermogenesis_skin
-            dict_out["q_skin2env_sensible"] = shl_sk
-            dict_out["q_skin2env_latent"] = e_sk
-            dict_out["q_res_sensible"] = res_sh
-            dict_out["q_res_latent"] = res_lh
+            detail_out["e_skin"] = np.round(e_sk, 2)
+            detail_out["e_max"] = np.round(e_max, 2)
+            detail_out["e_sweat"] = np.round(e_sweat, 2)
+            detail_out["bf_core"] = np.round(bf_core, 2)
+            detail_out["bf_muscle"] = np.round(bf_muscle[VINDEX["muscle"]], 2)
+            detail_out["bf_fat"] = np.round(bf_fat[VINDEX["fat"]], 2)
+            detail_out["bf_skin"] = np.round(bf_skin, 2)
+            detail_out["bf_ava_hand"] = np.round(bf_ava_hand, 2)
+            detail_out["bf_ava_foot"] = np.round(bf_ava_foot, 2)
+            detail_out["q_bmr_core"] = np.round(q_bmr_local[0], 2)
+            detail_out["q_bmr_muscle"] = np.round(q_bmr_local[1][VINDEX["muscle"]], 2)
+            detail_out["q_bmr_fat"] = np.round(q_bmr_local[2][VINDEX["fat"]], 2)
+            detail_out["q_bmr_skin"] = np.round(q_bmr_local[3], 2)
+            detail_out["q_work"] = np.round(q_work, 2)
+            detail_out["q_shiv"] = np.round(q_shiv, 2)
+            detail_out["q_nst"] = np.round(q_nst, 2)
+            detail_out["q_thermogenesis_core"] = np.round(q_thermogenesis_core, 2)
+            detail_out["q_thermogenesis_muscle"] = np.round(
+                q_thermogenesis_muscle[VINDEX["muscle"]], 2
+            )
+            detail_out["q_thermogenesis_fat"] = np.round(
+                q_thermogenesis_fat[VINDEX["fat"]], 2
+            )
+            detail_out["q_thermogenesis_skin"] = np.round(q_thermogenesis_skin, 2)
+            dict_out["q_skin2env_sensible"] = np.round(shl_sk, 2)
+            dict_out["q_skin2env_latent"] = np.round(e_sk, 2)
+            dict_out["q_res_sensible"] = np.round(res_sh, 2)
+            dict_out["q_res_latent"] = np.round(res_lh, 2)
 
         if self._ex_output == "all":
             dict_out.update(detail_out)

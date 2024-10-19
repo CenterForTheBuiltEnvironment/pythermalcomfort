@@ -1,28 +1,23 @@
 import numpy as np
 
-from pythermalcomfort.models import (
-    utci,
-)
+from pythermalcomfort.models import utci
 from pythermalcomfort.models.utci import _utci_optimized
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
-def test_utci(get_utci_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_utci_url)
+
+def test_utci(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.UTCI.name
+    )
+    tolerance = reference_table["tolerance"]
+
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         result = utci(**inputs)
-        for key in outputs:
-            # Use the custom is_equal for other types
-            try:
-                if isinstance(result, dict):
-                    assert is_equal(result[key], outputs[key])
-                else:
-                    assert is_equal(result, outputs[key])
-            except AssertionError as e:
-                print(
-                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result}, inputs={inputs}\nError: {str(e)}"
-                )
-                raise
+
+        validate_result(result, outputs, tolerance)
+
 
 def test_utci_optimized():
     np.testing.assert_equal(

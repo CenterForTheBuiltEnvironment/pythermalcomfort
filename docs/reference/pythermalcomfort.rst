@@ -6,20 +6,32 @@ Adaptive ASHRAE
 
 .. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
+.. autoclass:: pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE
+    :members:
+
 Adaptive EN
 -----------
 
 .. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
+
+.. autoclass:: pythermalcomfort.models.adaptive_en.AdaptiveEN
+    :members:
 
 Adaptive Predicted Mean Vote (aPMV)
 -----------------------------------
 
 .. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
 
+.. autoclass:: pythermalcomfort.models.a_pmv.AdaptivePMV
+    :members:
+
 Adaptive Thermal Heat Balance (ATHB)
 ------------------------------------
 
 .. autofunction:: pythermalcomfort.models.athb.athb
+
+.. autoclass:: pythermalcomfort.models.athb.ATHB
+    :members:
 
 Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 -----------------------------------------------------------
@@ -31,15 +43,24 @@ Apparent Temperature (AT)
 
 .. autofunction:: pythermalcomfort.models.at.at
 
+.. autoclass:: pythermalcomfort.models.at.AT
+    :members:
+
 Ankle draft
 -----------
 
 .. autofunction:: pythermalcomfort.models.ankle_draft.ankle_draft
 
+.. autoclass:: pythermalcomfort.models.ankle_draft.AnkleDraft
+    :members:
+
 Clothing prediction
 -------------------
 
 .. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
+
+.. autoclass:: pythermalcomfort.models.clo_tout.CloTout
+    :members:
 
 Cooling Effect (CE)
 -------------------

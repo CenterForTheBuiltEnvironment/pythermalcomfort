@@ -1,12 +1,10 @@
 import warnings
-from typing import Union
+from typing import Union, Literal
 
 from scipy import optimize
 
-from pythermalcomfort.utilities import (
-    units_converter,
-)
 from pythermalcomfort.models.set_tmp import set_tmp
+from pythermalcomfort.utilities import units_converter
 
 
 def cooling_effect(
@@ -16,9 +14,9 @@ def cooling_effect(
     rh: Union[float, int],
     met: Union[float, int],
     clo: Union[float, int],
-    wme=0,
-    units="SI",
-):
+    wme: Union[float, int] = 0,
+    units: Literal["SI", "IP"] = "SI",
+) -> float:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
@@ -31,66 +29,76 @@ def cooling_effect(
     Parameters
     ----------
     tdb : float
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
+        Dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'.
     tr : float
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
+        Mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'.
     vr : float
-        relative air speed, default in [m/s] in [fps] if `units` = 'IP'
+        Relative air speed, default in [m/s] in [fps] if `units` = 'IP'.
 
-        Note: vr is the relative air speed caused by body movement and not the air
-        speed measured by the air speed sensor. The relative air speed is the sum of the
-        average air speed measured by the sensor plus the activity-generated air speed
-        (Vag). Where Vag is the activity-generated air speed caused by motion of
-        individual body parts. vr can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.v_relative`.
+        .. note::
+            vr is the relative air speed caused by body movement and not the air
+            speed measured by the air speed sensor. The relative air speed is the sum of the
+            average air speed measured by the sensor plus the activity-generated air speed
+            (Vag). Where Vag is the activity-generated air speed caused by motion of
+            individual body parts. vr can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.v_relative`.
+
     rh : float
-        relative humidity, [%]
+        Relative humidity, [%].
     met : float
-        metabolic rate, [met]
+        Metabolic rate, [met].
     clo : float
-        clothing insulation, [clo]
+        Clothing insulation, [clo].
 
-        Note: The activity as well as the air speed modify the insulation characteristics
-        of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
-        the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
-        for the effect of the body movement for met equal or higher than 1.2 met using
-        the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-        can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
-    wme : float, default 0
-        external work, [met]
-    units : {'SI', 'IP'}     select the SI (International System of Units) or the IP (Imperial Units) system.
+        .. note::
+            The activity as well as the air speed modify the insulation characteristics
+            of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
+            the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+            for the effect of the body movement for met equal or higher than 1.2 met using
+            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+            can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+
+    wme : float, optional
+        External work, [met]. Defaults to 0.
+    units : {'SI', 'IP'}, optional
+        Select the SI (International System of Units) or the IP (Imperial Units) system.
+        Supported values are 'SI' and 'IP'. Defaults to 'SI'.
 
     Returns
     -------
-    ce : float
-        Cooling Effect, default in [°C] in [°F] if `units` = 'IP'
+    float
+        The Cooling Effect value.
+
+    Raises
+    ------
+    ValueError
+        If the cooling effect could not be calculated.
+
+    Notes
+    -----
+    .. warning::
+        Limitations:
+        - This equation may not be accurate for extreme temperature ranges.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import cooling_effect
-        >>> CE = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
-        >>> print(CE)
-        1.64
+        from pythermalcomfort.models import cooling_effect
 
-        >>> # for users who wants to use the IP system
-        >>> CE = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
-        >>> print(CE)
-        3.74
+        result = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+        print(result)  # 1.68
 
-    Raises
-    ------
-    ValueError
-        If the cooling effect could not be calculated
+        result = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+        print(result)  # 3.95
     """
 
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     if vr <= 0.1:
-        return 0
+        return 0.0
 
     still_air_threshold = 0.1
 
@@ -144,3 +152,11 @@ def cooling_effect(
         ce = ce / 1.8 * 3.28
 
     return round(ce, 2)
+
+
+if __name__ == "__main__":
+    ce = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+    print(ce)
+
+    ce = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+    print(ce)

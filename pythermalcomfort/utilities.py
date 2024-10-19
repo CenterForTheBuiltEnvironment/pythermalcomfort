@@ -1,13 +1,83 @@
 import math
 import warnings
+from dataclasses import dataclass, field
 from typing import NamedTuple
+from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.psychrometrics import p_sat, t_o
+from pythermalcomfort.psychrometrics import t_o
 from pythermalcomfort.shared_functions import valid_range
 
 warnings.simplefilter("always")
+
+
+def validate_units(units: str) -> None:
+    """Validate the units parameter."""
+    if units.lower() not in ["si", "ip"]:
+        raise ValueError("Units must be either 'SI' or 'IP'")
+
+
+def validate_type(value, name: str, allowed_types: tuple):
+    """Validate the type of a value against allowed types."""
+    if not isinstance(value, allowed_types):
+        raise TypeError(f"{name} must be one of the following types: {allowed_types}.")
+
+
+@dataclass
+class BaseInputs:
+    """Base class containing all possible input parameters."""
+
+    tdb: Union[float, int, np.ndarray, list] = field(default=None)
+    tr: Union[float, int, np.ndarray, list] = field(default=None)
+    vr: Union[float, int, np.ndarray, list] = field(default=None)
+    v: Union[float, int, np.ndarray, list] = field(default=None)
+    rh: Union[float, int, np.ndarray, list] = field(default=None)
+    met: Union[float, int, np.ndarray, list] = field(default=None)
+    clo: Union[float, int, np.ndarray, list] = field(default=None)
+    wme: Union[float, int, np.ndarray, list] = field(default=0)
+    round_output: bool = field(default=True)
+    units: str = field(default="SI")
+    a_coefficient: Union[float, int] = field(default=None)
+    v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
+    t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
+    q: Union[float, int, np.ndarray, list] = field(default=None)
+    tout: Union[float, int, np.ndarray, list] = field(default=None)
+
+    def __post_init__(self):
+        # Only validate attributes that are not None
+        validate_units(self.units)
+
+        if self.tdb is not None:
+            validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
+        if self.tr is not None:
+            validate_type(self.tr, "tr", (float, int, np.ndarray, list))
+        if self.vr is not None:
+            validate_type(self.vr, "vr", (float, int, np.ndarray, list))
+        if self.v is not None:
+            validate_type(self.v, "v", (float, int, np.ndarray, list))
+        if self.rh is not None:
+            validate_type(self.rh, "rh", (float, int, np.ndarray, list))
+        if self.met is not None:
+            validate_type(self.met, "met", (float, int, np.ndarray, list))
+        if self.clo is not None:
+            validate_type(self.clo, "clo", (float, int, np.ndarray, list))
+        if self.a_coefficient is not None:
+            validate_type(self.a_coefficient, "a_coefficient", (float, int))
+        if self.wme is not None:
+            validate_type(self.wme, "wme", (float, int, np.ndarray, list))
+        if self.v_ankle is not None:
+            validate_type(self.v_ankle, "v_ankle", (float, int, np.ndarray, list))
+        if self.t_running_mean is not None:
+            validate_type(
+                self.t_running_mean, "t_running_mean", (float, int, np.ndarray, list)
+            )
+        if self.q is not None:
+            validate_type(self.q, "q", (float, int, np.ndarray, list))
+        if not isinstance(self.round_output, bool):
+            raise TypeError("round must be either True or False.")
+        if self.tout is not None:
+            validate_type(self.tout, "tout", (float, int, np.ndarray, list))
 
 
 def transpose_sharp_altitude(sharp, altitude):
@@ -108,11 +178,16 @@ def check_standard_compliance(standard, **kwargs):
 def check_standard_compliance_array(standard, **kwargs):
     default_kwargs = {"airspeed_control": True}
     params = {**default_kwargs, **kwargs}
+    values_to_return = {}
 
     if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
         v_valid = valid_range(params["v"], (0.0, 2.0))
+
+        values_to_return["tdb"] = tdb_valid
+        values_to_return["tr"] = tr_valid
+        values_to_return["v"] = v_valid
 
         if not params["airspeed_control"]:
             v_valid = np.where(
@@ -140,14 +215,20 @@ def check_standard_compliance_array(standard, **kwargs):
                 v_valid,
             )
 
+            values_to_return["v"] = v_valid
+
         if "met" in params.keys():
             met_valid = valid_range(params["met"], (1.0, 4.0))
             clo_valid = valid_range(params["clo"], (0.0, 1.5))
 
-            return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
+            values_to_return["met"] = met_valid
+            values_to_return["clo"] = clo_valid
 
-        else:
-            return tdb_valid, tr_valid, v_valid
+        if "v_limited" in params.keys():
+            valid = valid_range(params["v_limited"], (0.0, 0.2))
+            values_to_return["v_limited"] = valid
+
+        return values_to_return.values()
 
     if standard == "7933":  # based on ISO 7933:2004 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))

@@ -1,4 +1,7 @@
+from typing import Literal, Any, Union
+
 import numpy as np
+import numpy.typing as npt
 from scipy import optimize
 
 from pythermalcomfort.psychrometrics import p_sat
@@ -7,21 +10,22 @@ from pythermalcomfort.utilities import (
 )
 
 
+@np.vectorize
 def pet_steady(
-    tdb,
-    tr,
-    v,
-    rh,
-    met,
-    clo,
-    p_atm=1013.25,
-    position=1,
-    age=23,
-    sex=1,
-    weight=75,
-    height=1.8,
-    wme=0,
-):
+    tdb: npt.ArrayLike,
+    tr: npt.ArrayLike,
+    v: npt.ArrayLike,
+    rh: npt.ArrayLike,
+    met: npt.ArrayLike,
+    clo: npt.ArrayLike,
+    p_atm: npt.ArrayLike = 1013.25,
+    position: Union[npt.ArrayLike, Literal[1, 2, 3]] = 1,
+    age: npt.ArrayLike = 23,
+    sex: Union[npt.ArrayLike, Literal[1, 2]] = 1,
+    weight: npt.ArrayLike = 75,
+    height: npt.ArrayLike = 1.8,
+    wme: npt.ArrayLike = 0,
+) -> Union[npt.NDArray[Any], float]:
     """
     The steady physiological equivalent temperature (PET) is calculated using the Munich
     Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
@@ -43,31 +47,31 @@ def pet_steady(
 
     Parameters
     ----------
-    tdb : float
+    tdb : float or array-like
         dry bulb air temperature, [°C]
-    tr : float
+    tr : float or array-like
         mean radiant temperature, [°C]
-    v : float
+    v : float or array-like
         air speed, [m/s]
-    rh : float
+    rh : float or array-like
         relative humidity, [%]
-    met : float
+    met : float or array-like
         metabolic rate, [met]
-    clo : float
+    clo : float or array-like
         clothing insulation, [clo]
-    p_atm : float
+    p_atm : float or array-like
         atmospheric pressure, default value 1013.25 [hPa]
-    position : int
+    position : int or array-like
         position of the individual (1=sitting, 2=standing, 3=standing, forced convection)
-    age : int, default 23
+    age : int or array-like, default 23
         age in years
-    sex : int, default 1
+    sex : int or array-like, default 1
         male (1) or female (2).
-    weight : float, default 75
+    weight : float or array-like, default 75
         body mass, [kg]
-    height: float, default 1.8
-        height, [m]
-    wme : float, default 0
+    height: float or array-like, default 1.8
+        height or array-like, [m]
+    wme : float or array-like, default 0
         external work, [W/(m2)] default 0
 
     Returns
@@ -247,9 +251,7 @@ def pet_steady(
         fcl = (
             1 + 0.31 * _clo
         )  # Increase heat exchange surface depending on clothing level
-        f_a_cl = (
-            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0
-        ) / 100
+        f_a_cl = (173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
         f_eff = 0.696 if position == 2 else 0.725  # effective radiation factor

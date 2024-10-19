@@ -6,13 +6,9 @@ from __future__ import annotations
 
 import io
 import re
-from glob import glob
-from os.path import basename
 from os.path import dirname
 from os.path import join
-from os.path import splitext
 
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -61,7 +57,6 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",

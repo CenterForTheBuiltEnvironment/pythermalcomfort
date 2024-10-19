@@ -1,14 +1,16 @@
-import numpy as np
 from pythermalcomfort.models import e_pmv
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_e_pmv(get_e_pmv_url, retrieve_data, is_equal):
-    reference_table = retrieve_data(get_e_pmv_url)
+def test_e_pmv(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.E_PMV.name
+    )
+    tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
-        expected_outputs = entry["outputs"]["pmv"]
-
+        outputs = entry["outputs"]
         result = e_pmv(
             tdb=inputs["tdb"],
             tr=inputs["tr"],
@@ -19,13 +21,4 @@ def test_e_pmv(get_e_pmv_url, retrieve_data, is_equal):
             e_coefficient=inputs["e_coefficient"],
         )
 
-        try:
-            if isinstance(expected_outputs, list):
-                np.testing.assert_equal(result, expected_outputs)
-            else:
-                assert is_equal(result, expected_outputs)
-        except AssertionError as e:
-            print(
-                f"Assertion failed for e_pmv. Expected {expected_outputs}, got {result}, inputs={inputs}\nError: {str(e)}"
-            )
-            raise
+        validate_result(result, outputs, tolerance)

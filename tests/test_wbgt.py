@@ -1,25 +1,21 @@
 import pytest
-import math
 
 from pythermalcomfort.models import wbgt
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_wbgt_with_url_cases(get_wbgt_url, retrieve_data, is_equal):
+def test_wbgt_with_url_cases(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.WBGT.name
+    )
+    tolerance = reference_table["tolerance"]
 
-    reference_table = retrieve_data(get_wbgt_url)
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         result = wbgt(**inputs)
-        for key in outputs:
-            # Use the custom is_equal for other types
-            try:
-                assert is_equal(result, outputs[key])
-            except AssertionError as e:
-                print(
-                    f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
-                )
-                raise
+
+        validate_result(result, outputs, tolerance)
 
 
 # Test wbgt value error

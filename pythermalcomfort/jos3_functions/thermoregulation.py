@@ -888,6 +888,10 @@ def basal_met(
 
     bmr *= 0.048  # [kcal/day] to [W]
 
+    # Set minimum BMR value in W
+    min_bmr_in_w = 68
+    bmr = max(bmr, min_bmr_in_w)
+
     return bmr
 
 

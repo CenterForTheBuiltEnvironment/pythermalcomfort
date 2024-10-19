@@ -85,9 +85,23 @@ def enthalpy(
 
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
-    h = h_dry_air + hr * h_sat_vap
+    return h_dry_air + hr * h_sat_vap
 
-    return round(h, 2)
+
+# pre-calculated constants for p_sat
+c1 = -5674.5359
+c2 = 6.3925247
+c3 = -0.9677843 * 1e-2
+c4 = 0.62215701 * 1e-6
+c5 = 0.20747825 * 1e-8
+c6 = -0.9484024 * 1e-12
+c7 = 4.1635019
+c8 = -5800.2206
+c9 = 1.3914993
+c10 = -0.048640239
+c11 = 0.41764768 * 1e-4
+c12 = -0.14452093 * 1e-7
+c13 = 6.5459673
 
 
 def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
@@ -105,37 +119,22 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     """
 
     ta_k = tdb + c_to_k
-    c1 = -5674.5359
-    c2 = 6.3925247
-    c3 = -0.9677843 * 1e-2
-    c4 = 0.62215701 * 1e-6
-    c5 = 0.20747825 * 1e-8
-    c6 = -0.9484024 * 1e-12
-    c7 = 4.1635019
-    c8 = -5800.2206
-    c9 = 1.3914993
-    c10 = -0.048640239
-    c11 = 0.41764768 * 1e-4
-    c12 = -0.14452093 * 1e-7
-    c13 = 6.5459673
-
+    # pre-calculate the value before passing it to .where
+    log_ta_k = np.log(ta_k)
     pascals = np.where(
         ta_k < c_to_k,
         np.exp(
             c1 / ta_k
             + c2
             + ta_k * (c3 + ta_k * (c4 + ta_k * (c5 + c6 * ta_k)))
-            + c7 * np.log(ta_k)
+            + c7 * log_ta_k
         ),
         np.exp(
-            c8 / ta_k
-            + c9
-            + ta_k * (c10 + ta_k * (c11 + ta_k * c12))
-            + c13 * np.log(ta_k)
+            c8 / ta_k + c9 + ta_k * (c10 + ta_k * (c11 + ta_k * c12)) + c13 * log_ta_k
         ),
     )
 
-    return np.around(pascals, 1)
+    return pascals
 
 
 @dataclass

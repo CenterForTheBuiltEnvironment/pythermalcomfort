@@ -2,38 +2,54 @@ import pytest
 import json
 import requests
 import numpy as np
+from enum import Enum
 
 # The conftest.py file serves as a means of providing fixtures for an entire directory.
 # Fixtures defined in a conftest.py can be used by any test in that package
 # without needing to import them (pytest will automatically discover them).
 
 
-unit_test_data_prefix = "https://raw.githubusercontent.com/TwinGan/validation-data-comfort-models/release_v1.0/"
-test_adaptive_en_url = unit_test_data_prefix + "ts_adaptive_en.json"
-test_adaptive_ashrae_url = unit_test_data_prefix + "ts_adaptive_ashrae.json"
-test_a_pmv_url = unit_test_data_prefix + "ts_a_pmv.json"
-test_two_nodes_url = unit_test_data_prefix + "ts_two_nodes.json"
-test_solar_gain_url = unit_test_data_prefix + "ts_solar_gain.json"
-test_ankle_draft_url = unit_test_data_prefix + "ts_ankle_draft.json"
-test_phs_url = unit_test_data_prefix + "ts_phs.json"
-test_e_pmv_url = unit_test_data_prefix + "ts_e_pmv.json"
-test_at_url = unit_test_data_prefix + "ts_at.json"
-test_athb_url = unit_test_data_prefix + "ts_athb.json"
-test_clo_tout_url = unit_test_data_prefix + "ts_clo_tout.json"
-test_cooling_effect_url = unit_test_data_prefix + "ts_cooling_effect.json"
-test_vertical_tmp_grad_ppd_url = unit_test_data_prefix + "ts_vertical_tmp_grad_ppd.json"
-test_wbgt_url = unit_test_data_prefix + "ts_wbgt.json"
-test_heat_index_url = unit_test_data_prefix + "ts_heat_index.json"
-test_net_url = unit_test_data_prefix + "ts_net.json"
-test_pmv_pdd_url = unit_test_data_prefix + "ts_pmv_pdd.json"
-test_pmv_url = unit_test_data_prefix + "ts_pmv.json"
-test_set_url = unit_test_data_prefix + "ts_set.json"
-test_humidex_url = unit_test_data_prefix + "ts_humidex.json"
-test_use_fans_heatwaves_url = unit_test_data_prefix + "ts_use_fans_heatwaves.json"
-test_utci_url = unit_test_data_prefix + "ts_utci.json"
-test_wind_chill_url = unit_test_data_prefix + "ts_wind_chill.json"
-test_pet_steady_url = unit_test_data_prefix + "ts_pet_steady.json"
-test_discomfort_index_url = unit_test_data_prefix + "ts_discomfort_index.json"
+unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/"
+
+
+class Urls(Enum):
+    ADAPTIVE_EN = "ts_adaptive_en.json"
+    ADAPTIVE_ASHRAE = "ts_adaptive_ashrae.json"
+    A_PMV = "ts_a_pmv.json"
+    TWO_NODES = "ts_two_nodes.json"
+    SOLAR_GAIN = "ts_solar_gain.json"
+    ANKLE_DRAFT = "ts_ankle_draft.json"
+    PHS = "ts_phs.json"
+    E_PMV = "ts_e_pmv.json"
+    AT = "ts_at.json"
+    ATHB = "ts_athb.json"
+    CLO_TOUT = "ts_clo_tout.json"
+    COOLING_EFFECT = "ts_cooling_effect.json"
+    VERTICAL_TMP_GRAD_PPD = "ts_vertical_tmp_grad_ppd.json"
+    WBGT = "ts_wbgt.json"
+    HEAT_INDEX = "ts_heat_index.json"
+    NET = "ts_net.json"
+    PMV_PPD = "ts_pmv_ppd.json"
+    PMV = "ts_pmv.json"
+    SET = "ts_set.json"
+    HUMIDEX = "ts_humidex.json"
+    USE_FANS_HEATWAVES = "ts_use_fans_heatwaves.json"
+    UTCI = "ts_utci.json"
+    WIND_CHILL = "ts_wind_chill.json"
+    PET_STEADY = "ts_pet_steady.json"
+    DISCOMFORT_INDEX = "ts_discomfort_index.json"
+
+
+@pytest.fixture
+def get_test_url():
+    def _get_test_url(model_name):
+        try:
+            return unit_test_data_prefix + Urls[model_name.upper()].value
+        except KeyError:
+            return ""
+
+    return _get_test_url
+
 
 @pytest.fixture
 def retrieve_data():
@@ -51,145 +67,65 @@ def retrieve_data():
     return _retrieve_data
 
 
-@pytest.fixture
-def is_equal():
-    def compare(a, b):
-        if isinstance(a, np.ndarray):
-            if not isinstance(b, np.ndarray):
-                b = np.array(b, dtype=a.dtype)
-            if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
-                return np.array_equal(a, b)
-            else:
-                b = np.where(b == None, np.nan, b)  # Replace None with np.nan
-                # Return True if arrays are close enough, including handling of NaN values
-                return np.allclose(a, b, equal_nan=True)
-        elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
-            return True
+def is_equal(a, b, tolerance=1e-6):
+    if isinstance(a, np.ndarray):
+        if not isinstance(b, np.ndarray):
+            b = np.array(b, dtype=a.dtype)
+        if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
+            return np.array_equal(a, b)
         else:
-            return a == b
-
-    return compare
-
-
-@pytest.fixture
-def get_adaptive_en_url():
-    return test_adaptive_en_url
-
-
-@pytest.fixture
-def get_adaptive_ashrae_url():
-    return test_adaptive_ashrae_url
+            b = np.where(b is None, np.nan, b)  # Replace None with np.nan
+            # Return True if arrays are close enough, including handling of NaN values
+            return np.allclose(a, b, atol=tolerance, equal_nan=True)
+    elif (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
+        return True
+    elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        # Compare scalar values with tolerance
+        return np.isclose(a, b, atol=tolerance)
+    else:
+        return a == b
 
 
-@pytest.fixture
-def get_a_pmv_url():
-    return test_a_pmv_url
+def retrieve_reference_table(get_test_url, retrieve_data, url_name):
+    reference_table = retrieve_data(get_test_url(url_name))
+    if reference_table is None:
+        pytest.fail(f"Failed to retrieve reference table for {url_name.lower()}")
+    return reference_table
 
 
-@pytest.fixture
-def get_two_nodes_url():
-    return test_two_nodes_url
+def validate_result(result, expected_output, tolerance: dict):
+    """
 
+    Parameters
+    ----------
+    result this is the result of the function that is being tested
+    expected_output this is the expected output of the function that is being tested
+    tolerance this is the tolerance that is used to compare the result with the expected output
 
-@pytest.fixture
-def get_solar_gain_url():
-    return test_solar_gain_url
+    Returns
+    -------
+    None
 
+    """
 
-@pytest.fixture
-def get_ankle_draft_url():
-    return test_ankle_draft_url
+    for key in expected_output:
+        _expected_output = expected_output[key]
 
+        # some functions return a dictionary or class with multiple values while others return a single value
+        # todo remove this once all the functions return a dictionary or class
+        try:
+            _result = result[key]
+        except (IndexError, KeyError, TypeError):
+            _result = result
 
-@pytest.fixture
-def get_phs_url():
-    return test_phs_url
+        # if the key is not in the tolerance dictionary we set the tolerance to 1e-6
+        if key in tolerance:
+            _tolerance = tolerance[key]
+        else:
+            _tolerance = 1e-6
 
-
-@pytest.fixture
-def get_vertical_tmp_grad_ppd_url():
-    return test_vertical_tmp_grad_ppd_url
-
-
-@pytest.fixture
-def get_humidex_url():
-    return test_humidex_url
-
-
-@pytest.fixture
-def get_wbgt_url():
-    return test_wbgt_url
-
-
-@pytest.fixture
-def get_e_pmv_url():
-    return test_e_pmv_url
-
-
-@pytest.fixture
-def get_at_url():
-    return test_at_url
-
-
-@pytest.fixture
-def get_athb_url():
-    return test_athb_url
-
-
-@pytest.fixture
-def get_clo_tout_url():
-    return test_clo_tout_url
-
-
-@pytest.fixture
-def get_cooling_effect_url():
-    return test_cooling_effect_url
-
-
-@pytest.fixture
-def get_heat_index_url():
-    return test_heat_index_url
-
-
-@pytest.fixture
-def get_net_url():
-    return test_net_url
-
-
-@pytest.fixture
-def get_pmv_pdd_url():
-    return test_pmv_pdd_url
-
-
-@pytest.fixture
-def get_pmv_url():
-    return test_pmv_url
-
-
-@pytest.fixture
-def get_set_url():
-    return test_set_url
-
-
-@pytest.fixture
-def get_use_fans_heatwaves_url():
-    return test_use_fans_heatwaves_url
-
-
-@pytest.fixture
-def get_utci_url():
-    return test_utci_url
-
-
-@pytest.fixture
-def get_wind_chill_url():
-    return test_wind_chill_url
-
-
-@pytest.fixture
-def get_pet_steady_url():
-    return test_pet_steady_url
-
-@pytest.fixture
-def get_discomfort_index_url():
-    return test_discomfort_index_url
+        try:
+            assert is_equal(_result, _expected_output, _tolerance)
+        except Exception as e:
+            print(f"Expected {_expected_output}, got {_result}\nError: {str(e)}")
+            raise

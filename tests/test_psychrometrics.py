@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from pythermalcomfort.psychrometrics import (
     t_dp,
@@ -10,6 +11,7 @@ from pythermalcomfort.psychrometrics import (
     t_o,
     PsychrometricValues,
 )
+from tests.conftest import is_equal
 
 
 def test_t_dp():
@@ -24,18 +26,18 @@ def test_t_wb():
 
 
 def test_enthalpy():
-    assert enthalpy(25, 0.01) == 50561.25
-    assert enthalpy(27.1, 0.01) == 52707.56
+    assert is_equal(enthalpy(25, 0.01), 50561.25, 0.1)
+    assert is_equal(enthalpy(27.1, 0.01), 52707.56, 0.1)
 
 
 def test_psy_ta_rh():
     assert psy_ta_rh(25, 50, p_atm=101325) == PsychrometricValues(
-        p_sat=3169.2,
-        p_vap=1584.6,
-        hr=0.009881547577511219,
+        p_sat=pytest.approx(3169.2, abs=1e-1),
+        p_vap=pytest.approx(1584.6, abs=1e-1),
+        hr=pytest.approx(0.009881547577511219, abs=1e-7),
         t_wb=18.0,
         t_dp=13.8,
-        h=50259.66,
+        h=pytest.approx(50259.79, abs=1e-1),
     )
 
 
@@ -50,8 +52,8 @@ def test_t_o():
 
 
 def test_p_sat():
-    assert (p_sat(tdb=25)) == 3169.2
-    assert (p_sat(tdb=50)) == 12349.9
+    assert pytest.approx(p_sat(tdb=25), abs=1e-1) == 3169.2
+    assert pytest.approx(p_sat(tdb=50), abs=1e-1) == 12349.9
 
 
 def test_t_mrt():

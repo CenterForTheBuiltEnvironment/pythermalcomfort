@@ -1,32 +1,29 @@
-import pytest
 from pythermalcomfort.models import vertical_tmp_grad_ppd
+from tests.conftest import Urls, retrieve_reference_table, validate_result
+import pytest
 
 
-def test_vertical_tmp_grad_ppd(get_vertical_tmp_grad_ppd_url, retrieve_data):
-    test_data = retrieve_data(get_vertical_tmp_grad_ppd_url)
+def test_vertical_tmp_grad_ppd(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.VERTICAL_TMP_GRAD_PPD.name
+    )
+    tolerance = reference_table["tolerance"]
 
-    if test_data is None:
-        pytest.skip("Failed to retrieve test data")
-
-    for case in test_data.get("data", []):
-        inputs = case["inputs"]
-        expected_outputs = case["outputs"]
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
         result = vertical_tmp_grad_ppd(
-            inputs["tdb"],
-            inputs["tr"],
-            inputs["v"],
-            inputs["rh"],
-            inputs["met"],
-            inputs["clo"],
-            inputs["delta_t"],
+            tdb=inputs["tdb"],
+            tr=inputs["tr"],
+            vr=inputs["vr"],
+            rh=inputs["rh"],
+            met=inputs["met"],
+            clo=inputs["clo"],
+            vertical_tmp_grad=inputs["delta_t"],
             units=inputs.get("units", "SI"),
         )
 
-        for key, expected_value in expected_outputs.items():
-            if isinstance(expected_value, float):
-                assert round(result[key], 1) == round(expected_value, 1)
-            else:
-                assert result[key] == expected_value
+        validate_result(result, outputs, tolerance)
 
     # Test for ValueError
     with pytest.raises(ValueError):

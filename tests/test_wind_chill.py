@@ -1,28 +1,23 @@
 from pythermalcomfort.models import wc
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 import pytest
 
 
-class TestWc:
+def test_calculates_wci(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.WIND_CHILL.name
+    )
+    tolerance = reference_table["tolerance"]
 
-    #  Calculates the wind chill index (WCI) for given dry bulb air temperature and wind speed
-    def test_calculates_wci(self, get_wind_chill_url, retrieve_data, is_equal):
-        reference_table = retrieve_data(get_wind_chill_url)
-        for entry in reference_table["data"]:
-            inputs = entry["inputs"]
-            outputs = entry["outputs"]
-            result = wc(**inputs)
-            for key in outputs:
-                # Use the custom is_equal for other types
-                try:
-                    if(inputs.get("round", True)):
-                        assert is_equal(result[key], outputs[key])
-                    else:
-                        assert abs(result["wci"] - 518.587) < 0.01
-                except AssertionError as e:
-                    print(
-                        f"Assertion failed for {key}. Expected {outputs[key]}, got {result[key]}, inputs={inputs}\nError: {str(e)}"
-                    )
-                    raise
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = wc(**inputs)
+
+        validate_result(result, outputs, tolerance)
+
+
+class TestWc:
 
     #  Returns the WCI value in a dictionary format
     def test_returns_wci_dictionary(self):

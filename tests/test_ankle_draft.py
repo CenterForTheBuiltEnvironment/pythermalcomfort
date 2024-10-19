@@ -1,22 +1,66 @@
 import pytest
+import numpy as np
 from pythermalcomfort.models import ankle_draft
+from pythermalcomfort.models.ankle_draft import AnkleDraft
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
-def test_ankle_draft(get_ankle_draft_url, retrieve_data):
-    test_data = retrieve_data(get_ankle_draft_url)
-    
-    if test_data is None:
-        pytest.skip("Failed to retrieve test data")
 
-    # Tests using data from URL
-    for case in test_data.get("data", []):
-        inputs = case["inputs"]
-        expected_output = case["outputs"]["PPD_ad"]
-        result = ankle_draft(
-            inputs["tdb"], inputs["tr"], inputs["v"], inputs["rh"],
-            inputs["met"], inputs["clo"], inputs["v_ankle"], units=inputs["units"]
-        )
-        assert round(result["PPD_ad"], 1) == round(expected_output, 1)
+def test_ankle_draft(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.ANKLE_DRAFT.name
+    )
+    tolerance = reference_table["tolerance"]
 
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = ankle_draft(**inputs)
+
+        validate_result(result, outputs, tolerance)
+
+
+def test_ankle_draft_invalid_input_range():
     # Test for ValueError
     with pytest.raises(ValueError):
         ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, 7)
+    # Test for ValueError
+    with pytest.raises(ValueError):
+        ankle_draft(25, 25, 0.3, 50, 1.2, 0.5, [0.1, 0.2, 0.3, 0.4])
+
+
+def test_ankle_draft_outside_ashrae_range():
+    r = ankle_draft(50, 25, 0.1, 50, 1.2, 0.5, 0.1)
+    assert np.isnan(r.PPD_ad)
+
+    r = ankle_draft([50, 45], 25, 0.1, 50, 1.2, 0.5, 0.1)
+    assert np.all(np.isnan(r.PPD_ad))
+
+
+def test_ankle_draft_list_inputs():
+    results = ankle_draft(
+        tdb=[25, 26, 27],
+        tr=[25, 26, 27],
+        vr=[0.1, 0.1, 0.1],
+        rh=[50, 50, 50],
+        met=[1.2, 1.2, 1.2],
+        clo=[0.5, 0.5, 0.5],
+        v_ankle=[0.1, 0.1, 0.1],
+        units="SI",
+    )
+    assert isinstance(results, AnkleDraft)
+    assert len(results.PPD_ad) == 3
+    assert len(results.Acceptability) == 3
+
+
+def test_ankle_draft_invalid_list_inputs():
+    with pytest.raises(TypeError):
+        ankle_draft(
+            tdb=[25, "invalid", 27],
+            tr=[25, 26, 27],
+            vr=[0.1, 0.1, 0.1],
+            rh=[50, 50, 50],
+            met=[1.2, 1.2, 1.2],
+            clo=[0.5, 0.5, 0.5],
+            v_ankle=[0.1, 0.1, 0.1],
+            units="SI",
+        )
