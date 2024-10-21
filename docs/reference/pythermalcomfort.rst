@@ -107,6 +107,9 @@ Normal Effective Temperature (NET)
 
 .. autofunction:: pythermalcomfort.models.net.net
 
+.. autoclass:: pythermalcomfort.models.net.Net
+    :members:
+
 Predicted Heat Strain (PHS) Index
 ---------------------------------
 
