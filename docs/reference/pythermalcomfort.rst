@@ -83,6 +83,9 @@ Heat Index (HI)
 
 .. autofunction:: pythermalcomfort.models.heat_index.heat_index
 
+.. autoclass:: pythermalcomfort.models.heat_index.HeatIndex
+    :members:
+
 Humidex
 -------
 
