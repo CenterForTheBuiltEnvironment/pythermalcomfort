@@ -1,6 +1,6 @@
 from pythermalcomfort.models.heat_index import heat_index
 from pythermalcomfort.models.pet_steady import pet_steady
-from pythermalcomfort.models.wc import wc
+from pythermalcomfort.models.wci import wci
 from pythermalcomfort.models.humidex import humidex
 from pythermalcomfort.models.at import at
 from pythermalcomfort.models.solar_gain import solar_gain

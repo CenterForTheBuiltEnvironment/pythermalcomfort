@@ -168,7 +168,10 @@ Wet Bulb Globe Temperature Index (WBGT)
 Wind chill index
 ----------------
 
-.. autofunction:: pythermalcomfort.models.wc.wc
+.. autofunction:: pythermalcomfort.models.wci.wci
+
+.. autoclass:: pythermalcomfort.models.wci.WCI
+    :members:
 
 Psychrometrics functions
 ========================
