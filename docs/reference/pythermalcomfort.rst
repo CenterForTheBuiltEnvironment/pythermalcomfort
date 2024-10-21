@@ -91,6 +91,9 @@ Humidex
 
 .. autofunction:: pythermalcomfort.models.humidex.humidex
 
+.. autoclass:: pythermalcomfort.models.humidex.Humidex
+    :members:
+
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 

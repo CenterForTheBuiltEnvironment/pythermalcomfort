@@ -111,3 +111,11 @@ def heat_index(
         hi = np.around(hi, 1)
 
     return HeatIndex(hi=hi)
+
+
+if __name__ == "__main__":
+    result = heat_index(tdb=25, rh=50)
+    print(result.hi)  # 25.9
+
+    result = heat_index(tdb=[25, 30], rh=[50, 60], units="IP", round_output=False)
+    print(result.hi)  # [78.6, 86.7]
