@@ -12,16 +12,7 @@ def test_vertical_tmp_grad_ppd(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = vertical_tmp_grad_ppd(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            vr=inputs["vr"],
-            rh=inputs["rh"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-            vertical_tmp_grad=inputs["delta_t"],
-            units=inputs.get("units", "SI"),
-        )
+        result = vertical_tmp_grad_ppd(**inputs)
 
         validate_result(result, outputs, tolerance)
 
