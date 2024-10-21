@@ -72,6 +72,9 @@ Discomfort Index (DI)
 
 .. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
 
+.. autoclass:: pythermalcomfort.models.discomfort_index.DiscomfortIndex
+    :members:
+
 Heat Index (HI)
 ---------------
 
