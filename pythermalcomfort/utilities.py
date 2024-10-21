@@ -39,6 +39,7 @@ class BaseInputs:
     round_output: bool = field(default=True)
     units: str = field(default="SI")
     a_coefficient: Union[float, int] = field(default=None)
+    e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
     t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
     q: Union[float, int, np.ndarray, list] = field(default=None)
@@ -64,6 +65,8 @@ class BaseInputs:
             validate_type(self.clo, "clo", (float, int, np.ndarray, list))
         if self.a_coefficient is not None:
             validate_type(self.a_coefficient, "a_coefficient", (float, int))
+        if self.e_coefficient is not None:
+            validate_type(self.e_coefficient, "e_coefficient", (float, int))
         if self.wme is not None:
             validate_type(self.wme, "wme", (float, int, np.ndarray, list))
         if self.v_ankle is not None:

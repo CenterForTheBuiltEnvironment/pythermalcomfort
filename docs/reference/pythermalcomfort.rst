@@ -38,6 +38,9 @@ Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 
 .. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
 
+.. autoclass:: pythermalcomfort.models.e_pmv.EPMV
+    :members:
+
 Apparent Temperature (AT)
 -------------------------
 
