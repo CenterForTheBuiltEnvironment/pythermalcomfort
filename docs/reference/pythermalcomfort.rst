@@ -123,6 +123,9 @@ Physiological Equivalent Temperature (PET)
 
 .. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
 
+.. autoclass:: pythermalcomfort.models.pet_steady.PETSteady
+    :members:
+
 Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 ------------------------------------------------------------------------
 
