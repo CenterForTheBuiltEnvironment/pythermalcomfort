@@ -115,7 +115,7 @@ def pet_steady(
     p_atm : float or list of floats, optional
         Atmospheric pressure, [hPa]. Defaults to 1013.25.
     position : str or list of str, optional
-        Position of the person "sitting", "standing", "lying". Defaults to "standing".
+        Position of the person "sitting", "standing", "standing, forced convection". Defaults to "sitting".
     age : int or list of ints, optional
         Age of the person. Defaults to 23.
     sex : str or list of str, optional
