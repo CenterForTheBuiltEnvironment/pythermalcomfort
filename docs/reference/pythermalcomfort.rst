@@ -118,6 +118,9 @@ Predicted Heat Strain (PHS) Index
 
 .. autofunction:: pythermalcomfort.models.phs.phs
 
+.. autoclass:: pythermalcomfort.models.phs.PHS
+    :members:
+
 Physiological Equivalent Temperature (PET)
 ------------------------------------------
 

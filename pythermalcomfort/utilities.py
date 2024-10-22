@@ -50,6 +50,7 @@ class BaseInputs:
     height: Union[float, int, np.ndarray, list] = field(default=None)
     position: Union[str, np.ndarray, list] = field(default=None)
     sex: Union[str, np.ndarray, list] = field(default=None)
+    posture: Union[str, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         # Only validate attributes that are not None
@@ -62,6 +63,11 @@ class BaseInputs:
             ]:
                 raise ValueError(
                     "position must be either 'standing', 'sitting', or 'standing, forced convection'"
+                )
+        if self.posture is not None:
+            if self.posture.lower() not in ["sitting", "standing", "crouching"]:
+                raise ValueError(
+                    "posture must be either 'sitting', 'standing', or 'crouching'"
                 )
         if self.sex is not None:
             if self.sex.lower() not in ["male", "female"]:
