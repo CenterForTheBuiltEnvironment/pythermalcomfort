@@ -241,12 +241,3 @@ if __name__ == "__main__":
         clo=[0.5],
     )
     print(ce)
-
-    tdb = 20
-    tr = 20
-    vr = 0.1
-    rh = 50
-    met = 1.1
-    clo = 0.5
-    ce = cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo)
-    print(ce)

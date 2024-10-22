@@ -1,11 +1,9 @@
+from dataclasses import dataclass
+from typing import Union, List
+
 import numpy as np
-from typing import Union, List
 
-from dataclasses import dataclass
-from typing import Union, List
 from pythermalcomfort.utilities import BaseInputs
-
-from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
