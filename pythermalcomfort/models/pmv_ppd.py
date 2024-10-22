@@ -190,7 +190,7 @@ def pmv_ppd(
     if standard == "ashrae":
         ce = np.where(
             vr > 0.1,
-            np.vectorize(cooling_effect, cache=True)(tdb, tr, vr, rh, met, clo, wme),
+            cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, wme=wme).ce,
             0.0,
         )
 

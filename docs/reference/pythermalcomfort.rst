@@ -70,6 +70,9 @@ Cooling Effect (CE)
 
 .. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
 
+.. autoclass:: pythermalcomfort.models.cooling_effect.CoolingEffect
+    :members:
+
 Discomfort Index (DI)
 ---------------------
 

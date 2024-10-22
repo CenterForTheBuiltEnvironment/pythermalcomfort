@@ -1,22 +1,68 @@
 import warnings
-from typing import Union, Literal
+from dataclasses import dataclass
+from typing import Union, List, Literal
 
+import numpy as np
 from scipy import optimize
 
 from pythermalcomfort.models.set_tmp import set_tmp
+from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import units_converter
 
 
+@dataclass(frozen=True)
+class CoolingEffect:
+    """
+    Dataclass to represent the Cooling Effect (CE).
+
+    Attributes
+    ----------
+    ce : float or list of floats
+        Cooling Effect value.
+    """
+
+    ce: Union[float, List[float]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class CoolingEffectInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        wme,
+        units,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            vr=vr,
+            rh=rh,
+            met=met,
+            clo=clo,
+            wme=wme,
+            units=units,
+        )
+
+
 def cooling_effect(
-    tdb: Union[float, int],
-    tr: Union[float, int],
-    vr: Union[float, int],
-    rh: Union[float, int],
-    met: Union[float, int],
-    clo: Union[float, int],
-    wme: Union[float, int] = 0,
+    tdb: Union[float, List[float]],
+    tr: Union[float, List[float]],
+    vr: Union[float, List[float]],
+    rh: Union[float, List[float]],
+    met: Union[float, List[float]],
+    clo: Union[float, List[float]],
+    wme: Union[float, List[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
-) -> float:
+) -> CoolingEffect:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
@@ -28,14 +74,17 @@ def cooling_effect(
 
     Parameters
     ----------
-    tdb : float
-        Dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'.
-    tr : float
-        Mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'.
-    vr : float
-        Relative air speed, default in [m/s] in [fps] if `units` = 'IP'.
+    tdb : float or list of floats
+        Dry bulb air temperature, default in [°C] or [°F] if `units` = 'IP'.
+    tr : float or list of floats
+        Mean radiant temperature, default in [°C] or [°F] if `units` = 'IP'.
+    vr : float or list of floats
+        Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
         .. note::
+            The cooling effect is calculated only for air speed higher than 0.1 m/s. If the air speed is lower than 0.1 m/s the function will return 0.
+
+        .. warning::
             vr is the relative air speed caused by body movement and not the air
             speed measured by the air speed sensor. The relative air speed is the sum of the
             average air speed measured by the sensor plus the activity-generated air speed
@@ -43,14 +92,14 @@ def cooling_effect(
             individual body parts. vr can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.v_relative`.
 
-    rh : float
+    rh : float or list of floats
         Relative humidity, [%].
-    met : float
+    met : float or list of floats
         Metabolic rate, [met].
-    clo : float
+    clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. note::
+        .. warning::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
             the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
@@ -59,7 +108,7 @@ def cooling_effect(
             can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
 
-    wme : float, optional
+    wme : float or list of floats, optional
         External work, [met]. Defaults to 0.
     units : {'SI', 'IP'}, optional
         Select the SI (International System of Units) or the IP (Imperial Units) system.
@@ -67,13 +116,9 @@ def cooling_effect(
 
     Returns
     -------
-    float
-        The Cooling Effect value.
-
-    Raises
-    ------
-    ValueError
-        If the cooling effect could not be calculated.
+    CoolingEffect
+        A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.models.cooling_effect.CoolingEffect` for more details.
+        To access the `ce` value, use the `ce` attribute of the returned `CoolingEffect` instance, e.g., `result.ce`.
 
     Notes
     -----
@@ -88,21 +133,59 @@ def cooling_effect(
         from pythermalcomfort.models import cooling_effect
 
         result = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
-        print(result)  # 1.68
+        print(result.ce)  # 1.68
 
-        result = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
-        print(result)  # 3.95
+        result = cooling_effect(tdb=[25, 77], tr=[25, 77], vr=[0.3, 1.64], rh=[50, 50], met=[1.2, 1], clo=[0.5, 0.6], units="IP")
+        print(result.ce)  # [0, 3.95]
     """
+
+    # Validate inputs using the CoolingEffectInputs class
+    CoolingEffectInputs(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        units=units,
+    )
+
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
-    if vr <= 0.1:
-        return 0.0
-
     still_air_threshold = 0.1
 
-    warnings.simplefilter("ignore")
+    ce = _cooling_effect_vectorised(
+        tdb=tdb,
+        tr=tr,
+        still_air_threshold=still_air_threshold,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        vr=vr,
+    )
+
+    if units.lower() == "ip":
+        ce = ce / 1.8 * 3.28
+
+    return CoolingEffect(ce=np.around(ce, 2))
+
+
+@np.vectorize
+def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, vr):
+
+    if vr <= 0.1:
+        return 0.0
 
     initial_set_tmp = set_tmp(
         tdb=tdb,
@@ -120,8 +203,8 @@ def cooling_effect(
     def function(x):
         return (
             set_tmp(
-                tdb - x,
-                tr - x,
+                tdb=tdb - x,
+                tr=tr - x,
                 v=still_air_threshold,
                 rh=rh,
                 met=met,
@@ -137,26 +220,33 @@ def cooling_effect(
     try:
         ce = optimize.brentq(function, 0.0, 40)
     except ValueError:
-        ce = 0
+        ce = 0.0
 
-    warnings.simplefilter("always")
-
-    if ce == 0:
+    if ce == 0.0:
         warnings.warn(
-            "Assuming cooling effect = 0 since it could not be calculated for this set"
-            f" of inputs {tdb=}, {tr=}, {rh=}, {vr=}, {clo=}, {met=}",
+            "Cooling effect could not be calculated. Returning 0.",
             UserWarning,
         )
 
-    if units.lower() == "ip":
-        ce = ce / 1.8 * 3.28
-
-    return round(ce, 2)
+    return ce
 
 
 if __name__ == "__main__":
-    ce = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
+    ce = cooling_effect(
+        tdb=40,
+        tr=[40],
+        vr=[1, 0.2, 0.1, 0.05],
+        rh=[50],
+        met=[1.1],
+        clo=[0.5],
+    )
     print(ce)
 
-    ce = cooling_effect(tdb=77, tr=77, vr=1.64, rh=50, met=1, clo=0.6, units="IP")
+    tdb = 20
+    tr = 20
+    vr = 0.1
+    rh = 50
+    met = 1.1
+    clo = 0.5
+    ce = cooling_effect(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo)
     print(ce)
