@@ -24,28 +24,71 @@ def test_value_acclimatized():
             tr=40,
             rh=33.85,
             v=0.3,
-            met=150,
+            met=2.58,
             clo=0.5,
-            posture=2,
+            posture="standing",
             acclimatized=101,
         )
 
     with pytest.raises(ValueError):
         phs(
-            tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, acclimatized=-1
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.58,
+            clo=0.5,
+            posture="standing",
+            acclimatized=-1,
         )
 
 
 def test_value_weight():
     with pytest.raises(ValueError):
-        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, weight=1001)
+        phs(
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.58,
+            clo=0.5,
+            posture="standing",
+            weight=1001,
+        )
 
     with pytest.raises(ValueError):
-        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, weight=0)
+        phs(
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.58,
+            clo=0.5,
+            posture="standing",
+            weight=0,
+        )
 
 
 def test_value_drink():
     with pytest.raises(ValueError):
-        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, drink=0.5)
+        phs(
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.58,
+            clo=0.5,
+            posture="standing",
+            drink=0.5,
+        )
     with pytest.raises(ValueError):
-        phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, drink=2)
+        phs(
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.58,
+            clo=0.5,
+            posture="standing",
+            drink=2,
+        )

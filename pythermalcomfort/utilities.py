@@ -39,15 +39,39 @@ class BaseInputs:
     round_output: bool = field(default=True)
     units: str = field(default="SI")
     a_coefficient: Union[float, int] = field(default=None)
+    e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
     t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
     q: Union[float, int, np.ndarray, list] = field(default=None)
     tout: Union[float, int, np.ndarray, list] = field(default=None)
+    p_atm: Union[float, int, np.ndarray, list] = field(default=101325)
+    age: Union[float, int, np.ndarray, list] = field(default=None)
+    weight: Union[float, int, np.ndarray, list] = field(default=None)
+    height: Union[float, int, np.ndarray, list] = field(default=None)
+    position: Union[str, np.ndarray, list] = field(default=None)
+    sex: Union[str, np.ndarray, list] = field(default=None)
+    posture: Union[str, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         # Only validate attributes that are not None
         validate_units(self.units)
-
+        if self.position is not None:
+            if self.position.lower() not in [
+                "sitting",
+                "standing",
+                "standing, forced convection",
+            ]:
+                raise ValueError(
+                    "position must be either 'standing', 'sitting', or 'standing, forced convection'"
+                )
+        if self.posture is not None:
+            if self.posture.lower() not in ["sitting", "standing", "crouching"]:
+                raise ValueError(
+                    "posture must be either 'sitting', 'standing', or 'crouching'"
+                )
+        if self.sex is not None:
+            if self.sex.lower() not in ["male", "female"]:
+                raise ValueError("sex must be either 'male' or 'female'")
         if self.tdb is not None:
             validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
         if self.tr is not None:
@@ -64,6 +88,8 @@ class BaseInputs:
             validate_type(self.clo, "clo", (float, int, np.ndarray, list))
         if self.a_coefficient is not None:
             validate_type(self.a_coefficient, "a_coefficient", (float, int))
+        if self.e_coefficient is not None:
+            validate_type(self.e_coefficient, "e_coefficient", (float, int))
         if self.wme is not None:
             validate_type(self.wme, "wme", (float, int, np.ndarray, list))
         if self.v_ankle is not None:
@@ -78,6 +104,14 @@ class BaseInputs:
             raise TypeError("round must be either True or False.")
         if self.tout is not None:
             validate_type(self.tout, "tout", (float, int, np.ndarray, list))
+        if self.p_atm is not None:
+            validate_type(self.p_atm, "p_atm", (float, int, np.ndarray, list))
+        if self.age is not None:
+            validate_type(self.age, "age", (float, int, np.ndarray, list))
+        if self.weight is not None:
+            validate_type(self.weight, "weight", (float, int, np.ndarray, list))
+        if self.height is not None:
+            validate_type(self.height, "height", (float, int, np.ndarray, list))
 
 
 def transpose_sharp_altitude(sharp, altitude):

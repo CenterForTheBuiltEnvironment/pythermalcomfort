@@ -38,6 +38,9 @@ Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 
 .. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
 
+.. autoclass:: pythermalcomfort.models.e_pmv.EPMV
+    :members:
+
 Apparent Temperature (AT)
 -------------------------
 
@@ -67,20 +70,32 @@ Cooling Effect (CE)
 
 .. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
 
+.. autoclass:: pythermalcomfort.models.cooling_effect.CoolingEffect
+    :members:
+
 Discomfort Index (DI)
 ---------------------
 
 .. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
+
+.. autoclass:: pythermalcomfort.models.discomfort_index.DiscomfortIndex
+    :members:
 
 Heat Index (HI)
 ---------------
 
 .. autofunction:: pythermalcomfort.models.heat_index.heat_index
 
+.. autoclass:: pythermalcomfort.models.heat_index.HeatIndex
+    :members:
+
 Humidex
 -------
 
 .. autofunction:: pythermalcomfort.models.humidex.humidex
+
+.. autoclass:: pythermalcomfort.models.humidex.Humidex
+    :members:
 
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
@@ -95,15 +110,24 @@ Normal Effective Temperature (NET)
 
 .. autofunction:: pythermalcomfort.models.net.net
 
+.. autoclass:: pythermalcomfort.models.net.Net
+    :members:
+
 Predicted Heat Strain (PHS) Index
 ---------------------------------
 
 .. autofunction:: pythermalcomfort.models.phs.phs
 
+.. autoclass:: pythermalcomfort.models.phs.PHS
+    :members:
+
 Physiological Equivalent Temperature (PET)
 ------------------------------------------
 
 .. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
+
+.. autoclass:: pythermalcomfort.models.pet_steady.PETSteady
+    :members:
 
 Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 ------------------------------------------------------------------------
@@ -153,7 +177,10 @@ Wet Bulb Globe Temperature Index (WBGT)
 Wind chill index
 ----------------
 
-.. autofunction:: pythermalcomfort.models.wc.wc
+.. autofunction:: pythermalcomfort.models.wci.wci
+
+.. autoclass:: pythermalcomfort.models.wci.WCI
+    :members:
 
 Psychrometrics functions
 ========================

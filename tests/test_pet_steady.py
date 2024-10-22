@@ -35,9 +35,9 @@ PET_TEST_MATRIX = (
 @pytest.mark.parametrize("shape", ((10, 10), 10, (3, 3, 3)))
 @pytest.mark.parametrize(("tdb", "tr", "rh", "v", "met", "clo", "exp"), PET_TEST_MATRIX)
 def test_pet_array(shape, tdb, tr, rh, v, met, clo, exp):
-    tdb_arr = np.full(shape, tdb)
-    tr_arr = np.full(shape, tr)
-    rh_arr = np.full(shape, rh)
-    v_arr = np.full(shape, v)
-    res = pet_steady(tdb=tdb_arr, tr=tr_arr, rh=rh_arr, v=v_arr, met=met, clo=clo)
+    tdb_arr = list(np.full(shape, tdb))
+    tr_arr = list(np.full(shape, tr))
+    rh_arr = list(np.full(shape, rh))
+    v_arr = list(np.full(shape, v))
+    res = pet_steady(tdb=tdb_arr, tr=tr_arr, rh=rh_arr, v=v_arr, met=met, clo=clo).pet
     np.testing.assert_array_equal(actual=res, desired=np.full(shape, exp))
