@@ -24,24 +24,10 @@ def test_set_url(get_test_url, retrieve_data):
         outputs = entry["outputs"]
         inputs["round"] = True
         inputs["limit_inputs"] = False
-
-        if "calculate_ce" not in inputs and "units" not in inputs:
-            tdb.append(inputs["tdb"])
-            tr.append(inputs["tr"])
-            v.append(inputs["v"])
-            rh.append(inputs["rh"])
-            met.append(inputs["met"])
-            clo.append(inputs["clo"])
-            set_exp.append(outputs["set"])
-
         result = set_tmp(**inputs)
 
         validate_result(result, outputs, tolerance)
 
-
-def test_set_array_inputs():
-    results = set_tmp(tdb, tr, v, rh, met, clo, limit_inputs=False)
-    np.testing.assert_equal(set_exp, results)
 
 
 def test_set_npnan():

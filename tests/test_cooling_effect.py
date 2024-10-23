@@ -11,14 +11,6 @@ def test_cooling_effect(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = cooling_effect(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            rh=inputs["rh"],
-            vr=inputs["vr"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-            units=inputs.get("units", "SI"),
-        )
+        result = cooling_effect(**inputs)
 
         validate_result(result, outputs, tolerance)

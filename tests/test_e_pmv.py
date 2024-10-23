@@ -11,14 +11,6 @@ def test_e_pmv(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = e_pmv(
-            tdb=inputs["tdb"],
-            tr=inputs["tr"],
-            vr=inputs["vr"],
-            rh=inputs["rh"],
-            met=inputs["met"],
-            clo=inputs["clo"],
-            e_coefficient=inputs["e_coefficient"],
-        )
+        result = e_pmv(**inputs)
 
         validate_result(result, outputs, tolerance)
