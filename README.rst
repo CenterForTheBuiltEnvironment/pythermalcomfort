@@ -118,20 +118,23 @@ See file in `.github/workflows/` for more information.
 
 Test (For developers)
 =====================
-To run all the test cases with scripts_test_result.py script after any changes. The test cases come from `validation-data-comfort-models`_
+Run all the test cases with scripts_test_result.py after making any changes. The test cases come from an online repository.
 
 .. _validation-data-comfort-models: https://github.com/FedericoTartarini/validation-data-comfort-models
 
     ```bash
-    python ./tests/scripts_test_result.py [env]
+    python ./tests/scripts_test_result.py py311
     ```
-`env` is used to specify the Python version of test environment. It could be py39, py310, py311, py312. The scripts will call tox command and summarize test results into a markdown table. 
-The following markdown table will be updated once you run the scriput.
+
+You can also specify another version of Python like one of the following py39, py310, py311, py312.
+You must have this Python version installed in your system.
+The scripts will call tox command and summarize test results into a markdown table.
+The following markdown table will be updated once you run the script.
 
 ----------------------------
 | Test File                     | Result   |
 |:------------------------------|:---------|
-| test_a_pmv.py                 | PASSED   |
+| test_a_pmv.py                 | FAILED   |
 | test_adaptive_ashrae.py       | PASSED   |
 | test_adaptive_en.py           | PASSED   |
 | test_ankle_draft.py           | PASSED   |

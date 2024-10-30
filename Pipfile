@@ -15,6 +15,7 @@ pytest = "*"
 requests = "*"
 pandas = "*"
 pydantic = "*"
+tabulate = "*"
 
 [requires]
 python_version = "3.12"
