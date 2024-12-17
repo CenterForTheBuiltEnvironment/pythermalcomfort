@@ -157,7 +157,7 @@ def a_pmv(
         standard="ISO",
         units=units,
         limit_inputs=limit_inputs,
-    )
+    ).pmv
 
     pmv_value = np.around(_pmv / (1 + a_coefficient * _pmv), 2)
 

@@ -78,7 +78,7 @@ def vertical_tmp_grad_ppd(tdb, tr, vr, rh, met, clo, vertical_tmp_grad, units="S
     )
 
     tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
-    numerator = math.exp(0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
+    numerator = math.exp(0.13 * (tsv.pmv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = round((numerator / (1 + numerator) - 0.345) * 100, 1)
     acceptability = ppd_val <= 5
     return {"PPD_vg": ppd_val, "Acceptability": acceptability}

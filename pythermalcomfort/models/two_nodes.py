@@ -224,7 +224,7 @@ def two_nodes(
     for key in output.keys():
         # round the results if needed
         if kwargs["round"]:
-            output[key] = np.around(output[key], 3)
+            output[key] = np.around(output[key], 1)
 
     return output
 

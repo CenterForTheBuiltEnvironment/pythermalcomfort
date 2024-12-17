@@ -162,7 +162,7 @@ def ankle_draft(
             "This equation is only applicable for air speed lower than 0.2 m/s"
         )
 
-    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae")
+    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae").pmv
     ppd_val = np.around(
         np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)
         / (1 + np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv))

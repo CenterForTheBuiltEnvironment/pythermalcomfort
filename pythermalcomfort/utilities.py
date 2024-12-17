@@ -12,12 +12,6 @@ from pythermalcomfort.shared_functions import valid_range
 warnings.simplefilter("always")
 
 
-def validate_units(units: str) -> None:
-    """Validate the units parameter."""
-    if units.lower() not in ["si", "ip"]:
-        raise ValueError("Units must be either 'SI' or 'IP'")
-
-
 def validate_type(value, name: str, allowed_types: tuple):
     """Validate the type of a value against allowed types."""
     if not isinstance(value, allowed_types):
@@ -37,7 +31,10 @@ class BaseInputs:
     clo: Union[float, int, np.ndarray, list] = field(default=None)
     wme: Union[float, int, np.ndarray, list] = field(default=0)
     round_output: bool = field(default=True)
+    limit_inputs: bool = field(default=True)
+    airspeed_control: bool = field(default=True)
     units: str = field(default="SI")
+    standard: str = field(default="ISO")
     a_coefficient: Union[float, int] = field(default=None)
     e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
@@ -54,7 +51,10 @@ class BaseInputs:
 
     def __post_init__(self):
         # Only validate attributes that are not None
-        validate_units(self.units)
+        if self.units.lower() not in ["si", "ip"]:
+            raise ValueError("Units must be either 'SI' or 'IP'")
+        if self.standard.lower() not in ["ashrae", "iso"]:
+            raise ValueError("Standard must be either 'ASHRAE', 'ISO'")
         if self.position is not None:
             if self.position.lower() not in [
                 "sitting",
@@ -102,6 +102,10 @@ class BaseInputs:
             validate_type(self.q, "q", (float, int, np.ndarray, list))
         if not isinstance(self.round_output, bool):
             raise TypeError("round must be either True or False.")
+        if not isinstance(self.limit_inputs, bool):
+            raise TypeError("limit_inputs must be either True or False.")
+        if not isinstance(self.airspeed_control, bool):
+            raise TypeError("airspeed_control must be either True or False.")
         if self.tout is not None:
             validate_type(self.tout, "tout", (float, int, np.ndarray, list))
         if self.p_atm is not None:

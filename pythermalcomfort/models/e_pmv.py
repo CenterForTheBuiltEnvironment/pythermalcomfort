@@ -164,9 +164,9 @@ def e_pmv(
 
     default_kwargs = {"units": units, "limit_inputs": limit_inputs}
     met = np.array(met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs)
+    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs)
+    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
 
     epmv_value = np.around(_pmv * e_coefficient, 2)
 

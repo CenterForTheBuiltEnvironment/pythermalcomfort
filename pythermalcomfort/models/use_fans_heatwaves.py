@@ -4,7 +4,6 @@ from pythermalcomfort.models import two_nodes
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
-    body_surface_area,
 )
 
 

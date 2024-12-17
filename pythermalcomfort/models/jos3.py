@@ -450,7 +450,7 @@ class JOS3:
 
         # Main loop for finding PMV=0
         for i in range(max_iterations):
-            pmv_value = pmv(to, to, va, rh, met, clo)
+            pmv_value = pmv(to, to, va, rh, met, clo).pmv
 
             # Check for NaN and handle retries
             if np.isnan(pmv_value):
@@ -460,7 +460,7 @@ class JOS3:
                 for retry in range(retry_attempts):
                     adjustment_factor = retry_adjustment_factor
                     to = initial_to  # Reset to initial temperature for retry
-                    pmv_value = pmv(to, to, va, rh, met, clo)
+                    pmv_value = pmv(to, to, va, rh, met, clo).pmv
                     logger.info(
                         f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}"
                     )
