@@ -24,6 +24,8 @@ class BaseInputs:
 
     tdb: Union[float, int, np.ndarray, list] = field(default=None)
     tr: Union[float, int, np.ndarray, list] = field(default=None)
+    twb: Union[float, int, np.ndarray, list] = field(default=None)
+    tg: Union[float, int, np.ndarray, list] = field(default=None)
     vr: Union[float, int, np.ndarray, list] = field(default=None)
     v: Union[float, int, np.ndarray, list] = field(default=None)
     rh: Union[float, int, np.ndarray, list] = field(default=None)
@@ -32,6 +34,7 @@ class BaseInputs:
     wme: Union[float, int, np.ndarray, list] = field(default=0)
     round_output: bool = field(default=True)
     limit_inputs: bool = field(default=True)
+    with_solar_load: bool = field(default=False)
     airspeed_control: bool = field(default=True)
     units: str = field(default="SI")
     standard: str = field(default="ISO")
@@ -76,6 +79,10 @@ class BaseInputs:
             validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
         if self.tr is not None:
             validate_type(self.tr, "tr", (float, int, np.ndarray, list))
+        if self.twb is not None:
+            validate_type(self.twb, "twb", (float, int, np.ndarray, list))
+        if self.tg is not None:
+            validate_type(self.tg, "tg", (float, int, np.ndarray, list))
         if self.vr is not None:
             validate_type(self.vr, "vr", (float, int, np.ndarray, list))
         if self.v is not None:
@@ -106,6 +113,8 @@ class BaseInputs:
             raise TypeError("limit_inputs must be either True or False.")
         if not isinstance(self.airspeed_control, bool):
             raise TypeError("airspeed_control must be either True or False.")
+        if not isinstance(self.with_solar_load, bool):
+            raise TypeError("with_solar_load must be either True or False.")
         if self.tout is not None:
             validate_type(self.tout, "tout", (float, int, np.ndarray, list))
         if self.p_atm is not None:
