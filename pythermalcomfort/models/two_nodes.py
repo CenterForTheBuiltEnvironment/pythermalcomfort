@@ -603,3 +603,8 @@ def _two_nodes_optimized_return_set(
         body_position,
         True,
     )[0]
+
+
+if __name__ == "__main__":
+    results = two_nodes(tdb=45, tr=45, v=1.1, rh=20, met=3, clo=0.2)
+    print(results)

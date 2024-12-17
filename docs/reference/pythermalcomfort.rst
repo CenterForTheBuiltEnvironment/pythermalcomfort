@@ -139,6 +139,9 @@ Predicted Mean Vote (PMV)
 
 .. autofunction:: pythermalcomfort.models.pmv.pmv
 
+.. autoclass:: pythermalcomfort.models.pmv.PMV
+    :members:
+
 Solar gain on people
 --------------------
 
@@ -173,6 +176,9 @@ Wet Bulb Globe Temperature Index (WBGT)
 ---------------------------------------
 
 .. autofunction:: pythermalcomfort.models.wbgt.wbgt
+
+.. autoclass:: pythermalcomfort.models.wbgt.WBGT
+    :members:
 
 Wind chill index
 ----------------
