@@ -96,9 +96,9 @@ def two_nodes(
     t_skin : float or array-like
         Skin temperature, [°C]
     m_bl : float or array-like
-        Skin blood flow, [kg/h/m2]
+        Skin blood flow, [g/h/m2]
     m_rsw : float or array-like
-        Rate at which regulatory sweat is generated, [kg/h/m2]
+        Rate at which regulatory sweat is generated, [g/h/m2]
     w : float or array-like
         Skin wettedness, adimensional. Ranges from 0 and 1.
     w_max : float or array-like
@@ -224,7 +224,7 @@ def two_nodes(
     for key in output.keys():
         # round the results if needed
         if kwargs["round"]:
-            output[key] = np.around(output[key], 1)
+            output[key] = np.around(output[key], 3)
 
     return output
 
@@ -284,7 +284,7 @@ def _two_nodes_optimized(
 
     pressure_in_atmospheres = p_atmospheric / 101325
     length_time_simulation = 60  # length time simulation
-    n_simulation = 0
+    n_simulation = 1
 
     r_clo = 0.155 * clo  # thermal resistance of clothing, C M^2 /W
     f_a_cl = 1.0 + 0.15 * clo  # increase in body surface area due to clothing
