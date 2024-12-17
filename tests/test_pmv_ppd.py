@@ -3,14 +3,10 @@ import math
 import numpy as np
 import pytest
 
-from pythermalcomfort.models import (
-    pmv_ppd,
-)
-from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
-
+from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMV_PPD
 
 from pythermalcomfort.models import pmv_ppd
-from tests.conftest import Urls, retrieve_reference_table, validate_result
+from tests.conftest import Urls, retrieve_reference_table, validate_result, is_equal
 
 
 def test_pmv_ppd(get_test_url, retrieve_data):
@@ -57,16 +53,16 @@ class TestPmvPpd:
         result = pmv_ppd(tdb, tr, vr, rh, met, clo)
 
         # Assert
-        assert math.isnan(result["pmv"][1])
-        assert math.isnan(result["ppd"][1])
+        assert math.isnan(result.pmv[1])
+        assert math.isnan(result.ppd[1])
 
         assert (
-            round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1)
+            round(pmv_ppd(67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip").pmv, 1)
         ) == -0.5
 
         np.testing.assert_equal(
             np.around(
-                pmv_ppd([70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip")["pmv"], 1
+                pmv_ppd([70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip").pmv, 1
             ),
             [-0.3, -0.3],
         )
@@ -82,7 +78,7 @@ class TestPmvPpd:
                 [0.5, 0.5, 0.5, 0.7, 0.7, 0.7],
                 standard="ashrae",
                 airspeed_control=False,
-            )["pmv"],
+            ).pmv,
             [np.nan, np.nan, np.nan, -0.14, -0.43, -0.57],
         )
 
@@ -99,11 +95,8 @@ class TestPmvPpd:
                 [1.1, 1.1, 1.1, 0.7, 1.1, 4.1],
                 [0.5, 0.5, 0.5, 0.5, 2.1, 0.1],
                 standard="iso",
-            ),
-            {
-                "pmv": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-                "ppd": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            },
+            ).pmv,
+            np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         np.testing.assert_equal(
@@ -115,22 +108,19 @@ class TestPmvPpd:
                 [1.1, 1.1, 1.1, 0.7, 1.1, 3.9],
                 [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
                 standard="ashrae",
-            ),
-            {
-                "pmv": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-                "ppd": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-            },
+            ).pmv,
+            np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         # check results with limit_inputs disabled
         np.testing.assert_equal(
             pmv_ppd(31, 41, 2, 50, 0.7, 2.1, standard="iso", limit_inputs=False),
-            {"pmv": 2.4, "ppd": 91.0},
+            PMV_PPD(pmv=np.float64(2.4), ppd=np.float64(91.0)),
         )
 
         np.testing.assert_equal(
             pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", limit_inputs=False),
-            {"pmv": 4.48, "ppd": 100.0},
+            PMV_PPD(pmv=np.float64(4.48), ppd=np.float64(100.0)),
         )
 
     def test_pmv_ppd_optimized(self):

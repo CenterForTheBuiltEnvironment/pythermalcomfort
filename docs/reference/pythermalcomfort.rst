@@ -134,6 +134,9 @@ Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 
 .. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
 
+.. autoclass:: pythermalcomfort.models.pmv_ppd.PMV_PPD
+    :members:
+
 Predicted Mean Vote (PMV)
 -------------------------
 
