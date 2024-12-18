@@ -4,27 +4,11 @@ from typing import Union, List
 import numpy as np
 
 from pythermalcomfort.models.two_nodes import two_nodes
+from pythermalcomfort.return_classes import SetTmp
 from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import (
     check_standard_compliance_array,
 )
-
-
-@dataclass(frozen=True)
-class SetTmp:
-    """
-    Dataclass to represent the Standard Effective Temperature (SET).
-
-    Attributes
-    ----------
-    set : float or list of floats
-        Standard effective temperature, [°C].
-    """
-
-    set: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass
@@ -171,12 +155,11 @@ def set_tmp(
         clo=clo,
         wme=wme,
         body_surface_area=body_surface_area,
-        p_atmospheric=p_atm,
+        p_atm=p_atm,
         position=position,
         calculate_ce=calculate_ce,
-        round=False,
-        output="all",
-    )["_set"]
+        round_output=False,
+    ).set
 
     if limit_inputs:
         (

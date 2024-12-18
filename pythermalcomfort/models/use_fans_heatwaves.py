@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Union, List
 
 import numpy as np
@@ -217,13 +217,14 @@ def use_fans_heatwaves(
         clo,
         wme=wme,
         body_surface_area=body_surface_area,
-        p_atmospheric=p_atm,
+        p_atm=p_atm,
         position=position,
         max_skin_blood_flow=max_skin_blood_flow,
-        round=False,
-        output="all",
+        round_output=False,
         max_sweating=max_sweating,
     )
+
+    output = asdict(output)
 
     output_vars = [
         "e_skin",

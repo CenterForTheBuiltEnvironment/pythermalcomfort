@@ -71,6 +71,7 @@ def cooling_effect(
     cooling effect is calculated only for air speed higher than 0.1 m/s.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
+    .. _SET: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
 
     Parameters
     ----------

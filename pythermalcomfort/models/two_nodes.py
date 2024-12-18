@@ -1,142 +1,224 @@
-from typing import Union, List
 import math
+from dataclasses import dataclass
+from typing import Union, List
 
 import numpy as np
 from numba import jit, vectorize, float64
 
 from pythermalcomfort.psychrometrics import p_sat_torr
-from pythermalcomfort.utilities import (
-    body_surface_area,
-)
+from pythermalcomfort.return_classes import SetTmp
+from pythermalcomfort.utilities import BaseInputs
+
+
+@dataclass(frozen=True)
+class TwoNodes:
+    """
+    Dataclass to represent the results of the two-node model of human temperature regulation.
+
+    Attributes
+    ----------
+    e_skin : float or list of floats
+        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff.
+    e_rsw : float or list of floats
+        Rate of evaporative heat loss from sweat evaporation, [W/m2].
+    e_max : float or list of floats
+        Maximum rate of evaporative heat loss from skin, [W/m2].
+    q_sensible : float or list of floats
+        Sensible heat loss from skin, [W/m2].
+    q_skin : float or list of floats
+        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin.
+    q_res : float or list of floats
+        Total rate of heat loss through respiration, [W/m2].
+    t_core : float or list of floats
+        Core temperature, [°C].
+    t_skin : float or list of floats
+        Skin temperature, [°C].
+    m_bl : float or list of floats
+        Skin blood flow, [kg/h/m2].
+    m_rsw : float or list of floats
+        Rate at which regulatory sweat is generated, [mL/h/m2].
+    w : float or list of floats
+        Skin wettedness, adimensional. Ranges from 0 to 1.
+    w_max : float or list of floats
+        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 to 1.
+    set : float or list of floats
+        Standard Effective Temperature (SET).
+    et : float or list of floats
+        New Effective Temperature (ET).
+    pmv_gagge : float or list of floats
+        PMV Gagge.
+    pmv_set : float or list of floats
+        PMV SET.
+    disc : float or list of floats
+        Thermal discomfort.
+    t_sens : float or list of floats
+        Predicted Thermal Sensation.
+    """
+
+    e_skin: Union[float, List[float]]
+    e_rsw: Union[float, List[float]]
+    e_max: Union[float, List[float]]
+    q_sensible: Union[float, List[float]]
+    q_skin: Union[float, List[float]]
+    q_res: Union[float, List[float]]
+    t_core: Union[float, List[float]]
+    t_skin: Union[float, List[float]]
+    m_bl: Union[float, List[float]]
+    m_rsw: Union[float, List[float]]
+    w: Union[float, List[float]]
+    w_max: Union[float, List[float]]
+    set: Union[float, List[float]]
+    et: Union[float, List[float]]
+    pmv_gagge: Union[float, List[float]]
+    pmv_set: Union[float, List[float]]
+    disc: Union[float, List[float]]
+    t_sens: Union[float, List[float]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class TwoNodesInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        rh,
+        met,
+        clo,
+        wme=0,
+        body_surface_area=1.8258,
+        p_atm=101325,
+        position="standing",
+        max_skin_blood_flow=90,
+        round_output=True,
+        max_sweating=500,
+        w_max=None,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            met=met,
+            clo=clo,
+            wme=wme,
+            body_surface_area=body_surface_area,
+            p_atm=p_atm,
+            position=position,
+            max_skin_blood_flow=max_skin_blood_flow,
+            round_output=round_output,
+            max_sweating=max_sweating,
+            w_max=w_max,
+        )
 
 
 def two_nodes(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-    met: Union[float, int, np.ndarray, List[float], List[int]],
-    clo: Union[float, int, np.ndarray, List[float], List[int]],
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
-    body_surface_area=1.8258,
-    p_atmospheric=101325,
-    body_position="standing",
-    max_skin_blood_flow=90,
-    **kwargs,
-):
+    tdb: Union[float, List[float]],
+    tr: Union[float, List[float]],
+    v: Union[float, List[float]],
+    rh: Union[float, List[float]],
+    met: Union[float, List[float]],
+    clo: Union[float, List[float]],
+    wme: Union[float, List[float]] = 0,
+    body_surface_area: Union[float, List[float]] = 1.8258,
+    p_atm: Union[float, List[float]] = 101325,
+    position: str = "standing",
+    max_skin_blood_flow: Union[float, List[float]] = 90,
+    round_output: bool = True,
+    max_sweating: Union[float, List[float]] = 500,
+    w_max: Union[float, List[float]] = False,
+    calculate_ce: bool = False,
+) -> SetTmp | TwoNodes:
     """Two-node model of human temperature regulation Gagge et al. (1986). [10]_
-    This model it can be used to calculate a variety of indices,
-    including:
+    This model can be used to calculate a variety of indices, including:
 
-    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two node model developed by Gagge et al. (1986) [10]_.
+    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [10]_.
     * PMV SET and the predicted thermal sensation based on SET [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
-    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (S). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
-    * Heat gains and losses via convection, radiation and conduction.
-    * The Standard Effective Temperature (SET)
-    * The New Effective Temperature (ET)
-    * The Predicted  Thermal  Sensation  (TSENS)
-    * The Predicted  Percent  Dissatisfied  Due  to  Draft  (PD)
-    * Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement"   (PS)
+    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [10]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (5). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [10]_.
+    * Heat gains and losses via convection, radiation, and conduction.
+    * The Standard Effective Temperature (SET).
+    * The New Effective Temperature (ET).
+    * The Predicted Thermal Sensation (TSENS).
+    * The Predicted Percent Dissatisfied Due to Draft (PD).
+    * Predicted Percent Satisfied With the Level of Air Movement (PS).
 
     Parameters
     ----------
-    tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float or array-like
-        air speed, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float or array-like
-        relative humidity, [%]
-    met : float or array-like
-        metabolic rate, [met]
-    clo : float or array-like
-        clothing insulation, [clo]
-    wme : float or array-like
-        external work, [met] default 0
-    body_surface_area : float
-        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    tr : float or list of floats
+        Mean radiant temperature, [°C].
+    v : float or list of floats
+        Air speed, [m/s].
+    rh : float or list of floats
+        Relative humidity, [%].
+    met : float or list of floats
+        Metabolic rate, [met].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+    wme : float or list of floats, optional
+        External work, [met]. Defaults to 0.
+    body_surface_area : float or list of floats, optional
+        Body surface area, default value 1.8258 [m2]. Defaults to 1.8258.
 
-        The body surface area can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
-    p_atmospheric : float
-        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
-    body_position: str default="standing" or array-like
-        select either "sitting" or "standing"
-    max_skin_blood_flow : float
-        maximum blood flow from the core to the skin, [kg/h/m2] default 80
+        .. note::
+            The body surface area can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.body_surface_area`.
 
-    Other Parameters
-    ----------------
-    round: boolean, default True
-        if True rounds output values, if False it does not round them
-    max_sweating : float
-        Maximum rate at which regulatory sweat is generated, [kg/h/m2]
-    w_max : float
-        Maximum skin wettedness (w) adimensional. Ranges from 0 and 1.
+    p_atm : float or list of floats, optional
+        Atmospheric pressure, default value 101325 [Pa]. Defaults to 101325.
+    position : str, optional
+        Select either "sitting" or "standing". Defaults to "standing".
+    max_skin_blood_flow : float or list of floats, optional
+        Maximum blood flow from the core to the skin, [kg/h/m2]. Defaults to 90.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
+    max_sweating : float or list of floats, optional
+        Maximum rate at which regulatory sweat is generated, [kg/h/m2]. Defaults to 500.
+    w_max : float or list of floats, optional
+        Maximum skin wettedness (w) adimensional. Ranges from 0 and 1. Defaults to False.
 
     Returns
     -------
-    e_skin : float or array-like
-        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff
-    e_rsw : float or array-like
-        Rate of evaporative heat loss from sweat evaporation, [W/m2]
-    e_diff : float or array-like
-        Rate of evaporative heat loss from moisture diffused through the skin, [W/m2]
-    e_max : float or array-like
-        Maximum rate of evaporative heat loss from skin, [W/m2]
-    q_sensible : float or array-like
-        Sensible heat loss from skin, [W/m2]
-    q_skin : float or array-like
-        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin
-    q_res : float or array-like
-        Total rate of heat loss through respiration, [W/m2]
-    t_core : float or array-like
-        Core temperature, [°C]
-    t_skin : float or array-like
-        Skin temperature, [°C]
-    m_bl : float or array-like
-        Skin blood flow, [g/h/m2]
-    m_rsw : float or array-like
-        Rate at which regulatory sweat is generated, [g/h/m2]
-    w : float or array-like
-        Skin wettedness, adimensional. Ranges from 0 and 1.
-    w_max : float or array-like
-        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
-    set : float or array-like
-        Standard Effective Temperature (SET)
-    et : float or array-like
-        New Effective Temperature (ET)
-    pmv_gagge : float or array-like
-        PMV Gagge
-    pmv_set : float or array-like
-        PMV SET
-    pd : float or array-like
-        Predicted  Percent  Dissatisfied  Due  to  Draft"
-    ps : float or array-like
-        Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
-    disc : float or array-like
-        Thermal discomfort
-    t_sens : float or array-like
-        Predicted  Thermal  Sensation
+    TwoNodes
+        A dataclass containing the results of the two-node model of human temperature regulation.
+        See :py:class:`~pythermalcomfort.models.two_nodes.TwoNodes` for more details.
+        To access the results, use the corresponding attributes of the returned `TwoNodes` instance, e.g., `result.e_skin`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import two_nodes
-        >>> print(two_nodes(tdb=25, tr=25, v=0.3, rh=50, met=1.2, clo=0.5))
-        {'e_skin': 15.8, 'e_rsw': 6.5, 'e_diff': 9.3, ... }
-        >>> print(two_nodes(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5))
-        {'e_skin': array([15.8, 15.8]), 'e_rsw': array([6.5, 6.5]), ... }
+        from pythermalcomfort.models import two_nodes
+
+        result = two_nodes(tdb=25, tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
+        print(result.e_skin)  # 100.0
+
+        result = two_nodes(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
+        print(result.e_skin)  # [100.0, 100.0]
     """
-    default_kwargs = {
-        "round": True,
-        "calculate_ce": False,
-        "max_sweating": 500,
-        "w_max": False,
-    }
-    kwargs = {**default_kwargs, **kwargs}
+
+    # Validate inputs using the TwoNodesInputs class
+    TwoNodesInputs(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atm=p_atm,
+        position=position,
+        max_skin_blood_flow=max_skin_blood_flow,
+        round_output=round_output,
+        max_sweating=max_sweating,
+        w_max=w_max,
+    )
 
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -145,11 +227,11 @@ def two_nodes(
     met = np.array(met)
     clo = np.array(clo)
     wme = np.array(wme)
-    body_position = np.array(body_position)
+    position = np.array(position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
-    if kwargs["calculate_ce"]:
+    if calculate_ce:
         result = _two_nodes_optimized_return_set(
             tdb,
             tr,
@@ -159,10 +241,10 @@ def two_nodes(
             vapor_pressure,
             wme,
             body_surface_area,
-            p_atmospheric,
+            p_atm,
             1,
         )
-        return {"_set": result}
+        return SetTmp(set=result)
 
     (
         _set,
@@ -192,12 +274,12 @@ def two_nodes(
         vapor_pressure=vapor_pressure,
         wme=wme,
         body_surface_area=body_surface_area,
-        p_atmospheric=p_atmospheric,
-        body_position=body_position,
-        calculate_ce=kwargs["calculate_ce"],
+        p_atm=p_atm,
+        position=position,
+        calculate_ce=calculate_ce,
         max_skin_blood_flow=max_skin_blood_flow,
-        max_sweating=kwargs["max_sweating"],
-        w_max=kwargs["w_max"],
+        max_sweating=max_sweating,
+        w_max=w_max,
     )
 
     output = {
@@ -213,7 +295,7 @@ def two_nodes(
         "m_rsw": m_rsw,
         "w": w,
         "w_max": w_max,
-        "_set": _set,
+        "set": _set,
         "et": et,
         "pmv_gagge": pmv_gagge,
         "pmv_set": pmv_set,
@@ -223,10 +305,10 @@ def two_nodes(
 
     for key in output.keys():
         # round the results if needed
-        if kwargs["round"]:
+        if round_output:
             output[key] = np.around(output[key], 1)
 
-    return output
+    return TwoNodes(**output)
 
 
 @jit(nopython=True)
@@ -239,12 +321,12 @@ def _two_nodes_optimized(
     vapor_pressure,
     wme,
     body_surface_area,
-    p_atmospheric,
-    body_position,
+    p_atm,
+    position,
     calculate_ce=False,
     max_skin_blood_flow=90,
     max_sweating=500,
-    w_max=False,
+    w_max=None,
 ):
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
@@ -282,7 +364,7 @@ def _two_nodes_optimized(
     r_ecl = 0
     c_res = 0  # convective heat loss respiration
 
-    pressure_in_atmospheres = p_atmospheric / 101325
+    pressure_in_atmospheres = p_atm / 101325
     length_time_simulation = 60  # length time simulation
     n_simulation = 1
 
@@ -338,7 +420,7 @@ def _two_nodes_optimized(
         while not tc_converged:
 
             # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
-            if body_position == "sitting":
+            if position == "sitting":
                 # 0.7 ratio between radiation area of the body and the body area
                 h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.7
             else:  # if standing
@@ -587,8 +669,8 @@ def _two_nodes_optimized_return_set(
     vapor_pressure,
     wme,
     body_surface_area,
-    p_atmospheric,
-    body_position,
+    p_atm,
+    position,
 ):
     return _two_nodes_optimized(
         tdb,
@@ -599,8 +681,8 @@ def _two_nodes_optimized_return_set(
         vapor_pressure,
         wme,
         body_surface_area,
-        p_atmospheric,
-        body_position,
+        p_atm,
+        position,
         True,
     )[0]
 

@@ -158,13 +158,16 @@ Standard Effective Temperature (SET)
 
 .. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
-.. autoclass:: pythermalcomfort.models.set_tmp.SET
+.. autoclass:: pythermalcomfort.return_classes.SetTmp
     :members:
 
 Two-node model
 --------------
 
 .. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
+
+.. autoclass:: pythermalcomfort.models.two_nodes.TwoNodes
+    :members:
 
 Universal Thermal Climate Index (UTCI)
 --------------------------------------
