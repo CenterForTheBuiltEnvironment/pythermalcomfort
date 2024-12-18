@@ -1,14 +1,12 @@
+from dataclasses import dataclass
+from typing import Union, List
+
 import numpy as np
-from typing import Union, List
 from numba import vectorize, float64
+
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import units_converter, mapping
-
-from dataclasses import dataclass
 from pythermalcomfort.utilities import BaseInputs
-
-from dataclasses import dataclass
-from typing import Union, List
+from pythermalcomfort.utilities import units_converter, mapping
 
 
 @dataclass(frozen=True)

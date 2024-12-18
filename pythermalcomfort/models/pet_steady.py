@@ -182,7 +182,7 @@ def pet_steady(
     )
 
 
-@np.vectorize
+@np.vectorize(cache=True)
 def _pet_steady_vectorised(
     tdb,
     tr,

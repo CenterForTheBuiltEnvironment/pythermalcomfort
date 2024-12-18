@@ -287,7 +287,7 @@ def phs(
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
-    ) = np.vectorize(_phs_optimized, cache=True)(
+    ) = _phs_optimized(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -363,6 +363,7 @@ const_t_sk = math.exp(-1 / 3)
 const_sw = math.exp(-1 / 10)
 
 
+@np.vectorize(cache=True)
 @jit(nopython=True)
 def _phs_optimized(
     tdb,

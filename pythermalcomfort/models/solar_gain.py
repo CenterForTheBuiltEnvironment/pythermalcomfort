@@ -185,7 +185,7 @@ def solar_gain(
     return SolarGain(erf=erf, delta_mrt=d_mrt)
 
 
-@np.vectorize
+@np.vectorize(cache=True)
 def _solar_gain_vectorised(
     sol_altitude,
     sharp,
