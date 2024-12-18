@@ -1,7 +1,35 @@
 Changelog
 =========
 
-2.10.0 (unreleased)
+3.0.0 (2024-03-18)
+-------------------
+
+.. warning::
+    pythermalcomfort version 3.0.0 introduces some breaking changes as the functions now return dataclass instances with the calculation results.
+    This change enhances the structure and accessibility of the results.
+    For example:
+
+    .. code-block:: python
+
+        from pythermalcomfort.models import pmv_ppd
+        result = pmv_ppd(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5)
+        print(result.pmv)  # [-0.  0.41]
+
+    This update aims to make the package more user-friendly and to provide a more organized way to access all calculation results.
+
+.. note::
+    We have updated all functions to accept Numpy arrays as inputs, allowing you to pass multiple values at once for faster results.
+    Single values are still accepted, and the functions will return results as before.
+    Additionally, we have synchronized the tests with the R comf package to ensure consistent calculation results across both packages.
+
+    Other improvements include:
+
+    * Enhanced documentation with more examples.
+    * Added more tests to ensure calculation accuracy.
+    * Implemented input validation to ensure inputs are within model applicability limits.
+    * Harmonized input names across all functions.
+
+2.10.0 (2024-03-18)
 -------------------
 
 * allow n-dimensional arrays for ``pet_steady`` and speedup ``p_sat`` calculation

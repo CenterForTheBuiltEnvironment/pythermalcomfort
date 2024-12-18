@@ -15,7 +15,7 @@ Authors
 
 **Derivative work**
 
-`pythermalcomfort`_ is a derivative work of the following software projects:
+`pythermalcomfort` is a derivative work of the following software projects:
 
 * `CBE Comfort Tool`_ for indoor thermal comfort calculations. Available under GPL.
 * `ladybug-comfort`_. Available under GPL.
