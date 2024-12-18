@@ -56,6 +56,7 @@ class BaseInputs:
     f_bes: Union[float, int, np.ndarray, list] = field(default=None)
     asw: Union[float, int, np.ndarray, list] = field(default=None)
     floor_reflectance: Union[float, int, np.ndarray, list] = field(default=None)
+    vertical_tmp_grad: Union[float, int, np.ndarray, list] = field(default=None)
     position: Union[str, np.ndarray, list] = field(default=None)
     sex: Union[str, np.ndarray, list] = field(default=None)
     posture: Union[str, np.ndarray, list] = field(default=None)
@@ -163,6 +164,12 @@ class BaseInputs:
                 "floor_reflectance",
                 (float, int, np.ndarray, list),
             )
+        if self.vertical_tmp_grad is not None:
+            validate_type(
+                self.vertical_tmp_grad,
+                "vertical_tmp_grad",
+                (float, int, np.ndarray, list),
+            )
 
 
 def transpose_sharp_altitude(sharp, altitude):
@@ -268,11 +275,13 @@ def check_standard_compliance_array(standard, **kwargs):
     if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
-        v_valid = valid_range(params["v"], (0.0, 2.0))
 
         values_to_return["tdb"] = tdb_valid
         values_to_return["tr"] = tr_valid
-        values_to_return["v"] = v_valid
+
+        if "v" in params.keys():
+            v_valid = valid_range(params["v"], (0.0, 2.0))
+            values_to_return["v"] = v_valid
 
         if not params["airspeed_control"]:
             v_valid = np.where(

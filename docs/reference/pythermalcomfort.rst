@@ -178,6 +178,9 @@ Vertical air temperature gradient
 
 .. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd.vertical_tmp_grad_ppd
 
+.. autoclass:: pythermalcomfort.models.vertical_tmp_grad_ppd.VerticalTmpGradPPD
+    :members:
+
 Wet Bulb Globe Temperature Index (WBGT)
 ---------------------------------------
 
