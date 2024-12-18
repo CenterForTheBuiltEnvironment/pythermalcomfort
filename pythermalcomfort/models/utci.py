@@ -76,17 +76,11 @@ def utci(
     Parameters
     ----------
     tdb : float or list of floats
-        Dry bulb air temperature, [°C].
-        .. note::
-            Default in [°C] in [°F] if `units` = 'IP'.
+        Dry bulb air temperature. Default in [°C] in [°F] if `units` = 'IP'.
     tr : float or list of floats
-        Mean radiant temperature, [°C].
-        .. note::
-            Default in [°C] in [°F] if `units` = 'IP'.
+        Mean radiant temperature. Default in [°C] in [°F] if `units` = 'IP'.
     v : float or list of floats
-        Wind speed 10m above ground level, [m/s].
-        .. note::
-            Default in [m/s] in [fps] if `units` = 'IP'.
+        Wind speed 10m above ground level. Default in [m/s] in [fps] if `units` = 'IP'.
     rh : float or list of floats
         Relative humidity, [%].
     units : str, optional
