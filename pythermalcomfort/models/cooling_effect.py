@@ -195,10 +195,10 @@ def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, 
         met=met,
         clo=clo,
         wme=wme,
-        round=False,
+        round_output=False,
         calculate_ce=True,
         limit_inputs=False,
-    )
+    ).set
 
     def function(x):
         return (
@@ -210,10 +210,10 @@ def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, 
                 met=met,
                 clo=clo,
                 wme=wme,
-                round=False,
+                round_output=False,
                 calculate_ce=True,
                 limit_inputs=False,
-            )
+            ).set
             - initial_set_tmp
         )
 

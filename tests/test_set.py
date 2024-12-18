@@ -22,12 +22,11 @@ def test_set_url(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        inputs["round"] = True
+        inputs["round_output"] = True
         inputs["limit_inputs"] = False
         result = set_tmp(**inputs)
 
         validate_result(result, outputs, tolerance)
-
 
 
 def test_set_npnan():
@@ -39,6 +38,6 @@ def test_set_npnan():
             50,
             [1.1, 1.1, 1.1, 0.7, 1.1, 3.9],
             [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
-        ),
+        ).set,
         [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
     )

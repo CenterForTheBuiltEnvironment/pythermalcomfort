@@ -158,6 +158,9 @@ Standard Effective Temperature (SET)
 
 .. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
+.. autoclass:: pythermalcomfort.models.set_tmp.SET
+    :members:
+
 Two-node model
 --------------
 

@@ -22,6 +22,7 @@ def validate_type(value, name: str, allowed_types: tuple):
 class BaseInputs:
     """Base class containing all possible input parameters."""
 
+    body_surface_area: Union[float, int, np.ndarray, list] = field(default=1.8258)
     tdb: Union[float, int, np.ndarray, list] = field(default=None)
     tr: Union[float, int, np.ndarray, list] = field(default=None)
     twb: Union[float, int, np.ndarray, list] = field(default=None)
@@ -168,6 +169,12 @@ class BaseInputs:
             validate_type(
                 self.vertical_tmp_grad,
                 "vertical_tmp_grad",
+                (float, int, np.ndarray, list),
+            )
+        if self.body_surface_area is not None:
+            validate_type(
+                self.body_surface_area,
+                "body_surface_area",
                 (float, int, np.ndarray, list),
             )
 
