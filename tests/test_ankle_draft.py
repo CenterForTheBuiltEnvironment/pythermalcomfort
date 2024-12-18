@@ -15,7 +15,7 @@ def test_ankle_draft(get_test_url, retrieve_data):
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         result = ankle_draft(**inputs)
-        
+
         validate_result(result, outputs, tolerance)
 
 
@@ -30,10 +30,10 @@ def test_ankle_draft_invalid_input_range():
 
 def test_ankle_draft_outside_ashrae_range():
     r = ankle_draft(50, 25, 0.1, 50, 1.2, 0.5, 0.1)
-    assert np.isnan(r.PPD_ad)
+    assert np.isnan(r.ppd_ad)
 
     r = ankle_draft([50, 45], 25, 0.1, 50, 1.2, 0.5, 0.1)
-    assert np.all(np.isnan(r.PPD_ad))
+    assert np.all(np.isnan(r.ppd_ad))
 
 
 def test_ankle_draft_list_inputs():
@@ -48,8 +48,8 @@ def test_ankle_draft_list_inputs():
         units="SI",
     )
     assert isinstance(results, AnkleDraft)
-    assert len(results.PPD_ad) == 3
-    assert len(results.Acceptability) == 3
+    assert len(results.ppd_ad) == 3
+    assert len(results.acceptability) == 3
 
 
 def test_ankle_draft_invalid_list_inputs():

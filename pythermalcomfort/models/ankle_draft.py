@@ -19,14 +19,14 @@ class AnkleDraft:
 
     Attributes
     ----------
-    PPD_ad : float
+    ppd_ad : float
         Predicted Percentage of Dissatisfied occupants with ankle draft, [%].
-    Acceptability : bool
+    acceptability : bool
         Indicates if the air speed at the ankle level is acceptable according to ASHRAE 55 2020 standard.
     """
 
-    PPD_ad: Union[float, npt.ArrayLike]
-    Acceptability: Union[bool, npt.ArrayLike]
+    ppd_ad: Union[float, npt.ArrayLike]
+    acceptability: Union[bool, npt.ArrayLike]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -130,7 +130,7 @@ def ankle_draft(
         from pythermalcomfort.models import ankle_draft
         results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
         print(results)
-        # AnkleDraft(PPD_ad=18.5, Acceptability=True)
+        # AnkleDraft(ppd_ad=18.5, acceptability=True)
     """
     # Validate inputs using the AnkleDraftInputs class
     AnkleDraftInputs(
@@ -170,7 +170,7 @@ def ankle_draft(
         1,
     )
     acceptability = ppd_val <= 20
-    return AnkleDraft(PPD_ad=ppd_val, Acceptability=acceptability)
+    return AnkleDraft(ppd_ad=ppd_val, acceptability=acceptability)
 
 
 if __name__ == "__main__":
