@@ -6,7 +6,7 @@ result = adaptive_ashrae(tdb=25, tr=25, t_running_mean=23, v=0.3)
 
 pprint(result)
 
-print(result["acceptability_80"])
+print(result.acceptability_80)  # or use result["acceptability_80"]
 
 result = adaptive_ashrae(tdb=77, tr=77, t_running_mean=73.5, v=1, units="IP")
 

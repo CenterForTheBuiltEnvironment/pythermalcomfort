@@ -1,3 +1,5 @@
+import itertools
+
 import matplotlib.pyplot as plt
 
 from pythermalcomfort.models import phs
@@ -6,22 +8,26 @@ import seaborn as sns
 
 plt.close("all")
 
-for v in [0.2, 0.8]:
+t_array = range(30, 52, 1)
+rh_array = range(0, 100, 1)
 
-    results = []
-    for tdb in range(30, 52, 1):
-        for rh in range(0, 100, 1):
-            result = phs(tdb=tdb, tr=tdb, rh=rh, v=v, met=55, clo=0.5, posture=2)
-            result["tdb"] = tdb
-            result["rh"] = rh
-            results.append(result)
+df = pd.DataFrame(list(itertools.product(t_array, rh_array)), columns=["tdb", "rh"])
 
-    df = pd.DataFrame.from_dict(results)
+results = phs(
+    tdb=df.tdb.values,
+    tr=df.tdb.values,
+    rh=df.rh.values,
+    v=0.3,
+    met=2,
+    clo=0.5,
+    posture="sitting",
+)
 
-    plt.figure()
-    pivot = df.pivot("tdb", "rh", "t_re")
-    pivot = pivot.sort_index(ascending=False)
-    ax = sns.heatmap(pivot)
-    plt.title(f"velocity {v}")
-    plt.tight_layout()
-    plt.show()
+df["t_re"] = results.t_re
+
+plt.figure()
+pivot = df.pivot(columns="tdb", index="rh", values="t_re")
+pivot = pivot.sort_index(ascending=False)
+ax = sns.heatmap(pivot)
+plt.tight_layout()
+plt.show()
