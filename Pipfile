@@ -16,6 +16,8 @@ requests = "*"
 pandas = "*"
 pydantic = "*"
 tabulate = "*"
+matplotlib = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.12"
