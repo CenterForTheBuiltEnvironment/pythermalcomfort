@@ -171,6 +171,9 @@ Universal Thermal Climate Index (UTCI)
 
 .. autofunction:: pythermalcomfort.models.utci.utci
 
+.. autoclass:: pythermalcomfort.models.utci.UTCI
+    :members:
+
 Use Fans During Heatwaves
 -------------------------
 
