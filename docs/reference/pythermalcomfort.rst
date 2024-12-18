@@ -179,6 +179,9 @@ Use Fans During Heatwaves
 
 .. autofunction:: pythermalcomfort.models.use_fans_heatwaves.use_fans_heatwaves
 
+.. autoclass:: pythermalcomfort.models.use_fans_heatwaves.UseFansHeatwaves
+    :members:
+
 Vertical air temperature gradient
 ---------------------------------
 

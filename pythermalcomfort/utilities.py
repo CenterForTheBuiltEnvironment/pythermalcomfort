@@ -61,6 +61,8 @@ class BaseInputs:
     position: Union[str, np.ndarray, list] = field(default=None)
     sex: Union[str, np.ndarray, list] = field(default=None)
     posture: Union[str, np.ndarray, list] = field(default=None)
+    max_skin_blood_flow: Union[float, int, np.ndarray, list] = field(default=80)
+    max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
 
     def __post_init__(self):
         # Only validate attributes that are not None
@@ -177,6 +179,10 @@ class BaseInputs:
                 "body_surface_area",
                 (float, int, np.ndarray, list),
             )
+        if self.max_sweating is not None:
+            validate_type(self.max_sweating, "max_sweating", (float, int))
+        if self.max_skin_blood_flow is not None:
+            validate_type(self.max_skin_blood_flow, "max_skin_blood_flow", (float, int))
 
 
 def transpose_sharp_altitude(sharp, altitude):
