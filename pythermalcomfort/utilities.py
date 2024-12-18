@@ -48,6 +48,14 @@ class BaseInputs:
     age: Union[float, int, np.ndarray, list] = field(default=None)
     weight: Union[float, int, np.ndarray, list] = field(default=None)
     height: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_altitude: Union[float, int, np.ndarray, list] = field(default=None)
+    sharp: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_radiation_dir: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_transmittance: Union[float, int, np.ndarray, list] = field(default=None)
+    f_svv: Union[float, int, np.ndarray, list] = field(default=None)
+    f_bes: Union[float, int, np.ndarray, list] = field(default=None)
+    asw: Union[float, int, np.ndarray, list] = field(default=None)
+    floor_reflectance: Union[float, int, np.ndarray, list] = field(default=None)
     position: Union[str, np.ndarray, list] = field(default=None)
     sex: Union[str, np.ndarray, list] = field(default=None)
     posture: Union[str, np.ndarray, list] = field(default=None)
@@ -125,6 +133,36 @@ class BaseInputs:
             validate_type(self.weight, "weight", (float, int, np.ndarray, list))
         if self.height is not None:
             validate_type(self.height, "height", (float, int, np.ndarray, list))
+        if self.sol_altitude is not None:
+            validate_type(
+                self.sol_altitude, "sol_altitude", (float, int, np.ndarray, list)
+            )
+        if self.sharp is not None:
+            validate_type(self.sharp, "sharp", (float, int, np.ndarray, list))
+        if self.sol_radiation_dir is not None:
+            validate_type(
+                self.sol_radiation_dir,
+                "sol_radiation_dir",
+                (float, int, np.ndarray, list),
+            )
+        if self.sol_transmittance is not None:
+            validate_type(
+                self.sol_transmittance,
+                "sol_transmittance",
+                (float, int, np.ndarray, list),
+            )
+        if self.f_svv is not None:
+            validate_type(self.f_svv, "f_svv", (float, int, np.ndarray, list))
+        if self.f_bes is not None:
+            validate_type(self.f_bes, "f_bes", (float, int, np.ndarray, list))
+        if self.asw is not None:
+            validate_type(self.asw, "asw", (float, int, np.ndarray, list))
+        if self.floor_reflectance is not None:
+            validate_type(
+                self.floor_reflectance,
+                "floor_reflectance",
+                (float, int, np.ndarray, list),
+            )
 
 
 def transpose_sharp_altitude(sharp, altitude):

@@ -150,6 +150,9 @@ Solar gain on people
 
 .. autofunction:: pythermalcomfort.models.solar_gain.solar_gain
 
+.. autoclass:: pythermalcomfort.models.solar_gain.SolarGain
+    :members:
+
 Standard Effective Temperature (SET)
 ------------------------------------
 

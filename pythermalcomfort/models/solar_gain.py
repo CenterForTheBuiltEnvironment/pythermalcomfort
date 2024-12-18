@@ -1,42 +1,96 @@
 import math
+from dataclasses import dataclass
+from typing import Union, List
+
+import numpy as np
+
+from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import transpose_sharp_altitude
 
 
+@dataclass(frozen=True)
+class SolarGain:
+    """
+    Dataclass to represent the solar gain to the human body.
+
+    Attributes
+    ----------
+    erf : float or list of floats
+        Solar gain to the human body using the Effective Radiant Field [W/m2].
+    delta_mrt : float or list of floats
+        Delta mean radiant temperature. The amount by which the mean radiant
+        temperature of the space should be increased if no solar radiation is present.
+    """
+
+    erf: Union[float, List[float]]
+    delta_mrt: Union[float, List[float]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass
+class SolarGainInputs(BaseInputs):
+    def __init__(
+        self,
+        sol_altitude,
+        sharp,
+        sol_radiation_dir,
+        sol_transmittance,
+        f_svv,
+        f_bes,
+        asw=0.7,
+        posture="sitting",
+        floor_reflectance=0.6,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            sol_altitude=sol_altitude,
+            sharp=sharp,
+            sol_radiation_dir=sol_radiation_dir,
+            sol_transmittance=sol_transmittance,
+            f_svv=f_svv,
+            f_bes=f_bes,
+            asw=asw,
+            posture=posture,
+            floor_reflectance=floor_reflectance,
+        )
+
+
 def solar_gain(
-    sol_altitude,
-    sharp,
-    sol_radiation_dir,
-    sol_transmittance,
-    f_svv,
-    f_bes,
-    asw=0.7,
-    posture="seated",
-    floor_reflectance=0.6,
-):
+    sol_altitude: Union[float, List[float]],
+    sharp: Union[float, List[float]],
+    sol_radiation_dir: Union[float, List[float]],
+    sol_transmittance: Union[float, List[float]],
+    f_svv: Union[float, List[float]],
+    f_bes: Union[float, List[float]],
+    asw: Union[float, List[float]] = 0.7,
+    posture: str = "sitting",
+    floor_reflectance: Union[float, List[float]] = 0.6,
+    round_output: bool = True,
+) -> SolarGain:
     """Calculates the solar gain to the human body using the Effective Radiant
-    Field ( ERF) [1]_. The ERF is a measure of the net energy flux to or from
-    the human body. ERF is expressed in W over human body surface area [w/m2].
+    Field (ERF) [1]_. The ERF is a measure of the net energy flux to or from
+    the human body. ERF is expressed in W over human body surface area [W/m2].
     In addition, it calculates the delta mean radiant temperature. Which is the
     amount by which the mean radiant temperature of the space should be
     increased if no solar radiation is present.
 
     Parameters
     ----------
-    sol_altitude : float
+    sol_altitude : float or list of floats
         Solar altitude, degrees from horizontal [deg]. Ranges between 0 and 90.
-    sharp : float
+    sharp : float or list of floats
         Solar horizontal angle relative to the front of the person (SHARP) [deg].
         Ranges between 0 and 180 and is symmetrical on either side. Zero (0) degrees
         represents direct-beam radiation from the front, 90 degrees represents
-        direct-beam radiation from the side, and 180 degrees rep- resent direct-beam
+        direct-beam radiation from the side, and 180 degrees represents direct-beam
         radiation from the back. SHARP is the angle between the sun and the person
         only. Orientation relative to compass or to room is not included in SHARP.
-    posture : str
-        Default 'seated' list of available options 'standing', 'supine' or 'seated'
-    sol_radiation_dir : float
+    sol_radiation_dir : float or list of floats
         Direct-beam solar radiation, [W/m2]. Ranges between 200 and 1000. See Table
         C2-3 of ASHRAE 55 2020 [1]_.
-    sol_transmittance : float
+    sol_transmittance : float or list of floats
         Total solar transmittance, ranges from 0 to 1. The total solar
         transmittance of window systems, including glazing unit, blinds, and other
         façade treatments, shall be determined using one of the following methods:
@@ -46,52 +100,103 @@ def solar_gain(
         ii) Glazing unit plus venetian blinds or other complex or unique shades
         shall be calculated using National Fenestration Rating Council approved
         software or Lawrence Berkeley National Lab Complex Glazing Database.
-    f_svv : float
+    f_svv : float or list of floats
         Fraction of sky-vault view fraction exposed to body, ranges from 0 to 1.
         It can be calculated using the function
         :py:meth:`pythermalcomfort.utilities.f_svv`.
-    f_bes : float
+    f_bes : float or list of floats
         Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
         See Table C2-2 and equation C-7 ASHRAE 55 2020 [1]_.
-    asw: float
+    asw : float or list of floats, optional
         The average short-wave absorptivity of the occupant. It will range widely,
         depending on the color of the occupant’s skin as well as the color and
-        amount of clothing covering the body.
-        A value of 0.7 shall be used unless more specific information about the
-        clothing or skin color of the occupants is available.
-        Note: Short-wave absorptivity typically ranges from 0.57 to 0.84, depending
-        on skin and clothing color. More information is available in Blum (1945).
-    floor_reflectance: float
-        Floor refectance. It is assumed to be constant and equal to 0.6.
+        amount of clothing covering the body. Defaults to 0.7.
 
-    Notes
-    -----
-    More information on the calculation procedure can be found in Appendix C of [1]_.
+        .. note::
+            Short-wave absorptivity typically ranges from 0.57 to 0.84, depending
+            on skin and clothing color. More information is available in Blum (1945).
+
+    posture : str, optional
+        Default 'sitting' list of available options 'standing', 'supine' or 'sitting'.
+    floor_reflectance : float or list of floats, optional
+        Floor reflectance. It is assumed to be constant and equal to 0.6. Defaults to 0.6.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------
-    erf: float
-        Solar gain to the human body using the Effective Radiant Field [W/m2]
-    delta_mrt: float
-        Delta mean radiant temperature. The amount by which the mean radiant
-        temperature of the space should be increased if no solar radiation is present.
+    SolarGain
+        A dataclass containing the solar gain to the human body and delta mean radiant temperature.
+        See :py:class:`~pythermalcomfort.models.solar_gain.SolarGain` for more details.
+        To access the `erf` and `delta_mrt` values, use the corresponding attributes of the returned `SolarGain` instance, e.g., `result.erf`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import solar_gain
-        >>> results = solar_gain(sol_altitude=0, sharp=120,
-        sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5,
-        asw=0.7, posture='seated')
-        >>> print(results)
-        {'erf': 42.9, 'delta_mrt': 10.3}
+        from pythermalcomfort.models import solar_gain
+
+        result = solar_gain(sol_altitude=0, sharp=120, sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5, asw=0.7, posture='sitting')
+        print(result.erf)  # 42.9
+        print(result.delta_mrt)  # 10.3
     """
 
-    posture = posture.lower()
-    if posture not in ["standing", "supine", "seated"]:
-        raise ValueError("Posture has to be either standing, supine or seated")
+    # Validate inputs using the SolarGainInputs class
+    SolarGainInputs(
+        sol_altitude=sol_altitude,
+        sharp=sharp,
+        sol_radiation_dir=sol_radiation_dir,
+        sol_transmittance=sol_transmittance,
+        f_svv=f_svv,
+        f_bes=f_bes,
+        asw=asw,
+        floor_reflectance=floor_reflectance,
+    )
 
+    sol_altitude = np.asarray(sol_altitude)
+    sharp = np.asarray(sharp)
+    sol_radiation_dir = np.asarray(sol_radiation_dir)
+    sol_transmittance = np.asarray(sol_transmittance)
+    f_svv = np.asarray(f_svv)
+    f_bes = np.asarray(f_bes)
+    asw = np.asarray(asw)
+    floor_reflectance = np.asarray(floor_reflectance)
+
+    posture = posture.lower()
+    if posture not in ["standing", "supine", "sitting"]:
+        raise ValueError("Posture has to be either standing, supine or sitting")
+
+    erf, d_mrt = _solar_gain_vectorised(
+        sol_altitude=sol_altitude,
+        sharp=sharp,
+        sol_radiation_dir=sol_radiation_dir,
+        sol_transmittance=sol_transmittance,
+        f_svv=f_svv,
+        f_bes=f_bes,
+        asw=asw,
+        floor_reflectance=floor_reflectance,
+        posture=posture,
+    )
+
+    if round_output:
+        erf = np.round(erf, 1)
+        d_mrt = np.round(d_mrt, 1)
+
+    return SolarGain(erf=erf, delta_mrt=d_mrt)
+
+
+@np.vectorize
+def _solar_gain_vectorised(
+    sol_altitude,
+    sharp,
+    sol_radiation_dir,
+    sol_transmittance,
+    f_svv,
+    f_bes,
+    asw,
+    posture,
+    floor_reflectance,
+):
     def find_span(arr, x):
         for i in range(0, len(arr)):
             if arr[i + 1] >= x >= arr[i]:
@@ -118,7 +223,7 @@ def solar_gain(
         [0.344, 0.344, 0.304, 0.244, 0.19, 0.128, 0.082],
         [0.347, 0.347, 0.308, 0.246, 0.191, 0.128, 0.082],
     ]
-    if posture == "seated":
+    if posture == "sitting":
         fp_table = [
             [0.29, 0.324, 0.305, 0.303, 0.262, 0.224, 0.177],
             [0.292, 0.328, 0.294, 0.288, 0.268, 0.227, 0.177],
@@ -157,7 +262,7 @@ def solar_gain(
     fp /= (az2 - az1) * (alt2 - alt1)
 
     f_eff = 0.725  # fraction of the body surface exposed to environmental radiation
-    if posture == "seated":
+    if posture == "sitting":
         f_eff = 0.696
 
     sw_abs = asw
@@ -178,4 +283,43 @@ def solar_gain(
     erf = e_solar * (sw_abs / lw_abs)
     d_mrt = erf / (hr * f_eff)
 
-    return {"erf": round(erf, 1), "delta_mrt": round(d_mrt, 1)}
+    return erf, d_mrt
+
+
+if __name__ == "__main__":
+    result = solar_gain(
+        sol_altitude=0,
+        sharp=120,
+        sol_radiation_dir=800,
+        sol_transmittance=0.5,
+        f_svv=0.5,
+        f_bes=0.5,
+        asw=0.7,
+        posture="sitting",
+    )
+    print(result)
+
+    result = solar_gain(
+        sol_altitude=[0, 30],
+        sharp=[120, 60],
+        sol_radiation_dir=[800, 600],
+        sol_transmittance=[0.5, 0.6],
+        f_svv=[0.5, 0.4],
+        f_bes=[0.5, 0.6],
+        asw=0.7,
+        posture="sitting",
+    )
+    print(result)
+
+    result = solar_gain(
+        **{
+            "sol_altitude": 45,
+            "sharp": 0,
+            "sol_radiation_dir": 700,
+            "sol_transmittance": 0.8,
+            "f_svv": 0.2,
+            "f_bes": 0.5,
+            "asw": 0.7,
+            "posture": "sitting",
+        }
+    )
