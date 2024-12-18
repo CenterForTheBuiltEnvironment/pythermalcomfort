@@ -206,12 +206,13 @@ def pmv_ppd(
         airspeed_control=airspeed_control,
     )
 
-    tdb = np.asarray(tdb)
-    tr = np.asarray(tr)
-    vr = np.asarray(vr)
-    met = np.asarray(met)
-    clo = np.asarray(clo)
-    wme = np.asarray(wme)
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    rh = np.array(rh)
+    vr = np.array(vr)
+    met = np.array(met)
+    clo = np.array(clo)
+    wme = np.array(wme)
 
     if units.lower() == "ip":
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)

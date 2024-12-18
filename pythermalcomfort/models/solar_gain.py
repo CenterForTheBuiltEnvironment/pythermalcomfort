@@ -153,14 +153,14 @@ def solar_gain(
         floor_reflectance=floor_reflectance,
     )
 
-    sol_altitude = np.asarray(sol_altitude)
-    sharp = np.asarray(sharp)
-    sol_radiation_dir = np.asarray(sol_radiation_dir)
-    sol_transmittance = np.asarray(sol_transmittance)
-    f_svv = np.asarray(f_svv)
-    f_bes = np.asarray(f_bes)
-    asw = np.asarray(asw)
-    floor_reflectance = np.asarray(floor_reflectance)
+    sol_altitude = np.array(sol_altitude)
+    sharp = np.array(sharp)
+    sol_radiation_dir = np.array(sol_radiation_dir)
+    sol_transmittance = np.array(sol_transmittance)
+    f_svv = np.array(f_svv)
+    f_bes = np.array(f_bes)
+    asw = np.array(asw)
+    floor_reflectance = np.array(floor_reflectance)
 
     posture = posture.lower()
     if posture not in ["standing", "supine", "sitting"]:
