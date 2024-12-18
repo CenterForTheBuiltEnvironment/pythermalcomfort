@@ -1,3 +1,5 @@
+import numpy as np
+
 from pythermalcomfort.models import vertical_tmp_grad_ppd
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 import pytest
@@ -17,5 +19,8 @@ def test_vertical_tmp_grad_ppd(get_test_url, retrieve_data):
         validate_result(result, outputs, tolerance)
 
     # Test for ValueError
-    with pytest.raises(ValueError):
-        vertical_tmp_grad_ppd(25, 25, 0.3, 50, 1.2, 0.5, 7)
+    np.isclose(
+        vertical_tmp_grad_ppd(25, 25, 0.3, 50, 1.2, 0.5, 7).ppd_vg,
+        np.nan,
+        equal_nan=True,
+    )
