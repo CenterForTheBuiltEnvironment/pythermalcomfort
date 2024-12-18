@@ -12,11 +12,10 @@ jobs:
 
   test:
 
-    # I am only testing with py310 but travis is Testing the other versions of Python
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.9', '3.10', '3.11', '3.12' ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
         platform: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
