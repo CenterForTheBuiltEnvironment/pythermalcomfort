@@ -21,7 +21,7 @@ class UTCI:
     utci : float or list of floats
         Universal Thermal Climate Index, [°C] or in [°F].
     stress_category : str or list of strs
-        UTCI categorized in terms of thermal stress.
+        UTCI categorized in terms of thermal stress [9]_.
     """
 
     utci: Union[float, List[float]]
