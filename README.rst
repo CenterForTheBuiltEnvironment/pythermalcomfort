@@ -7,24 +7,24 @@ Overview
 .. list-table::
     :stub-columns: 1
 
-    * - docs
+    * - Documentation
       - |docs|
-    * - license
+    * - License
       - |license|
-    * - downloads
+    * - Downloads
       - |downloads|
-    * - tests
+    * - Tests
       - | |appveyor|
         | |codecov|
         | |tests|
-    * - package
+    * - Package
       - | |version| |wheel|
         | |supported-ver|
         | |package-health|
 
 .. |tests| image:: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish.yml/badge.svg
     :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish.yml
-    :alt: Tests to make sure pythermalcomfort works on different Python versions and OS
+    :alt: Tests to ensure pythermalcomfort works on different Python versions and OS
 
 .. |package-health| image:: https://snyk.io/advisor/python/pythermalcomfort/badge.svg
     :target: https://snyk.io/advisor/python/pythermalcomfort
@@ -67,99 +67,38 @@ Overview
 
 .. end-badges
 
-Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET, adaptive) and convert physical variables.
+pythermalcomfort
+================
 
-Please cite us if you use this package: `Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578 <https://doi.org/10.1016/j.softx.2020.100578>`_
+`pythermalcomfort` is a Python package for calculating several thermal comfort indices (e.g., PMV, PPD, SET, adaptive) and converting physical variables.
+Please check the `Functions documentation Section <https://pythermalcomfort.readthedocs.io/en/latest/reference/index.html>`_ for a list of all the functions available in the package.
 
-* Free software: MIT license
+**Please cite us if you use this package:**
+
+Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578
 
 Installation
 ============
+
+To install `pythermalcomfort`, use pip:
 
 ::
 
     pip install pythermalcomfort
 
-You can also install the in-development version with::
-
-    pip install https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/archive/master.zip
-
-
 Documentation
 =============
 
-
-https://pythermalcomfort.readthedocs.io/
-
+The full documentation is available at: https://pythermalcomfort.readthedocs.io/
 
 Examples and Tutorials
 ======================
 
-`Examples`_ files on how to use some of the functions
+We have provided examples on how to use all the functions in the documentation page right below the function definition.
 
-.. _Examples: https://pythermalcomfort.readthedocs.io/en/latest/usage.html
-
+Find example files and tutorials on how to use some of the functions at: https://pythermalcomfort.readthedocs.io/en/latest/usage.html
 
 Contributing
 ============
 
-Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given. Click `here`_  to learn more on how to contribute to the project.
-
-.. _here: https://pythermalcomfort.readthedocs.io/en/latest/contributing.html
-
-
-Deployment
-==========
-
-I am using travis to test the code. In addition, I have enabled GitHub actions.
-Every time the code is pushed or pulled to the `master` repository then the GitHub action tests the code and if the tests pass, a new version of the package is published automatically on PyPI.
-See file in `.github/workflows/` for more information.
-
-
-Test (For developers)
-=====================
-Run all the test cases with scripts_test_result.py after making any changes. The test cases come from an online repository.
-
-.. _validation-data-comfort-models: https://github.com/FedericoTartarini/validation-data-comfort-models
-
-    ```bash
-    python ./tests/scripts_test_result.py py311
-    ```
-
-You can also specify another version of Python like one of the following py39, py310, py311, py312.
-You must have this Python version installed in your system.
-The scripts will call tox command and summarize test results into a markdown table.
-The following markdown table will be updated once you run the script.
-
-----------------------------
-| Test File                     | Result   |
-|:------------------------------|:---------|
-| test_a_pmv.py                 | FAILED   |
-| test_adaptive_ashrae.py       | PASSED   |
-| test_adaptive_en.py           | PASSED   |
-| test_ankle_draft.py           | PASSED   |
-| test_at.py                    | PASSED   |
-| test_athb.py                  | PASSED   |
-| test_clo_tout.py              | PASSED   |
-| test_cooling_effect.py        | PASSED   |
-| test_discomfort_index.py      | PASSED   |
-| test_e_pmv.py                 | PASSED   |
-| test_heat_index.py            | PASSED   |
-| test_humidex.py               | PASSED   |
-| test_jos3.py                  | PASSED   |
-| test_net.py                   | PASSED   |
-| test_pet_steady.py            | PASSED   |
-| test_phs.py                   | PASSED   |
-| test_pmv.py                   | PASSED   |
-| test_pmv_ppd.py               | PASSED   |
-| test_psychrometrics.py        | PASSED   |
-| test_set.py                   | PASSED   |
-| test_solar_gain.py            | PASSED   |
-| test_two_nodes.py             | PASSED   |
-| test_use_fans_heatwaves.py    | PASSED   |
-| test_utci.py                  | PASSED   |
-| test_utilities.py             | PASSED   |
-| test_vertical_tmp_grad_ppd.py | PASSED   |
-| test_wbgt.py                  | PASSED   |
-| test_wind_chill.py            | PASSED   |
-----------------------------
+Contributions are welcome and greatly appreciated! Every little bit helps, and credit will always be given. Learn more about how to contribute to the project here: https://pythermalcomfort.readthedocs.io/en/latest/contributing.html
