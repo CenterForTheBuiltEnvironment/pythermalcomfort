@@ -34,6 +34,7 @@ Changelog
     * Added more tests to ensure calculation accuracy.
     * Implemented input validation to ensure inputs are within model applicability limits.
     * Harmonized input names across all functions.
+    * Added surveys to assess thermal comfort to the documentation.
 
 2.10.0 (2024-03-18)
 -------------------
