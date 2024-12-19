@@ -2,8 +2,16 @@
 Authors
 =======
 
+Main Authors
+------------
+
 * `Federico Tartarini`_
 * `Stefano Schiavon`_
+
+Contributors
+------------
+
+* `Akihisa Nomoto`_
 * `Tyler Hoyt`_
 * Chris Mackey
 * `Jonas Kittner`_
@@ -12,8 +20,10 @@ Authors
 .. _Stefano Schiavon: https://www.linkedin.com/in/stefanoschiavon/
 .. _Tyler Hoyt: https://www.linkedin.com/in/tyler-hoyt1/
 .. _Jonas Kittner: https://github.com/jkittner/
+.. _Akihisa Nomoto: https://www.linkedin.com/in/akihisa-nomoto-3b872611b/
 
-**Derivative work**
+Acknowledgements
+----------------
 
 `pythermalcomfort` is a derivative work of the following software projects:
 
