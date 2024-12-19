@@ -14,6 +14,7 @@ def athb(
     rh: Union[float, List[float]],
     met: Union[float, List[float]],
     t_running_mean: Union[float, List[float]],
+    clo: Union[bool, float, List[float]] = False,
 ) -> ATHB:
     """
     Return the PMV value calculated with the Adaptive Thermal Heat Balance
@@ -45,6 +46,9 @@ def athb(
         Relative humidity, [%].
     met : float or list of floats
         Metabolic rate, [met].
+    clo : bool, float or list of floats, optional
+        Clothing insulation, in [clo]. If `clo` is set to False, the clothing insulation
+        value will be calculated using the equation provided in the paper. Defaults to False.
     t_running_mean: float or list of floats
         Running mean temperature, in [°C].
 
@@ -83,16 +87,18 @@ def athb(
 
     met_adapted = met - (0.234 * t_running_mean) / 58.2
 
-    # Adapted clothing insulation level through behavioral adaptation
-    clo_adapted = np.power(
-        10,
-        (
-            -0.17168
-            - 0.000485 * t_running_mean
-            + 0.08176 * met_adapted
-            - 0.00527 * t_running_mean * met_adapted
-        ),
-    )
+    clo_adapted = clo
+    if not clo:
+        # Adapted clothing insulation level through behavioral adaptation
+        clo_adapted = np.power(
+            10,
+            (
+                -0.17168
+                - 0.000485 * t_running_mean
+                + 0.08176 * met_adapted
+                - 0.00527 * t_running_mean * met_adapted
+            ),
+        )
 
     pmv_res = _pmv_ppd_optimized(tdb, tr, vr, rh, met_adapted, clo_adapted, 0)
     ts = 0.303 * np.exp(-0.036 * met_adapted * 58.15) + 0.028
@@ -111,3 +117,18 @@ def athb(
     )
 
     return ATHB(athb_pmv=athb_pmv)
+
+
+if __name__ == "__main__":
+    results = athb(
+        tdb=[25, 25, 25],
+        tr=[25, 25, 25],
+        vr=[0.1, 0.1, 0.1],
+        rh=[50, 50, 50],
+        met=[1.2, 1.2, 1.2],
+        t_running_mean=[20, 20, 20],
+    )
+    print(results.athb_pmv)
+
+    results = athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20, clo=0.3)
+    print(results.athb_pmv)
