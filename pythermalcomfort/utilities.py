@@ -31,7 +31,6 @@ def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     -------
     p_sat : float
         saturation vapor pressure [torr]
-
     """
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
@@ -40,7 +39,7 @@ def enthalpy_air(
     tdb: Union[float, int, np.ndarray, List[float], List[int]],
     hr: Union[float, int, np.ndarray, List[float], List[int]],
 ):
-    """Calculates air enthalpy_air
+    """Calculates air enthalpy_air.
 
     Parameters
     ----------
@@ -53,7 +52,6 @@ def enthalpy_air(
     -------
     enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
@@ -77,7 +75,7 @@ c13 = 6.5459673
 
 
 def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
-    """Calculates vapour pressure of water at different temperatures
+    """Calculates vapour pressure of water at different temperatures.
 
     Parameters
     ----------
@@ -88,7 +86,6 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     -------
     p_sat: float or list of floats
         saturation vapor pressure, [Pa]
-
     """
     ta_k = tdb + c_to_k
     # pre-calculate the value before passing it to .where
@@ -127,10 +124,9 @@ def psy_ta_rh(
     rh: Union[float, int, np.ndarray, List[float], List[int]],
     p_atm=101325,
 ) -> PsychrometricValues:
-    """Calculates psychrometric values of air based on dry bulb air temperature and
-    relative humidity.
-    For more accurate results we recommend the use of the Python package
-    `psychrolib`_.
+    """Calculates psychrometric values of air based on dry bulb air temperature
+    and relative humidity. For more accurate results we recommend the use of
+    the Python package `psychrolib`_.
 
     .. _psychrolib: https://pypi.org/project/PsychroLib/
 
@@ -155,7 +151,6 @@ def psy_ta_rh(
         dew point temperature, [°C]
     h: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     tdb = np.array(tdb)
     rh = np.array(rh)
@@ -194,7 +189,6 @@ def wet_bulb_tmp(
     -------
     tdb: float or list of floats
         wet-bulb temperature, [°C]
-
     """
     twb = (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
@@ -224,7 +218,6 @@ def dew_point_tmp(
     -------
     dew_point_tmp: float or list of floats
         dew point temperature, [°C]
-
     """
     tdb = np.array(tdb)
     rh = np.array(rh)
@@ -246,9 +239,9 @@ def mean_radiant_tmp(
     emissivity: Union[float, int, np.ndarray, List[float], List[int]] = 0.95,
     standard="Mixed Convection",
 ):
-    """Converts globe temperature reading into mean radiant temperature in accordance
-    with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [5]_.
+    """Converts globe temperature reading into mean radiant temperature in
+    accordance with either the Mixed Convection developed by Teitelbaum E. et
+    al. (2022) or the ISO 7726:1998 Standard [5]_.
 
     Parameters
     ----------
@@ -276,7 +269,6 @@ def mean_radiant_tmp(
     -------
     tr: float or list of floats
         mean radiant temperature, [°C]
-
     """
     standard = standard.lower()
 
@@ -733,7 +725,6 @@ def body_surface_area(weight, height, formula="dubois"):
     -------
     body_surface_area : float
         body surface area, [m2]
-
     """
     if formula == "dubois":
         return 0.202 * (weight**0.425) * (height**0.725)
@@ -765,7 +756,6 @@ def f_svv(w, h, d):
     -------
     f_svv  : float
         sky-vault view fraction ranges between 0 and 1
-
     """
     return (
         math.degrees(math.atan(h / (2 * d)))
@@ -776,9 +766,9 @@ def f_svv(w, h, d):
 
 def v_relative(v, met):
     """Estimates the relative air speed which combines the average air speed of
-    the space plus the relative air speed caused by the body movement. Vag is assumed to
-    be 0 for metabolic rates equal and lower than 1 met and otherwise equal to
-    Vag = 0.3 (M – 1) (m/s)
+    the space plus the relative air speed caused by the body movement. Vag is
+    assumed to be 0 for metabolic rates equal and lower than 1 met and
+    otherwise equal to Vag = 0.3 (M – 1) (m/s)
 
     Parameters
     ----------
@@ -791,18 +781,17 @@ def v_relative(v, met):
     -------
     vr  : float or list of floats
         relative air speed, [m/s]
-
     """
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
 def clo_dynamic(clo, met, standard="ASHRAE"):
-    """Estimates the dynamic clothing insulation of a moving occupant. The activity as
-    well as the air speed modify the insulation characteristics of the clothing and the
-    adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
-    shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect
-    of the body movement for met equal or higher than 1.2 met using the equation
-    clo = Icl × (0.6 + 0.4/met)
+    """Estimates the dynamic clothing insulation of a moving occupant. The
+    activity as well as the air speed modify the insulation characteristics of
+    the clothing and the adjacent air layer. Consequently, the ISO 7730 states
+    that the clothing insulation shall be corrected [2]_. The ASHRAE 55
+    Standard corrects for the effect of the body movement for met equal or
+    higher than 1.2 met using the equation clo = Icl × (0.6 + 0.4/met)
 
     Parameters
     ----------
@@ -817,7 +806,6 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
-
     """
     standard = standard.lower()
 
@@ -858,7 +846,6 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     -------
     t_rm  : float
         running mean outdoor temperature
-
     """
     if units.lower() == "ip":
         for ix, x in enumerate(temp_array):
@@ -885,7 +872,6 @@ def units_converter(from_units="ip", **kwargs):
     Returns
     -------
     converted values in SI units
-
     """
     results = list()
     if from_units == "ip":
@@ -928,7 +914,6 @@ def mapping(value, map_dictionary, right=True):
     Returns
     -------
     Stress category for each input temperature.
-
     """
     bins = np.array(list(map_dictionary.keys()))
     words = np.append(np.array(list(map_dictionary.values())), "unknown")
@@ -959,7 +944,6 @@ def operative_tmp(
     -------
     to: float
         operative temperature, [°C]
-
     """
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
