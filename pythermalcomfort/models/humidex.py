@@ -1,9 +1,16 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.psychrometrics import t_dp
 from pythermalcomfort.utilities import BaseInputs
+
+
+class HumidexModels(Enum):
+    rana = "rana"
+    masterson = "masterson"
 
 
 @dataclass(frozen=True)
@@ -46,6 +53,7 @@ def humidex(
     tdb: Union[float, List[float]],
     rh: Union[float, List[float]],
     round_output: bool = True,
+    model: str = "rana",
 ) -> Humidex:
     """Calculates the humidex (short for "humidity index"). It has been
     developed by the Canadian Meteorological service. It was introduced in 1965
@@ -62,6 +70,14 @@ def humidex(
         Relative humidity, [%].
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
+    model : str, optional
+        The model to be used for the calculation. Options are 'rana' and 'masterson'. Defaults to 'rana'.
+
+        .. note::
+            The 'rana' model is the Humidex model proposed by `Rana et al. (2013)`_.
+            The 'masterson' model is the Humidex model proposed by Masterson and Richardson (1979) [14]_.
+
+            .. _Rana et al. (2013): https://doi.org/10.1016/j.enbuild.2013.04.019
 
     Returns
     -------
@@ -97,7 +113,17 @@ def humidex(
     if np.any(rh > 100) or np.any(rh < 0):
         raise ValueError("Relative humidity must be between 0 and 100%")
 
+    if model not in [model.value for model in HumidexModels]:
+        raise ValueError(
+            "Invalid model. The model must be either 'rana' or 'masterson'"
+        )
+
     hi = tdb + 5 / 9 * ((6.112 * 10 ** (7.5 * tdb / (237.7 + tdb)) * rh / 100) - 10)
+    if model == HumidexModels.masterson.value:
+        hi = tdb + 5 / 9 * (
+            6.11 * np.exp(5417.753 * (1 / 273.15 - 1 / (t_dp(tdb=tdb, rh=rh) + 273.15)))
+            - 10
+        )
 
     if round_output:
         hi = np.around(hi, 1)
@@ -120,3 +146,6 @@ if __name__ == "__main__":
     result = humidex(tdb=[25, 30], rh=[50, 60], round_output=False)
     print(result.humidex)  # [28.2, 39.1]
     print(result.discomfort)  # ['Little or no discomfort', 'Evident discomfort']
+
+    result = humidex(tdb=21, rh=100, model="masterson")
+    print(result.humidex)  # 29.3
