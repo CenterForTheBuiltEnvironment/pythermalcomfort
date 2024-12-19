@@ -1001,7 +1001,8 @@ clo_typical_ensembles = {
     "Typical winter indoor clothing": 1.0,
 }
 
-#: Clo values of individual clothing elements. To calculate the total clothing insulation you need to add these values together.
+#: Clo values of individual clothing elements. To calculate the total
+#: clothing insulation you need to add these values together.
 clo_individual_garments = {
     "Metal chair": 0.00,
     "Bra": 0.01,
@@ -1061,7 +1062,8 @@ clo_individual_garments = {
     "Double-breasted coat (thick)": 0.48,
 }
 
-#: This dictionary contains the reflection coefficients, Fr, for different special materials
+#: This dictionary contains the reflection coefficients, Fr, for different
+#: special materials
 f_r_garments = {
     "Cotton with aluminium paint": 0.42,
     "Viscose with glossy aluminium foil": 0.19,

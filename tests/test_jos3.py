@@ -46,7 +46,7 @@ from pythermalcomfort.jos3_functions.thermoregulation import (
     sum_bf,
     wet_r,
 )
-from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
+from pythermalcomfort.models import JOS3
 
 
 # test JOS-3 class
@@ -70,9 +70,7 @@ def test_JOS3_class():
 
     # Test: _reset_setpt()
     result = model._reset_setpt()
-    # Check if the _reset_setpt method returns the expected type (e.g., dict)
     assert isinstance(result, dict)
-    # Check if the result contains specific keys (e.g., 't_core', 't_skin')
     assert "t_core" in result
     assert "t_skin" in result
     # Check if the attributes of the JOS3 object have been updated as expected
@@ -101,7 +99,7 @@ def test_JOS3_class():
     model.par = 1.2  # Physical activity ratio [-]
     model.simulate(60)  # Exposure time = 60 [min]
 
-    # Set the next condition (You only need to change the parameters that you want to change)
+    # Set the next condition
     model.to = 20  # Change only operative temperature
     model.simulate(60)  # Additional exposure time = 60 [min]
 
@@ -117,7 +115,7 @@ def test_JOS3_class():
     relative_path = os.path.join(
         "examples", "jos3_output_example", "jos3_example1 (default output).csv"
     )
-    # Generate the absolute path by combining the project directory and the relative path
+    # Generate the absolute path by combining the project and the relative path
     file_path = os.path.join(project_directory, relative_path)
 
     # Read the 't_skin_mean' column from the CSV file into a DataFrame
@@ -459,7 +457,8 @@ def test_local_arr():
     assert result.shape == (NUM_NODES, NUM_NODES)
 
     # Check that the elements in the array are correct
-    # You could add more specific checks here, depending on the expected behavior of the function
+    # You could add more specific checks here, depending on the expected
+    # behavior of the function
     for i, bn in enumerate(BODY_NAMES):
         index_of = IDICT[bn]
 
@@ -525,7 +524,6 @@ def test_vessel_blood_flow():
     xbf = bf_core + bf_muscle + bf_fat + bf_skin
 
     # Check that the elements in the array are correct
-    # You could add more specific checks here, depending on the expected behavior of the function
     assert np.isclose(bf_art[0], xbf[0])
     assert np.isclose(bf_vein[0], xbf[0])
 
@@ -1197,8 +1195,9 @@ def test_ava_blood_flow():
     bf_ava_hand, bf_ava_foot = ava_blood_flow(err_cr, err_sk)
 
     # (Need to be investigated)
-    # Expected results are 1.71258 for hands and 1.42223 for feet when focusing on the equation (Takemori, 1995.),
-    # but they might be 0 in theory, considering characteristics of ava blood flow.
+    # Expected results are 1.71258 for hands and 1.42223 for feet when focusing on the
+    # equation (Takemori, 1995.), but they might be 0 considering
+    # characteristics of ava blood flow.
     expected_result_hand = 1.71258
     expected_result_foot = 1.42223
 
@@ -1249,7 +1248,8 @@ def test_local_mbase():
         height=1.80, weight=70, age=25, sex="male", bmr_equation="harris-benedict"
     )
 
-    # Check that each element of mbase_cr is greater than the corresponding elements of mbase_ms, mbase_fat, and mbase_sk
+    # Check that each element of mbase_cr is greater than the corresponding elements
+    # of mbase_ms, mbase_fat, and mbase_sk
     assert all(mbase_cr > mbase_ms)
     assert all(mbase_cr > mbase_fat)
     assert all(mbase_cr > mbase_sk)

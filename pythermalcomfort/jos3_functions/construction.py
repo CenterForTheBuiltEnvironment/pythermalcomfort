@@ -1,5 +1,5 @@
-"""This code provides models for calculating the surface area of different
-body parts, weight ratio, basal blood flow ratio, and thermal conductance and
+"""This code provides models for calculating the surface area of different body
+parts, weight ratio, basal blood flow ratio, and thermal conductance and
 thermal capacity.
 
 The values of a NumPy array containing 17 elements correspond to the
@@ -72,7 +72,6 @@ def _to17array(inp):
     ------
     ValueError
         If the input type is not supported or if the input list or ndarray is not of length 17.
-
     """
     if isinstance(inp, (int, float)):
         array = np.ones(17) * inp
@@ -113,7 +112,6 @@ def bsa_rate(
     -------
     bsa_rate : float
         The ratio of bsa to the standard body [-].
-
     """
     validate_body_parameters(height=height, weight=weight)
 
@@ -153,7 +151,6 @@ def local_bsa(
     -------
     local_bsa : ndarray(17,)
         Local body surface area (bsa) [m2].
-
     """
     validate_body_parameters(height=height, weight=weight)
     _bsa_rate = bsa_rate(
@@ -189,7 +186,6 @@ def weight_rate(
     weight_rate : float
         The ratio of the body weight to the standard body (74.43 kg).
         weight_rate = weight / 74.43
-
     """
     validate_body_parameters(weight=weight)
     return weight / Default.weight
@@ -223,7 +219,6 @@ def bfb_rate(
     -------
     bfb_rate : float
         Basal blood flow rate.
-
     """
     validate_body_parameters(
         height=height,
@@ -274,7 +269,6 @@ def conductance(
     conductance : numpy.ndarray
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
-
     """
     validate_body_parameters(
         height=height,
@@ -562,7 +556,6 @@ def capacity(
     capacity : numpy.ndarray.
         Thermal capacity [W/K].
         The shape is (NUM_NODES).
-
     """
     validate_body_parameters(
         height=height,

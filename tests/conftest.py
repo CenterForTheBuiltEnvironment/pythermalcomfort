@@ -99,7 +99,8 @@ def validate_result(result, expected_output, tolerance: dict):
     ----------
     result this is the result of the function that is being tested
     expected_output this is the expected output of the function that is being tested
-    tolerance this is the tolerance that is used to compare the result with the expected output
+    tolerance this is the tolerance that is used to compare the result with the
+    expected output
 
     Returns
     -------
@@ -109,7 +110,8 @@ def validate_result(result, expected_output, tolerance: dict):
     for key in expected_output:
         _expected_output = expected_output[key]
 
-        # some functions return a dictionary or class with multiple values while others return a single value
+        # some functions return a dictionary or class with multiple values while
+        # others return a single value
         # todo remove this once all the functions return a dictionary or class
         try:
             _result = result[key]

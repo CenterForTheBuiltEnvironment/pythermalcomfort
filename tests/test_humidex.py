@@ -32,7 +32,8 @@ def test_humidex(get_test_url, retrieve_data):
 
 def test_humidex_masterson():
     # todo move this to shared test
-    # I got these values from https://publications.gc.ca/collections/collection_2018/eccc/En57-23-1-79-eng.pdf
+    # I got these values from
+    # https://publications.gc.ca/collections/collection_2018/eccc/En57-23-1-79-eng.pdf
     result = humidex(tdb=21, rh=100, model="masterson")
     assert result.humidex == 29.3
     assert result.discomfort == "Little or no discomfort"

@@ -124,9 +124,7 @@ def pmv(
         v_r = v_relative(v=v, met=met_rate)
         # calculate dynamic clothing
         clo_d = clo_dynamic(clo=clo_insulation, met=met_rate)
-        results = pmv(
-            tdb=t_db, tr=t_r, vr=v_r, rh=relative_humidity, met=met_rate, clo=clo_d
-        )
+        results = pmv(tdb=t_db, tr=t_r, vr=v_r, rh=relative_humidity, met=met_rate, clo=clo_d)
         print(result.pmv)  # 0.06
         # you can also pass an array-like of inputs
         results = pmv(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)

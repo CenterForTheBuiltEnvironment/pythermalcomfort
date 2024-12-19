@@ -2,9 +2,12 @@
 line-length = 88
 
 [lint]
-select = ["E501", "I"]
+select = [
+    "E",
+    "I"
+]
 
 [format]
 docstring-code-format = true
-docstring-code-line-length = 88
+docstring-code-line-length = 90
 
