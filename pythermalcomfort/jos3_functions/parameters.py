@@ -16,7 +16,7 @@ string can be displayed or printed for user reference.
 
 import textwrap
 from dataclasses import dataclass
-from typing import ClassVar, List
+from typing import ClassVar
 
 import numpy as np
 

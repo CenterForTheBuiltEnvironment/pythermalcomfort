@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union
+from typing import Union
 
 import numpy.typing as npt
 
@@ -198,7 +198,7 @@ class DI:
     """
 
     di: Union[float, list[float]]
-    discomfort_condition: Union[str, List[str]]
+    discomfort_condition: Union[str, list[str]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -250,7 +250,7 @@ class Humidex:
     """
 
     humidex: Union[float, list[float]]
-    discomfort: Union[str, List[str]]
+    discomfort: Union[str, list[str]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -523,10 +523,10 @@ class UseFansHeatwaves:
     m_rsw: Union[float, list[float]]
     w: Union[float, list[float]]
     w_max: Union[float, list[float]]
-    heat_strain: Union[bool, List[bool]]
-    heat_strain_blood_flow: Union[bool, List[bool]]
-    heat_strain_w: Union[bool, List[bool]]
-    heat_strain_sweating: Union[bool, List[bool]]
+    heat_strain: Union[bool, list[bool]]
+    heat_strain_blood_flow: Union[bool, list[bool]]
+    heat_strain_w: Union[bool, list[bool]]
+    heat_strain_sweating: Union[bool, list[bool]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -545,7 +545,7 @@ class UTCI:
     """
 
     utci: Union[float, list[float]]
-    stress_category: Union[str, List[str]]
+    stress_category: Union[str, list[str]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -565,7 +565,7 @@ class VerticalTGradPPD:
     """
 
     ppd_vg: Union[float, list[float]]
-    acceptability: Union[bool, List[bool]]
+    acceptability: Union[bool, list[bool]]
 
     def __getitem__(self, item):
         return getattr(self, item)

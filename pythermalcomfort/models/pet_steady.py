@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -17,9 +17,9 @@ def pet_steady(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     p_atm: Union[float, list[float]] = 1013.25,
-    position: Union[str, List[str]] = "sitting",
-    age: Union[int, List[int]] = 23,
-    sex: Union[int, List[int]] = "male",
+    position: Union[str, list[str]] = "sitting",
+    age: Union[int, list[int]] = 23,
+    sex: Union[int, list[int]] = "male",
     weight: Union[float, list[float]] = 75,
     height: Union[float, list[float]] = 1.8,
     wme: Union[float, list[float]] = 0,

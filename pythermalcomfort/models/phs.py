@@ -1,5 +1,5 @@
 import math
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 from numba import jit
@@ -19,8 +19,8 @@ def phs(
     rh: Union[float, list[float]],
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
-    posture: Union[str, List[str]],
-    wme: Union[float, int, np.ndarray, list[float], List[int]] = 0,
+    posture: Union[str, list[str]],
+    wme: Union[float, int, np.ndarray, list[float], list[int]] = 0,
     round_output: bool = True,
     **kwargs,
 ) -> PHS:

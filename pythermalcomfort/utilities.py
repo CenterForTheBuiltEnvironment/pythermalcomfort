@@ -1,7 +1,7 @@
 import math
 import warnings
 from dataclasses import dataclass, field
-from typing import List, NamedTuple, Union
+from typing import NamedTuple, Union
 
 import numpy as np
 
