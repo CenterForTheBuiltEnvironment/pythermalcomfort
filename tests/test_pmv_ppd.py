@@ -201,3 +201,14 @@ class TestPmvPpdOptimized:
     def test_check_wrong_input(self):
         with pytest.raises(TypeError):
             pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, stardard="random")
+
+    def test_wrong_standard(self):
+        with pytest.raises(ValueError):
+            pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, standard="random")
+
+    def test_no_rounding(self):
+        np.isclose(
+            pmv_ppd(25, 25, 0.1, 50, 1.1, 0.5, round_output=False).pmv,
+            -0.13201636,
+            atol=0.01,
+        )
