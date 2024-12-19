@@ -5,9 +5,9 @@ from typing import Union, List
 import numpy as np
 from numba import jit
 
-from pythermalcomfort.psychrometrics import p_sat
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import (
+    BaseInputs,
+    p_sat,
     check_standard_compliance_array,
 )
 

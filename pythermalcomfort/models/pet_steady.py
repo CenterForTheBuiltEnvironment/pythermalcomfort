@@ -5,11 +5,8 @@ import numpy as np
 import numpy.typing as npt
 from scipy import optimize
 
-from pythermalcomfort.psychrometrics import p_sat
 from pythermalcomfort.utilities import BaseInputs
-from pythermalcomfort.utilities import (
-    body_surface_area,
-)
+from pythermalcomfort.utilities import body_surface_area, p_sat
 
 
 @dataclass(frozen=True)

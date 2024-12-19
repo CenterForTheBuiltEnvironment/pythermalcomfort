@@ -5,7 +5,10 @@ Changelog
 -------------------
 
 .. warning::
-    pythermalcomfort version 3.0.0 introduces some breaking changes as the functions now return dataclass instances with the calculation results.
+    pythermalcomfort version 3.0.0 introduces some breaking changes.
+
+    **How functions return results:**
+    as the functions now return dataclass instances with the calculation results.
     This change enhances the structure and accessibility of the results.
     For example:
 
@@ -16,6 +19,9 @@ Changelog
         print(result.pmv)  # [-0.  0.41]
 
     This update aims to make the package more user-friendly and to provide a more organized way to access all calculation results.
+
+    **Moved functions**
+    Moved all the functions that were in the `psychrometrics.py` file to the `utilities.py` file.
 
 .. note::
     We have updated all functions to accept Numpy arrays as inputs, allowing you to pass multiple values at once for faster results.
@@ -294,7 +300,7 @@ Changelog
 1.2.2 (2020-08-21)
 ------------------
 
-* Changed default diameter in t_mrt
+* Changed default diameter in mean_radiant_tmp
 * Improved documentation
 
 
@@ -353,7 +359,7 @@ Changelog
 * Added functions to calculate vapour pressure, wet-bulb temperature, dew point temperature, and psychrometric data from dry bulb temperature and RH
 * Added authors
 * Added dictionaries with reference clo and met values
-* Added function to calculate enthalpy
+* Added function to calculate enthalpy_air
 
 0.5.2 (2020-03-11)
 ------------------

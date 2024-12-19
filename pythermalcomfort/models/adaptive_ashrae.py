@@ -4,7 +4,7 @@ from typing import Union, Literal
 import numpy as np
 import numpy.typing as npt
 
-from pythermalcomfort.psychrometrics import t_o
+from pythermalcomfort.utilities import operative_tmp
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
     units_converter,
@@ -165,7 +165,7 @@ def adaptive_ashrae(
     )
     trm_valid = valid_range(t_running_mean, (10.0, 33.5))
 
-    to = t_o(tdb, tr, v, standard=standard)
+    to = operative_tmp(tdb, tr, v, standard=standard)
 
     # Calculate cooling effect (ce) of elevated air speed when top > 25 degC.
     ce = np.where((v >= 0.6) & (to >= 25.0), 999, 0)

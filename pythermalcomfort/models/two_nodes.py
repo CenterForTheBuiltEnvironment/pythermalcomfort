@@ -5,9 +5,8 @@ from typing import Union, List
 import numpy as np
 from numba import jit, vectorize, float64
 
-from pythermalcomfort.psychrometrics import p_sat_torr
 from pythermalcomfort.return_classes import SetTmp
-from pythermalcomfort.utilities import BaseInputs
+from pythermalcomfort.utilities import BaseInputs, p_sat_torr
 
 
 @dataclass(frozen=True)

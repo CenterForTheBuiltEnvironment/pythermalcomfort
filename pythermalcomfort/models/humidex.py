@@ -4,8 +4,7 @@ from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.psychrometrics import t_dp
-from pythermalcomfort.utilities import BaseInputs
+from pythermalcomfort.utilities import BaseInputs, dew_point_tmp
 
 
 class HumidexModels(Enum):
@@ -121,7 +120,10 @@ def humidex(
     hi = tdb + 5 / 9 * ((6.112 * 10 ** (7.5 * tdb / (237.7 + tdb)) * rh / 100) - 10)
     if model == HumidexModels.masterson.value:
         hi = tdb + 5 / 9 * (
-            6.11 * np.exp(5417.753 * (1 / 273.15 - 1 / (t_dp(tdb=tdb, rh=rh) + 273.15)))
+            6.11
+            * np.exp(
+                5417.753 * (1 / 273.15 - 1 / (dew_point_tmp(tdb=tdb, rh=rh) + 273.15))
+            )
             - 10
         )
 
