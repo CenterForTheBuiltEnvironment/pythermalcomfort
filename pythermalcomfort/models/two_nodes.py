@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Union
 
 import numpy as np
 from numba import float64, jit, vectorize

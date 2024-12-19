@@ -6,13 +6,17 @@ indent-width = 4
 select = [
     "A",  # prevent using keywords that clobber python builtins
     "B",  # bugbear: security warnings
-#    "E",  # pycodestyle
+    "E",  # pycodestyle
     "F",  # pyflakes
     "E4",
     "E7",
     "E9",
     "UP",  # alert you when better syntax is available in your python version
     "I",  # import order
+]
+ignore = [
+    "E712",  # Allow using if x == False, as it's not always equivalent to if x.
+    "E501",  # Supress line-too-long warnings: trust black's judgement on this one.
 ]
 
 [format]
