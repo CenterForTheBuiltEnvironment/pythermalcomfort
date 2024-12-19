@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMV_PPD
+from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMVPPD
 
 from pythermalcomfort.models import pmv_ppd
 from tests.conftest import Urls, retrieve_reference_table, validate_result, is_equal
@@ -115,12 +115,12 @@ class TestPmvPpd:
         # check results with limit_inputs disabled
         np.testing.assert_equal(
             pmv_ppd(31, 41, 2, 50, 0.7, 2.1, standard="iso", limit_inputs=False),
-            PMV_PPD(pmv=np.float64(2.4), ppd=np.float64(91.0)),
+            PMVPPD(pmv=np.float64(2.4), ppd=np.float64(91.0)),
         )
 
         np.testing.assert_equal(
             pmv_ppd(41, 41, 2, 50, 0.7, 2.1, standard="ashrae", limit_inputs=False),
-            PMV_PPD(pmv=np.float64(4.48), ppd=np.float64(100.0)),
+            PMVPPD(pmv=np.float64(4.48), ppd=np.float64(100.0)),
         )
 
     def test_pmv_ppd_optimized(self):

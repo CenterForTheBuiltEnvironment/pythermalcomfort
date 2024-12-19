@@ -1,56 +1,10 @@
-from dataclasses import dataclass
 from typing import Union, Literal, List
 
 import numpy as np
-import numpy.typing as npt
 
+from pythermalcomfort.classes_input import APMVInputs
+from pythermalcomfort.classes_return import APMV
 from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class AdaptivePMV:
-    """
-    A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV) model.
-
-    Attributes
-    ----------
-    a_pmv : float, or array-like
-        Predicted Mean Vote.
-    """
-
-    a_pmv: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class APMVInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        a_coefficient,
-        wme=0,
-        units="SI",
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            a_coefficient=a_coefficient,
-            wme=wme,
-            units=units,
-        )
 
 
 def a_pmv(
@@ -64,7 +18,7 @@ def a_pmv(
     wme: Union[float, List[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
-) -> AdaptivePMV:
+) -> APMV:
     """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was developed by Yao, R. et al. (2009).
     The model takes into account factors such as culture, climate, social, psychological, and behavioral
     adaptations, which have an impact on the senses used to detect thermal comfort. This model uses an
@@ -106,7 +60,7 @@ def a_pmv(
 
     Returns
     -------
-    AdaptivePMV
+    APMV
         A dataclass containing the Predicted Mean Vote (a_pmv). See :py:class:`~pythermalcomfort.models.a_pmv.AdaptivePMV` for more details.
         To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance, e.g., `result.a_pmv`.
 
@@ -161,4 +115,4 @@ def a_pmv(
 
     pmv_value = np.around(_pmv / (1 + a_coefficient * _pmv), 2)
 
-    return AdaptivePMV(a_pmv=pmv_value)
+    return APMV(a_pmv=pmv_value)

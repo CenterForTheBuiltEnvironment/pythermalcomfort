@@ -1,87 +1,15 @@
 import math
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 from numba import jit
 
+from pythermalcomfort.classes_input import PHSInputs
+from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
-    BaseInputs,
     p_sat,
     check_standard_compliance_array,
 )
-
-
-@dataclass(frozen=True)
-class PHS:
-    """
-    Dataclass to represent the Predicted Heat Strain (PHS).
-
-    Attributes
-    ----------
-    t_re : float or list of floats
-        Rectal temperature, [°C].
-    t_sk : float or list of floats
-        Skin temperature, [°C].
-    t_cr : float or list of floats
-        Core temperature, [°C].
-    t_cr_eq : float or list of floats
-        Core temperature as a function of the metabolic rate, [°C].
-    t_sk_t_cr_wg : float or list of floats
-        Fraction of the body mass at the skin temperature.
-    d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time for water loss, mean subject, [minutes].
-    d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
-    d_lim_t_re : float or list of floats
-        Maximum allowable exposure time for heat storage, [minutes].
-    water_loss_watt : float or list of floats
-        Maximum water loss in watts, [W].
-    water_loss : float or list of floats
-        Maximum water loss, [g].
-    """
-
-    t_re: Union[float, List[float]]
-    t_sk: Union[float, List[float]]
-    t_cr: Union[float, List[float]]
-    t_cr_eq: Union[float, List[float]]
-    t_sk_t_cr_wg: Union[float, List[float]]
-    d_lim_loss_50: Union[float, List[float]]
-    d_lim_loss_95: Union[float, List[float]]
-    d_lim_t_re: Union[float, List[float]]
-    water_loss_watt: Union[float, List[float]]
-    water_loss: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class PHSInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        met,
-        clo,
-        round_output,
-        wme,
-        posture,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            met=met,
-            clo=clo,
-            round_output=round_output,
-            wme=wme,
-            posture=posture,
-        )
 
 
 def phs(
@@ -125,7 +53,7 @@ def phs(
         Clothing insulation, [clo].
     posture: string or list of strings
         a string value presenting posture of person "sitting", "standing", or "crouching"
-    wme : float, int, or array-like
+    wme : float or list of floats
         external work, [met] default 0
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.

@@ -1,75 +1,13 @@
-from dataclasses import dataclass
 from typing import Union, Literal
 
 import numpy as np
 import numpy.typing as npt
 
-from pythermalcomfort.utilities import operative_tmp
+from pythermalcomfort.classes_input import ENInputs
+from pythermalcomfort.classes_return import AdaptiveEN
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import units_converter, BaseInputs
-
-
-@dataclass
-class AdaptiveEN:
-    """
-    Dataclass to store the results of the adaptive thermal comfort calculation based on EN 16798-1 2019.
-
-    Attributes
-    ----------
-    tmp_cmf : float or array-like
-        Comfort temperature at that specific running mean temperature, default in [°C] or in [°F].
-    acceptability_cat_i : bool or array-like
-        If the indoor conditions comply with comfort category I.
-    acceptability_cat_ii : bool or array-like
-        If the indoor conditions comply with comfort category II.
-    acceptability_cat_iii : bool or array-like
-        If the indoor conditions comply with comfort category III.
-    tmp_cmf_cat_i_up : float or array-like
-        Upper acceptable comfort temperature for category I, default in [°C] or in [°F].
-    tmp_cmf_cat_ii_up : float or array-like
-        Upper acceptable comfort temperature for category II, default in [°C] or in [°F].
-    tmp_cmf_cat_iii_up : float or array-like
-        Upper acceptable comfort temperature for category III, default in [°C] or in [°F].
-    tmp_cmf_cat_i_low : float or array-like
-        Lower acceptable comfort temperature for category I, default in [°C] or in [°F].
-    tmp_cmf_cat_ii_low : float or array-like
-        Lower acceptable comfort temperature for category II, default in [°C] or in [°F].
-    tmp_cmf_cat_iii_low : float or array-like
-        Lower acceptable comfort temperature for category III, default in [°C] or in [°F].
-    """
-
-    tmp_cmf: Union[float, npt.ArrayLike]
-    acceptability_cat_i: Union[bool, npt.ArrayLike]
-    acceptability_cat_ii: Union[bool, npt.ArrayLike]
-    acceptability_cat_iii: Union[bool, npt.ArrayLike]
-    tmp_cmf_cat_i_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_ii_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_iii_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_i_low: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_ii_low: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_iii_low: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class ENInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        t_running_mean,
-        v,
-        units,
-    ):
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            units=units,
-            t_running_mean=t_running_mean,
-        )
+from pythermalcomfort.utilities import operative_tmp
+from pythermalcomfort.utilities import units_converter
 
 
 def adaptive_en(

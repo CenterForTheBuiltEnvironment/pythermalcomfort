@@ -1,60 +1,11 @@
 import math
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs
+from pythermalcomfort.classes_input import SolarGainInputs
+from pythermalcomfort.classes_return import SolarGain
 from pythermalcomfort.utilities import transpose_sharp_altitude
-
-
-@dataclass(frozen=True)
-class SolarGain:
-    """
-    Dataclass to represent the solar gain to the human body.
-
-    Attributes
-    ----------
-    erf : float or list of floats
-        Solar gain to the human body using the Effective Radiant Field [W/m2].
-    delta_mrt : float or list of floats
-        Delta mean radiant temperature. The amount by which the mean radiant
-        temperature of the space should be increased if no solar radiation is present.
-    """
-
-    erf: Union[float, List[float]]
-    delta_mrt: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class SolarGainInputs(BaseInputs):
-    def __init__(
-        self,
-        sol_altitude,
-        sharp,
-        sol_radiation_dir,
-        sol_transmittance,
-        f_svv,
-        f_bes,
-        asw=0.7,
-        posture="sitting",
-        floor_reflectance=0.6,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            sol_altitude=sol_altitude,
-            sharp=sharp,
-            sol_radiation_dir=sol_radiation_dir,
-            sol_transmittance=sol_transmittance,
-            f_svv=f_svv,
-            f_bes=f_bes,
-            asw=asw,
-            posture=posture,
-            floor_reflectance=floor_reflectance,
-        )
 
 
 def solar_gain(

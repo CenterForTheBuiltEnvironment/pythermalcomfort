@@ -1,51 +1,10 @@
-from dataclasses import dataclass
-from enum import Enum
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs, dew_point_tmp
-
-
-class HumidexModels(Enum):
-    rana = "rana"
-    masterson = "masterson"
-
-
-@dataclass(frozen=True)
-class Humidex:
-    """
-    Dataclass to represent the Humidex and its discomfort category.
-
-    Attributes
-    ----------
-    humidex : float or list of floats
-        Humidex value, [°C].
-    discomfort : str or list of str
-        Degree of comfort or discomfort as defined in Havenith and Fiala (2016).
-    """
-
-    humidex: Union[float, List[float]]
-    discomfort: Union[str, List[str]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class HumidexInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        rh,
-        round_output,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            rh=rh,
-            round_output=round_output,
-        )
+from pythermalcomfort.classes_input import HumidexInputs, HumidexModels
+from pythermalcomfort.classes_return import Humidex
+from pythermalcomfort.utilities import dew_point_tmp
 
 
 def humidex(

@@ -6,7 +6,7 @@ Adaptive ASHRAE
 
 .. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
-.. autoclass:: pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE
+.. autoclass:: pythermalcomfort.classes_return.AdaptiveASHRAE
     :members:
 
 Adaptive EN
@@ -14,7 +14,7 @@ Adaptive EN
 
 .. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
 
-.. autoclass:: pythermalcomfort.models.adaptive_en.AdaptiveEN
+.. autoclass:: pythermalcomfort.classes_return.AdaptiveEN
     :members:
 
 Adaptive Predicted Mean Vote (aPMV)
@@ -22,7 +22,7 @@ Adaptive Predicted Mean Vote (aPMV)
 
 .. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
 
-.. autoclass:: pythermalcomfort.models.a_pmv.AdaptivePMV
+.. autoclass:: pythermalcomfort.classes_return.APMV
     :members:
 
 Adaptive Thermal Heat Balance (ATHB)
@@ -30,7 +30,7 @@ Adaptive Thermal Heat Balance (ATHB)
 
 .. autofunction:: pythermalcomfort.models.athb.athb
 
-.. autoclass:: pythermalcomfort.models.athb.ATHB
+.. autoclass:: pythermalcomfort.classes_return.ATHB
     :members:
 
 Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
@@ -38,7 +38,7 @@ Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 
 .. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
 
-.. autoclass:: pythermalcomfort.models.e_pmv.EPMV
+.. autoclass:: pythermalcomfort.classes_return.EPMV
     :members:
 
 Apparent Temperature (AT)
@@ -46,7 +46,7 @@ Apparent Temperature (AT)
 
 .. autofunction:: pythermalcomfort.models.at.at
 
-.. autoclass:: pythermalcomfort.models.at.AT
+.. autoclass:: pythermalcomfort.classes_return.AT
     :members:
 
 Ankle draft
@@ -54,7 +54,7 @@ Ankle draft
 
 .. autofunction:: pythermalcomfort.models.ankle_draft.ankle_draft
 
-.. autoclass:: pythermalcomfort.models.ankle_draft.AnkleDraft
+.. autoclass:: pythermalcomfort.classes_return.AnkleDraft
     :members:
 
 Clothing prediction
@@ -62,7 +62,7 @@ Clothing prediction
 
 .. autofunction:: pythermalcomfort.models.clo_tout.clo_tout
 
-.. autoclass:: pythermalcomfort.models.clo_tout.CloTout
+.. autoclass:: pythermalcomfort.classes_return.CloTOut
     :members:
 
 Cooling Effect (CE)
@@ -70,7 +70,7 @@ Cooling Effect (CE)
 
 .. autofunction:: pythermalcomfort.models.cooling_effect.cooling_effect
 
-.. autoclass:: pythermalcomfort.models.cooling_effect.CoolingEffect
+.. autoclass:: pythermalcomfort.classes_return.CE
     :members:
 
 Discomfort Index (DI)
@@ -78,7 +78,7 @@ Discomfort Index (DI)
 
 .. autofunction:: pythermalcomfort.models.discomfort_index.discomfort_index
 
-.. autoclass:: pythermalcomfort.models.discomfort_index.DiscomfortIndex
+.. autoclass:: pythermalcomfort.classes_return.DI
     :members:
 
 Heat Index (HI)
@@ -86,7 +86,7 @@ Heat Index (HI)
 
 .. autofunction:: pythermalcomfort.models.heat_index.heat_index
 
-.. autoclass:: pythermalcomfort.models.heat_index.HeatIndex
+.. autoclass:: pythermalcomfort.classes_return.HI
     :members:
 
 Humidex
@@ -94,7 +94,7 @@ Humidex
 
 .. autofunction:: pythermalcomfort.models.humidex.humidex
 
-.. autoclass:: pythermalcomfort.models.humidex.Humidex
+.. autoclass:: pythermalcomfort.classes_return.Humidex
     :members:
 
 Joint system thermoregulation model (JOS-3)
@@ -110,7 +110,7 @@ Normal Effective Temperature (NET)
 
 .. autofunction:: pythermalcomfort.models.net.net
 
-.. autoclass:: pythermalcomfort.models.net.Net
+.. autoclass:: pythermalcomfort.classes_return.NET
     :members:
 
 Predicted Heat Strain (PHS) Index
@@ -118,7 +118,7 @@ Predicted Heat Strain (PHS) Index
 
 .. autofunction:: pythermalcomfort.models.phs.phs
 
-.. autoclass:: pythermalcomfort.models.phs.PHS
+.. autoclass:: pythermalcomfort.classes_return.PHS
     :members:
 
 Physiological Equivalent Temperature (PET)
@@ -126,7 +126,7 @@ Physiological Equivalent Temperature (PET)
 
 .. autofunction:: pythermalcomfort.models.pet_steady.pet_steady
 
-.. autoclass:: pythermalcomfort.models.pet_steady.PETSteady
+.. autoclass:: pythermalcomfort.classes_return.PETSteady
     :members:
 
 Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
@@ -134,7 +134,7 @@ Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 
 .. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
 
-.. autoclass:: pythermalcomfort.models.pmv_ppd.PMV_PPD
+.. autoclass:: pythermalcomfort.classes_return.PMVPPD
     :members:
 
 Predicted Mean Vote (PMV)
@@ -142,7 +142,7 @@ Predicted Mean Vote (PMV)
 
 .. autofunction:: pythermalcomfort.models.pmv.pmv
 
-.. autoclass:: pythermalcomfort.models.pmv.PMV
+.. autoclass:: pythermalcomfort.classes_return.PMV
     :members:
 
 Solar gain on people
@@ -150,7 +150,7 @@ Solar gain on people
 
 .. autofunction:: pythermalcomfort.models.solar_gain.solar_gain
 
-.. autoclass:: pythermalcomfort.models.solar_gain.SolarGain
+.. autoclass:: pythermalcomfort.classes_return.SolarGain
     :members:
 
 Standard Effective Temperature (SET)
@@ -158,7 +158,7 @@ Standard Effective Temperature (SET)
 
 .. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
-.. autoclass:: pythermalcomfort.return_classes.SetTmp
+.. autoclass:: pythermalcomfort.classes_return.SET
     :members:
 
 Two-node model
@@ -166,7 +166,7 @@ Two-node model
 
 .. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
 
-.. autoclass:: pythermalcomfort.models.two_nodes.TwoNodes
+.. autoclass:: pythermalcomfort.classes_return.TwoNodes
     :members:
 
 Universal Thermal Climate Index (UTCI)
@@ -174,7 +174,7 @@ Universal Thermal Climate Index (UTCI)
 
 .. autofunction:: pythermalcomfort.models.utci.utci
 
-.. autoclass:: pythermalcomfort.models.utci.UTCI
+.. autoclass:: pythermalcomfort.classes_return.UTCI
     :members:
 
 Use Fans During Heatwaves
@@ -182,7 +182,7 @@ Use Fans During Heatwaves
 
 .. autofunction:: pythermalcomfort.models.use_fans_heatwaves.use_fans_heatwaves
 
-.. autoclass:: pythermalcomfort.models.use_fans_heatwaves.UseFansHeatwaves
+.. autoclass:: pythermalcomfort.classes_return.UseFansHeatwaves
     :members:
 
 Vertical air temperature gradient
@@ -190,7 +190,7 @@ Vertical air temperature gradient
 
 .. autofunction:: pythermalcomfort.models.vertical_tmp_grad_ppd.vertical_tmp_grad_ppd
 
-.. autoclass:: pythermalcomfort.models.vertical_tmp_grad_ppd.VerticalTmpGradPPD
+.. autoclass:: pythermalcomfort.classes_return.VerticalTGradPPD
     :members:
 
 Wet Bulb Globe Temperature Index (WBGT)
@@ -198,7 +198,7 @@ Wet Bulb Globe Temperature Index (WBGT)
 
 .. autofunction:: pythermalcomfort.models.wbgt.wbgt
 
-.. autoclass:: pythermalcomfort.models.wbgt.WBGT
+.. autoclass:: pythermalcomfort.classes_return.WBGT
     :members:
 
 Wind chill index
@@ -206,7 +206,7 @@ Wind chill index
 
 .. autofunction:: pythermalcomfort.models.wci.wci
 
-.. autoclass:: pythermalcomfort.models.wci.WCI
+.. autoclass:: pythermalcomfort.classes_return.WCI
     :members:
 
 Wind chill temperature
@@ -214,7 +214,7 @@ Wind chill temperature
 
 .. autofunction:: pythermalcomfort.models.wind_chill_temperature.wct
 
-.. autoclass:: pythermalcomfort.models.wind_chill_temperature.WCT
+.. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
 
 Utilities functions

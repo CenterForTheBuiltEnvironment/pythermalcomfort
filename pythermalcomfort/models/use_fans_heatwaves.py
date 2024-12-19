@@ -1,109 +1,14 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.classes_input import UseFansHeatwavesInputs
+from pythermalcomfort.classes_return import UseFansHeatwaves
 from pythermalcomfort.models.two_nodes import two_nodes
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import (
     check_standard_compliance_array,
 )
-
-
-@dataclass(frozen=True)
-class UseFansHeatwaves:
-    """
-    Dataclass to represent the results of using fans during heatwaves.
-
-    Attributes
-    ----------
-    e_skin : float or list of floats
-        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff.
-    e_rsw : float or list of floats
-        Rate of evaporative heat loss from sweat evaporation, [W/m2].
-    e_max : float or list of floats
-        Maximum rate of evaporative heat loss from skin, [W/m2].
-    q_sensible : float or list of floats
-        Sensible heat loss from skin, [W/m2].
-    q_skin : float or list of floats
-        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin.
-    q_res : float or list of floats
-        Total rate of heat loss through respiration, [W/m2].
-    t_core : float or list of floats
-        Core temperature, [°C].
-    t_skin : float or list of floats
-        Skin temperature, [°C].
-    m_bl : float or list of floats
-        Skin blood flow, [kg/h/m2].
-    m_rsw : float or list of floats
-        Rate at which regulatory sweat is generated, [mL/h/m2].
-    w : float or list of floats
-        Skin wettedness, adimensional. Ranges from 0 to 1.
-    w_max : float or list of floats
-        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 to 1.
-    heat_strain : bool or list of bools
-        True if the model predicts that the person may be experiencing heat strain.
-    heat_strain_blood_flow : bool or list of bools
-        True if heat strain is caused by skin blood flow (m_bl) reaching its maximum value.
-    heat_strain_w : bool or list of bools
-        True if heat strain is caused by skin wettedness (w) reaching its maximum value.
-    heat_strain_sweating : bool or list of bools
-        True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value.
-    """
-
-    e_skin: Union[float, List[float]]
-    e_rsw: Union[float, List[float]]
-    e_max: Union[float, List[float]]
-    q_sensible: Union[float, List[float]]
-    q_skin: Union[float, List[float]]
-    q_res: Union[float, List[float]]
-    t_core: Union[float, List[float]]
-    t_skin: Union[float, List[float]]
-    m_bl: Union[float, List[float]]
-    m_rsw: Union[float, List[float]]
-    w: Union[float, List[float]]
-    w_max: Union[float, List[float]]
-    heat_strain: Union[bool, List[bool]]
-    heat_strain_blood_flow: Union[bool, List[bool]]
-    heat_strain_w: Union[bool, List[bool]]
-    heat_strain_sweating: Union[bool, List[bool]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class UseFansHeatwavesInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        met,
-        clo,
-        wme=0,
-        body_surface_area=1.8258,
-        p_atm=101325,
-        position="standing",
-        max_skin_blood_flow=80,
-        limit_inputs=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            body_surface_area=body_surface_area,
-            p_atm=p_atm,
-            position=position,
-            max_skin_blood_flow=max_skin_blood_flow,
-            limit_inputs=limit_inputs,
-        )
 
 
 def use_fans_heatwaves(

@@ -1,45 +1,16 @@
 from typing import Union, List, Literal
-from dataclasses import dataclass
+
 import numpy as np
+
+from pythermalcomfort.classes_input import CloTOutInputs
+from pythermalcomfort.classes_return import CloTOut
 from pythermalcomfort.utilities import units_converter
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class CloTout:
-    """
-    Dataclass to represent the clothing insulation Icl as a function of outdoor air temperature.
-
-    Attributes
-    ----------
-    clo_tout : float or np.ndarray
-        Representative clothing insulation Icl.
-    """
-
-    clo_tout: Union[float, np.ndarray]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class CloToutInputs(BaseInputs):
-    def __init__(
-        self,
-        tout: Union[float, List[float]],
-        units: str = "SI",
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tout=tout,
-            units=units,
-        )
 
 
 def clo_tout(
     tout: Union[float, List[float]],
     units: Literal["SI", "IP"] = "SI",
-) -> CloTout:
+) -> CloTOut:
     """Representative clothing insulation Icl as a function of outdoor air
     temperature at 06:00 a.m [4]_.
 
@@ -53,9 +24,9 @@ def clo_tout(
 
     Returns
     -------
-    CloTout
-        A dataclass containing the representative clothing insulation Icl. See :py:class:`~pythermalcomfort.models.clo_tout.CloTout` for more details.
-        To access the `clo_tout` value, use the `clo_tout` attribute of the returned `CloTout` instance, e.g., `result.clo_tout`.
+    CloTOut
+        A dataclass containing the representative clothing insulation Icl. See :py:class:`~pythermalcomfort.models.clo_tout.CloTOut` for more details.
+        To access the `clo_tout` value, use the `clo_tout` attribute of the returned `CloTOut` instance, e.g., `result.clo_tout`.
 
     Raises
     ------
@@ -87,8 +58,8 @@ def clo_tout(
         print(result.clo_tout)  # array([0.46, 0.47])
     """
 
-    # Validate inputs using the CloToutInputs class
-    CloToutInputs(
+    # Validate inputs using the CloTOutInputs class
+    CloTOutInputs(
         tout=tout,
         units=units,
     )
@@ -104,4 +75,4 @@ def clo_tout(
     clo = np.where(tout < 5, 0.818 - 0.0364 * tout, clo)
     clo = np.where(tout < -5, 1, clo)
 
-    return CloTout(clo_tout=np.around(clo, 2))
+    return CloTOut(clo_tout=np.around(clo, 2))

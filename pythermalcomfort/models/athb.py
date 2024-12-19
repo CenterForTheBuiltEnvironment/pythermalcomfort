@@ -1,50 +1,10 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
-import numpy.typing as npt
 
+from pythermalcomfort.classes_input import ATHBInputs
+from pythermalcomfort.classes_return import ATHB
 from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class ATHB:
-    """
-    Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB) calculation.
-
-    Attributes
-    ----------
-    athb_pmv : float or array-like
-        Predicted Mean Vote calculated with the Adaptive Thermal Heat Balance framework.
-    """
-
-    athb_pmv: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class ATHBInputs(BaseInputs):
-
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        t_running_mean,
-    ):
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            t_running_mean=t_running_mean,
-        )
 
 
 def athb(
@@ -85,7 +45,7 @@ def athb(
         Relative humidity, [%].
     met : float or list of floats
         Metabolic rate, [met].
-    t_running_mean: float or array-like
+    t_running_mean: float or list of floats
         Running mean temperature, in [°C].
 
         .. note::

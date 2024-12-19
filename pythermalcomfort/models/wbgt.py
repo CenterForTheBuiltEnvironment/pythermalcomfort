@@ -1,47 +1,10 @@
-from dataclasses import dataclass
 from typing import Union
 
 import numpy as np
 import numpy.typing as npt
 
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class WBGT:
-    """
-    Dataclass to represent the Wet Bulb Globe Temperature (WBGT) index.
-
-    Attributes
-    ----------
-    wbgt : float, or array-like
-        Wet Bulb Globe Temperature Index.
-    """
-
-    wbgt: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class WBGTInputs(BaseInputs):
-    def __init__(
-        self,
-        twb,
-        tg,
-        tdb=None,
-        with_solar_load=False,
-        round_output=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            twb=twb,
-            tg=tg,
-            tdb=tdb,
-            with_solar_load=with_solar_load,
-            round_output=round_output,
-        )
+from pythermalcomfort.classes_input import WBGTInputs
+from pythermalcomfort.classes_return import WBGT
 
 
 def wbgt(
@@ -69,11 +32,11 @@ def wbgt(
 
     Parameters
     ----------
-    twb : float, or array-like
+    twb : float or list of floats
         Natural (no forced air flow) wet bulb temperature, [°C].
-    tg : float, or array-like
+    tg : float or list of floats
         Globe temperature, [°C].
-    tdb : float, or array-like, optional
+    tdb : float or list of floats, optional
         Dry bulb air temperature, [°C]. This value is needed as input if the person is
         exposed to direct solar radiation.
     with_solar_load : bool, optional

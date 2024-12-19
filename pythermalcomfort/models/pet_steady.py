@@ -1,65 +1,12 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 import numpy.typing as npt
 from scipy import optimize
 
-from pythermalcomfort.utilities import BaseInputs
+from pythermalcomfort.classes_input import PETSteadyInputs
+from pythermalcomfort.classes_return import PETSteady
 from pythermalcomfort.utilities import body_surface_area, p_sat
-
-
-@dataclass(frozen=True)
-class PETSteady:
-    """
-    Dataclass to represent the Physiological Equivalent Temperature (PET).
-
-    Attributes
-    ----------
-    pet : float or list of floats
-        Physiological Equivalent Temperature.
-    """
-
-    pet: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class PETSteadyInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        met,
-        clo,
-        p_atm,
-        position,
-        age,
-        sex,
-        weight,
-        height,
-        wme,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            met=met,
-            clo=clo,
-            p_atm=p_atm,
-            position=position,
-            age=age,
-            sex=sex,
-            weight=weight,
-            height=height,
-            wme=wme,
-        )
 
 
 def pet_steady(
@@ -288,7 +235,7 @@ def _pet_steady_vectorised(
 
         Parameters
         ----------
-        t_arr : list or array-like
+        t_arr : list or list of floats
             [T_core, T_sk, T_clo], [°C]
         _tdb : float
             dry bulb air temperature, [°C]
@@ -503,7 +450,7 @@ def _pet_steady_vectorised(
 
         Parameters
         ----------
-        _t_stable : list or array-like
+        _t_stable : list or list of floats
             3 temperatures obtained from the actual environment (T_core,T_skin,T_clo).
 
         Returns

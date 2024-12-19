@@ -1,60 +1,10 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
-import numpy.typing as npt
 
+from pythermalcomfort.classes_input import PMVInputs
+from pythermalcomfort.classes_return import PMV
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class PMV:
-    """
-    Dataclass to represent the Predicted Mean Vote (PMV).
-
-    Attributes
-    ----------
-    pmv : float or list of floats
-        Predicted Mean Vote.
-    """
-
-    pmv: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class PMVInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        wme=0,
-        standard="ISO",
-        units="SI",
-        limit_inputs=True,
-        airspeed_control=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            standard=standard,
-            units=units,
-            limit_inputs=limit_inputs,
-            airspeed_control=airspeed_control,
-        )
 
 
 def pmv(
@@ -207,7 +157,7 @@ def pmv(
         units=units,
         limit_inputs=limit_inputs,
         airspeed_control=airspeed_control,
-    )["pmv"]
+    ).pmv
 
     if round_output:
         pmv_value = np.round(pmv_value, 2)

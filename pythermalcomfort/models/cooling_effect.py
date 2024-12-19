@@ -1,56 +1,13 @@
 import warnings
-from dataclasses import dataclass
 from typing import Union, List, Literal
 
 import numpy as np
 from scipy import optimize
 
+from pythermalcomfort.classes_input import CEInputs
+from pythermalcomfort.classes_return import CE
 from pythermalcomfort.models.set_tmp import set_tmp
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import units_converter
-
-
-@dataclass(frozen=True)
-class CoolingEffect:
-    """
-    Dataclass to represent the Cooling Effect (CE).
-
-    Attributes
-    ----------
-    ce : float or list of floats
-        Cooling Effect value.
-    """
-
-    ce: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class CoolingEffectInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        wme,
-        units,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            units=units,
-        )
 
 
 def cooling_effect(
@@ -62,7 +19,7 @@ def cooling_effect(
     clo: Union[float, List[float]],
     wme: Union[float, List[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
-) -> CoolingEffect:
+) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
@@ -117,7 +74,7 @@ def cooling_effect(
 
     Returns
     -------
-    CoolingEffect
+    CE
         A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.models.cooling_effect.CoolingEffect` for more details.
         To access the `ce` value, use the `ce` attribute of the returned `CoolingEffect` instance, e.g., `result.ce`.
 
@@ -141,7 +98,7 @@ def cooling_effect(
     """
 
     # Validate inputs using the CoolingEffectInputs class
-    CoolingEffectInputs(
+    CEInputs(
         tdb=tdb,
         tr=tr,
         vr=vr,
@@ -165,7 +122,7 @@ def cooling_effect(
 
     still_air_threshold = 0.1
 
-    ce = _cooling_effect_vectorised(
+    _ce = _cooling_effect_vectorised(
         tdb=tdb,
         tr=tr,
         still_air_threshold=still_air_threshold,
@@ -177,9 +134,9 @@ def cooling_effect(
     )
 
     if units.lower() == "ip":
-        ce = ce / 1.8 * 3.28
+        _ce = _ce / 1.8 * 3.28
 
-    return CoolingEffect(ce=np.around(ce, 2))
+    return CE(ce=np.around(_ce, 2))
 
 
 @np.vectorize(cache=True)
@@ -233,7 +190,7 @@ def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, 
 
 
 if __name__ == "__main__":
-    ce = cooling_effect(
+    result = cooling_effect(
         tdb=40,
         tr=[40],
         vr=[1, 0.2, 0.1, 0.05],
@@ -241,4 +198,4 @@ if __name__ == "__main__":
         met=[1.1],
         clo=[0.5],
     )
-    print(ce)
+    print(result)

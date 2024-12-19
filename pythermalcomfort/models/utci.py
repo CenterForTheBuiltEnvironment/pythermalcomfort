@@ -1,54 +1,12 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 from numba import vectorize, float64
 
+from pythermalcomfort.classes_input import UTCIInputs
+from pythermalcomfort.classes_return import UTCI
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import units_converter, mapping
-
-
-@dataclass(frozen=True)
-class UTCI:
-    """
-    Dataclass to represent the Universal Thermal Climate Index (UTCI).
-
-    Attributes
-    ----------
-    utci : float or list of floats
-        Universal Thermal Climate Index, [°C] or in [°F].
-    stress_category : str or list of strs
-        UTCI categorized in terms of thermal stress [9]_.
-    """
-
-    utci: Union[float, List[float]]
-    stress_category: Union[str, List[str]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class UtciInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        units="SI",
-        limit_inputs=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            units=units,
-            limit_inputs=limit_inputs,
-        )
 
 
 def utci(
@@ -113,7 +71,7 @@ def utci(
     """
 
     # Validate inputs using the UtciInputs class
-    UtciInputs(
+    UTCIInputs(
         tdb=tdb,
         tr=tr,
         v=v,

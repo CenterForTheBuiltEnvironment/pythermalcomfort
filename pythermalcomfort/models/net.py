@@ -1,44 +1,9 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class Net:
-    """
-    Dataclass to represent the Normal Effective Temperature (NET).
-
-    Attributes
-    ----------
-    net : float or list of floats
-        Normal Effective Temperature, [°C].
-    """
-
-    net: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class NetInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        rh,
-        v,
-        round_output=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            rh=rh,
-            v=v,
-            round_output=round_output,
-        )
+from pythermalcomfort.classes_input import NETInputs
+from pythermalcomfort.classes_return import NET
 
 
 def net(
@@ -46,7 +11,7 @@ def net(
     rh: Union[float, List[float]],
     v: Union[float, List[float]],
     round_output: bool = True,
-) -> Net:
+) -> NET:
     """Calculates the Normal Effective Temperature (NET). Missenard (1933)
     devised a formula for calculating effective temperature. The index
     establishes a link between the same condition of the organism's
@@ -77,7 +42,7 @@ def net(
 
     Returns
     -------
-    Net
+    NET
         A dataclass containing the Normal Effective Temperature. See :py:class:`~pythermalcomfort.models.net.Net` for more details.
         To access the `net` value, use the `net` attribute of the returned `Net` instance, e.g., `result.net`.
 
@@ -95,7 +60,7 @@ def net(
     """
 
     # Validate inputs using the NetInputs class
-    NetInputs(
+    NETInputs(
         tdb=tdb,
         rh=rh,
         v=v,
@@ -112,7 +77,7 @@ def net(
     if round_output:
         et = np.around(et, 1)
 
-    return Net(net=et)
+    return NET(net=et)
 
 
 if __name__ == "__main__":

@@ -1,42 +1,9 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class WCI:
-    """
-    Dataclass to represent the Wind Chill Index (WCI).
-
-    Attributes
-    ----------
-    wci : float or list of floats
-        Wind Chill Index, [W/m^2].
-    """
-
-    wci: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class WCIInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        v,
-        round_output=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            v=v,
-            round_output=round_output,
-        )
+from pythermalcomfort.classes_input import WCIInputs
+from pythermalcomfort.classes_return import WCI
 
 
 def wci(
@@ -98,15 +65,15 @@ def wci(
     tdb = np.array(tdb)
     v = np.array(v)
 
-    wci = (10.45 + 10 * v**0.5 - v) * (33 - tdb)
+    _wci = (10.45 + 10 * v**0.5 - v) * (33 - tdb)
 
     # the factor 1.163 is used to convert to W/m^2
-    wci = wci * 1.163
+    _wci = _wci * 1.163
 
     if round_output:
-        wci = np.around(wci, 1)
+        _wci = np.around(_wci, 1)
 
-    return WCI(wci=wci)
+    return WCI(wci=_wci)
 
 
 if __name__ == "__main__":

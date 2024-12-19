@@ -1,63 +1,14 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
-import numpy.typing as npt
 
+from pythermalcomfort.classes_input import AnkleDraftInputs
+from pythermalcomfort.classes_return import AnkleDraft
 from pythermalcomfort.models import pmv
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
-    BaseInputs,
 )
-
-
-@dataclass(frozen=True)
-class AnkleDraft:
-    """
-    Dataclass to store the results of the ankle draft calculation.
-
-    Attributes
-    ----------
-    ppd_ad : float
-        Predicted Percentage of Dissatisfied occupants with ankle draft, [%].
-    acceptability : bool
-        Indicates if the air speed at the ankle level is acceptable according to ASHRAE 55 2020 standard.
-    """
-
-    ppd_ad: Union[float, npt.ArrayLike]
-    acceptability: Union[bool, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class AnkleDraftInputs(BaseInputs):
-    """Child class that only requires specific attributes."""
-
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        v_ankle,
-        units="SI",
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            v_ankle=v_ankle,
-            units=units,
-        )
 
 
 def ankle_draft(

@@ -1,55 +1,12 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
+from setuptools.package_index import entity_sub
 
+from pythermalcomfort.classes_input import EPMVInputs
+from pythermalcomfort.classes_return import EPMV
 from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class EPMV:
-    """
-    Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
-
-    Attributes
-    ----------
-    e_pmv : float or list of floats
-        Adjusted Predicted Mean Votes with Expectancy Factor.
-    """
-
-    e_pmv: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class EPMVInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        e_coefficient,
-        wme,
-        units,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            e_coefficient=e_coefficient,
-            wme=wme,
-            units=units,
-        )
+from pythermalcomfort.utilities import enthalpy_air
 
 
 def e_pmv(
@@ -168,9 +125,9 @@ def e_pmv(
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
     _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
 
-    epmv_value = np.around(_pmv * e_coefficient, 2)
+    e_pmv_value = np.around(_pmv * e_coefficient, 2)
 
-    return EPMV(e_pmv=epmv_value)
+    return EPMV(e_pmv=e_pmv_value)
 
 
 if __name__ == "__main__":

@@ -1,48 +1,13 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.classes_input import SETInputs
+from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.two_nodes import two_nodes
-from pythermalcomfort.return_classes import SetTmp
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import (
     check_standard_compliance_array,
 )
-
-
-@dataclass
-class SetTmpInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        met,
-        clo,
-        wme=0,
-        body_surface_area=1.8258,
-        p_atm=101325,
-        position="standing",
-        units="SI",
-        limit_inputs=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            body_surface_area=body_surface_area,
-            p_atm=p_atm,
-            position=position,
-            units=units,
-            limit_inputs=limit_inputs,
-        )
 
 
 def set_tmp(
@@ -59,7 +24,7 @@ def set_tmp(
     limit_inputs: bool = True,
     round_output: bool = True,
     calculate_ce: bool = False,
-) -> SetTmp:
+) -> SET:
     """Calculates the Standard Effective Temperature (SET). The SET is the temperature of
     a hypothetical isothermal environment at 50% (rh), <0.1 m/s (20 fpm) average air
     speed (v), and tr = tdb, in which the total heat loss from the skin of an imaginary occupant
@@ -106,7 +71,7 @@ def set_tmp(
 
     Returns
     -------
-    SetTmp
+    SET
         A dataclass containing the Standard Effective Temperature. See :py:class:`~pythermalcomfort.models.set.SetTmp` for more details.
         To access the `set` value, use the corresponding attribute of the returned `SetTmp` instance, e.g., `result.set`.
 
@@ -132,7 +97,7 @@ def set_tmp(
     wme = np.array(wme)
 
     # Validate inputs using the SetTmpInputs class
-    SetTmpInputs(
+    SETInputs(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -183,7 +148,7 @@ def set_tmp(
     if round_output:
         set_array = np.around(set_array, 1)
 
-    return SetTmp(set=set_array)
+    return SET(set=set_array)
 
 
 if __name__ == "__main__":

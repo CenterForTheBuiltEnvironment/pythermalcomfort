@@ -3,44 +3,9 @@ from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.classes_input import ATInputs
+from pythermalcomfort.classes_return import AT
 from pythermalcomfort.utilities import BaseInputs, psy_ta_rh
-
-
-@dataclass(frozen=True)
-class AT:
-    """Dataclass to store the results of the Apparent Temperature (AT) calculation.
-
-    Attributes
-    ----------
-    at : float
-        Apparent temperature, [°C]
-    """
-
-    at: float
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class ATInputs(BaseInputs):
-
-    def __init__(
-        self,
-        tdb,
-        rh,
-        v,
-        q=None,
-        round_output=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            vr=v,
-            rh=rh,
-            q=q,
-            round_output=round_output,
-        )
 
 
 def at(

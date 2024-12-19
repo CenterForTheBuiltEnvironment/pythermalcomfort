@@ -403,7 +403,7 @@ def wet_r(
         Convective heat transfer coefficient (hc) [W/(m2*K)].
     clo : float or array
         Clothing insulation [clo].
-    i_clo : float, or array, optional
+    i_clo : float or array, optional
         Clothing vapor permeation efficiency [-]. The default is 0.45.
     lewis_rate : float, optional
         Lewis rate [K/kPa]. The default is 16.5.

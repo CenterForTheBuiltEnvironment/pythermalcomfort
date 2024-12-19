@@ -1,118 +1,14 @@
+from __future__ import annotations
+
 import math
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 from numba import jit, vectorize, float64
 
-from pythermalcomfort.return_classes import SetTmp
-from pythermalcomfort.utilities import BaseInputs, p_sat_torr
-
-
-@dataclass(frozen=True)
-class TwoNodes:
-    """
-    Dataclass to represent the results of the two-node model of human temperature regulation.
-
-    Attributes
-    ----------
-    e_skin : float or list of floats
-        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff.
-    e_rsw : float or list of floats
-        Rate of evaporative heat loss from sweat evaporation, [W/m2].
-    e_max : float or list of floats
-        Maximum rate of evaporative heat loss from skin, [W/m2].
-    q_sensible : float or list of floats
-        Sensible heat loss from skin, [W/m2].
-    q_skin : float or list of floats
-        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin.
-    q_res : float or list of floats
-        Total rate of heat loss through respiration, [W/m2].
-    t_core : float or list of floats
-        Core temperature, [°C].
-    t_skin : float or list of floats
-        Skin temperature, [°C].
-    m_bl : float or list of floats
-        Skin blood flow, [kg/h/m2].
-    m_rsw : float or list of floats
-        Rate at which regulatory sweat is generated, [mL/h/m2].
-    w : float or list of floats
-        Skin wettedness, adimensional. Ranges from 0 to 1.
-    w_max : float or list of floats
-        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 to 1.
-    set : float or list of floats
-        Standard Effective Temperature (SET).
-    et : float or list of floats
-        New Effective Temperature (ET).
-    pmv_gagge : float or list of floats
-        PMV Gagge.
-    pmv_set : float or list of floats
-        PMV SET.
-    disc : float or list of floats
-        Thermal discomfort.
-    t_sens : float or list of floats
-        Predicted Thermal Sensation.
-    """
-
-    e_skin: Union[float, List[float]]
-    e_rsw: Union[float, List[float]]
-    e_max: Union[float, List[float]]
-    q_sensible: Union[float, List[float]]
-    q_skin: Union[float, List[float]]
-    q_res: Union[float, List[float]]
-    t_core: Union[float, List[float]]
-    t_skin: Union[float, List[float]]
-    m_bl: Union[float, List[float]]
-    m_rsw: Union[float, List[float]]
-    w: Union[float, List[float]]
-    w_max: Union[float, List[float]]
-    set: Union[float, List[float]]
-    et: Union[float, List[float]]
-    pmv_gagge: Union[float, List[float]]
-    pmv_set: Union[float, List[float]]
-    disc: Union[float, List[float]]
-    t_sens: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class TwoNodesInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        v,
-        rh,
-        met,
-        clo,
-        wme=0,
-        body_surface_area=1.8258,
-        p_atm=101325,
-        position="standing",
-        max_skin_blood_flow=90,
-        round_output=True,
-        max_sweating=500,
-        w_max=None,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            body_surface_area=body_surface_area,
-            p_atm=p_atm,
-            position=position,
-            max_skin_blood_flow=max_skin_blood_flow,
-            round_output=round_output,
-            max_sweating=max_sweating,
-            w_max=w_max,
-        )
+from pythermalcomfort.classes_input import TwoNodesInputs
+from pythermalcomfort.classes_return import SET, TwoNodes
+from pythermalcomfort.utilities import p_sat_torr
 
 
 def two_nodes(
@@ -131,7 +27,7 @@ def two_nodes(
     max_sweating: Union[float, List[float]] = 500,
     w_max: Union[float, List[float]] = False,
     calculate_ce: bool = False,
-) -> SetTmp | TwoNodes:
+) -> SET | TwoNodes:
     """Two-node model of human temperature regulation Gagge et al. (1986). [10]_
     This model can be used to calculate a variety of indices, including:
 
@@ -243,7 +139,7 @@ def two_nodes(
             p_atm,
             1,
         )
-        return SetTmp(set=result)
+        return SET(set=result)
 
     (
         _set,

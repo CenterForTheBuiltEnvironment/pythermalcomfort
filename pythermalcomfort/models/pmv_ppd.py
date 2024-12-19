@@ -1,68 +1,16 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 from numba import vectorize, float64
 
+from pythermalcomfort.classes_input import PMVPPDInputs
+from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models import cooling_effect
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import BaseInputs
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
 )
-
-
-@dataclass(frozen=True)
-class PMV_PPD:
-    """
-    Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD).
-
-    Attributes
-    ----------
-    pmv : float or list of floats
-        Predicted Mean Vote.
-    ppd : float or list of floats
-        Predicted Percentage of Dissatisfied.
-    """
-
-    pmv: Union[float, List[float]]
-    ppd: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class PMVPPDInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        wme=0,
-        standard="ISO",
-        units="SI",
-        limit_inputs=True,
-        airspeed_control=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            wme=wme,
-            standard=standard,
-            units=units,
-            limit_inputs=limit_inputs,
-            airspeed_control=airspeed_control,
-        )
 
 
 def pmv_ppd(
@@ -78,7 +26,7 @@ def pmv_ppd(
     limit_inputs: bool = True,
     airspeed_control: bool = True,
     round_output: bool = True,
-) -> PMV_PPD:
+) -> PMVPPD:
     """Returns Predicted Mean Vote (PMV) and Predicted Percentage of
     Dissatisfied (PPD) calculated in accordance with main thermal comfort
     Standards. The PMV is an index that predicts the mean value of the thermal
@@ -162,7 +110,7 @@ def pmv_ppd(
 
     Returns
     -------
-    PMV_PPD
+    PMVPPD
         A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.models.pmv_ppd.pmv_ppd` for more details.
         To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `pmv_ppd` instance, e.g., `result.pmv`.
 
@@ -280,7 +228,7 @@ def pmv_ppd(
         pmv_array = np.round(pmv_array, 2)
         ppd_array = np.round(ppd_array, 1)
 
-    return PMV_PPD(pmv=pmv_array, ppd=ppd_array)
+    return PMVPPD(pmv=pmv_array, ppd=ppd_array)
 
 
 @vectorize(

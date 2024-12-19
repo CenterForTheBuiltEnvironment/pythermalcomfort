@@ -1,44 +1,9 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class HeatIndex:
-    """
-    Dataclass to represent the Heat Index (HI).
-
-    Attributes
-    ----------
-    hi : float or list of floats
-        Heat Index, [°C] or [°F] depending on the units.
-    """
-
-    hi: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class HeatIndexInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        rh,
-        units,
-        round_output,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            rh=rh,
-            units=units,
-            round_output=round_output,
-        )
+from pythermalcomfort.classes_input import HIInputs
+from pythermalcomfort.classes_return import HI
 
 
 def heat_index(
@@ -46,7 +11,7 @@ def heat_index(
     rh: Union[float, List[float]],
     units: str = "SI",
     round_output: bool = True,
-) -> HeatIndex:
+) -> HI:
     """Calculates the Heat Index (HI). It combines air temperature and relative
     humidity to determine an apparent temperature. The HI equation [12]_ is
     derived by multiple regression analysis in temperature and relative
@@ -67,9 +32,9 @@ def heat_index(
 
     Returns
     -------
-    HeatIndex
-        A dataclass containing the Heat Index. See :py:class:`~pythermalcomfort.models.heat_index.HeatIndex` for more details.
-        To access the `hi` value, use the `hi` attribute of the returned `HeatIndex` instance, e.g., `result.hi`.
+    HI
+        A dataclass containing the Heat Index. See :py:class:`~pythermalcomfort.models.heat_index.HI` for more details.
+        To access the `hi` value, use the `hi` attribute of the returned `HI` instance, e.g., `result.hi`.
 
     Examples
     --------
@@ -85,7 +50,7 @@ def heat_index(
     """
 
     # Validate inputs using the HeatIndexInputs class
-    HeatIndexInputs(
+    HIInputs(
         tdb=tdb,
         rh=rh,
         units=units,
@@ -95,12 +60,11 @@ def heat_index(
     tdb = np.array(tdb)
     rh = np.array(rh)
 
-    if units == "SI":
-        hi = -8.784695 + 1.61139411 * tdb + 2.338549 * rh - 0.14611605 * tdb * rh
-        hi += -1.2308094 * 10**-2 * tdb**2 - 1.6424828 * 10**-2 * rh**2
-        hi += 2.211732 * 10**-3 * tdb**2 * rh + 7.2546 * 10**-4 * tdb * rh**2
-        hi += -3.582 * 10**-6 * tdb**2 * rh**2
-    else:
+    hi = -8.784695 + 1.61139411 * tdb + 2.338549 * rh - 0.14611605 * tdb * rh
+    hi += -1.2308094 * 10**-2 * tdb**2 - 1.6424828 * 10**-2 * rh**2
+    hi += 2.211732 * 10**-3 * tdb**2 * rh + 7.2546 * 10**-4 * tdb * rh**2
+    hi += -3.582 * 10**-6 * tdb**2 * rh**2
+    if units.lower() == "ip":
         hi = -42.379 + 2.04901523 * tdb + 10.14333127 * rh
         hi += -0.22475541 * tdb * rh - 6.83783 * 10**-3 * tdb**2
         hi += -5.481717 * 10**-2 * rh**2
@@ -110,7 +74,7 @@ def heat_index(
     if round_output:
         hi = np.around(hi, 1)
 
-    return HeatIndex(hi=hi)
+    return HI(hi=hi)
 
 
 if __name__ == "__main__":

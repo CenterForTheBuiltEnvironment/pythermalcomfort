@@ -3,40 +3,9 @@ from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.classes_input import WCTInputs
+from pythermalcomfort.classes_return import WCT
 from pythermalcomfort.utilities import BaseInputs
-
-
-@dataclass(frozen=True)
-class WCT:
-    """
-    Dataclass to represent the Wind Chill Temperature (WCT).
-
-    Attributes
-    ----------
-    wct : float or list of floats
-        Wind Chill Temperature, [°C].
-    """
-
-    wct: Union[float, List[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class WCTInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        v,
-        round_output=True,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            v=v,
-            round_output=round_output,
-        )
 
 
 def wct(
@@ -90,12 +59,12 @@ def wct(
     tdb = np.array(tdb)
     v = np.array(v)
 
-    wct = 13.12 + 0.6215 * tdb - 11.37 * v**0.16 + 0.3965 * tdb * v**0.16
+    _wct = 13.12 + 0.6215 * tdb - 11.37 * v**0.16 + 0.3965 * tdb * v**0.16
 
     if round_output:
-        wct = np.around(wct, 1)
+        _wct = np.around(_wct, 1)
 
-    return WCT(wct=wct)
+    return WCT(wct=_wct)
 
 
 if __name__ == "__main__":

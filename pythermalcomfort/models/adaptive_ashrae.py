@@ -1,71 +1,16 @@
-from dataclasses import dataclass
 from typing import Union, Literal
 
 import numpy as np
 import numpy.typing as npt
 
-from pythermalcomfort.utilities import operative_tmp
+from pythermalcomfort.classes_input import ASHRAEInputs
+from pythermalcomfort.classes_return import AdaptiveASHRAE
 from pythermalcomfort.shared_functions import valid_range
+from pythermalcomfort.utilities import operative_tmp
 from pythermalcomfort.utilities import (
     units_converter,
     check_standard_compliance_array,
-    BaseInputs,
 )
-
-
-@dataclass(frozen=True)
-class AdaptiveASHRAE:
-    """
-    A dataclass to store the results of the adaptive thermal comfort model based on ASHRAE 55.
-
-    Attributes
-    ----------
-    tmp_cmf : float, or array-like
-        Comfort temperature at a specific running mean temperature, default in [°C] or [°F].
-    tmp_cmf_80_low : float, or array-like
-        Lower acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_80_up : float, or array-like
-        Upper acceptable comfort temperature for 80% occupants, default in [°C] or [°F].
-    tmp_cmf_90_low : float, or array-like
-        Lower acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-    tmp_cmf_90_up : float, or array-like
-        Upper acceptable comfort temperature for 90% occupants, default in [°C] or [°F].
-    acceptability_80 : bool or array-like
-        Acceptability for 80% occupants.
-    acceptability_90 : bool or array-like
-        Acceptability for 90% occupants.
-    """
-
-    tmp_cmf: Union[float, npt.ArrayLike]
-    tmp_cmf_80_low: Union[float, npt.ArrayLike]
-    tmp_cmf_80_up: Union[float, npt.ArrayLike]
-    tmp_cmf_90_low: Union[float, npt.ArrayLike]
-    tmp_cmf_90_up: Union[float, npt.ArrayLike]
-    acceptability_80: Union[bool, npt.ArrayLike]
-    acceptability_90: Union[bool, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class ASHRAEInputs(BaseInputs):
-
-    def __init__(
-        self,
-        tdb,
-        tr,
-        t_running_mean,
-        v,
-        units,
-    ):
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            v=v,
-            units=units,
-            t_running_mean=t_running_mean,
-        )
 
 
 def adaptive_ashrae(

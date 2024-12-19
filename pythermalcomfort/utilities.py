@@ -32,7 +32,7 @@ def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
 
     Parameters
     ----------
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         dry bulb air temperature, [C]
 
     Returns
@@ -51,14 +51,14 @@ def enthalpy_air(
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         air temperature, [°C]
-    hr: float, int, or array-like
+    hr: float or list of floats
         humidity ratio, [kg water/kg dry air]
 
     Returns
     -------
-    enthalpy_air: float, int, or array-like
+    enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
     """
 
@@ -88,12 +88,12 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         air temperature, [°C]
 
     Returns
     -------
-    p_sat: float, int, or array-like
+    p_sat: float or list of floats
         saturation vapor pressure, [Pa]
     """
 
@@ -143,24 +143,24 @@ def psy_ta_rh(
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         air temperature, [°C]
-    rh: float, int, or array-like
+    rh: float or list of floats
         relative humidity, [%]
-    p_atm: float, int, or array-like
+    p_atm: float or list of floats
         atmospheric pressure, [Pa]
 
     Returns
     -------
-    p_vap: float, int, or array-like
+    p_vap: float or list of floats
         partial pressure of water vapor in moist air, [Pa]
-    hr: float, int, or array-like
+    hr: float or list of floats
         humidity ratio, [kg water/kg dry air]
-    wet_bulb_tmp: float, int, or array-like
+    wet_bulb_tmp: float or list of floats
         wet bulb temperature, [°C]
-    dew_point_tmp: float, int, or array-like
+    dew_point_tmp: float or list of floats
         dew point temperature, [°C]
-    h: float, int, or array-like
+    h: float or list of floats
         enthalpy_air [J/kg dry air]
     """
     tdb = np.array(tdb)
@@ -191,14 +191,14 @@ def wet_bulb_tmp(
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         air temperature, [°C]
-    rh: float, int, or array-like
+    rh: float or list of floats
         relative humidity, [%]
 
     Returns
     -------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         wet-bulb temperature, [°C]
     """
     twb = (
@@ -220,14 +220,14 @@ def dew_point_tmp(
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         dry bulb air temperature, [°C]
-    rh: float, int, or array-like
+    rh: float or list of floats
         relative humidity, [%]
 
     Returns
     -------
-    dew_point_tmp: float, int, or array-like
+    dew_point_tmp: float or list of floats
         dew point temperature, [°C]
     """
     tdb = np.array(tdb)
@@ -256,15 +256,15 @@ def mean_radiant_tmp(
 
     Parameters
     ----------
-    tg : float, int, or array-like
+    tg : float or list of floats
         globe temperature, [°C]
-    tdb : float, int, or array-like
+    tdb : float or list of floats
         air temperature, [°C]
-    v : float, int, or array-like
+    v : float or list of floats
         air speed, [m/s]
-    d : float, int, or array-like
+    d : float or list of floats
         diameter of the globe, [m] default 0.15 m
-    emissivity : float, int, or array-like
+    emissivity : float or list of floats
         emissivity of the globe temperature sensor, default 0.95
     standard : str, optional
         Supported values are 'Mixed Convection' and 'ISO'. Defaults to 'Mixed Convection'.
@@ -278,7 +278,7 @@ def mean_radiant_tmp(
 
     Returns
     -------
-    tr: float, int, or array-like
+    tr: float or list of floats
         mean radiant temperature, [°C]
     """
     standard = standard.lower()
@@ -786,14 +786,14 @@ def v_relative(v, met):
 
     Parameters
     ----------
-    v : float, int, or array-like
+    v : float or list of floats
         air speed measured by the sensor, [m/s]
     met : float
         metabolic rate, [met]
 
     Returns
     -------
-    vr  : float, int, or array-like
+    vr  : float or list of floats
         relative air speed, [m/s]
     """
 
@@ -810,16 +810,16 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
 
     Parameters
     ----------
-    clo : float, int, or array-like
+    clo : float or list of floats
         clothing insulation, [clo]
-    met : float, int, or array-like
+    met : float or list of floats
         metabolic rate, [met]
     standard: str (default="ASHRAE")
         - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
 
     Returns
     -------
-    clo : float, int, or array-like
+    clo : float or list of floats
         dynamic clothing insulation, [clo]
     """
 
@@ -948,11 +948,11 @@ def operative_tmp(
 
     Parameters
     ----------
-    tdb: float, int, or array-like
+    tdb: float or list of floats
         air temperature, [°C]
-    tr: float, int, or array-like
+    tr: float or list of floats
         mean radiant temperature, [°C]
-    v: float, int, or array-like
+    v: float or list of floats
         air speed, [m/s]
     standard: str (default="ISO")
         either choose between ISO and ASHRAE

@@ -1,50 +1,16 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
-from pythermalcomfort.utilities import BaseInputs
+from pythermalcomfort.classes_input import DIInputs
+from pythermalcomfort.classes_return import DI
 from pythermalcomfort.utilities import mapping
-
-
-@dataclass(frozen=True)
-class DiscomfortIndex:
-    """
-    Dataclass to represent the Discomfort Index (DI) and its classification.
-
-    Attributes
-    ----------
-    di : float or list of floats
-        Discomfort Index, [°C].
-    discomfort_condition : str or list of str
-        Classification of the thermal comfort conditions according to the discomfort index.
-    """
-
-    di: Union[float, List[float]]
-    discomfort_condition: Union[str, List[str]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class DiscomfortIndexInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        rh,
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            rh=rh,
-        )
 
 
 def discomfort_index(
     tdb: Union[float, List[float]],
     rh: Union[float, List[float]],
-) -> DiscomfortIndex:
+) -> DI:
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usually divided into 6 discomfort categories and it only applies to
@@ -66,9 +32,9 @@ def discomfort_index(
 
     Returns
     -------
-    DiscomfortIndex
-        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.models.discomfort_index.DiscomfortIndex` for more details.
-        To access the `di` and `discomfort_condition` values, use the respective attributes of the returned `DiscomfortIndex` instance, e.g., `result.di`.
+    DI
+        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.models.discomfort_index.DI` for more details.
+        To access the `di` and `discomfort_condition` values, use the respective attributes of the returned `DI` instance, e.g., `result.di`.
 
     Examples
     --------
@@ -86,7 +52,7 @@ def discomfort_index(
     """
 
     # Validate inputs using the DiscomfortIndexInputs class
-    DiscomfortIndexInputs(
+    DIInputs(
         tdb=tdb,
         rh=rh,
     )
@@ -105,7 +71,7 @@ def discomfort_index(
         99: "State of medical emergency",
     }
 
-    return DiscomfortIndex(
+    return DI(
         di=np.around(di, 1),
         discomfort_condition=mapping(di, di_categories, right=False),
     )

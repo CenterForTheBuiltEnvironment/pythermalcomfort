@@ -1,56 +1,11 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
+from pythermalcomfort.classes_input import VerticalTGradPPDInputs
+from pythermalcomfort.classes_return import VerticalTGradPPD
 from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import BaseInputs, check_standard_compliance_array
-
-
-@dataclass(frozen=True)
-class VerticalTmpGradPPD:
-    """
-    Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with vertical temperature gradient.
-
-    Attributes
-    ----------
-    ppd_vg : float or list of floats
-        Predicted Percentage of Dissatisfied occupants with vertical temperature gradient.
-    acceptability : bool or list of bools
-        True if the value of air speed at the ankle level is acceptable (PPD_vg <= 5%).
-    """
-
-    ppd_vg: Union[float, List[float]]
-    acceptability: Union[bool, List[bool]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-@dataclass
-class VerticalTmpGradPPDInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        tr,
-        vr,
-        rh,
-        met,
-        clo,
-        vertical_tmp_grad,
-        units="SI",
-    ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            tdb=tdb,
-            tr=tr,
-            vr=vr,
-            rh=rh,
-            met=met,
-            clo=clo,
-            vertical_tmp_grad=vertical_tmp_grad,
-            units=units,
-        )
+from pythermalcomfort.utilities import check_standard_compliance_array
 
 
 def vertical_tmp_grad_ppd(
@@ -62,7 +17,7 @@ def vertical_tmp_grad_ppd(
     clo: Union[float, List[float]],
     vertical_tmp_grad: Union[float, List[float]],
     round_output: bool = True,
-) -> VerticalTmpGradPPD:
+) -> VerticalTGradPPD:
     """Calculates the percentage of thermally dissatisfied people with a
     vertical temperature gradient between feet and head [1]_. This equation is
     only applicable for vr < 0.2 m/s (40 fps).
@@ -113,7 +68,7 @@ def vertical_tmp_grad_ppd(
 
     Returns
     -------
-    VerticalTmpGradPPD
+    VerticalTGradPPD
         A dataclass containing the Predicted Percentage of Dissatisfied occupants with vertical temperature gradient and acceptability.
         See :py:class:`~pythermalcomfort.models.vertical_tmp_grad_ppd.VerticalTmpGradPPD` for more details.
         To access the `ppd_vg` and `acceptability` values, use the corresponding attributes of the returned `VerticalTmpGradPPD` instance, e.g., `result.ppd_vg`.
@@ -130,7 +85,7 @@ def vertical_tmp_grad_ppd(
     """
 
     # Validate inputs using the VerticalTmpGradPPDInputs class
-    VerticalTmpGradPPDInputs(
+    VerticalTGradPPDInputs(
         tdb=tdb,
         tr=tr,
         vr=vr,
@@ -176,7 +131,7 @@ def vertical_tmp_grad_ppd(
     ppd_val = np.where(all_valid, ppd_val, np.nan)
     acceptability = np.where(all_valid, acceptability, np.nan)
 
-    return VerticalTmpGradPPD(ppd_vg=ppd_val, acceptability=acceptability)
+    return VerticalTGradPPD(ppd_vg=ppd_val, acceptability=acceptability)
 
 
 if __name__ == "__main__":
