@@ -149,11 +149,3 @@ def set_tmp(
         set_array = np.around(set_array, 1)
 
     return SET(set=set_array)
-
-
-if __name__ == "__main__":
-    result = set_tmp(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
-    print(result.set)
-
-    result = set_tmp(tdb=[25, 27], tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
-    print(result.set)

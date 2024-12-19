@@ -23,3 +23,8 @@ def test_a_pmv_wrong_input_type():
         a_pmv("25", 25, 0.1, 50, 1.2, 0.5, 7)
     with pytest.raises(ValueError):
         a_pmv(25, 25, 0.1, 50, 1.2, 0.5, 7, units="celsius")
+
+
+def test_not_valid_units():
+    with pytest.raises(ValueError):
+        a_pmv(25, 25, 0.1, 50, 1.2, 0.5, 7, units="wrong")

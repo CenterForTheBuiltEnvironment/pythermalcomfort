@@ -193,9 +193,3 @@ def use_fans_heatwaves(
         output = {key: np.around(output[key], 1) for key in output_vars}
 
     return UseFansHeatwaves(**output)
-
-
-if __name__ == "__main__":
-    results = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
-    print(results.e_skin)  # 100.0
-    print(results.heat_strain)  # 0.0

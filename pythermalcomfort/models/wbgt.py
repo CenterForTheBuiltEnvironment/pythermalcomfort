@@ -90,11 +90,3 @@ def wbgt(
         t_wbg = np.round(t_wbg, 1)
 
     return WBGT(wbgt=t_wbg)
-
-
-if __name__ == "__main__":
-    result = wbgt(twb=25, tg=32)
-    print(result.wbgt)  # 27.1
-
-    result = wbgt(twb=[25, 23], tg=32, tdb=20, with_solar_load=True)
-    print(result.wbgt)  # [25.9 24.5]

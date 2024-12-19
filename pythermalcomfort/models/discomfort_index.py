@@ -77,15 +77,3 @@ def discomfort_index(
         di=np.around(di, 1),
         discomfort_condition=mapping(di, di_categories, right=False),
     )
-
-
-if __name__ == "__main__":
-    result = discomfort_index(tdb=25, rh=50)
-    print(result.di)  # 22.1
-    print(result.discomfort_condition)  # Less than 50% feels discomfort
-
-    result = discomfort_index(tdb=[25, 30], rh=[50, 60])
-    print(result.di)  # [22.1, 27.3]
-    print(
-        result.discomfort_condition
-    )  # ['Less than 50% feels discomfort', 'Most of the population feels discomfort']

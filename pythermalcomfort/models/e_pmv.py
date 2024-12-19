@@ -125,8 +125,3 @@ def e_pmv(
     e_pmv_value = np.around(_pmv * e_coefficient, 2)
 
     return EPMV(e_pmv=e_pmv_value)
-
-
-if __name__ == "__main__":
-    result = e_pmv(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5, e_coefficient=0.6)
-    print(result.e_pmv)  # 0.51

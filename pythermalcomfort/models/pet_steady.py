@@ -496,18 +496,3 @@ def _pet_steady_vectorised(
     )
     # compute PET
     return pet_fc(t_stable)
-
-
-if __name__ == "__main__":
-    result = pet_steady(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
-    print(result.pet)  # 23.5
-
-    result = pet_steady(
-        tdb=[25, 30],
-        tr=[25, 30],
-        v=[0.1, 0.2],
-        rh=[50, 60],
-        met=[1.2, 1.4],
-        clo=[0.5, 0.6],
-    )
-    print(result.pet)  # [23.5, 28.7]

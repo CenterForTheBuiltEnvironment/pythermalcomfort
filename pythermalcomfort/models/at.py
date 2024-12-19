@@ -77,9 +77,3 @@ def at(
         t_at = np.around(t_at, 1)
 
     return AT(at=t_at)
-
-
-if __name__ == "__main__":
-    at(25, 30, 0.1)
-    at([25, 25, 25], [30, 30, 30], [0.1, 0.1, 0.1])
-    at(25, 30, 0.1, 100)

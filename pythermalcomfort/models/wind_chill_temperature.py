@@ -62,14 +62,3 @@ def wct(
         _wct = np.around(_wct, 1)
 
     return WCT(wct=_wct)
-
-
-if __name__ == "__main__":
-    result = wct(tdb=-20, v=5)
-    print(result.wct)
-
-    result = wct(tdb=-20, v=15)
-    print(result.wct)
-
-    result = wct(tdb=-20, v=60)
-    print(result.wct)

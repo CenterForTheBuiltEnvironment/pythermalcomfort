@@ -194,15 +194,3 @@ def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, 
         )
 
     return ce
-
-
-if __name__ == "__main__":
-    result = cooling_effect(
-        tdb=40,
-        tr=[40],
-        vr=[1, 0.2, 0.1, 0.05],
-        rh=[50],
-        met=[1.1],
-        clo=[0.5],
-    )
-    print(result)

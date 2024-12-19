@@ -78,11 +78,3 @@ def net(
         et = np.around(et, 1)
 
     return NET(net=et)
-
-
-if __name__ == "__main__":
-    result = net(tdb=37, rh=100, v=0.1)
-    print(result.net)  # 37.0
-
-    result = net(tdb=[37, 30], rh=[100, 60], v=[0.1, 0.5], round_output=False)
-    print(result.net)  # [37.0, 28.5]

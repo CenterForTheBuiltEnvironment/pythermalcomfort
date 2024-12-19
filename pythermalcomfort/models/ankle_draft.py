@@ -123,16 +123,3 @@ def ankle_draft(
     )
     acceptability = ppd_val <= 20
     return AnkleDraft(ppd_ad=ppd_val, acceptability=acceptability)
-
-
-if __name__ == "__main__":
-    results = ankle_draft(
-        tdb=[50, 26, 27],
-        tr=[25, 26, 27],
-        vr=[0.1, 0.1, 0.1],
-        rh=[50, 50, 50],
-        met=[1.2, 1.2, 1.2],
-        clo=[0.5, 0.5, 0.5],
-        v_ankle=[0.1, 0.1, 0.1],
-        units="SI",
-    )

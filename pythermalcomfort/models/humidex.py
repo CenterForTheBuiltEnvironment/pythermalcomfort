@@ -96,16 +96,3 @@ def humidex(
     stress_category[(hi > 45) & (hi <= 54)] = "Dangerous discomfort"
 
     return Humidex(humidex=hi, discomfort=stress_category)
-
-
-if __name__ == "__main__":
-    result = humidex(tdb=25, rh=50)
-    print(result.humidex)  # 28.2
-    print(result.discomfort)  # Little or no discomfort
-
-    result = humidex(tdb=[25, 30], rh=[50, 60], round_output=False)
-    print(result.humidex)  # [28.2, 39.1]
-    print(result.discomfort)  # ['Little or no discomfort', 'Evident discomfort']
-
-    result = humidex(tdb=21, rh=100, model="masterson")
-    print(result.humidex)  # 29.3

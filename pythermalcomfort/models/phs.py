@@ -578,22 +578,3 @@ def _phs_optimized(
         d_lim_loss_95,
         d_lim_t_re,
     )
-
-
-if __name__ == "__main__":
-    result = phs(
-        tdb=40, tr=40, rh=33.85, v=0.3, met=2.58, clo=0.5, posture="standing", wme=0
-    )
-    print(result)
-
-    inputs = {
-        "tdb": [40, 40],
-        "tr": 40,
-        "rh": 33.85,
-        "v": 0.3,
-        "met": 2.58,
-        "clo": 0.5,
-        "posture": "standing",
-    }
-    result = phs(**inputs)
-    print(result)

@@ -512,8 +512,3 @@ def _utci_optimized(tdb, v, delta_t_tr, pa):
         + (2.47090539 * (10 ** (-4))) * delta_t_tr * pa * pa * pa * pa * pa
         + 0.00148348065 * pa * pa * pa * pa * pa * pa
     )
-
-
-if __name__ == "__main__":
-    results = utci(tdb=25, tr=25, v=1.0, rh=50)
-    print(results)

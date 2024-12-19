@@ -166,15 +166,3 @@ def pmv(
         pmv_value = np.round(pmv_value, 2)
 
     return PMV(pmv=pmv_value)
-
-
-if __name__ == "__main__":
-    results = pmv(
-        tdb=[25, 27],
-        tr=[25, 25],
-        vr=[0.1, 0.1],
-        rh=[50, 50],
-        met=[1.2, 1.2],
-        clo=[0.5, 0.5],
-    )
-    print(results.pmv)  # [0.08, 0.4]

@@ -74,11 +74,3 @@ def wci(
         _wci = np.around(_wci, 1)
 
     return WCI(wci=_wci)
-
-
-if __name__ == "__main__":
-    result = wci(tdb=-5, v=5.5)
-    print(result.wci)  # 1255.2
-
-    result = wci(tdb=[-5, -10], v=[5.5, 10], round_output=True)
-    print(result.wci)  # [1255.2 1603.9]

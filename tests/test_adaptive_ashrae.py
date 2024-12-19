@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from pythermalcomfort.models import adaptive_ashrae
@@ -44,3 +45,19 @@ def test_ashrae_inputs_invalid_t_running_mean_type():
 def test_ashrae_inputs_invalid_v_type():
     with pytest.raises(TypeError):
         adaptive_ashrae(tdb=25, tr=25, t_running_mean=20, v="invalid")
+
+    # Return nan values when limit_inputs=True and inputs are invalid
+
+
+def test_nan_values_for_invalid_inputs():
+    # Test with invalid inputs where limit_inputs=True
+    result = adaptive_ashrae(
+        tdb=5.0, tr=5.0, t_running_mean=5.0, v=3.0, limit_inputs=True
+    )
+
+    # Check that the comfort temperature is nan
+    assert np.isnan(result.tmp_cmf)
+
+    # Check that the acceptability flags are False
+    assert result.acceptability_80 == False
+    assert result.acceptability_90 == False

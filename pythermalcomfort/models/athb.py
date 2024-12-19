@@ -123,18 +123,3 @@ def athb(
     )
 
     return ATHB(athb_pmv=athb_pmv)
-
-
-if __name__ == "__main__":
-    results = athb(
-        tdb=[25, 25, 25],
-        tr=[25, 25, 25],
-        vr=[0.1, 0.1, 0.1],
-        rh=[50, 50, 50],
-        met=[1.2, 1.2, 1.2],
-        t_running_mean=[20, 20, 20],
-    )
-    print(results.athb_pmv)
-
-    results = athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20, clo=0.3)
-    print(results.athb_pmv)

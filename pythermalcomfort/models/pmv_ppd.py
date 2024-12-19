@@ -308,16 +308,3 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     _pmv = ts * (mw - hl1 - hl2 - hl3 - hl4 - hl5 - hl6)
 
     return _pmv
-
-
-if __name__ == "__main__":
-    results = pmv_ppd(
-        tdb=[25, 27],
-        tr=[25, 25],
-        vr=[0.1, 0.1],
-        rh=[50, 50],
-        met=[1.2, 1.2],
-        clo=[0.5, 0.5],
-    )
-    print(results.pmv)  # [0.08 0.4 ]
-    print(results.ppd)  # [5.1 8.3]

@@ -133,15 +133,3 @@ def vertical_tmp_grad_ppd(
     acceptability = np.where(all_valid, acceptability, np.nan)
 
     return VerticalTGradPPD(ppd_vg=ppd_val, acceptability=acceptability)
-
-
-if __name__ == "__main__":
-    result = vertical_tmp_grad_ppd(
-        tdb=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, vertical_tmp_grad=7
-    )
-    print(result.ppd_vg)
-
-    result = vertical_tmp_grad_ppd(
-        tdb=[25, 23], tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, vertical_tmp_grad=7
-    )
-    print(result.ppd_vg)
