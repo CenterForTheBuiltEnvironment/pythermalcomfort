@@ -21,6 +21,7 @@ seaborn = "*"
 ruff = "*"
 docformatter = "*"
 autopep8 = "*"
+bump-my-version = "*"
 
 [requires]
 python_version = "3.12"

@@ -1,0 +1,29 @@
+[tool.bumpversion]
+current_version = "2.10.0"
+commit = true
+tag = true
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit_message = "Bump version: {current_version} → {new_version}"
+files = [
+    "pythermalcomfort/__init__.py",
+    "docs/conf.py",
+    "setup.py",
+]
+
+#[bumpversion:file:setup.py]
+#search = version="{current_version}"
+#replace = version="{new_version}"
+#
+#[bumpversion:file:docs/conf.py]
+#search = version = release = "{current_version}"
+#replace = version = release = "{new_version}"
+#
+#[bumpversion:file:pythermalcomfort/__init__.py]
+#search = __version__ = '{current_version}'
+#replace = __version__ = '{new_version}'
