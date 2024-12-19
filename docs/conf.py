@@ -20,7 +20,7 @@ master_doc = "index"
 project = "pythermalcomfort"
 year = "2019"
 author = "Federico Tartarini"
-copyright = f"{year}, {author}"
+project_copyright = f"{year}, {author}"
 version = release = "2.10.0"
 
 autodoc_typehints = "none"
@@ -47,7 +47,7 @@ html_split_index = False
 html_sidebars = {
     "**": ["searchbox.html", "globaltoc.html", "sourcelink.html"],
 }
-html_short_title = "%s-%s" % (project, version)
+html_short_title = f"{project}-{version}"
 
 napoleon_use_ivar = True
 napoleon_use_rtype = False

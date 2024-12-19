@@ -25,8 +25,7 @@ setup(
         " package for thermal comfort research. SoftwareX 12, 100578."
         " https://doi.org/10.1016/j.softx.2020.100578"
     ),
-    long_description="%s\n%s"
-    % (
+    long_description="{}\n{}".format(
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
             "", read("README.rst")
         ),

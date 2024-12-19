@@ -7,7 +7,7 @@ select = [
     "A",  # prevent using keywords that clobber python builtins
     "B",  # bugbear: security warnings
 #    "E",  # pycodestyle
-#    "F",  # pyflakes
+    "F",  # pyflakes
     "E4",
     "E7",
     "E9",

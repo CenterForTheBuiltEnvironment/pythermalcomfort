@@ -12,20 +12,20 @@ from pythermalcomfort.utilities import p_sat_torr
 
 
 def two_nodes(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
-    body_surface_area: Union[float, list[float]] = 1.8258,
-    p_atm: Union[float, list[float]] = 101325,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
+    body_surface_area: float | list[float] = 1.8258,
+    p_atm: float | list[float] = 101325,
     position: str = "standing",
-    max_skin_blood_flow: Union[float, list[float]] = 90,
+    max_skin_blood_flow: float | list[float] = 90,
     round_output: bool = True,
-    max_sweating: Union[float, list[float]] = 500,
-    w_max: Union[float, list[float]] = False,
+    max_sweating: float | list[float] = 500,
+    w_max: float | list[float] = False,
     calculate_ce: bool = False,
 ) -> SET | TwoNodes:
     """Two-node model of human temperature regulation Gagge et al. (1986).
