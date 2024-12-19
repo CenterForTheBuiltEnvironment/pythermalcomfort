@@ -30,6 +30,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install setuptools
           python -m pip install "tox<4" tox-gh-actions
+          python -m pip install black ruff
+      - name: Lint
+        run: ruff check ./pythermalcomfort ./tests
+      - name: Check formatting
+        run: black --check ./pythermalcomfort ./tests
       - name: Run Tox
         run: |
           tox
