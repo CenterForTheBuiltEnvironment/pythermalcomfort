@@ -512,8 +512,8 @@ def _two_nodes_optimized(
     e_req_set = rm - c_res - q_res - dry_set
     pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
 
-    # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
-    ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
+    # # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
+    # ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
 
     return (
         _set,

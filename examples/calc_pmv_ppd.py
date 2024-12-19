@@ -1,7 +1,13 @@
+import os
+import time
+
+import numpy as np
+import pandas as pd
+
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import v_relative, clo_dynamic
-from pythermalcomfort.utilities import met_typical_tasks
 from pythermalcomfort.utilities import clo_individual_garments
+from pythermalcomfort.utilities import met_typical_tasks
+from pythermalcomfort.utilities import v_relative, clo_dynamic
 
 # input variables
 tdb = 27  # dry bulb air temperature, [$^{\circ}$C]
@@ -35,11 +41,6 @@ results_ip = pmv_ppd(tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP")
 print(results_ip)
 
 # If you want you can also pass an array of inputs
-from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import v_relative, clo_dynamic
-import pandas as pd
-import os
-
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
 ta = df["tdb"].values
@@ -64,10 +65,6 @@ print(df.head())
 # df.to_csv('results.csv')
 
 # This method is extremely fast and can perform a lot of calculations in very little time
-from pythermalcomfort.models import pmv_ppd
-import numpy as np
-import time
-
 iterations = 10000
 tdb = np.empty(iterations)
 tdb.fill(25)

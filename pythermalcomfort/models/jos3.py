@@ -1230,7 +1230,7 @@ class JOS3:
             self._posture = "sitting"
         elif inp == 2:
             self._posture = "lying"
-        elif type(inp) == str:
+        elif isinstance(inp, str):
             if inp.lower() == "standing":
                 self._posture = "standing"
             elif inp.lower() in ["sitting", "sedentary"]:

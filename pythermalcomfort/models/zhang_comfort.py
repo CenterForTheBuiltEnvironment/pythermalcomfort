@@ -937,11 +937,6 @@ def calculate_overall_thermal_comfort(
       in the surrounding code.
     """
 
-    # Define local comfort dictionary
-    local_comfort_dict = convert_17_segments_dict_from_array(
-        array=local_comfort_array, body_name_list=body_name_list
-    )
-
     # Define the highest local thermal comfort (most comfortable)
     highest_local_comfort_value = np.max(local_comfort_array)
 
@@ -996,7 +991,7 @@ def calculate_overall_thermal_comfort(
     # Rule 1 (Steady state or controlled, such as in sens_third_coldest climate chamber)
     # Rule 1: Overall comfort is the average of the two minimum local comfort votes unless Rule 2 applies.
     if not is_transient or is_controlled:
-        if are_lowest_comfort_values_hands_or_feet == True:
+        if are_lowest_comfort_values_hands_or_feet:
             overall_comfort_value = np.mean(
                 [
                     mean_top2_lowest_comfort,
@@ -1016,7 +1011,7 @@ def calculate_overall_thermal_comfort(
     # Rule 2 (Transient state or not controlled space)
     # Rule 2: Overall comfort is the average of the two minimum votes and the maximum comfort vote:
     else:
-        if are_lowest_comfort_values_hands_or_feet == True:
+        if are_lowest_comfort_values_hands_or_feet:
             overall_comfort_value = np.mean(
                 [
                     mean_top2_lowest_comfort,

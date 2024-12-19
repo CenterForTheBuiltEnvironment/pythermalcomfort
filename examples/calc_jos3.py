@@ -424,7 +424,6 @@ def validation_simulation():
             df["ExpName"] = key
             df["Type"] = seg
             dfs.append(df.copy())
-    dfstatic = pd.concat(dfs).reset_index(drop=True)
 
     def plotdata(ser, ax, color, markersize=7, legend=False):
         mk = None

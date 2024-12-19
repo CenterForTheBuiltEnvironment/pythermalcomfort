@@ -480,9 +480,13 @@ def error_signals(err_sk=0.0):
 
 
 # Antoine equation [kPa]
-antoine = lambda x: math.e ** (16.6536 - (4030.183 / (x + 235)))
+def antoine(x):
+    return math.e ** (16.6536 - (4030.183 / (x + 235)))
+
+
 # Tetens equation [kPa]
-tetens = lambda x: 0.61078 * 10 ** (7.5 * x / (x + 237.3))
+def tetens(x):
+    return 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 
 
 def evaporation(

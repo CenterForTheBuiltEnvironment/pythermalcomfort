@@ -26,3 +26,35 @@ from pythermalcomfort.models.athb import athb
 from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.atcs import ATCS
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
+
+
+__all__ = [
+    "heat_index",
+    "pet_steady",
+    "wci",
+    "humidex",
+    "at",
+    "solar_gain",
+    "cooling_effect",
+    "pmv_ppd",
+    "pmv",
+    "a_pmv",
+    "e_pmv",
+    "set_tmp",
+    "two_nodes",
+    "use_fans_heatwaves",
+    "adaptive_ashrae",
+    "adaptive_en",
+    "utci",
+    "vertical_tmp_grad_ppd",
+    "clo_tout",
+    "ankle_draft",
+    "phs",
+    "wbgt",
+    "net",
+    "discomfort_index",
+    "athb",  # Add athb to the __all__ list
+    "JOS3",
+    "ATCS",
+    "zhang_sensation_comfort",
+]
