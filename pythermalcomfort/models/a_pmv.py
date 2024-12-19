@@ -19,10 +19,12 @@ def a_pmv(
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> APMV:
-    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was developed by Yao, R. et al. (2009).
-    The model takes into account factors such as culture, climate, social, psychological, and behavioral
-    adaptations, which have an impact on the senses used to detect thermal comfort. This model uses an
-    adaptive coefficient (λ) representing the adaptive factors that affect the sense of thermal comfort.
+    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was
+    developed by Yao, R. et al. (2009). The model takes into account factors
+    such as culture, climate, social, psychological, and behavioral
+    adaptations, which have an impact on the senses used to detect thermal
+    comfort. This model uses an adaptive coefficient (λ) representing the
+    adaptive factors that affect the sense of thermal comfort.
 
     Parameters
     ----------
@@ -87,7 +89,6 @@ def a_pmv(
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.74
-
     """
     # Validate inputs using the APMVInputs class
     APMVInputs(

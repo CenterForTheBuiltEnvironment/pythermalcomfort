@@ -28,8 +28,8 @@ def two_nodes(
     w_max: Union[float, List[float]] = False,
     calculate_ce: bool = False,
 ) -> SET | TwoNodes:
-    """Two-node model of human temperature regulation Gagge et al. (1986). [10]_
-    This model can be used to calculate a variety of indices, including:
+    """Two-node model of human temperature regulation Gagge et al. (1986).
+    [10]_ This model can be used to calculate a variety of indices, including:
 
     * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [10]_.
     * PMV SET and the predicted thermal sensation based on SET [10]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
@@ -95,7 +95,6 @@ def two_nodes(
 
         result = two_nodes(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
-
     """
     # Validate inputs using the TwoNodesInputs class
     TwoNodesInputs(

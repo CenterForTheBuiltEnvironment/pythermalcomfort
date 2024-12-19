@@ -56,7 +56,6 @@ def clo_tout(
 
         result = clo_tout(tout=[27, 25])
         print(result.clo_tout)  # array([0.46, 0.47])
-
     """
     # Validate inputs using the CloTOutInputs class
     CloTOutInputs(

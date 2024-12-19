@@ -153,8 +153,8 @@ def _pet_steady_vectorised(
     met = met * met_factor  # metabolic rate
 
     def vasomotricity(t_cr, t_sk):
-        """Defines the vasomotricity (blood flow) in function of the core
-        and skin temperatures.
+        """Defines the vasomotricity (blood flow) in function of the core and
+        skin temperatures.
 
         Parameters
         ----------
@@ -169,7 +169,6 @@ def _pet_steady_vectorised(
             "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
             mass
             between core and skin [].
-
         """
         # skin and core temperatures set values
         tc_set = 36.6  # 36.8
@@ -206,7 +205,6 @@ def _pet_steady_vectorised(
         -------
         m_rsw : float
             The sweating flow rate, [g/m2/h].
-
         """
         tc_set = 36.6  # 36.8
         tsk_set = 34  # 33.7
@@ -464,7 +462,6 @@ def _pet_steady_vectorised(
         -------
         float
             The PET comfort index.
-
         """
 
         # Definition of a function with the input variables of the PET reference situation

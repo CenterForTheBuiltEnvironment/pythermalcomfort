@@ -12,16 +12,16 @@ logging.basicConfig(level=logging.WARNING)
 
 
 class ATCS(JOS3):
-    """ATCS (Advanced Thermal Comfort Simulator) is an integrated simulator that combines
-    JOS-3 model for simulating human thermal physiology, with a thermal sensation and
-    comfort model for predicting psychological parameters from the physiological parameters.
-    """
+    """ATCS (Advanced Thermal Comfort Simulator) is an integrated simulator
+    that combines JOS-3 model for simulating human thermal physiology, with a
+    thermal sensation and comfort model for predicting psychological parameters
+    from the physiological parameters."""
 
     default_iteration_number_to_get_stable_condition = 600
 
     def __init__(self, *args, **kwargs):
-        """Initializes this class by calling the parent class constructor
-        and setting initial values for instance variables.
+        """Initializes this class by calling the parent class constructor and
+        setting initial values for instance variables.
 
         Parameters
         ----------
@@ -126,7 +126,6 @@ class ATCS(JOS3):
         >>>
         >>># Exporting the results as csv
         >>> model.to_csv("atcs_example1 (default output).csv"))
-
         """
         # Initialize instance variables for this class.
         self.cached_clo = np.ones(17) * Default.clothing_insulation
@@ -173,7 +172,6 @@ class ATCS(JOS3):
           the cached comfortable skin temperature set point directly.
         - The calculation of the comfortable skin temperature set point involves determining the operative temperature
           where PMV is zero and then running the model in uniform conditions to extract skin temperatures as set points.
-
         """
         # If the clothing insulation value 'clo' and the metabolic rate 'par' are the same as the cached values,
         # return the cached comfortable skin temperature set point
@@ -220,7 +218,8 @@ class ATCS(JOS3):
         t_skin,
         wet,
     ):
-        """Calculate the skin temperature considering sweating for Zhang's model.
+        """Calculate the skin temperature considering sweating for Zhang's
+        model.
 
         This function takes into account the impact of sweating on the skin temperature. The Zhang model's
         prediction of local thermal sensation is represented by a logistic function of the difference between
@@ -251,7 +250,6 @@ class ATCS(JOS3):
         -----
         In the future, it may be more reasonable to predict thermal sensation
         based on the total heat loss (sensible + latent) of JOS3 model, as in the SET calculation method.
-
         """
         coef = 2.5
         t_skin_increase = coef * (wet - 0.06)
@@ -282,7 +280,6 @@ class ATCS(JOS3):
         - The skin temperature after considering sweat (`t_skin_wet`) is used for further calculations if `consider_sweat`
           is True. Otherwise, the regular skin temperature (`t_skin`) is used.
         - Local and overall thermal sensations and comfort are computed using the `cbe_comfort` function.
-
         """
         # Internal switch to consider sweat for comfort model
         consider_sweat = True
@@ -344,8 +341,10 @@ class ATCS(JOS3):
 
     def simulate(self, *args, **kwargs):
         """Runs the model for a given time.
-        This method extends the simulate method of the parent class by additionally computing the comfortable skin
-        temperature set point before running the simulation.
+
+        This method extends the simulate method of the parent class by
+        additionally computing the comfortable skin temperature set
+        point before running the simulation.
         """
         result = super().simulate(*args, **kwargs)
         return result

@@ -99,7 +99,6 @@ def solar_gain(
         )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
-
     """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(

@@ -84,7 +84,6 @@ def vertical_tmp_grad_ppd(
         )
         print(result.ppd_vg)  # 12.6
         print(result.acceptability)  # False
-
     """
     # Validate inputs using the VerticalTmpGradPPDInputs class
     VerticalTGradPPDInputs(

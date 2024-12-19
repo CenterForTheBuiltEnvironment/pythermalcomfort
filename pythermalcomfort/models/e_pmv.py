@@ -102,7 +102,6 @@ def e_pmv(
         clo_d = clo_dynamic(clo=clo, met=met)
         results = e_pmv(tdb, tr, v_r, rh, met, clo_d, e_coefficient=0.6)
         print(results.e_pmv)  # 0.51
-
     """
     # Validate inputs using the EPMVInputs class
     EPMVInputs(

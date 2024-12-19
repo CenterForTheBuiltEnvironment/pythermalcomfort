@@ -14,12 +14,13 @@ def wbgt(
     with_solar_load: bool = False,
     round_output: bool = True,
 ) -> WBGT:
-    """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance with
-    the ISO 7243 Standard [11]_. The WBGT is a heat stress index that measures the thermal
-    environment to which a person is exposed. In most situations, this index is simple
-    to calculate. It should be used as a screening tool to determine whether heat stress
-    is present. The PHS model allows a more accurate estimation of stress. PHS can be
-    calculated using the function :py:meth:`pythermalcomfort.models.phs`.
+    """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance
+    with the ISO 7243 Standard [11]_. The WBGT is a heat stress index that
+    measures the thermal environment to which a person is exposed. In most
+    situations, this index is simple to calculate. It should be used as a
+    screening tool to determine whether heat stress is present. The PHS model
+    allows a more accurate estimation of stress. PHS can be calculated using
+    the function :py:meth:`pythermalcomfort.models.phs`.
 
     The WBGT determines the impact of heat on a person throughout the course of a working
     day (up to 8 hours). It does not apply to very brief heat exposures. It pertains to
@@ -61,7 +62,6 @@ def wbgt(
 
         result = wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
         print(result.wbgt)  # 25.9
-
     """
     # Validate inputs using the WBGTInputs class
     WBGTInputs(

@@ -47,7 +47,6 @@ def heat_index(
 
         result = heat_index(tdb=[25, 30], rh=[50, 60], units="IP", round_output=False)
         print(result.hi)  # [78.6, 86.7]
-
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(

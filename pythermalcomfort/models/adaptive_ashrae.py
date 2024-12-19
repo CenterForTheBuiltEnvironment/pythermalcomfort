@@ -21,7 +21,11 @@ def adaptive_ashrae(
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
-    """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive model relates indoor design temperatures or acceptable temperature ranges to outdoor meteorological or climatological parameters. The adaptive model can only be used in occupant-controlled naturally conditioned spaces that meet all the following criteria:
+    """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
+    model relates indoor design temperatures or acceptable temperature ranges
+    to outdoor meteorological or climatological parameters. The adaptive model
+    can only be used in occupant-controlled naturally conditioned spaces that
+    meet all the following criteria:
 
     * There is no mechanical cooling or heating system in operation.
     * Occupants have a metabolic rate between 1.0 and 1.5 met.
@@ -82,7 +86,6 @@ def adaptive_ashrae(
         adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
         # AdaptiveASHRAE(tmp_cmf=np.float64(nan), ... acceptability_90=array(False))
         # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C.
-
     """
     # Validate inputs using the ASHRAEInputs class
     ASHRAEInputs(

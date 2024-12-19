@@ -329,7 +329,6 @@ class JOS3:
             >>> plt.show()  # Show the plot
             >>> # Exporting the results as csv
             >>> model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
-
         """
         # Version of pythermalcomfort
         version_string = (
@@ -418,7 +417,8 @@ class JOS3:
         met=Default.metabolic_rate,
         clo=Default.clothing_insulation,
     ) -> float:
-        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry logic.
+        """Calculate operative temperature [°C] when PMV=0 with NaN handling
+        and retry logic.
 
         Parameters
         ----------
@@ -436,7 +436,6 @@ class JOS3:
         -------
         to : float
             Operative temperature [°C].
-
         """
         # Default parameters
         initial_to = 28
@@ -494,17 +493,18 @@ class JOS3:
         return to
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
-        """Reset set-point temperatures under steady state calculation.
-        Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
-        when at rest (similar to room set-point temperature for air conditioning).
-        This function is used during initialization to calculate the set-point temperatures as a reference for thermoregulation.
-        Be careful, input parameters (tdb, tr, rh, v, clo, par) and body temperatures are also reset.
+        """Reset set-point temperatures under steady state calculation. Set-
+        point temperatures are hypothetical core or skin temperatures in a
+        thermally neutral state when at rest (similar to room set-point
+        temperature for air conditioning). This function is used during
+        initialization to calculate the set-point temperatures as a reference
+        for thermoregulation. Be careful, input parameters (tdb, tr, rh, v,
+        clo, par) and body temperatures are also reset.
 
         Returns
         -------
         dict
             Parameters of JOS-3 model.
-
         """
         # Set operative temperature under PMV=0 environment
         # 1 met = 58.15 W/m2
@@ -543,7 +543,6 @@ class JOS3:
         Returns
         -------
         None.
-
         """
         # Loop through the simulation for the given number of times
         for _ in range(times):
@@ -595,7 +594,6 @@ class JOS3:
         -------
         dict_out : dictionary
             Output parameters.
-
         """
         # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
@@ -989,7 +987,6 @@ class JOS3:
         -------
         dict
             A dictionary of the results, with keys as column names and values as pandas.DataFrame objects.
-
         """
         if not self._history:
             print("The model has no data.")
@@ -1077,7 +1074,6 @@ class JOS3:
         >>> model = JOS3()
         >>> model.simulate(60)
         >>> model.to_csv()
-
         """
         # Use the model name and current time as default output file name
         if path is None:
@@ -1142,7 +1138,6 @@ class JOS3:
         -------
         array
             Extra heat gain of model.
-
         """
         self.ex_q[INDEX[tissue]] = value
         return self.ex_q
@@ -1157,7 +1152,6 @@ class JOS3:
         -------
         ndarray
             A NumPy array of shape (17,).
-
         """
         return self._ta
 

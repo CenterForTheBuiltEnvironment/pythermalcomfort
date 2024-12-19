@@ -19,6 +19,7 @@ tabulate = "*"
 matplotlib = "*"
 seaborn = "*"
 ruff = "*"
+docformatter = "*"
 
 [requires]
 python_version = "3.12"

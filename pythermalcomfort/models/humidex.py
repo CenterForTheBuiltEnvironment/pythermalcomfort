@@ -56,7 +56,6 @@ def humidex(
         result = humidex(tdb=[25, 30], rh=[50, 60], round_output=False)
         print(result.humidex)  # [28.2, 39.1]
         print(result.discomfort)  # ['Little or no discomfort', 'Evident discomfort']
-
     """
     # Validate inputs using the HumidexInputs class
     HumidexInputs(

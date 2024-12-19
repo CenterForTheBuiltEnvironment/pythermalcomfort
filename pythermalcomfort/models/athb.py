@@ -80,7 +80,6 @@ def athb(
             t_running_mean=[20, 20, 20],
         )
         print(results.athb_pmv)
-
     """
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)

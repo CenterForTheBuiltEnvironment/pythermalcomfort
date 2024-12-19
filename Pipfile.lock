@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8fbc53f16eed204871b8e9a9e39e5cce61702ea44d4b5a777bf46a779c10ca56"
+            "sha256": "6a8a182f5c892fe6db2a109de1b3ca435590c2c90905e90c8c5c18a05de6560f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -457,6 +457,15 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==0.12.1"
+        },
+        "docformatter": {
+            "hashes": [
+                "sha256:a24f5545ed1f30af00d106f5d85dc2fce4959295687c24c8f39f5263afaf9186",
+                "sha256:ffed3da0daffa2e77f80ccba4f0e50bfa2755e1c10e130102571c890a61b246e"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7' and python_version < '4.0'",
+            "version": "==1.7.5"
         },
         "fonttools": {
             "hashes": [
@@ -1111,6 +1120,12 @@
             ],
             "markers": "python_version >= '2'",
             "version": "==2024.2"
+        },
+        "untokenize": {
+            "hashes": [
+                "sha256:3865dbbbb8efb4bb5eaa72f1be7f3e0be00ea8b7f125c69cbd1f5fda926f37a2"
+            ],
+            "version": "==0.1.1"
         },
         "urllib3": {
             "hashes": [
