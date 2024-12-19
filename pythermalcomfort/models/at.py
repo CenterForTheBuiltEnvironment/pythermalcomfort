@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
 from pythermalcomfort.classes_input import ATInputs
 from pythermalcomfort.classes_return import AT
-from pythermalcomfort.utilities import BaseInputs, psy_ta_rh
+from pythermalcomfort.utilities import psy_ta_rh
 
 
 def at(

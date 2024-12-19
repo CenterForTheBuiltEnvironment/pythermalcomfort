@@ -1,12 +1,10 @@
 from typing import Union, List
 
 import numpy as np
-from setuptools.package_index import entity_sub
 
 from pythermalcomfort.classes_input import EPMVInputs
 from pythermalcomfort.classes_return import EPMV
 from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import enthalpy_air
 
 
 def e_pmv(

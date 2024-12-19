@@ -13,7 +13,7 @@ following order: "head", "neck", "chest", "back", "pelvis",
 import numpy as np
 import math
 
-from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
+from pythermalcomfort.jos3_functions.matrix import IDICT, BODY_NAMES
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.parameters import Default
 

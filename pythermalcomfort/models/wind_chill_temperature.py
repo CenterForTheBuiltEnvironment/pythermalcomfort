@@ -1,11 +1,9 @@
-from dataclasses import dataclass
 from typing import Union, List
 
 import numpy as np
 
 from pythermalcomfort.classes_input import WCTInputs
 from pythermalcomfort.classes_return import WCT
-from pythermalcomfort.utilities import BaseInputs
 
 
 def wct(

@@ -11,12 +11,8 @@ from pythermalcomfort.shared_functions import valid_range
 warnings.simplefilter("always")
 
 
-from dataclasses import dataclass
-from typing import Union, List
 
-import numpy as np
 
-from pythermalcomfort.shared_functions import valid_range
 
 c_to_k = 273.15
 cp_vapour = 1805.0
