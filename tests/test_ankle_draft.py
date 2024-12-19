@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from pythermalcomfort.models.ankle_draft import ankle_draft
-from pythermalcomfort.models.ankle_draft import AnkleDraft
+from pythermalcomfort.models.ankle_draft import AnkleDraft, ankle_draft
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
