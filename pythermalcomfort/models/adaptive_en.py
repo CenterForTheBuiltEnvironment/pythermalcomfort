@@ -18,8 +18,7 @@ def adaptive_en(
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveEN:
-    """
-    Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
+    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
 
     Parameters
     ----------
@@ -60,6 +59,7 @@ def adaptive_en(
     .. code-block:: python
 
         from pythermalcomfort.models import adaptive_en
+
         results = adaptive_en(tdb=25, tr=25, t_running_mean=20, v=0.1)
         print(results)
         # AdaptiveEN(tmp_cmf=np.float64(25.4), acceptability_cat_i=np.True_, acceptability_cat_ii=np.True_, ...)
@@ -69,7 +69,7 @@ def adaptive_en(
         # The conditions you entered are considered to comply with Category I
 
         # For users who want to use the IP system
-        results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units='ip')
+        results = adaptive_en(tdb=77, tr=77, t_running_mean=68, v=0.3, units="ip")
         print(results)
         # AdaptiveEN(tmp_cmf=np.float64(77.7), acceptability_cat_i=np.True_, ...)
 
@@ -78,8 +78,8 @@ def adaptive_en(
         # AdaptiveEN(tmp_cmf=np.float64(nan), acceptability_cat_i=np.False_, ...)
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C.
-    """
 
+    """
     # Validate inputs using the ENInputs class
     ENInputs(tdb=tdb, tr=tr, t_running_mean=t_running_mean, v=v, units=units)
 

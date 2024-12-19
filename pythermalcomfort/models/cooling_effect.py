@@ -93,10 +93,18 @@ def cooling_effect(
         result = cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5)
         print(result.ce)  # 1.68
 
-        result = cooling_effect(tdb=[25, 77], tr=[25, 77], vr=[0.3, 1.64], rh=[50, 50], met=[1.2, 1], clo=[0.5, 0.6], units="IP")
+        result = cooling_effect(
+            tdb=[25, 77],
+            tr=[25, 77],
+            vr=[0.3, 1.64],
+            rh=[50, 50],
+            met=[1.2, 1],
+            clo=[0.5, 0.6],
+            units="IP",
+        )
         print(result.ce)  # [0, 3.95]
-    """
 
+    """
     # Validate inputs using the CoolingEffectInputs class
     CEInputs(
         tdb=tdb,

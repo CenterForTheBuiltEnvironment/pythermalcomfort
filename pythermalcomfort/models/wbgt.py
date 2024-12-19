@@ -61,8 +61,8 @@ def wbgt(
 
         result = wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
         print(result.wbgt)  # 25.9
-    """
 
+    """
     # Validate inputs using the WBGTInputs class
     WBGTInputs(
         twb=twb,

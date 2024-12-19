@@ -87,11 +87,20 @@ def solar_gain(
 
         from pythermalcomfort.models import solar_gain
 
-        result = solar_gain(sol_altitude=0, sharp=120, sol_radiation_dir=800, sol_transmittance=0.5, f_svv=0.5, f_bes=0.5, asw=0.7, posture='sitting')
+        result = solar_gain(
+            sol_altitude=0,
+            sharp=120,
+            sol_radiation_dir=800,
+            sol_transmittance=0.5,
+            f_svv=0.5,
+            f_bes=0.5,
+            asw=0.7,
+            posture="sitting",
+        )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
-    """
 
+    """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(
         sol_altitude=sol_altitude,

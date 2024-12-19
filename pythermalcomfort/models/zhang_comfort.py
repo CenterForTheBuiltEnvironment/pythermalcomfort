@@ -513,6 +513,7 @@ def convert_to_17_segments_array_from_any_data_type(data):
     Notes
     -----
     Ensure that the `body_name_list` is defined elsewhere in the code if using this function with dictionary input data.
+
     """
     if data is None:
         return None
@@ -535,8 +536,7 @@ def convert_to_17_segments_array_from_any_data_type(data):
 
 
 def convert_17_segments_dict_from_array(array, body_name_list):
-    """
-    Convert a 17-segment numpy array to a dictionary using the provided body name list.
+    """Convert a 17-segment numpy array to a dictionary using the provided body name list.
 
     Parameters
     ----------
@@ -550,6 +550,7 @@ def convert_17_segments_dict_from_array(array, body_name_list):
     -------
     dict
         A dictionary with keys as body part names from `body_name_list` and values from the input `array`.
+
     """
     return {part: array[i] for i, part in enumerate(body_name_list)}
 
@@ -566,7 +567,7 @@ def calculate_local_thermal_sensation(
     """Calculate local thermal sensation based on physiological parameters and the selected sensation scale.
 
     Parameters
-    -----------
+    ----------
     t_skin_local_array : numpy.ndarray
         Array of local skin temperatures [°C].
     dt_skin_local_dt_array : numpy.ndarray
@@ -584,10 +585,11 @@ def calculate_local_thermal_sensation(
         - '9-point': Ranges from -4 (very cold) to 4 (very hot).
         - '7-point': Ranges from -3 (cold) to 3 (hot).
 
-    Return
+    Return:
     ------
     sensation_local_array : numpy.ndarray
         Local thermal sensation on sens_third_coldest 9-point/7-point sensation scale [-].
+
     """
 
     def get_coefficient_c1(t_skin_local_array, t_skin_local_set_array):
@@ -668,8 +670,8 @@ def calculate_overall_sensation(sensation_local_array):
     -------
     overall_sensation : float
         Overall thermal sensation.
-    """
 
+    """
     # Define local thermal comfort as a dictionary
     local_17_segments_dict = convert_17_segments_dict_from_array(
         array=sensation_local_array, body_name_list=body_name_list
@@ -713,7 +715,6 @@ def calculate_overall_sensation(sensation_local_array):
         If not, it will directly return False without further checks.
 
         """
-
         # Sensation array must have at least two elements for this function to work properly
         if len(sensation_local_array) < 2:
             return False
@@ -764,8 +765,8 @@ def calculate_overall_sensation(sensation_local_array):
         -------
         overall_sensation_weighted : float
             The weighted overall sensation.
-        """
 
+        """
         # Calculate the absolute values of sensations as initial weights
         abs_sensations = np.abs(sensation_local_array)
 
@@ -825,7 +826,6 @@ def calculate_local_thermal_comfort(overall_sensation, sensation_local_array):
         local thermal comfort values. Each value is constrained to the range of -4 (very uncomfortable) to 4 (very comfortable).
 
     """
-
     C31 = C31_array
     C32 = C32_array
     C6 = C6_array
@@ -845,6 +845,7 @@ def calculate_local_thermal_comfort(overall_sensation, sensation_local_array):
         -------
         tuple
             A tuple containing the computed elements.
+
         """
         if overall_sensation >= 0:
             A1 = -8 * (C6 + C72 * overall_sensation + 4)
@@ -935,8 +936,8 @@ def calculate_overall_thermal_comfort(
       determine if the two most uncomfortable segments are the hands or feet.
     - The function assumes that `body_name_list` and `convert_17_segments_dict_from_array` are available
       in the surrounding code.
-    """
 
+    """
     # Define the highest local thermal comfort (most comfortable)
     highest_local_comfort_value = np.max(local_comfort_array)
 
@@ -957,8 +958,7 @@ def calculate_overall_thermal_comfort(
     )
 
     def are_lowest_comfort_values_hands_or_feet(local_comfort_dict):
-        """
-        Determine if the two most uncomfortable sensations are from the hands or feet.
+        """Determine if the two most uncomfortable sensations are from the hands or feet.
 
         Parameters
         ----------
@@ -970,8 +970,8 @@ def calculate_overall_thermal_comfort(
         -------
         bool
             True if the two most uncomfortable sensations correspond to the hands or feet. False otherwise.
-        """
 
+        """
         # Find the two minimum comfort values
         two_lowest_values = sorted(local_comfort_dict.values())[:2]
 
@@ -1068,7 +1068,7 @@ def zhang_sensation_comfort(
 
 
     Parameters
-    -----------
+    ----------
     t_skin_local : int, float, list, numpy.ndarray, dict
         Local skin temperature [°C].
     t_skin_local_set : int, float, list, numpy.ndarray, dict
@@ -1121,7 +1121,7 @@ def zhang_sensation_comfort(
 
 
     Examples
-    ---------
+    --------
     .. code-block:: python
     >>> from pythermalcomfort.models import zhang_sensation_comfort
     >>> dict_results = zhang_sensation_comfort(
@@ -1208,8 +1208,8 @@ def zhang_sensation_comfort(
     'sensation_right_shoulder': 1.09,
     'sensation_right_thigh': 2.23
      }
-    """
 
+    """
     default_options = {
         "sensation_scale": "9-point",
         "is_transient": False,

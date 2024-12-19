@@ -95,8 +95,8 @@ def two_nodes(
 
         result = two_nodes(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
-    """
 
+    """
     # Validate inputs using the TwoNodesInputs class
     TwoNodesInputs(
         tdb=tdb,

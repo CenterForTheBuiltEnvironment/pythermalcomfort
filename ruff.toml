@@ -1,0 +1,16 @@
+# Set the maximum line length to 88.
+line-length = 88
+
+[lint]
+# Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
+# overlap with the use of a formatter, like Black, but we can override this behavior by
+# explicitly adding the rule.
+extend-select = [
+    "E501",
+    "W505", # doc-line-too-long
+    "UP",  # pyupgrade
+    "D",   # pydocstyle
+]
+
+[format]
+docstring-code-format = true

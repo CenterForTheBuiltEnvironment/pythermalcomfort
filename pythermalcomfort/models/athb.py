@@ -16,8 +16,7 @@ def athb(
     t_running_mean: Union[float, List[float]],
     clo: Union[bool, float, List[float]] = False,
 ) -> ATHB:
-    """
-    Return the PMV value calculated with the Adaptive Thermal Heat Balance
+    """Return the PMV value calculated with the Adaptive Thermal Heat Balance
     Framework [27]_. The adaptive thermal heat balance (ATHB) framework
     introduced a method to account for the three adaptive principals, namely
     physiological, behavioral, and psychological adaptation, individually
@@ -72,8 +71,16 @@ def athb(
         print(results.athb_pmv)  # returns the PMV value
 
         # for multiple points
-        results = athb(tdb=[25, 25, 25], tr=[25, 25, 25], vr=[0.1, 0.1, 0.1], rh=[50, 50, 50], met=[1.2, 1.2, 1.2], t_running_mean=[20, 20, 20])
+        results = athb(
+            tdb=[25, 25, 25],
+            tr=[25, 25, 25],
+            vr=[0.1, 0.1, 0.1],
+            rh=[50, 50, 50],
+            met=[1.2, 1.2, 1.2],
+            t_running_mean=[20, 20, 20],
+        )
         print(results.athb_pmv)
+
     """
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)

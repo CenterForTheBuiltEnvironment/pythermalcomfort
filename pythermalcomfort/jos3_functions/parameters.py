@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This code defines a dataclass for default input and a dictionary called ALL_OUT_PARAMS that contains
 information about various output parameters related to human body properties,
 heat exchange, and environmental conditions.
@@ -448,8 +447,8 @@ def show_out_param_docs():
     -------
     docstring : str
         Text of the documentation of the output parameters
-    """
 
+    """
     outparams = textwrap.dedent(
         """
         Output parameters

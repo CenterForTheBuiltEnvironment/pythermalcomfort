@@ -45,8 +45,8 @@ def wct(
 
         result = wc(tdb=[-5, -10], v=[5.5, 10], round_output=True)
         print(result.wct)  # [1255.2 1603.9]
-    """
 
+    """
     # Validate inputs using the WCYInputs class
     WCTInputs(
         tdb=tdb,

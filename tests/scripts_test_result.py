@@ -31,7 +31,7 @@ def run_tox(env):
 def parse_tox_log(log_path):
     results = {}
     try:
-        with open(log_path, "r", encoding="utf-8") as file:
+        with open(log_path, encoding="utf-8") as file:
             for line in file:
                 if "PASSED" in line:
                     func = re.search(r"/([^/]*?)::", line)
@@ -50,7 +50,7 @@ def create_markdown_table(df):
 
 def add_markdown_table_to_readme(markdown_output):
     try:
-        with open("./README.rst", "r", encoding="utf-8") as f:
+        with open("./README.rst", encoding="utf-8") as f:
             readme_content = f.read()
 
         pattern = "----------------------------\n"

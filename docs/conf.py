@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import sys
 
@@ -23,7 +20,7 @@ master_doc = "index"
 project = "pythermalcomfort"
 year = "2019"
 author = "Federico Tartarini"
-copyright = "{0}, {1}".format(year, author)
+copyright = f"{year}, {author}"
 version = release = "2.10.0"
 
 autodoc_typehints = "none"

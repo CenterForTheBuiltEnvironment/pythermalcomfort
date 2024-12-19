@@ -94,9 +94,7 @@ def retrieve_reference_table(get_test_url, retrieve_data, url_name):
 
 
 def validate_result(result, expected_output, tolerance: dict):
-    """
-
-    Parameters
+    """Parameters
     ----------
     result this is the result of the function that is being tested
     expected_output this is the expected output of the function that is being tested
@@ -107,7 +105,6 @@ def validate_result(result, expected_output, tolerance: dict):
     None
 
     """
-
     for key in expected_output:
         _expected_output = expected_output[key]
 

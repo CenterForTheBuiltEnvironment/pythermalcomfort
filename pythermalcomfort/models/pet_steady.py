@@ -86,10 +86,17 @@ def pet_steady(
         result = pet_steady(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
         print(result.pet)  # 24.67
 
-        result = pet_steady(tdb=[25, 30], tr=[25, 30], v=[0.1, 0.2], rh=[50, 60], met=[1.2, 1.4], clo=[0.5, 0.6])
+        result = pet_steady(
+            tdb=[25, 30],
+            tr=[25, 30],
+            v=[0.1, 0.2],
+            rh=[50, 60],
+            met=[1.2, 1.4],
+            clo=[0.5, 0.6],
+        )
         print(result.pet)  # [24.67 31.46]
-    """
 
+    """
     # Validate inputs using the PETSteadyInputs class
     PETSteadyInputs(
         tdb=tdb,
@@ -162,6 +169,7 @@ def _pet_steady_vectorised(
             "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
             mass
             between core and skin [].
+
         """
         # skin and core temperatures set values
         tc_set = 36.6  # 36.8
@@ -198,6 +206,7 @@ def _pet_steady_vectorised(
         -------
         m_rsw : float
             The sweating flow rate, [g/m2/h].
+
         """
         tc_set = 36.6  # 36.8
         tsk_set = 34  # 33.7
@@ -226,8 +235,7 @@ def _pet_steady_vectorised(
         _clo=0.9,
         actual_environment=False,
     ):
-        """
-        This function allows solving for the PET : either it solves the vectorial balance
+        """This function allows solving for the PET : either it solves the vectorial balance
         of the 3 unknown temperatures (T_core, T_sk, T_clo) or it solves for the
         environment operative temperature that would yield the same energy balance as the
         actual environment.
@@ -255,8 +263,8 @@ def _pet_steady_vectorised(
         -------
         float or list
             PET or energy balance.
-        """
 
+        """
         e_skin = 0.99  # Skin emissivity
         e_clo = 0.95  # Clothing emissivity
         h_vap = 2.42 * 10**6  # Latent heat of evaporation [J/Kg]
@@ -456,6 +464,7 @@ def _pet_steady_vectorised(
         -------
         float
             The PET comfort index.
+
         """
 
         # Definition of a function with the input variables of the PET reference situation

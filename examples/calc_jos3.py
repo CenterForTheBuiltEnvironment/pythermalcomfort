@@ -592,7 +592,6 @@ def validation_simulation():
 
 def main():
     """Run the selected simulation."""
-
     # Simulation switch (Please change as needed)
     run_simple_simulation = True
     run_detailed_simulation = True

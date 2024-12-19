@@ -11,9 +11,6 @@ from pythermalcomfort.shared_functions import valid_range
 warnings.simplefilter("always")
 
 
-
-
-
 c_to_k = 273.15
 cp_vapour = 1805.0
 cp_water = 4186
@@ -35,6 +32,7 @@ def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     -------
     p_sat : float
         saturation vapor pressure [torr]
+
     """
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
@@ -56,8 +54,8 @@ def enthalpy_air(
     -------
     enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
-    """
 
+    """
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
     return h_dry_air + hr * h_sat_vap
@@ -91,8 +89,8 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
     -------
     p_sat: float or list of floats
         saturation vapor pressure, [Pa]
-    """
 
+    """
     ta_k = tdb + c_to_k
     # pre-calculate the value before passing it to .where
     log_ta_k = np.log(ta_k)
@@ -158,6 +156,7 @@ def psy_ta_rh(
         dew point temperature, [°C]
     h: float or list of floats
         enthalpy_air [J/kg dry air]
+
     """
     tdb = np.array(tdb)
     rh = np.array(rh)
@@ -196,6 +195,7 @@ def wet_bulb_tmp(
     -------
     tdb: float or list of floats
         wet-bulb temperature, [°C]
+
     """
     twb = (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
@@ -225,6 +225,7 @@ def dew_point_tmp(
     -------
     dew_point_tmp: float or list of floats
         dew point temperature, [°C]
+
     """
     tdb = np.array(tdb)
     rh = np.array(rh)
@@ -276,6 +277,7 @@ def mean_radiant_tmp(
     -------
     tr: float or list of floats
         mean radiant temperature, [°C]
+
     """
     standard = standard.lower()
 
@@ -732,8 +734,8 @@ def body_surface_area(weight, height, formula="dubois"):
     -------
     body_surface_area : float
         body surface area, [m2]
-    """
 
+    """
     if formula == "dubois":
         return 0.202 * (weight**0.425) * (height**0.725)
     elif formula == "takahira":
@@ -764,8 +766,8 @@ def f_svv(w, h, d):
     -------
     f_svv  : float
         sky-vault view fraction ranges between 0 and 1
-    """
 
+    """
     return (
         math.degrees(math.atan(h / (2 * d)))
         * math.degrees(math.atan(w / (2 * d)))
@@ -790,8 +792,8 @@ def v_relative(v, met):
     -------
     vr  : float or list of floats
         relative air speed, [m/s]
-    """
 
+    """
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
@@ -816,8 +818,8 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
-    """
 
+    """
     standard = standard.lower()
 
     if standard not in ["ashrae", "iso"]:
@@ -857,8 +859,8 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     -------
     t_rm  : float
         running mean outdoor temperature
-    """
 
+    """
     if units.lower() == "ip":
         for ix, x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
@@ -884,6 +886,7 @@ def units_converter(from_units="ip", **kwargs):
     Returns
     -------
     converted values in SI units
+
     """
     results = list()
     if from_units == "ip":
@@ -926,8 +929,8 @@ def mapping(value, map_dictionary, right=True):
     Returns
     -------
     Stress category for each input temperature.
-    """
 
+    """
     bins = np.array(list(map_dictionary.keys()))
     words = np.append(np.array(list(map_dictionary.values())), "unknown")
     return words[np.digitize(value, bins, right=right)]
@@ -957,8 +960,8 @@ def operative_tmp(
     -------
     to: float
         operative temperature, [°C]
-    """
 
+    """
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
     elif standard.lower() == "ashrae":
@@ -1093,7 +1096,8 @@ f_r_garments = {
 class DefaultSkinTemperature(NamedTuple):
     """Default skin temperature in degree Celsius for 17 local body parts
     The data comes from Hui Zhang's experiments
-    https://escholarship.org/uc/item/3f4599hx"""
+    https://escholarship.org/uc/item/3f4599hx
+    """
 
     head: float = 35.3
     neck: float = 35.6

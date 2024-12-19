@@ -114,13 +114,24 @@ def phs(
 
         from pythermalcomfort.models import phs
 
-        result = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0)
+        result = phs(
+            tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0
+        )
         print(result.t_re)  # 37.5
 
-        result = phs(tdb=[40, 45], tr=[40, 45], v=[0.3, 0.4], rh=[33.85, 40], met=[2.5, 2.6], clo=[0.5, 0.6], posture=["standing", "standing"], wme=[0, 0])
+        result = phs(
+            tdb=[40, 45],
+            tr=[40, 45],
+            v=[0.3, 0.4],
+            rh=[33.85, 40],
+            met=[2.5, 2.6],
+            clo=[0.5, 0.6],
+            posture=["standing", "standing"],
+            wme=[0, 0],
+        )
         print(result.t_re)  # [37.5 43.4]
-    """
 
+    """
     PHSInputs(
         tdb=tdb,
         tr=tr,

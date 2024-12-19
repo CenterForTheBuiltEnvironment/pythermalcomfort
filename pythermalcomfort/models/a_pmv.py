@@ -82,11 +82,13 @@ def a_pmv(
         # Calculate dynamic clothing
         clo_d = clo_dynamic(clo=clo, met=met)
 
-        results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
+        results = a_pmv(
+            tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293
+        )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.74
-    """
 
+    """
     # Validate inputs using the APMVInputs class
     APMVInputs(
         tdb=tdb,

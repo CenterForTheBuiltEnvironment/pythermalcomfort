@@ -329,8 +329,8 @@ class JOS3:
             >>> plt.show()  # Show the plot
             >>> # Exporting the results as csv
             >>> model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
-        """
 
+        """
         # Version of pythermalcomfort
         version_string = (
             __version__  # get the current version of pythermalcomfort package
@@ -420,7 +420,6 @@ class JOS3:
     ) -> float:
         """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry logic.
 
-
         Parameters
         ----------
         va : float, optional
@@ -437,6 +436,7 @@ class JOS3:
         -------
         to : float
             Operative temperature [°C].
+
         """
         # Default parameters
         initial_to = 28
@@ -504,6 +504,7 @@ class JOS3:
         -------
         dict
             Parameters of JOS-3 model.
+
         """
         # Set operative temperature under PMV=0 environment
         # 1 met = 58.15 W/m2
@@ -542,6 +543,7 @@ class JOS3:
         Returns
         -------
         None.
+
         """
         # Loop through the simulation for the given number of times
         for _ in range(times):
@@ -593,8 +595,8 @@ class JOS3:
         -------
         dict_out : dictionary
             Output parameters.
-        """
 
+        """
         # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
         # Manual setting is possible by setting self._hc and self._hr.
@@ -987,6 +989,7 @@ class JOS3:
         -------
         dict
             A dictionary of the results, with keys as column names and values as pandas.DataFrame objects.
+
         """
         if not self._history:
             print("The model has no data.")
@@ -1069,17 +1072,17 @@ class JOS3:
         None
 
         Examples
-        ----------
+        --------
         >>> from pythermalcomfort.models import JOS3
         >>> model = JOS3()
         >>> model.simulate(60)
         >>> model.to_csv()
-        """
 
+        """
         # Use the model name and current time as default output file name
         if path is None:
             now_time = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-            path = "{}_{}.csv".format(self.model_name, now_time)
+            path = f"{self.model_name}_{now_time}.csv"
             if folder:
                 os.makedirs(folder, exist_ok=True)
                 path = folder + os.sep + path
@@ -1111,7 +1114,7 @@ class JOS3:
                 meanings.append("")
 
         # Write to csv file
-        with open(path, "wt", newline="", encoding="utf-8-sig") as f:
+        with open(path, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.writer(f)
             writer.writerow(list(columns))
             if unit:
@@ -1139,6 +1142,7 @@ class JOS3:
         -------
         array
             Extra heat gain of model.
+
         """
         self.ex_q[INDEX[tissue]] = value
         return self.ex_q
@@ -1153,6 +1157,7 @@ class JOS3:
         -------
         ndarray
             A NumPy array of shape (17,).
+
         """
         return self._ta
 
@@ -1162,7 +1167,7 @@ class JOS3:
 
     @property
     def tr(self):
-        """tr : numpy.ndarray (17,) Mean radiant temperature [°C]."""
+        """Tr : numpy.ndarray (17,) Mean radiant temperature [°C]."""
         return self._tr
 
     @tr.setter
@@ -1171,7 +1176,7 @@ class JOS3:
 
     @property
     def to(self):
-        """to : numpy.ndarray (17,) Operative temperature [°C]."""
+        """To : numpy.ndarray (17,) Operative temperature [°C]."""
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -1201,7 +1206,7 @@ class JOS3:
 
     @property
     def rh(self):
-        """rh : numpy.ndarray (17,) Relative humidity [%]."""
+        """Rh : numpy.ndarray (17,) Relative humidity [%]."""
         return self._rh
 
     @rh.setter
@@ -1210,7 +1215,7 @@ class JOS3:
 
     @property
     def v(self):
-        """v : numpy.ndarray (17,) Air velocity [m/s]."""
+        """V : numpy.ndarray (17,) Air velocity [m/s]."""
         return self._va
 
     @v.setter
@@ -1219,7 +1224,7 @@ class JOS3:
 
     @property
     def posture(self):
-        """posture : str Current JOS3 posture."""
+        """Posture : str Current JOS3 posture."""
         return self._posture
 
     @posture.setter
@@ -1244,7 +1249,7 @@ class JOS3:
 
     @property
     def clo(self):
-        """clo : numpy.ndarray (17,) Clothing insulation [clo]."""
+        """Clo : numpy.ndarray (17,) Clothing insulation [clo]."""
         return self._clo
 
     @clo.setter
@@ -1253,7 +1258,7 @@ class JOS3:
 
     @property
     def par(self):
-        """par : float Physical activity ratio [-].This equals the ratio of metabolic rate to basal metabolic rate. par of sitting quietly is 1.2."""
+        """Par : float Physical activity ratio [-].This equals the ratio of metabolic rate to basal metabolic rate. par of sitting quietly is 1.2."""
         return self._par
 
     @par.setter
@@ -1271,7 +1276,7 @@ class JOS3:
 
     @property
     def bsa(self):
-        """bsa : numpy.ndarray (17,) Body surface areas by local body segments [m2]."""
+        """Bsa : numpy.ndarray (17,) Body surface areas by local body segments [m2]."""
         return self._bsa.copy()
 
     @property
@@ -1309,7 +1314,7 @@ class JOS3:
 
     @property
     def w(self):
-        """w : numpy.ndarray (17,) Skin wettedness on local body segments [-]."""
+        """W : numpy.ndarray (17,) Skin wettedness on local body segments [-]."""
         err_cr = self.t_core - self.setpt_cr
         err_sk = self.t_skin - self.setpt_sk
         wet, *_ = threg.evaporation(
@@ -1391,7 +1396,7 @@ class JOS3:
 
     @property
     def bmr(self):
-        """bmr : float Basal metabolic rate [W/m2]."""
+        """Bmr : float Basal metabolic rate [W/m2]."""
         tcr = threg.basal_met(
             self._height,
             self._weight,
@@ -1403,5 +1408,5 @@ class JOS3:
 
     @property
     def version(self):
-        """version : float The current version of pythermalcomfort."""
+        """Version : float The current version of pythermalcomfort."""
         return self._version

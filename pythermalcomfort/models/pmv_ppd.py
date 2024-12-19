@@ -120,6 +120,7 @@ def pmv_ppd(
 
         from pythermalcomfort.models import pmv_ppd
         from pythermalcomfort.utilities import v_relative, clo_dynamic
+
         tdb = 25
         tr = 25
         rh = 50
@@ -137,8 +138,8 @@ def pmv_ppd(
         result = pmv_ppd(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5)
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
-    """
 
+    """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
         tdb=tdb,

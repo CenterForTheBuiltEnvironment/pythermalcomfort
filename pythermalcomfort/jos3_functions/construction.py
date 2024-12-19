@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """This code provides models for calculating the surface area of different
 body parts, weight ratio, basal blood flow ratio, and thermal conductance and
 thermal capacity.
@@ -23,8 +21,7 @@ def validate_body_parameters(
     age=Default.age,
     body_fat=Default.body_fat,
 ):
-    """
-    Validate the parameters: height, weight, age, and body fat percentage.
+    """Validate the parameters: height, weight, age, and body fat percentage.
 
     Parameters
     ----------
@@ -41,8 +38,8 @@ def validate_body_parameters(
     ------
     ValueError
         If any of the parameters are out of the specified range.
-    """
 
+    """
     if not (0.5 <= height <= 3.0):
         raise ValueError("Height must be in the range [0.5, 3.0] meters.")
 
@@ -74,6 +71,7 @@ def _to17array(inp):
     ------
     ValueError
         If the input type is not supported or if the input list or ndarray is not of length 17.
+
     """
     if isinstance(inp, (int, float)):
         array = np.ones(17) * inp
@@ -114,6 +112,7 @@ def bsa_rate(
     -------
     bsa_rate : float
         The ratio of bsa to the standard body [-].
+
     """
     validate_body_parameters(height=height, weight=weight)
 
@@ -153,6 +152,7 @@ def local_bsa(
     -------
     local_bsa : ndarray(17,)
         Local body surface area (bsa) [m2].
+
     """
     validate_body_parameters(height=height, weight=weight)
     _bsa_rate = bsa_rate(
@@ -188,6 +188,7 @@ def weight_rate(
     weight_rate : float
         The ratio of the body weight to the standard body (74.43 kg).
         weight_rate = weight / 74.43
+
     """
     validate_body_parameters(weight=weight)
     return weight / Default.weight
@@ -221,6 +222,7 @@ def bfb_rate(
     -------
     bfb_rate : float
         Basal blood flow rate.
+
     """
     validate_body_parameters(
         height=height,
@@ -271,8 +273,8 @@ def conductance(
     conductance : numpy.ndarray
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
-    """
 
+    """
     validate_body_parameters(
         height=height,
         weight=weight,
@@ -559,6 +561,7 @@ def capacity(
     capacity : numpy.ndarray.
         Thermal capacity [W/K].
         The shape is (NUM_NODES).
+
     """
     validate_body_parameters(
         height=height,

@@ -79,11 +79,13 @@ def vertical_tmp_grad_ppd(
 
         from pythermalcomfort.models import vertical_tmp_grad_ppd
 
-        result = vertical_tmp_grad_ppd(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, vertical_tmp_grad=7)
+        result = vertical_tmp_grad_ppd(
+            tdb=25, tr=25, vr=0.1, rh=50, met=1.2, clo=0.5, vertical_tmp_grad=7
+        )
         print(result.ppd_vg)  # 12.6
         print(result.acceptability)  # False
-    """
 
+    """
     # Validate inputs using the VerticalTmpGradPPDInputs class
     VerticalTGradPPDInputs(
         tdb=tdb,

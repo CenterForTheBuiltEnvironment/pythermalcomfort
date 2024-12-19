@@ -6,13 +6,13 @@ import numpy.typing as npt
 
 @dataclass(frozen=True)
 class APMV:
-    """
-    A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV) model.
+    """A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV) model.
 
     Attributes
     ----------
     a_pmv : float or list of floats
         Predicted Mean Vote.
+
     """
 
     a_pmv: Union[float, npt.ArrayLike]
@@ -23,8 +23,7 @@ class APMV:
 
 @dataclass(frozen=True)
 class AdaptiveASHRAE:
-    """
-    A dataclass to store the results of the adaptive thermal comfort model based on ASHRAE 55.
+    """A dataclass to store the results of the adaptive thermal comfort model based on ASHRAE 55.
 
     Attributes
     ----------
@@ -42,6 +41,7 @@ class AdaptiveASHRAE:
         Acceptability for 80% occupants.
     acceptability_90 : bool or list of bools
         Acceptability for 90% occupants.
+
     """
 
     tmp_cmf: Union[float, npt.ArrayLike]
@@ -58,8 +58,7 @@ class AdaptiveASHRAE:
 
 @dataclass
 class AdaptiveEN:
-    """
-    Dataclass to store the results of the adaptive thermal comfort calculation based on EN 16798-1 2019.
+    """Dataclass to store the results of the adaptive thermal comfort calculation based on EN 16798-1 2019.
 
     Attributes
     ----------
@@ -83,6 +82,7 @@ class AdaptiveEN:
         Lower acceptable comfort temperature for category II, default in [°C] or in [°F].
     tmp_cmf_cat_iii_low : float or list of floats
         Lower acceptable comfort temperature for category III, default in [°C] or in [°F].
+
     """
 
     tmp_cmf: Union[float, npt.ArrayLike]
@@ -102,8 +102,7 @@ class AdaptiveEN:
 
 @dataclass(frozen=True)
 class AnkleDraft:
-    """
-    Dataclass to store the results of the ankle draft calculation.
+    """Dataclass to store the results of the ankle draft calculation.
 
     Attributes
     ----------
@@ -111,6 +110,7 @@ class AnkleDraft:
         Predicted Percentage of Dissatisfied occupants with ankle draft, [%].
     acceptability : bool or list of bools
         Indicates if the air speed at the ankle level is acceptable according to ASHRAE 55 2020 standard.
+
     """
 
     ppd_ad: Union[float, npt.ArrayLike]
@@ -128,6 +128,7 @@ class AT:
     ----------
     at : float or list of floats
         Apparent temperature, [°C]
+
     """
 
     at: float
@@ -138,13 +139,13 @@ class AT:
 
 @dataclass(frozen=True)
 class ATHB:
-    """
-    Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB) calculation.
+    """Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB) calculation.
 
     Attributes
     ----------
     athb_pmv : float or list of floats
         Predicted Mean Vote calculated with the Adaptive Thermal Heat Balance framework.
+
     """
 
     athb_pmv: Union[float, npt.ArrayLike]
@@ -155,13 +156,13 @@ class ATHB:
 
 @dataclass(frozen=True)
 class CloTOut:
-    """
-    Dataclass to represent the clothing insulation Icl as a function of outdoor air temperature.
+    """Dataclass to represent the clothing insulation Icl as a function of outdoor air temperature.
 
     Attributes
     ----------
     clo_tout : float or list of floats
         Representative clothing insulation Icl.
+
     """
 
     clo_tout: Union[float, List[float]]
@@ -172,13 +173,13 @@ class CloTOut:
 
 @dataclass(frozen=True)
 class CE:
-    """
-    Dataclass to represent the Cooling Effect (CE).
+    """Dataclass to represent the Cooling Effect (CE).
 
     Attributes
     ----------
     ce : float or list of floats
         Cooling Effect value.
+
     """
 
     ce: Union[float, List[float]]
@@ -189,8 +190,7 @@ class CE:
 
 @dataclass(frozen=True)
 class DI:
-    """
-    Dataclass to represent the Discomfort Index (DI) and its classification.
+    """Dataclass to represent the Discomfort Index (DI) and its classification.
 
     Attributes
     ----------
@@ -198,6 +198,7 @@ class DI:
         Discomfort Index, [°C].
     discomfort_condition : str or list of str
         Classification of the thermal comfort conditions according to the discomfort index.
+
     """
 
     di: Union[float, List[float]]
@@ -209,13 +210,13 @@ class DI:
 
 @dataclass(frozen=True)
 class EPMV:
-    """
-    Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
+    """Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
 
     Attributes
     ----------
     e_pmv : float or list of floats
         Adjusted Predicted Mean Votes with Expectancy Factor.
+
     """
 
     e_pmv: Union[float, List[float]]
@@ -226,13 +227,13 @@ class EPMV:
 
 @dataclass(frozen=True)
 class HI:
-    """
-    Dataclass to represent the Heat Index (HI).
+    """Dataclass to represent the Heat Index (HI).
 
     Attributes
     ----------
     hi : float or list of floats
         Heat Index, [°C] or [°F] depending on the units.
+
     """
 
     hi: Union[float, List[float]]
@@ -243,8 +244,7 @@ class HI:
 
 @dataclass(frozen=True)
 class Humidex:
-    """
-    Dataclass to represent the Humidex and its discomfort category.
+    """Dataclass to represent the Humidex and its discomfort category.
 
     Attributes
     ----------
@@ -252,6 +252,7 @@ class Humidex:
         Humidex value, [°C].
     discomfort : str or list of str
         Degree of comfort or discomfort as defined in Havenith and Fiala (2016).
+
     """
 
     humidex: Union[float, List[float]]
@@ -263,13 +264,13 @@ class Humidex:
 
 @dataclass(frozen=True)
 class NET:
-    """
-    Dataclass to represent the Normal Effective Temperature (NET).
+    """Dataclass to represent the Normal Effective Temperature (NET).
 
     Attributes
     ----------
     net : float or list of floats
         Normal Effective Temperature, [°C].
+
     """
 
     net: Union[float, List[float]]
@@ -280,13 +281,13 @@ class NET:
 
 @dataclass(frozen=True)
 class PETSteady:
-    """
-    Dataclass to represent the Physiological Equivalent Temperature (PET).
+    """Dataclass to represent the Physiological Equivalent Temperature (PET).
 
     Attributes
     ----------
     pet : float or list of floats
         Physiological Equivalent Temperature.
+
     """
 
     pet: Union[float, List[float]]
@@ -297,8 +298,7 @@ class PETSteady:
 
 @dataclass(frozen=True)
 class PHS:
-    """
-    Dataclass to represent the Predicted Heat Strain (PHS).
+    """Dataclass to represent the Predicted Heat Strain (PHS).
 
     Attributes
     ----------
@@ -322,6 +322,7 @@ class PHS:
         Maximum water loss in watts, [W].
     water_loss : float or list of floats
         Maximum water loss, [g].
+
     """
 
     t_re: Union[float, List[float]]
@@ -341,13 +342,13 @@ class PHS:
 
 @dataclass(frozen=True)
 class PMV:
-    """
-    Dataclass to represent the Predicted Mean Vote (PMV).
+    """Dataclass to represent the Predicted Mean Vote (PMV).
 
     Attributes
     ----------
     pmv : float or list of floats
         Predicted Mean Vote.
+
     """
 
     pmv: Union[float, npt.ArrayLike]
@@ -358,8 +359,7 @@ class PMV:
 
 @dataclass(frozen=True)
 class PMVPPD:
-    """
-    Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD).
+    """Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD).
 
     Attributes
     ----------
@@ -367,6 +367,7 @@ class PMVPPD:
         Predicted Mean Vote.
     ppd : float or list of floats
         Predicted Percentage of Dissatisfied.
+
     """
 
     pmv: Union[float, List[float]]
@@ -378,13 +379,13 @@ class PMVPPD:
 
 @dataclass(frozen=True)
 class SET:
-    """
-    Dataclass to represent the Standard Effective Temperature (SET).
+    """Dataclass to represent the Standard Effective Temperature (SET).
 
     Attributes
     ----------
     set : float or list of floats
         Standard effective temperature, [°C].
+
     """
 
     set: Union[float, List[float]]
@@ -395,8 +396,7 @@ class SET:
 
 @dataclass(frozen=True)
 class SolarGain:
-    """
-    Dataclass to represent the solar gain to the human body.
+    """Dataclass to represent the solar gain to the human body.
 
     Attributes
     ----------
@@ -405,6 +405,7 @@ class SolarGain:
     delta_mrt : float or list of floats
         Delta mean radiant temperature. The amount by which the mean radiant
         temperature of the space should be increased if no solar radiation is present.
+
     """
 
     erf: Union[float, List[float]]
@@ -416,8 +417,7 @@ class SolarGain:
 
 @dataclass(frozen=True)
 class TwoNodes:
-    """
-    Dataclass to represent the results of the two-node model of human temperature regulation.
+    """Dataclass to represent the results of the two-node model of human temperature regulation.
 
     Attributes
     ----------
@@ -457,6 +457,7 @@ class TwoNodes:
         Thermal discomfort.
     t_sens : float or list of floats
         Predicted Thermal Sensation.
+
     """
 
     e_skin: Union[float, List[float]]
@@ -484,8 +485,7 @@ class TwoNodes:
 
 @dataclass(frozen=True)
 class UseFansHeatwaves:
-    """
-    Dataclass to represent the results of using fans during heatwaves.
+    """Dataclass to represent the results of using fans during heatwaves.
 
     Attributes
     ----------
@@ -521,6 +521,7 @@ class UseFansHeatwaves:
         True if heat strain is caused by skin wettedness (w) reaching its maximum value.
     heat_strain_sweating : bool or list of bools
         True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value.
+
     """
 
     e_skin: Union[float, List[float]]
@@ -546,8 +547,7 @@ class UseFansHeatwaves:
 
 @dataclass(frozen=True)
 class UTCI:
-    """
-    Dataclass to represent the Universal Thermal Climate Index (UTCI).
+    """Dataclass to represent the Universal Thermal Climate Index (UTCI).
 
     Attributes
     ----------
@@ -555,6 +555,7 @@ class UTCI:
         Universal Thermal Climate Index, [°C] or in [°F].
     stress_category : str or list of strs
         UTCI categorized in terms of thermal stress [9]_.
+
     """
 
     utci: Union[float, List[float]]
@@ -566,8 +567,7 @@ class UTCI:
 
 @dataclass(frozen=True)
 class VerticalTGradPPD:
-    """
-    Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with vertical temperature gradient.
+    """Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with vertical temperature gradient.
 
     Attributes
     ----------
@@ -575,6 +575,7 @@ class VerticalTGradPPD:
         Predicted Percentage of Dissatisfied occupants with vertical temperature gradient.
     acceptability : bool or list of bools
         True if the value of air speed at the ankle level is acceptable (PPD_vg <= 5%).
+
     """
 
     ppd_vg: Union[float, List[float]]
@@ -586,13 +587,13 @@ class VerticalTGradPPD:
 
 @dataclass(frozen=True)
 class WBGT:
-    """
-    Dataclass to represent the Wet Bulb Globe Temperature (WBGT) index.
+    """Dataclass to represent the Wet Bulb Globe Temperature (WBGT) index.
 
     Attributes
     ----------
     wbgt : float or list of floats
         Wet Bulb Globe Temperature Index.
+
     """
 
     wbgt: Union[float, npt.ArrayLike]
@@ -603,13 +604,13 @@ class WBGT:
 
 @dataclass(frozen=True)
 class WCI:
-    """
-    Dataclass to represent the Wind Chill Index (WCI).
+    """Dataclass to represent the Wind Chill Index (WCI).
 
     Attributes
     ----------
     wci : float or list of floats
         Wind Chill Index, [W/m^2].
+
     """
 
     wci: Union[float, List[float]]
@@ -620,13 +621,13 @@ class WCI:
 
 @dataclass(frozen=True)
 class WCT:
-    """
-    Dataclass to represent the Wind Chill Temperature (WCT).
+    """Dataclass to represent the Wind Chill Temperature (WCT).
 
     Attributes
     ----------
     wct : float or list of floats
         Wind Chill Temperature, [°C].
+
     """
 
     wct: Union[float, List[float]]

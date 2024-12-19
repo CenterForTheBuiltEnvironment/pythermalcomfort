@@ -87,8 +87,8 @@ def use_fans_heatwaves(
 
         result = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # 63.0
-    """
 
+    """
     # Validate inputs using the UseFansHeatwavesInputs class
     UseFansHeatwavesInputs(
         tdb=tdb,
