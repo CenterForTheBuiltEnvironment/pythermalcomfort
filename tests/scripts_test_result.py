@@ -12,6 +12,7 @@ and add to the README.rst
 
 """
 
+
 def run_tox(env):
     log_file_path = "./tox.log"
     try:

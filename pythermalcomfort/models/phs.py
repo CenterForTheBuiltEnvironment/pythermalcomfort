@@ -22,7 +22,7 @@ def phs(
     posture: Union[str, List[str]],
     wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
     round_output: bool = True,
-    **kwargs
+    **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance with
     the ISO 7933:2004 Standard [8]_. The ISO 7933 provides a method for the

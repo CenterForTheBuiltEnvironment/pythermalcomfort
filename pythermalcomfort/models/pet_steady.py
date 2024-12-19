@@ -142,7 +142,6 @@ def _pet_steady_vectorised(
     height,
     wme,
 ) -> npt.ArrayLike:
-
     met_factor = 58.2  # met conversion factor
     met = met * met_factor  # metabolic rate
 

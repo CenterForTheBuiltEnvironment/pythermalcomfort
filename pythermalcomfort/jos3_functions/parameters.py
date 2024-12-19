@@ -12,6 +12,7 @@ for both regular output parameters and extra output parameters.
 It sorts the parameters alphabetically by key and formats each line with the parameter's name, meaning, and unit.
 The resulting documentation string can be displayed or printed for user reference.
 """
+
 from typing import List
 
 import textwrap

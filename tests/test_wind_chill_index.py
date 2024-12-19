@@ -18,7 +18,6 @@ def test_calculates_wci(get_test_url, retrieve_data):
 
 
 class TestWc:
-
     #  Raises TypeError if tdb parameter is not provided
     def test_raises_type_error_tdb_not_provided(self):
         with pytest.raises(TypeError):

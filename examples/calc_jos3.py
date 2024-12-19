@@ -16,6 +16,7 @@ if not os.path.exists(jos3_example_directory):
 # EXAMPLE 1 (simple simulation)
 # -------------------------------------------
 
+
 def simple_simulation():
     """Run a simple simulation example."""
     # Build a model and set a body built
@@ -36,7 +37,9 @@ def simple_simulation():
     # Show the results
     df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
     df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
-    plt.ylabel("Mean skin temperature [°C]")  # Set y-label as 'Mean skin temperature [°C]'
+    plt.ylabel(
+        "Mean skin temperature [°C]"
+    )  # Set y-label as 'Mean skin temperature [°C]'
     plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
     plt.savefig(
         os.path.join(jos3_example_directory, "jos3_example1_mean_skin_temperature.png")
@@ -44,7 +47,9 @@ def simple_simulation():
     plt.show()  # Show the plot
 
     # Exporting the results as csv
-    model.to_csv(os.path.join(jos3_example_directory, "jos3_example1 (default output).csv"))
+    model.to_csv(
+        os.path.join(jos3_example_directory, "jos3_example1 (default output).csv")
+    )
 
     # Print the BMR value using the getter
     print("BMR=", model.bmr)
@@ -161,6 +166,7 @@ def detailed_simulation():
     # Exporting the results as csv
     model.to_csv(os.path.join(jos3_example_directory, "jos3_example2 (all output).csv"))
 
+
 def female_simulation():
     """Run a simple simulation example."""
     model = JOS3(height=1.7, weight=60, age=30, sex="female", bmr_equation="japanese")
@@ -188,7 +194,10 @@ def female_simulation():
     plt.show()
 
     # Exporting the results as csv
-    model.to_csv(os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv"))
+    model.to_csv(
+        os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv")
+    )
+
 
 def validation_simulation():
     """Run validation simulation using Stolwijk and Hardy dataset."""
@@ -219,7 +228,6 @@ def validation_simulation():
 
     # Concatenate all the individual data frames into a single DataFrame
     sim_dataset = {}
-
 
     def sim_stolwijk_hardy(models, tolist, rhlist):
         result = []
@@ -280,7 +288,6 @@ def validation_simulation():
         avgsim["time"] = [i for i in range(0, 241, 5)]
 
         return avgsim.copy()
-
 
     simdatas = {}
 
@@ -419,7 +426,6 @@ def validation_simulation():
             dfs.append(df.copy())
     dfstatic = pd.concat(dfs).reset_index(drop=True)
 
-
     def plotdata(ser, ax, color, markersize=7, legend=False):
         mk = None
         me = 1
@@ -479,7 +485,6 @@ def validation_simulation():
                 markeredgewidth=me,
             )
 
-
     def graph(gexp, gsim, ax):
         gexp.index = [i for i in range(0, 241, 5)]
         gsim.index = [i for i in range(0, 241, 5)]
@@ -505,7 +510,6 @@ def validation_simulation():
         ax.set_xlim((0, 240))
         ax.set_xticks([i for i in range(0, 241, 30)])
 
-
     inputcons = {
         "A-FIG.4": {"to": [28.0, 27.8, 33.3, 28.0], "rh": [40, 37, 34, 37]},
         "A-FIG.5": {"to": [28.0, 28.5, 37.5, 28.5], "rh": [40, 40, 34, 41]},
@@ -520,8 +524,9 @@ def validation_simulation():
 
     gexp = exp_dataset["Stolwijk1966"].copy()
     gsim = sim_dataset["Stolwijk1966"].copy()
-    fig, axes = plt.subplots(nrows=5, ncols=2, sharex=True, sharey=True, figsize=(8, 12))
-
+    fig, axes = plt.subplots(
+        nrows=5, ncols=2, sharex=True, sharey=True, figsize=(8, 12)
+    )
 
     for i, dn in enumerate(
         [
@@ -571,7 +576,12 @@ def validation_simulation():
     fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, hspace=0.4)
 
     fig.text(
-        0.03, 0.5, "Body temperature [°C]", va="center", rotation="vertical", fontsize=12
+        0.03,
+        0.5,
+        "Body temperature [°C]",
+        va="center",
+        rotation="vertical",
+        fontsize=12,
     )
     fig.text(0.53, 0.03, "Time [min]", ha="center", fontsize=12)
 
@@ -579,6 +589,7 @@ def validation_simulation():
     fig.savefig(
         os.path.join(jos3_example_directory, "jos3_validation_with_Stolwijk1966.png")
     )
+
 
 def main():
     """Run the selected simulation."""
@@ -597,6 +608,7 @@ def main():
         female_simulation()
     if run_validation_simulation:
         validation_simulation()
+
 
 if __name__ == "__main__":
     main()

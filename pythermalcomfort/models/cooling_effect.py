@@ -141,7 +141,6 @@ def cooling_effect(
 
 @np.vectorize(cache=True)
 def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, vr):
-
     if vr <= 0.1:
         return 0.0
 

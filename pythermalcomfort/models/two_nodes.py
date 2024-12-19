@@ -303,7 +303,6 @@ def _two_nodes_optimized(
     c_res = 0.0014 * m * (34.0 - tdb)  # sensible convective heat loss respiration
 
     while n_simulation < length_time_simulation:
-
         n_simulation += 1
 
         iteration_limit = 150  # for following while loop
@@ -313,7 +312,6 @@ def _two_nodes_optimized(
         tc_converged = False
 
         while not tc_converged:
-
             # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
             if position == "sitting":
                 # 0.7 ratio between radiation area of the body and the body area

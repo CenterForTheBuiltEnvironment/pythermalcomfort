@@ -3,10 +3,9 @@ import math
 import numpy as np
 import pytest
 
-from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMVPPD
-
 from pythermalcomfort.models import pmv_ppd
-from tests.conftest import Urls, retrieve_reference_table, validate_result, is_equal
+from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMVPPD
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
 def test_pmv_ppd(get_test_url, retrieve_data):
@@ -24,7 +23,6 @@ def test_pmv_ppd(get_test_url, retrieve_data):
 
 
 class TestPmvPpd:
-
     #  Raises a ValueError if standard is not ISO or ASHRAE
     def test_raises_value_error_if_standard_is_not_iso_or_ashrae(self):
         # Arrange
@@ -135,7 +133,6 @@ class TestPmvPpd:
 
 
 class TestPmvPpdOptimized:
-
     #  The function returns the correct PMV value for typical input values.
     def test_pmv_typical_input(self):
         # Typical input values

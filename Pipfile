@@ -18,6 +18,7 @@ pydantic = "*"
 tabulate = "*"
 matplotlib = "*"
 seaborn = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.12"

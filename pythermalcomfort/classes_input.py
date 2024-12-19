@@ -34,7 +34,6 @@ class APMVInputs(BaseInputs):
 
 @dataclass
 class ASHRAEInputs(BaseInputs):
-
     def __init__(
         self,
         tdb,
@@ -101,7 +100,6 @@ class AnkleDraftInputs(BaseInputs):
 
 @dataclass
 class ATInputs(BaseInputs):
-
     def __init__(
         self,
         tdb,
@@ -122,7 +120,6 @@ class ATInputs(BaseInputs):
 
 @dataclass
 class ATHBInputs(BaseInputs):
-
     def __init__(
         self,
         tdb,

@@ -340,7 +340,6 @@ def mean_radiant_tmp(
         return np.around(tr, 1)
 
     if standard == "iso":
-
         tg = np.add(tg, c_to_k)
         tdb = np.add(tdb, c_to_k)
 
