@@ -8,14 +8,14 @@ from pythermalcomfort.models.pmv import pmv
 
 
 def e_pmv(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    e_coefficient: Union[float, List[float]],
-    wme: Union[float, List[float]] = 0,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    e_coefficient: Union[float, list[float]],
+    wme: Union[float, list[float]] = 0,
     units: str = "SI",
     limit_inputs: bool = True,
 ) -> EPMV:

@@ -19,7 +19,7 @@ r_air = 287.055
 g = 9.81  # m/s2
 
 
-def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
+def p_sat_torr(tdb: Union[float, list[float]]):
     """Estimates the saturation vapor pressure in [torr]
 
     Parameters
@@ -36,8 +36,8 @@ def p_sat_torr(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
 
 
 def enthalpy_air(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    hr: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, list[float]],
+    hr: Union[float, list[float]],
 ):
     """Calculates air enthalpy_air.
 
@@ -74,7 +74,7 @@ c12 = -0.14452093 * 1e-7
 c13 = 6.5459673
 
 
-def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
+def p_sat(tdb: Union[float, list[float]]):
     """Calculates vapour pressure of water at different temperatures.
 
     Parameters
@@ -108,25 +108,25 @@ def p_sat(tdb: Union[float, int, np.ndarray, List[float], List[int]]):
 
 @dataclass
 class PsychrometricValues:
-    p_sat: Union[float, int, np.ndarray, List[float], List[int]]
-    p_vap: Union[float, int, np.ndarray, List[float], List[int]]
-    hr: Union[float, int, np.ndarray, List[float], List[int]]
-    wet_bulb_tmp: Union[float, int, np.ndarray, List[float], List[int]]
-    dew_point_tmp: Union[float, int, np.ndarray, List[float], List[int]]
-    h: Union[float, int, np.ndarray, List[float], List[int]]
+    p_sat: Union[float, list[float]]
+    p_vap: Union[float, list[float]]
+    hr: Union[float, list[float]]
+    wet_bulb_tmp: Union[float, list[float]]
+    dew_point_tmp: Union[float, list[float]]
+    h: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
 
 
 def psy_ta_rh(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
     p_atm=101325,
 ) -> PsychrometricValues:
-    """Calculates psychrometric values of air based on dry bulb air temperature
-    and relative humidity. For more accurate results we recommend the use of
-    the Python package `psychrolib`_.
+    """Calculates psychrometric values of air based on dry bulb air temperature and
+    relative humidity. For more accurate results we recommend the use of the Python
+    package `psychrolib`_.
 
     .. _psychrolib: https://pypi.org/project/PsychroLib/
 
@@ -173,8 +173,8 @@ def psy_ta_rh(
 
 
 def wet_bulb_tmp(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
 ):
     """Calculates the wet-bulb temperature using the Stull equation [6]_
 
@@ -202,8 +202,8 @@ def wet_bulb_tmp(
 
 
 def dew_point_tmp(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
 ):
     """Calculates the dew point temperature.
 
@@ -232,16 +232,16 @@ def dew_point_tmp(
 
 
 def mean_radiant_tmp(
-    tg: Union[float, int, np.ndarray, List[float], List[int]],
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
-    d: Union[float, int, np.ndarray, List[float], List[int]] = 0.15,
-    emissivity: Union[float, int, np.ndarray, List[float], List[int]] = 0.95,
+    tg: Union[float, list[float]],
+    tdb: Union[float, list[float]],
+    v: Union[float, list[float]],
+    d: Union[float, list[float]] = 0.15,
+    emissivity: Union[float, list[float]] = 0.95,
     standard="Mixed Convection",
 ):
-    """Converts globe temperature reading into mean radiant temperature in
-    accordance with either the Mixed Convection developed by Teitelbaum E. et
-    al. (2022) or the ISO 7726:1998 Standard [5]_.
+    """Converts globe temperature reading into mean radiant temperature in accordance
+    with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
+    7726:1998 Standard [5]_.
 
     Parameters
     ----------
@@ -416,7 +416,8 @@ class BaseInputs:
                 "standing, forced convection",
             ]:
                 raise ValueError(
-                    "position must be either 'standing', 'sitting', or 'standing, forced convection'"
+                    "position must be either 'standing', 'sitting', or 'standing, "
+                    "forced convection'"
                 )
         if self.posture is not None:
             if self.posture.lower() not in ["sitting", "standing", "crouching"]:
@@ -551,11 +552,13 @@ def check_standard_compliance(standard, **kwargs):
                 warnings.warn(
                     "The ankle draft model is only valid for met <= 1.3",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "clo" and value > 0.7:
                 warnings.warn(
                     "The ankle draft model is only valid for clo <= 0.7",
                     UserWarning,
+                    stacklevel=2,
                 )
 
     elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2020
@@ -570,21 +573,25 @@ def check_standard_compliance(standard, **kwargs):
                         f"ASHRAE {parameter} temperature applicability limits between"
                         " 10 and 40 °C",
                         UserWarning,
+                        stacklevel=2,
                     )
             if key in ["v", "vr"] and (value > 2 or value < 0):
                 warnings.warn(
                     "ASHRAE air speed applicability limits between 0 and 2 m/s",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "met" and (value > 4 or value < 1):
                 warnings.warn(
                     "ASHRAE met applicability limits between 1.0 and 4.0 met",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "clo" and (value > 1.5 or value < 0):
                 warnings.warn(
                     "ASHRAE clo applicability limits between 0.0 and 1.5 clo",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "v_limited" and value > 0.2:
                 raise ValueError(
@@ -597,27 +604,32 @@ def check_standard_compliance(standard, **kwargs):
                 warnings.warn(
                     "ISO air temperature applicability limits between 10 and 30 °C",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "tr" and (value > 40 or value < 10):
                 warnings.warn(
                     "ISO mean radiant temperature applicability limits between 10 and"
                     " 40 °C",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key in ["v", "vr"] and (value > 1 or value < 0):
                 warnings.warn(
                     "ISO air speed applicability limits between 0 and 1 m/s",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "met" and (value > 4 or value < 0.8):
                 warnings.warn(
                     "ISO met applicability limits between 0.8 and 4.0 met",
                     UserWarning,
+                    stacklevel=2,
                 )
             if key == "clo" and (value > 2 or value < 0):
                 warnings.warn(
                     "ISO clo applicability limits between 0.0 and 2 clo",
                     UserWarning,
+                    stacklevel=2,
                 )
 
 
@@ -765,10 +777,10 @@ def f_svv(w, h, d):
 
 
 def v_relative(v, met):
-    """Estimates the relative air speed which combines the average air speed of
-    the space plus the relative air speed caused by the body movement. Vag is
-    assumed to be 0 for metabolic rates equal and lower than 1 met and
-    otherwise equal to Vag = 0.3 (M – 1) (m/s)
+    """Estimates the relative air speed which combines the average air speed of the
+    space plus the relative air speed caused by the body movement. Vag is assumed to be
+    0 for metabolic rates equal and lower than 1 met and otherwise equal to Vag = 0.3 (M
+    – 1) (m/s)
 
     Parameters
     ----------
@@ -786,12 +798,13 @@ def v_relative(v, met):
 
 
 def clo_dynamic(clo, met, standard="ASHRAE"):
-    """Estimates the dynamic clothing insulation of a moving occupant. The
-    activity as well as the air speed modify the insulation characteristics of
-    the clothing and the adjacent air layer. Consequently, the ISO 7730 states
-    that the clothing insulation shall be corrected [2]_. The ASHRAE 55
-    Standard corrects for the effect of the body movement for met equal or
-    higher than 1.2 met using the equation clo = Icl × (0.6 + 0.4/met)
+    """
+    Estimates the dynamic clothing insulation of a moving occupant. The activity as well
+    as the air speed modify the insulation characteristics of the clothing and the
+    adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
+    shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect of the body
+    movement for met equal or higher than 1.2 met using the equation clo = Icl × (0.6 +
+    0.4/met)
 
     Parameters
     ----------
@@ -821,8 +834,8 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
 
 
 def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
-    """Estimates the running mean temperature also known as prevailing mean
-    outdoor temperature.
+    """Estimates the running mean temperature also known as prevailing mean outdoor
+    temperature.
 
     Parameters
     ----------
@@ -848,7 +861,7 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         running mean outdoor temperature
     """
     if units.lower() == "ip":
-        for ix, x in enumerate(temp_array):
+        for ix, _x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
     coeff = [alpha**ix for ix, x in enumerate(temp_array)]
@@ -921,9 +934,9 @@ def mapping(value, map_dictionary, right=True):
 
 
 def operative_tmp(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
     standard: str = "ISO",
 ):
     """Calculates operative temperature in accordance with ISO 7726:1998 [5]_

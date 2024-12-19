@@ -8,8 +8,8 @@ from pythermalcomfort.utilities import dew_point_tmp
 
 
 def humidex(
-    tdb: Union[float, List[float]],
-    rh: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
     round_output: bool = True,
     model: str = "rana",
 ) -> Humidex:

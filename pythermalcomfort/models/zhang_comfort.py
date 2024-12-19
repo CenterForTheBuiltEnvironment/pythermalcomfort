@@ -489,16 +489,18 @@ body_name_list = [
 def convert_to_17_segments_array_from_any_data_type(data):
     """Convert various input data types to a 17-segment numpy array.
 
-    This function is designed to handle a variety of input types including integers, floats, dictionaries,
-    lists, and numpy arrays, and returns a standardized 17-segment numpy array. This can be useful when
-    ensuring consistent array formats across different input types.
+    This function is designed to handle a variety of input types including integers,
+    floats, dictionaries, lists, and numpy arrays, and returns a standardized 17-segment
+    numpy array. This can be useful when ensuring consistent array formats across
+    different input types.
 
     Parameters
     ----------
     data : int, float, dict, list, ndarray or None
         Input data that needs to be converted. If `data` is:
         - int or float: The returned array will have all 17 values set to this number.
-        - dict: The keys of the dictionary should match the `body_name_list` and the returned array will be constructed based on this order.
+        - dict: The keys of the dictionary should match the `body_name_list` and the
+          returned array will be constructed based on this order.
         - list or ndarray: Must be of length 17.
 
     Returns
@@ -509,11 +511,13 @@ def convert_to_17_segments_array_from_any_data_type(data):
     Raises
     ------
     ValueError
-        If the input data is not one of the supported types, or if it is a list or ndarray of length other than 17.
+        If the input data is not one of the supported types, or if it is a list or ndarray
+        of length other than 17.
 
     Notes
     -----
-    Ensure that the `body_name_list` is defined elsewhere in the code if using this function with dictionary input data.
+    Ensure that the `body_name_list` is defined elsewhere in the code if using this
+    function with dictionary input data.
     """
     if data is None:
         return None
@@ -536,8 +540,7 @@ def convert_to_17_segments_array_from_any_data_type(data):
 
 
 def convert_17_segments_dict_from_array(array, body_name_list):
-    """Convert a 17-segment numpy array to a dictionary using the provided body
-    name list.
+    """Convert a 17-segment numpy array to a dictionary using the provided body name list.
 
     Parameters
     ----------
@@ -545,12 +548,14 @@ def convert_17_segments_dict_from_array(array, body_name_list):
         A numpy array of shape (17,) containing the data to be converted.
 
     body_name_list : list
-        A list of body part names with length 17. Each name corresponds to a value in the `array`.
+        A list of body part names with length 17. Each name corresponds to a value in the
+        `array`.
 
     Returns
     -------
     dict
-        A dictionary with keys as body part names from `body_name_list` and values from the input `array`.
+        A dictionary with keys as body part names from `body_name_list` and values from the
+        input `array`.
     """
     return {part: array[i] for i, part in enumerate(body_name_list)}
 
@@ -564,8 +569,8 @@ def calculate_local_thermal_sensation(
     dt_core_local_dt_array,
     sensation_scale,
 ):
-    """Calculate local thermal sensation based on physiological parameters and
-    the selected sensation scale.
+    """Calculate local thermal sensation based on physiological parameters and the
+    selected sensation scale.
 
     Parameters
     ----------
@@ -593,8 +598,8 @@ def calculate_local_thermal_sensation(
     """
 
     def get_coefficient_c1(t_skin_local_array, t_skin_local_set_array):
-        """Return c1_minus or c1_plus based on the comparison of skin
-        temperature to its setpoint."""
+        """Return c1_minus or c1_plus based on the comparison of skin temperature to its
+        setpoint."""
         return np.where(
             t_skin_local_array - t_skin_local_set_array < 0,
             c1_minus_array,
@@ -602,8 +607,7 @@ def calculate_local_thermal_sensation(
         )
 
     def get_coefficient_c2(dt_skin_local_dt_array):
-        """Return c2_minus or c2_plus based on the local skin temperature
-        derivative."""
+        """Return c2_minus or c2_plus based on the local skin temperature derivative."""
         return np.where(dt_skin_local_dt_array < 0, c2_minus_array, c2_plus_array)
 
     # Set coefficients for the equation
@@ -658,8 +662,7 @@ def calculate_local_thermal_sensation(
 
 
 def calculate_overall_sensation(sensation_local_array):
-    """Calculate overall thermal sensation based on local sensation for each
-    body part.
+    """Calculate overall thermal sensation based on local sensation for each body part.
 
     Sensations in the cold or warm range are emphasized more in the average.
     If the most extreme sensations are from the hands or feet, they are excluded from the weighted average.
@@ -686,8 +689,8 @@ def calculate_overall_sensation(sensation_local_array):
         left_foot_sensation,
         right_foot_sensation,
     ):
-        """Determine if the most extreme sensations in a given array are from
-        the hands or feet.
+        """Determine if the most extreme sensations in a given array are from the hands
+        or feet.
 
         This function examines the input array of sensations to determine if the most
         extreme sensations (both maximum and minimum) come from the hands or feet. The
@@ -808,8 +811,7 @@ def calculate_overall_sensation(sensation_local_array):
 
 
 def calculate_local_thermal_comfort(overall_sensation, sensation_local_array):
-    """Calculate local thermal comfort based on overall sensation and local
-    sensations.
+    """Calculate local thermal comfort based on overall sensation and local sensations.
 
     This function computes the local thermal comfort by considering the overall sensation and
     an array of local sensations. It utilizes predefined coefficients and applies specific formulas
@@ -835,8 +837,7 @@ def calculate_local_thermal_comfort(overall_sensation, sensation_local_array):
     C8 = C8_array
 
     def get_elements_for_calculating_local_thermal_comfort(overall_sensation):
-        """Calculate and return elements used for determining local thermal
-        comfort.
+        """Calculate and return elements used for determining local thermal comfort.
 
         Parameters
         ----------
@@ -959,8 +960,8 @@ def calculate_overall_thermal_comfort(
     )
 
     def are_lowest_comfort_values_hands_or_feet(local_comfort_dict):
-        """Determine if the two most uncomfortable sensations are from the
-        hands or feet.
+        """Determine if the two most uncomfortable sensations are from the hands or
+        feet.
 
         Parameters
         ----------
@@ -1036,7 +1037,7 @@ def zhang_sensation_comfort(
     t_skin_local,
     dt_skin_local_dt,
     dt_core_local_dt,
-    t_skin_local_set=DefaultSkinTemperature()._asdict(),
+    t_skin_local_set=None,
     options=None,
 ):
     """Zhang's local and overall sensation and comfort model.
@@ -1210,6 +1211,9 @@ def zhang_sensation_comfort(
     'sensation_right_thigh': 2.23
      }
     """
+    if t_skin_local_set is None:
+        t_skin_local_set = DefaultSkinTemperature()._asdict()
+
     default_options = {
         "sensation_scale": "9-point",
         "is_transient": False,

@@ -14,13 +14,13 @@ from pythermalcomfort.utilities import (
 
 
 def pmv_ppd(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    wme: Union[float, List[float]] = 0,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    wme: Union[float, list[float]] = 0,
     standard: str = "ISO",
     units: str = "SI",
     limit_inputs: bool = True,

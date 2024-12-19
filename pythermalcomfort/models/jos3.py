@@ -28,9 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class JOS3:
-    """JOS-3 model simulates human thermal physiology including skin
-    temperature, core temperature, sweating rate, etc. for the whole body and
-    17 local body parts.
+    """JOS-3 model simulates human thermal physiology including skin temperature, core
+    temperature, sweating rate, etc. for the whole body and 17 local body parts.
 
     This model was developed at Shin-ichi Tanabe Laboratory, Waseda University
     and was derived from 65 Multi-Node model (https://doi.org/10.1016/S0378-7788(02)00014-2)
@@ -76,9 +75,8 @@ class JOS3:
         bsa_equation=Default.bsa_equation,
         ex_output=None,
     ):
-        """Initialize a new instance of JOS3 class, which is designed to model
-        and simulate various physiological parameters related to human
-        thermoregulation.
+        """Initialize a new instance of JOS3 class, which is designed to model and
+        simulate various physiological parameters related to human thermoregulation.
 
         This class uses mathematical models to calculate and predict
         body temperature, basal metabolic rate, body surface area, and
@@ -417,8 +415,8 @@ class JOS3:
         met=Default.metabolic_rate,
         clo=Default.clothing_insulation,
     ) -> float:
-        """Calculate operative temperature [°C] when PMV=0 with NaN handling
-        and retry logic.
+        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
+        logic.
 
         Parameters
         ----------
@@ -493,13 +491,12 @@ class JOS3:
         return to
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
-        """Reset set-point temperatures under steady state calculation. Set-
-        point temperatures are hypothetical core or skin temperatures in a
-        thermally neutral state when at rest (similar to room set-point
-        temperature for air conditioning). This function is used during
-        initialization to calculate the set-point temperatures as a reference
-        for thermoregulation. Be careful, input parameters (tdb, tr, rh, v,
-        clo, par) and body temperatures are also reset.
+        """Reset set-point temperatures under steady state calculation. Set- point
+        temperatures are hypothetical core or skin temperatures in a thermally neutral
+        state when at rest (similar to room set-point temperature for air conditioning).
+        This function is used during initialization to calculate the set-point
+        temperatures as a reference for thermoregulation. Be careful, input parameters
+        (tdb, tr, rh, v, clo, par) and body temperatures are also reset.
 
         Returns
         -------
@@ -1024,7 +1021,7 @@ class JOS3:
             key2keys.update({key: keys})
 
         data = []
-        for i, dictout in enumerate(self._history):
+        for _i, dictout in enumerate(self._history):
             row = {}
             for key, value in dictout.items():
                 keys = key2keys[key]
@@ -1144,9 +1141,9 @@ class JOS3:
 
     @property
     def tdb(self):
-        """Dry-bulb air temperature. The setter accepts int, float, dict, list,
-        ndarray. The inputs are used to create a 17-element array. dict should
-        be passed with BODY_NAMES as keys.
+        """Dry-bulb air temperature. The setter accepts int, float, dict, list, ndarray.
+        The inputs are used to create a 17-element array. dict should be passed with
+        BODY_NAMES as keys.
 
         Returns
         -------

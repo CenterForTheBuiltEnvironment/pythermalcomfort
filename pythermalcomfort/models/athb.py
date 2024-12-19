@@ -8,13 +8,13 @@ from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
 
 
 def athb(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    t_running_mean: Union[float, List[float]],
-    clo: Union[bool, float, List[float]] = False,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    t_running_mean: Union[float, list[float]],
+    clo: Union[bool, float, list[float]] = False,
 ) -> ATHB:
     """Return the PMV value calculated with the Adaptive Thermal Heat Balance
     Framework [27]_. The adaptive thermal heat balance (ATHB) framework

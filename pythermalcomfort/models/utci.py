@@ -10,23 +10,23 @@ from pythermalcomfort.utilities import mapping, units_converter
 
 
 def utci(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    v: Union[float, List[float]],
-    rh: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
     units: str = "SI",
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UTCI:
-    """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
-    equivalent temperature for the environment derived from a reference
-    environment. It is defined as the air temperature of the reference
-    environment which produces the same strain index value in comparison with
-    the reference individual's response to the real environment. It is regarded
-    as one of the most comprehensive indices for calculating heat stress in
-    outdoor spaces. The parameters that are taken into account for calculating
-    UTCI involve dry bulb temperature, mean radiation temperature, the pressure
-    of water vapor or relative humidity, and wind speed (at the elevation of 10
+    """
+    Determines the Universal Thermal Climate Index (UTCI). The UTCI is the equivalent
+    temperature for the environment derived from a reference environment. It is defined
+    as the air temperature of the reference environment which produces the same strain
+    index value in comparison with the reference individual's response to the real
+    environment. It is regarded as one of the most comprehensive indices for calculating
+    heat stress in outdoor spaces. The parameters that are taken into account for
+    calculating UTCI involve dry bulb temperature, mean radiation temperature, the
+    pressure of water vapor or relative humidity, and wind speed (at the elevation of 10
     m above the ground). [7]_
 
     Parameters
@@ -53,8 +53,9 @@ def utci(
     -------
     UTCI
         A dataclass containing the Universal Thermal Climate Index and stress category.
-        See :py:class:`~pythermalcomfort.models.utci.Utci` for more details.
-        To access the `utci` and `stress_category` values, use the corresponding attributes of the returned `Utci` instance, e.g., `result.utci`.
+        See :py:class:`~pythermalcomfort.models.utci.Utci` for more details. To access the
+        `utci` and `stress_category` values, use the corresponding attributes of the
+        returned `Utci` instance, e.g., `result.utci`.
 
     Examples
     --------

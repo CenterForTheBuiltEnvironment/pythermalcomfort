@@ -1082,7 +1082,7 @@ def shivering(
     age=Default.age,
     sex=Default.sex,
     dtime=60,
-    options={},
+    options=None,
 ):
     """Calculate local thermogenesis by shivering [W].
 

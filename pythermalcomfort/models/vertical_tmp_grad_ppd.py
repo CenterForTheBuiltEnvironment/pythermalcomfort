@@ -9,13 +9,13 @@ from pythermalcomfort.utilities import check_standard_compliance_array
 
 
 def vertical_tmp_grad_ppd(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    vertical_tmp_grad: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    vertical_tmp_grad: Union[float, list[float]],
     round_output: bool = True,
 ) -> VerticalTGradPPD:
     """Calculates the percentage of thermally dissatisfied people with a

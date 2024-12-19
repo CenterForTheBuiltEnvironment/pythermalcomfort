@@ -12,13 +12,13 @@ from pythermalcomfort.utilities import (
 
 
 def ankle_draft(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    v_ankle: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    v_ankle: Union[float, list[float]],
     units: str = "SI",
 ) -> AnkleDraft:
     """Calculates the percentage of thermally dissatisfied people with the

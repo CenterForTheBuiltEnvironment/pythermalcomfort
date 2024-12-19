@@ -8,7 +8,7 @@ from pythermalcomfort.utilities import units_converter
 
 
 def clo_tout(
-    tout: Union[float, List[float]],
+    tout: Union[float, list[float]],
     units: Literal["SI", "IP"] = "SI",
 ) -> CloTOut:
     """Representative clothing insulation Icl as a function of outdoor air

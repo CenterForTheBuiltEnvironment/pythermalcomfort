@@ -8,10 +8,10 @@ from pythermalcomfort.utilities import psy_ta_rh
 
 
 def at(
-    tdb: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    v: Union[float, List[float]],
-    q: Union[float, List[float]] = None,
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    v: Union[float, list[float]],
+    q: Union[float, list[float]] = None,
     round_output: bool = True,
 ) -> AT:
     """Calculates the Apparent Temperature (AT). The AT is defined as the

@@ -7,8 +7,8 @@ from pythermalcomfort.classes_return import HI
 
 
 def heat_index(
-    tdb: Union[float, List[float]],
-    rh: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
     units: str = "SI",
     round_output: bool = True,
 ) -> HI:

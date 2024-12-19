@@ -8,8 +8,8 @@ from pythermalcomfort.utilities import mapping
 
 
 def discomfort_index(
-    tdb: Union[float, List[float]],
-    rh: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
 ) -> DI:
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort

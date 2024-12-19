@@ -9,15 +9,15 @@ from pythermalcomfort.utilities import transpose_sharp_altitude
 
 
 def solar_gain(
-    sol_altitude: Union[float, List[float]],
-    sharp: Union[float, List[float]],
-    sol_radiation_dir: Union[float, List[float]],
-    sol_transmittance: Union[float, List[float]],
-    f_svv: Union[float, List[float]],
-    f_bes: Union[float, List[float]],
-    asw: Union[float, List[float]] = 0.7,
+    sol_altitude: Union[float, list[float]],
+    sharp: Union[float, list[float]],
+    sol_radiation_dir: Union[float, list[float]],
+    sol_transmittance: Union[float, list[float]],
+    f_svv: Union[float, list[float]],
+    f_bes: Union[float, list[float]],
+    asw: Union[float, list[float]] = 0.7,
     posture: str = "sitting",
-    floor_reflectance: Union[float, List[float]] = 0.6,
+    floor_reflectance: Union[float, list[float]] = 0.6,
     round_output: bool = True,
 ) -> SolarGain:
     """Calculates the solar gain to the human body using the Effective Radiant

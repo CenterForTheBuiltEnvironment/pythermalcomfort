@@ -8,13 +8,13 @@ from pythermalcomfort.models.pmv_ppd import pmv_ppd
 
 
 def pmv(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    wme: Union[float, List[float]] = 0,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    wme: Union[float, list[float]] = 0,
     standard: str = "ISO",
     units: str = "SI",
     limit_inputs: bool = True,
@@ -124,7 +124,9 @@ def pmv(
         v_r = v_relative(v=v, met=met_rate)
         # calculate dynamic clothing
         clo_d = clo_dynamic(clo=clo_insulation, met=met_rate)
-        results = pmv(tdb=t_db, tr=t_r, vr=v_r, rh=relative_humidity, met=met_rate, clo=clo_d)
+        results = pmv(
+            tdb=t_db, tr=t_r, vr=v_r, rh=relative_humidity, met=met_rate, clo=clo_d
+        )
         print(result.pmv)  # 0.06
         # you can also pass an array-like of inputs
         results = pmv(tdb=[22, 25], tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d)

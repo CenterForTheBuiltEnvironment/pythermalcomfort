@@ -7,8 +7,8 @@ from pythermalcomfort.classes_return import WCT
 
 
 def wct(
-    tdb: Union[float, List[float]],
-    v: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    v: Union[float, list[float]],
     round_output: bool = True,
 ) -> WCT:
     """Calculates the Wind Chill Temperature (`WCT`_).

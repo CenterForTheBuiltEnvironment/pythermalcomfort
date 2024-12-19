@@ -10,19 +10,19 @@ from pythermalcomfort.utilities import body_surface_area, p_sat
 
 
 def pet_steady(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    v: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    p_atm: Union[float, List[float]] = 1013.25,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    p_atm: Union[float, list[float]] = 1013.25,
     position: Union[str, List[str]] = "sitting",
     age: Union[int, List[int]] = 23,
     sex: Union[int, List[int]] = "male",
-    weight: Union[float, List[float]] = 75,
-    height: Union[float, List[float]] = 1.8,
-    wme: Union[float, List[float]] = 0,
+    weight: Union[float, list[float]] = 75,
+    height: Union[float, list[float]] = 1.8,
+    wme: Union[float, list[float]] = 0,
 ) -> PETSteady:
     """The steady physiological equivalent temperature (PET) is calculated using the Munich
     Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal

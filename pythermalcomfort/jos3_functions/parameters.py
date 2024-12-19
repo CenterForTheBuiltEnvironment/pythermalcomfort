@@ -36,7 +36,7 @@ class Default:
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
     bsa_equation: str = "dubois"
-    local_bsa: ClassVar[List[float]] = np.array(  # body surface area [m2]
+    local_bsa: ClassVar[list[float]] = np.array(  # body surface area [m2]
         [
             0.110,
             0.029,

@@ -71,7 +71,7 @@ To set up `pythermalcomfort` for local development:
         autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
         ruff check --fix
         ruff format
-        docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 --pre-summary-newline pythermalcomfort/*.py
+        docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
 
 5. Commit your changes and push your branch to GitHub:
 

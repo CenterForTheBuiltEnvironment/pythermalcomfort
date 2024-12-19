@@ -6,8 +6,8 @@ import numpy.typing as npt
 
 @dataclass(frozen=True)
 class APMV:
-    """A dataclass to store the results of the adaptive Predicted Mean Vote
-    (aPMV) model.
+    """A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV)
+    model.
 
     Attributes
     ----------
@@ -23,8 +23,8 @@ class APMV:
 
 @dataclass(frozen=True)
 class AdaptiveASHRAE:
-    """A dataclass to store the results of the adaptive thermal comfort model
-    based on ASHRAE 55.
+    """A dataclass to store the results of the adaptive thermal comfort model based on
+    ASHRAE 55.
 
     Attributes
     ----------
@@ -58,8 +58,8 @@ class AdaptiveASHRAE:
 
 @dataclass
 class AdaptiveEN:
-    """Dataclass to store the results of the adaptive thermal comfort
-    calculation based on EN 16798-1 2019.
+    """Dataclass to store the results of the adaptive thermal comfort calculation based
+    on EN 16798-1 2019.
 
     Attributes
     ----------
@@ -121,8 +121,7 @@ class AnkleDraft:
 
 @dataclass(frozen=True)
 class AT:
-    """Dataclass to store the results of the Apparent Temperature (AT)
-    calculation.
+    """Dataclass to store the results of the Apparent Temperature (AT) calculation.
 
     Attributes
     ----------
@@ -138,8 +137,8 @@ class AT:
 
 @dataclass(frozen=True)
 class ATHB:
-    """Dataclass to store the results of the Adaptive Thermal Heat Balance
-    (ATHB) calculation.
+    """Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB)
+    calculation.
 
     Attributes
     ----------
@@ -155,8 +154,8 @@ class ATHB:
 
 @dataclass(frozen=True)
 class CloTOut:
-    """Dataclass to represent the clothing insulation Icl as a function of
-    outdoor air temperature.
+    """Dataclass to represent the clothing insulation Icl as a function of outdoor air
+    temperature.
 
     Attributes
     ----------
@@ -164,7 +163,7 @@ class CloTOut:
         Representative clothing insulation Icl.
     """
 
-    clo_tout: Union[float, List[float]]
+    clo_tout: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -180,7 +179,7 @@ class CE:
         Cooling Effect value.
     """
 
-    ce: Union[float, List[float]]
+    ce: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -198,7 +197,7 @@ class DI:
         Classification of the thermal comfort conditions according to the discomfort index.
     """
 
-    di: Union[float, List[float]]
+    di: Union[float, list[float]]
     discomfort_condition: Union[str, List[str]]
 
     def __getitem__(self, item):
@@ -207,8 +206,8 @@ class DI:
 
 @dataclass(frozen=True)
 class EPMV:
-    """Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy
-    Factor (ePMV).
+    """Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor
+    (ePMV).
 
     Attributes
     ----------
@@ -216,7 +215,7 @@ class EPMV:
         Adjusted Predicted Mean Votes with Expectancy Factor.
     """
 
-    e_pmv: Union[float, List[float]]
+    e_pmv: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -232,7 +231,7 @@ class HI:
         Heat Index, [°C] or [°F] depending on the units.
     """
 
-    hi: Union[float, List[float]]
+    hi: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -250,7 +249,7 @@ class Humidex:
         Degree of comfort or discomfort as defined in Havenith and Fiala (2016).
     """
 
-    humidex: Union[float, List[float]]
+    humidex: Union[float, list[float]]
     discomfort: Union[str, List[str]]
 
     def __getitem__(self, item):
@@ -267,7 +266,7 @@ class NET:
         Normal Effective Temperature, [°C].
     """
 
-    net: Union[float, List[float]]
+    net: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -283,7 +282,7 @@ class PETSteady:
         Physiological Equivalent Temperature.
     """
 
-    pet: Union[float, List[float]]
+    pet: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -317,16 +316,16 @@ class PHS:
         Maximum water loss, [g].
     """
 
-    t_re: Union[float, List[float]]
-    t_sk: Union[float, List[float]]
-    t_cr: Union[float, List[float]]
-    t_cr_eq: Union[float, List[float]]
-    t_sk_t_cr_wg: Union[float, List[float]]
-    d_lim_loss_50: Union[float, List[float]]
-    d_lim_loss_95: Union[float, List[float]]
-    d_lim_t_re: Union[float, List[float]]
-    water_loss_watt: Union[float, List[float]]
-    water_loss: Union[float, List[float]]
+    t_re: Union[float, list[float]]
+    t_sk: Union[float, list[float]]
+    t_cr: Union[float, list[float]]
+    t_cr_eq: Union[float, list[float]]
+    t_sk_t_cr_wg: Union[float, list[float]]
+    d_lim_loss_50: Union[float, list[float]]
+    d_lim_loss_95: Union[float, list[float]]
+    d_lim_t_re: Union[float, list[float]]
+    water_loss_watt: Union[float, list[float]]
+    water_loss: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -350,8 +349,8 @@ class PMV:
 
 @dataclass(frozen=True)
 class PMVPPD:
-    """Dataclass to represent the Predicted Mean Vote (PMV) and Predicted
-    Percentage of Dissatisfied (PPD).
+    """Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of
+    Dissatisfied (PPD).
 
     Attributes
     ----------
@@ -361,8 +360,8 @@ class PMVPPD:
         Predicted Percentage of Dissatisfied.
     """
 
-    pmv: Union[float, List[float]]
-    ppd: Union[float, List[float]]
+    pmv: Union[float, list[float]]
+    ppd: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -378,7 +377,7 @@ class SET:
         Standard effective temperature, [°C].
     """
 
-    set: Union[float, List[float]]
+    set: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -397,8 +396,8 @@ class SolarGain:
         temperature of the space should be increased if no solar radiation is present.
     """
 
-    erf: Union[float, List[float]]
-    delta_mrt: Union[float, List[float]]
+    erf: Union[float, list[float]]
+    delta_mrt: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -406,8 +405,8 @@ class SolarGain:
 
 @dataclass(frozen=True)
 class TwoNodes:
-    """Dataclass to represent the results of the two-node model of human
-    temperature regulation.
+    """Dataclass to represent the results of the two-node model of human temperature
+    regulation.
 
     Attributes
     ----------
@@ -449,24 +448,24 @@ class TwoNodes:
         Predicted Thermal Sensation.
     """
 
-    e_skin: Union[float, List[float]]
-    e_rsw: Union[float, List[float]]
-    e_max: Union[float, List[float]]
-    q_sensible: Union[float, List[float]]
-    q_skin: Union[float, List[float]]
-    q_res: Union[float, List[float]]
-    t_core: Union[float, List[float]]
-    t_skin: Union[float, List[float]]
-    m_bl: Union[float, List[float]]
-    m_rsw: Union[float, List[float]]
-    w: Union[float, List[float]]
-    w_max: Union[float, List[float]]
-    set: Union[float, List[float]]
-    et: Union[float, List[float]]
-    pmv_gagge: Union[float, List[float]]
-    pmv_set: Union[float, List[float]]
-    disc: Union[float, List[float]]
-    t_sens: Union[float, List[float]]
+    e_skin: Union[float, list[float]]
+    e_rsw: Union[float, list[float]]
+    e_max: Union[float, list[float]]
+    q_sensible: Union[float, list[float]]
+    q_skin: Union[float, list[float]]
+    q_res: Union[float, list[float]]
+    t_core: Union[float, list[float]]
+    t_skin: Union[float, list[float]]
+    m_bl: Union[float, list[float]]
+    m_rsw: Union[float, list[float]]
+    w: Union[float, list[float]]
+    w_max: Union[float, list[float]]
+    set: Union[float, list[float]]
+    et: Union[float, list[float]]
+    pmv_gagge: Union[float, list[float]]
+    pmv_set: Union[float, list[float]]
+    disc: Union[float, list[float]]
+    t_sens: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -512,18 +511,18 @@ class UseFansHeatwaves:
         True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value.
     """
 
-    e_skin: Union[float, List[float]]
-    e_rsw: Union[float, List[float]]
-    e_max: Union[float, List[float]]
-    q_sensible: Union[float, List[float]]
-    q_skin: Union[float, List[float]]
-    q_res: Union[float, List[float]]
-    t_core: Union[float, List[float]]
-    t_skin: Union[float, List[float]]
-    m_bl: Union[float, List[float]]
-    m_rsw: Union[float, List[float]]
-    w: Union[float, List[float]]
-    w_max: Union[float, List[float]]
+    e_skin: Union[float, list[float]]
+    e_rsw: Union[float, list[float]]
+    e_max: Union[float, list[float]]
+    q_sensible: Union[float, list[float]]
+    q_skin: Union[float, list[float]]
+    q_res: Union[float, list[float]]
+    t_core: Union[float, list[float]]
+    t_skin: Union[float, list[float]]
+    m_bl: Union[float, list[float]]
+    m_rsw: Union[float, list[float]]
+    w: Union[float, list[float]]
+    w_max: Union[float, list[float]]
     heat_strain: Union[bool, List[bool]]
     heat_strain_blood_flow: Union[bool, List[bool]]
     heat_strain_w: Union[bool, List[bool]]
@@ -545,7 +544,7 @@ class UTCI:
         UTCI categorized in terms of thermal stress [9]_.
     """
 
-    utci: Union[float, List[float]]
+    utci: Union[float, list[float]]
     stress_category: Union[str, List[str]]
 
     def __getitem__(self, item):
@@ -554,8 +553,8 @@ class UTCI:
 
 @dataclass(frozen=True)
 class VerticalTGradPPD:
-    """Dataclass to represent the Predicted Percentage of Dissatisfied (PPD)
-    with vertical temperature gradient.
+    """Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with
+    vertical temperature gradient.
 
     Attributes
     ----------
@@ -565,7 +564,7 @@ class VerticalTGradPPD:
         True if the value of air speed at the ankle level is acceptable (PPD_vg <= 5%).
     """
 
-    ppd_vg: Union[float, List[float]]
+    ppd_vg: Union[float, list[float]]
     acceptability: Union[bool, List[bool]]
 
     def __getitem__(self, item):
@@ -598,7 +597,7 @@ class WCI:
         Wind Chill Index, [W/m^2].
     """
 
-    wci: Union[float, List[float]]
+    wci: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -614,7 +613,7 @@ class WCT:
         Wind Chill Temperature, [°C].
     """
 
-    wct: Union[float, List[float]]
+    wct: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)

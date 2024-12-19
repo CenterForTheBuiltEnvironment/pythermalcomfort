@@ -8,14 +8,14 @@ from pythermalcomfort.models.pmv import pmv
 
 
 def a_pmv(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
     a_coefficient: Union[float, int],
-    wme: Union[float, List[float]] = 0,
+    wme: Union[float, list[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> APMV:
@@ -84,7 +84,9 @@ def a_pmv(
         # Calculate dynamic clothing
         clo_d = clo_dynamic(clo=clo, met=met)
 
-        results = a_pmv(tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293)
+        results = a_pmv(
+            tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293
+        )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.74
     """

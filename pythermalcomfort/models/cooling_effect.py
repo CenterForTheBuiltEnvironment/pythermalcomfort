@@ -11,13 +11,13 @@ from pythermalcomfort.utilities import units_converter
 
 
 def cooling_effect(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    vr: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
-    wme: Union[float, List[float]] = 0,
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    wme: Union[float, list[float]] = 0,
     units: Literal["SI", "IP"] = "SI",
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
@@ -190,6 +190,7 @@ def _cooling_effect_vectorised(tdb, tr, still_air_threshold, rh, met, clo, wme, 
         warnings.warn(
             "Cooling effect could not be calculated. Returning 0.",
             UserWarning,
+            stacklevel=2,
         )
 
     return ce

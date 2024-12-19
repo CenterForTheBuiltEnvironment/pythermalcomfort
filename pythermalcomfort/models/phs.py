@@ -13,14 +13,14 @@ from pythermalcomfort.utilities import (
 
 
 def phs(
-    tdb: Union[float, List[float]],
-    tr: Union[float, List[float]],
-    v: Union[float, List[float]],
-    rh: Union[float, List[float]],
-    met: Union[float, List[float]],
-    clo: Union[float, List[float]],
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
     posture: Union[str, List[str]],
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
+    wme: Union[float, int, np.ndarray, list[float], List[int]] = 0,
     round_output: bool = True,
     **kwargs,
 ) -> PHS:
@@ -114,7 +114,9 @@ def phs(
 
         from pythermalcomfort.models import phs
 
-        result = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0)
+        result = phs(
+            tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0
+        )
         print(result.t_re)  # 37.5
 
         result = phs(

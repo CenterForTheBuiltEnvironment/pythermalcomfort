@@ -24,7 +24,7 @@ def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
     local_clo_dict = {}
 
     # Add data from each row to the dictionary
-    for index, row in df.iterrows():
+    for _index, row in df.iterrows():
         # Get the name of the clothing combination as the key
         key = row["clothing_ensemble"]
         # Create a dictionary as the value
