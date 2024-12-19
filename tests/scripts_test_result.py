@@ -1,8 +1,9 @@
-import subprocess
-import pandas as pd
-import re
 import os
+import re
+import subprocess
 import sys
+
+import pandas as pd
 
 """
 The `test-script.R` script is designed to leverage the `tox` command for running

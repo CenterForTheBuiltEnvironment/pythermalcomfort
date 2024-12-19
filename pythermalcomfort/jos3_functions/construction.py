@@ -10,7 +10,8 @@ following order: "head", "neck", "chest", "back", "pelvis",
 """
 
 import numpy as np
-from pythermalcomfort.jos3_functions.matrix import NUM_NODES, IDICT, BODY_NAMES
+
+from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT, NUM_NODES
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.utilities import body_surface_area
 

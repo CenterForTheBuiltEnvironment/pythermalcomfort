@@ -1,4 +1,5 @@
 import numpy as np
+
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.utilities import DefaultSkinTemperature
 

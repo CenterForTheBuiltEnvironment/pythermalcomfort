@@ -1,5 +1,8 @@
 import csv
 import datetime as dt
+
+# Set up logging with a level of WARNING
+import logging
 import os
 import re
 
@@ -11,17 +14,14 @@ from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import _to17array
 from pythermalcomfort.jos3_functions.matrix import (
-    NUM_NODES,
-    INDEX,
-    VINDEX,
     BODY_NAMES,
+    INDEX,
+    NUM_NODES,
+    VINDEX,
     remove_body_name,
 )
-from pythermalcomfort.jos3_functions.parameters import Default, ALL_OUT_PARAMS
-from pythermalcomfort.models import pmv
-
-# Set up logging with a level of WARNING
-import logging
+from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
+from pythermalcomfort.models.pmv import pmv
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)

@@ -8,11 +8,12 @@ following order: "head", "neck", "chest", "back", "pelvis",
 "right_leg" and "right_hand".
 """
 
-import numpy as np
 import math
 
-from pythermalcomfort.jos3_functions.matrix import IDICT, BODY_NAMES
+import numpy as np
+
 from pythermalcomfort.jos3_functions import construction as cons
+from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
 
 

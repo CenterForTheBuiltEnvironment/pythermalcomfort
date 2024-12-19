@@ -12,11 +12,9 @@ It sorts the parameters alphabetically by key and formats each line with the par
 The resulting documentation string can be displayed or printed for user reference.
 """
 
-from typing import List
-
 import textwrap
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, List
 
 import numpy as np
 

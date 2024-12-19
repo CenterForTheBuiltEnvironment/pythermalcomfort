@@ -1,5 +1,5 @@
 import warnings
-from typing import Union, List, Literal
+from typing import List, Literal, Union
 
 import numpy as np
 from scipy import optimize

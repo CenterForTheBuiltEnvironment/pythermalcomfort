@@ -3,8 +3,9 @@ import math
 import numpy as np
 import pytest
 
-from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized, PMVPPD
+from pythermalcomfort.classes_return import PMVPPD
+from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
+from pythermalcomfort.models.pmv_ppd import pmv_ppd
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 

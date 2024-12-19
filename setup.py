@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 import re
-from os.path import dirname
-from os.path import join
+from os.path import dirname, join
 
 from setuptools import setup
 

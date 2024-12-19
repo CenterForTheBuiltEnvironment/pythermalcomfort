@@ -1,5 +1,6 @@
-from pythermalcomfort.models import zhang_sensation_comfort
 from pprint import pprint
+
+from pythermalcomfort.models import zhang_sensation_comfort
 
 # -------------------------------------------
 # This model is often used with a thermal physiology model.

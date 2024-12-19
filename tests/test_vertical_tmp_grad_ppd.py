@@ -1,6 +1,6 @@
 import numpy as np
 
-from pythermalcomfort.models import vertical_tmp_grad_ppd
+from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 

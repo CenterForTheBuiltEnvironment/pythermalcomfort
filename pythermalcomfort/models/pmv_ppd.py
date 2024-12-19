@@ -1,15 +1,15 @@
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
-from numba import vectorize, float64
+from numba import float64, vectorize
 
 from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
-from pythermalcomfort.models import cooling_effect
+from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
-    units_converter,
     check_standard_compliance_array,
+    units_converter,
 )
 
 

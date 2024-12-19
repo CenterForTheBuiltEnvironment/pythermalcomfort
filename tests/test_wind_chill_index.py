@@ -1,6 +1,7 @@
+import pytest
+
 from pythermalcomfort.models import wci
 from tests.conftest import Urls, retrieve_reference_table, validate_result
-import pytest
 
 
 def test_calculates_wci(get_test_url, retrieve_data):

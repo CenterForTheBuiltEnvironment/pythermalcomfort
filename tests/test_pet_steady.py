@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from pythermalcomfort.models import pet_steady
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 

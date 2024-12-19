@@ -1,10 +1,10 @@
 import itertools
 
 import matplotlib.pyplot as plt
-
-from pythermalcomfort.models import phs
 import pandas as pd
 import seaborn as sns
+
+from pythermalcomfort.models import phs
 
 plt.close("all")
 

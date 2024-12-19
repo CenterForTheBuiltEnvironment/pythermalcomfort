@@ -1,5 +1,6 @@
-import pandas as pd
 import re
+
+import pandas as pd
 
 
 def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):

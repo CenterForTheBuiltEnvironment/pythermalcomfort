@@ -1,10 +1,10 @@
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 
 from pythermalcomfort.classes_input import PMVInputs
 from pythermalcomfort.classes_return import PMV
-from pythermalcomfort.models import pmv_ppd
+from pythermalcomfort.models.pmv_ppd import pmv_ppd
 
 
 def pmv(

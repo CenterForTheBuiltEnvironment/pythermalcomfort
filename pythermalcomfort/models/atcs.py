@@ -1,7 +1,9 @@
 import logging
+
 import numpy as np
-from pythermalcomfort.models.jos3 import JOS3
+
 from pythermalcomfort.jos3_functions.parameters import Default
+from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
 from pythermalcomfort.utilities import DefaultSkinTemperature
 

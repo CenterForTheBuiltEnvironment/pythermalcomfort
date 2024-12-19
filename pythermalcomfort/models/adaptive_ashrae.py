@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Literal, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -6,10 +6,10 @@ import numpy.typing as npt
 from pythermalcomfort.classes_input import ASHRAEInputs
 from pythermalcomfort.classes_return import AdaptiveASHRAE
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import operative_tmp
 from pythermalcomfort.utilities import (
-    units_converter,
     check_standard_compliance_array,
+    operative_tmp,
+    units_converter,
 )
 
 

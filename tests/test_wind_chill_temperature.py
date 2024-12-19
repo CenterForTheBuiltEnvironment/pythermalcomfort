@@ -1,6 +1,7 @@
 import numpy as np
-from pythermalcomfort.models.wind_chill_temperature import wct
 import pytest
+
+from pythermalcomfort.models.wind_chill_temperature import wct
 
 
 class TestWct:
@@ -42,7 +43,7 @@ class TestWct:
 
     # Handle non-numeric input values
     def test_wct_non_numeric_inputs(self):
-        """Test that the function raises a TypeError if non-numeric values are passed as input"""
+        """Test that the function raises a TypeError if non-numeric values are passed as input."""
         # Test with non-numeric values for tdb and v
         with pytest.raises(TypeError):
             wct(tdb="invalid", v=5.5)

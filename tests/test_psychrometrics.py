@@ -2,15 +2,15 @@ import numpy as np
 import pytest
 
 from pythermalcomfort.utilities import (
-    dew_point_tmp,
-    wet_bulb_tmp,
-    enthalpy_air,
-    psy_ta_rh,
-    p_sat,
-    mean_radiant_tmp,
     PsychrometricValues,
+    dew_point_tmp,
+    enthalpy_air,
+    mean_radiant_tmp,
+    operative_tmp,
+    p_sat,
+    psy_ta_rh,
+    wet_bulb_tmp,
 )
-from pythermalcomfort.utilities import operative_tmp
 from tests.conftest import is_equal
 
 

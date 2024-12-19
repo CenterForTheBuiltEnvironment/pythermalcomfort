@@ -1,13 +1,13 @@
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 
 from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
-from pythermalcomfort.models import pmv
+from pythermalcomfort.models.pmv import pmv
 from pythermalcomfort.utilities import (
-    units_converter,
     check_standard_compliance_array,
+    units_converter,
 )
 
 

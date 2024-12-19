@@ -1,6 +1,7 @@
+from pprint import pprint
+
 from pythermalcomfort.models import adaptive_ashrae
 from pythermalcomfort.utilities import running_mean_outdoor_temperature
-from pprint import pprint
 
 result = adaptive_ashrae(tdb=25, tr=25, t_running_mean=23, v=0.3)
 

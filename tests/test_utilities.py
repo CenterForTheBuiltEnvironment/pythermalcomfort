@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 
 from pythermalcomfort.utilities import (
-    transpose_sharp_altitude,
-    f_svv,
-    clo_dynamic,
-    running_mean_outdoor_temperature,
-    units_converter,
     body_surface_area,
+    clo_dynamic,
+    f_svv,
+    running_mean_outdoor_temperature,
+    transpose_sharp_altitude,
+    units_converter,
     v_relative,
 )
 

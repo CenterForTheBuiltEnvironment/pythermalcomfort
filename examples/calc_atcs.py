@@ -1,6 +1,8 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from pythermalcomfort import atcs
 
 # Make "atcs_output_example" directory in the current directory

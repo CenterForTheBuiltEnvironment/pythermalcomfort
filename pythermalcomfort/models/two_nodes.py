@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import math
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
-from numba import jit, vectorize, float64
+from numba import float64, jit, vectorize
 
 from pythermalcomfort.classes_input import TwoNodesInputs
 from pythermalcomfort.classes_return import SET, TwoNodes

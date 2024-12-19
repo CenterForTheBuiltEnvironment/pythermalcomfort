@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 

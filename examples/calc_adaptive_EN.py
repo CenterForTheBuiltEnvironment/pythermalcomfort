@@ -1,4 +1,5 @@
 from pprint import pprint
+
 from pythermalcomfort.models import adaptive_en
 from pythermalcomfort.utilities import running_mean_outdoor_temperature
 

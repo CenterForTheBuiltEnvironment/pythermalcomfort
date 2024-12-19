@@ -1,9 +1,9 @@
 import numpy as np
+
 from pythermalcomfort.models import (
     set_tmp,
 )
 from tests.conftest import Urls, retrieve_reference_table, validate_result
-
 
 tdb = []
 tr = []

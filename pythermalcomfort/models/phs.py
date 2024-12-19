@@ -1,5 +1,5 @@
 import math
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
 from numba import jit
@@ -7,8 +7,8 @@ from numba import jit
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
-    p_sat,
     check_standard_compliance_array,
+    p_sat,
 )
 
 

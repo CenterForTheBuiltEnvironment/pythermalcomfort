@@ -1,50 +1,50 @@
 import os
 
+import numpy as np
 import pandas as pd
 import pytest
-import numpy as np
 
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import (
-    validate_body_parameters,
-    local_bsa,
-    weight_rate,
     bfb_rate,
-    conductance,
     capacity,
+    conductance,
+    local_bsa,
+    validate_body_parameters,
+    weight_rate,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
-    NUM_NODES,
-    index_order,
-    LAYER_NAMES,
-    index_by_layer,
     IDICT,
-    valid_index_by_layer,
+    LAYER_NAMES,
+    NUM_NODES,
+    index_by_layer,
+    index_order,
     local_arr,
+    valid_index_by_layer,
     vessel_blood_flow,
 )
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.jos3_functions.thermoregulation import (
-    conv_coef,
-    rad_coef,
-    fixed_hc,
-    fixed_hr,
-    operative_temp,
-    clo_area_factor,
-    dry_r,
-    wet_r,
-    error_signals,
-    evaporation,
-    skin_blood_flow,
     ava_blood_flow,
     basal_met,
+    clo_area_factor,
+    conv_coef,
+    dry_r,
+    error_signals,
+    evaporation,
+    fixed_hc,
+    fixed_hr,
     local_mbase,
     local_q_work,
-    shivering,
     nonshivering,
-    sum_bf,
+    operative_temp,
+    rad_coef,
     resp_heat_loss,
+    shivering,
+    skin_blood_flow,
+    sum_bf,
+    wet_r,
 )
 from pythermalcomfort.models import JOS3  # Assuming models.py contains the JOS3 class
 

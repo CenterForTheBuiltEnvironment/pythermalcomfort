@@ -1,12 +1,12 @@
-from typing import Union, List
+from typing import List, Union
 
 import numpy as np
-from numba import vectorize, float64
+from numba import float64, vectorize
 
 from pythermalcomfort.classes_input import UTCIInputs
 from pythermalcomfort.classes_return import UTCI
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import units_converter, mapping
+from pythermalcomfort.utilities import mapping, units_converter
 
 
 def utci(

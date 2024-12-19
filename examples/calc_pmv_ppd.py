@@ -5,9 +5,12 @@ import numpy as np
 import pandas as pd
 
 from pythermalcomfort.models import pmv_ppd
-from pythermalcomfort.utilities import clo_individual_garments
-from pythermalcomfort.utilities import met_typical_tasks
-from pythermalcomfort.utilities import v_relative, clo_dynamic
+from pythermalcomfort.utilities import (
+    clo_dynamic,
+    clo_individual_garments,
+    met_typical_tasks,
+    v_relative,
+)
 
 # input variables
 tdb = 27  # dry bulb air temperature, [$^{\circ}$C]

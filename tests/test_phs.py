@@ -1,4 +1,5 @@
 import pytest
+
 from pythermalcomfort.models import phs
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 

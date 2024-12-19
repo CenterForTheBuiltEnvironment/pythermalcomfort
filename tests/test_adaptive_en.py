@@ -1,5 +1,6 @@
-from pythermalcomfort.models import adaptive_en
 import pytest
+
+from pythermalcomfort.models import adaptive_en
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
