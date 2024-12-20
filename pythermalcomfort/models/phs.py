@@ -301,7 +301,7 @@ const_t_sk = math.exp(-1 / 3)
 const_sw = math.exp(-1 / 10)
 
 
-@np.vectorize(cache=True)
+@np.vectorize()
 @jit(nopython=True)
 def _phs_optimized(
     tdb,
