@@ -196,10 +196,9 @@ def two_nodes(
         "t_sens": t_sens,
     }
 
-    for key in output.keys():
-        # round the results if needed
-        if round_output:
-            output[key] = np.around(output[key], 1)
+    if round_output:
+        for key in output.keys():
+            output[key] = np.around(output[key], 2)
 
     return TwoNodes(**output)
 
