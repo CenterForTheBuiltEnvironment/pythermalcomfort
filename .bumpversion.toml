@@ -10,14 +10,11 @@ tag_message = "Bump version: {current_version} → {new_version}"
 allow_dirty = false
 commit_message = "Bump version: {current_version} → {new_version}"
 
-#[bumpversion:file:setup.py]
-#search = version="{current_version}"
-#replace = version="{new_version}"
-#
-#[bumpversion:file:docs/conf.py]
-#search = version = release = "{current_version}"
-#replace = version = release = "{new_version}"
-#
-#[bumpversion:file:pythermalcomfort/__init__.py]
-#search = __version__ = '{current_version}'
-#replace = __version__ = '{new_version}'
+[[tool.bumpversion.files]]
+filename = "pythermalcomfort/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "setup.py"
+
+[[tool.bumpversion.files]]
+filename = "docs/conf.py"
