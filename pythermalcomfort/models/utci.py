@@ -5,9 +5,8 @@ from numba import float64, vectorize
 
 from pythermalcomfort.classes_input import UTCIInputs
 from pythermalcomfort.classes_return import UTCI
-from pythermalcomfort.shared_functions import valid_range
+from pythermalcomfort.shared_functions import mapping, valid_range
 from pythermalcomfort.utilities import units_converter
-from pythermalcomfort.shared_functions import mapping
 
 
 def utci(
