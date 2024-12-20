@@ -368,6 +368,19 @@ class PMVPPD:
 
 
 @dataclass(frozen=True)
+class PsychrometricValues:
+    p_sat: Union[float, list[float]]
+    p_vap: Union[float, list[float]]
+    hr: Union[float, list[float]]
+    wet_bulb_tmp: Union[float, list[float]]
+    dew_point_tmp: Union[float, list[float]]
+    h: Union[float, list[float]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass(frozen=True)
 class SET:
     """Dataclass to represent the Standard Effective Temperature (SET).
 
