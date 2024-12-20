@@ -7,7 +7,7 @@ from pythermalcomfort.classes_input import UseFansHeatwavesInputs
 from pythermalcomfort.classes_return import UseFansHeatwaves
 from pythermalcomfort.models.two_nodes import two_nodes
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    _check_standard_compliance_array,
 )
 
 
@@ -177,7 +177,7 @@ def use_fans_heatwaves(
             rh_valid,
             met_valid,
             clo_valid,
-        ) = check_standard_compliance_array(
+        ) = _check_standard_compliance_array(
             standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
         )
         all_valid = ~(

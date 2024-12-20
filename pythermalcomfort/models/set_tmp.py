@@ -6,7 +6,7 @@ from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.two_nodes import two_nodes
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    _check_standard_compliance_array,
 )
 
 
@@ -133,7 +133,7 @@ def set_tmp(
             v_valid,
             met_valid,
             clo_valid,
-        ) = check_standard_compliance_array(
+        ) = _check_standard_compliance_array(
             "ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
         )
         all_valid = ~(

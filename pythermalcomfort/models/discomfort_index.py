@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import DIInputs
 from pythermalcomfort.classes_return import DI
-from pythermalcomfort.utilities import mapping
+from pythermalcomfort.shared_functions import mapping
 
 
 def discomfort_index(

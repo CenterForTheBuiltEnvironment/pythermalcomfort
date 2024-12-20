@@ -8,7 +8,7 @@ from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    _check_standard_compliance_array,
     units_converter,
 )
 
@@ -178,7 +178,7 @@ def pmv_ppd(
         v_valid,
         met_valid,
         clo_valid,
-    ) = check_standard_compliance_array(
+    ) = _check_standard_compliance_array(
         standard,
         tdb=tdb,
         tr=tr,

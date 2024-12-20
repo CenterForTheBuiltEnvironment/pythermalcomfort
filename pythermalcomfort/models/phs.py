@@ -7,7 +7,7 @@ from numba import jit
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    _check_standard_compliance_array,
     p_sat,
 )
 
@@ -271,7 +271,7 @@ def phs(
             p_a_valid,
             met_valid,
             clo_valid,
-        ) = check_standard_compliance_array(
+        ) = _check_standard_compliance_array(
             "7933", tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
         )
         all_valid = ~(

@@ -5,7 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import VerticalTGradPPDInputs
 from pythermalcomfort.classes_return import VerticalTGradPPD
 from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import check_standard_compliance_array
+from pythermalcomfort.utilities import _check_standard_compliance_array
 
 
 def vertical_tmp_grad_ppd(
@@ -109,7 +109,7 @@ def vertical_tmp_grad_ppd(
         v_valid,
         met_valid,
         clo_valid,
-    ) = check_standard_compliance_array(
+    ) = _check_standard_compliance_array(
         standard="ashrae", tdb=tdb, tr=tr, v_limited=vr, met=met, clo=clo
     )
 

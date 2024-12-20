@@ -6,7 +6,7 @@ from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
 from pythermalcomfort.models.pmv import pmv
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    _check_standard_compliance_array,
     units_converter,
 )
 
@@ -101,7 +101,7 @@ def ankle_draft(
     if units.lower() == "ip":
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)
 
-    tdb_valid, tr_valid, v_valid, v_limited = check_standard_compliance_array(
+    tdb_valid, tr_valid, v_valid, v_limited = _check_standard_compliance_array(
         standard="ashrae",
         tdb=tdb,
         tr=tr,

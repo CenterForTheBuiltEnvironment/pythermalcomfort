@@ -357,100 +357,7 @@ def transpose_sharp_altitude(sharp, altitude):
     return round(sharp, 3), round(sol_altitude, 3)
 
 
-def check_standard_compliance(standard, **kwargs):
-    params = dict()
-    params["standard"] = standard
-    for key, value in kwargs.items():
-        params[key] = value
-
-    if params["standard"] == "ankle_draft":
-        for key, value in params.items():
-            if key == "met" and value > 1.3:
-                warnings.warn(
-                    "The ankle draft model is only valid for met <= 1.3",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "clo" and value > 0.7:
-                warnings.warn(
-                    "The ankle draft model is only valid for clo <= 0.7",
-                    UserWarning,
-                    stacklevel=2,
-                )
-
-    elif params["standard"] == "ashrae":  # based on table 7.3.4 ashrae 55 2020
-        for key, value in params.items():
-            if key in ["tdb", "tr"]:
-                if key == "tdb":
-                    parameter = "dry-bulb"
-                else:
-                    parameter = "mean radiant"
-                if value > 40 or value < 10:
-                    warnings.warn(
-                        f"ASHRAE {parameter} temperature applicability limits between"
-                        " 10 and 40 °C",
-                        UserWarning,
-                        stacklevel=2,
-                    )
-            if key in ["v", "vr"] and (value > 2 or value < 0):
-                warnings.warn(
-                    "ASHRAE air speed applicability limits between 0 and 2 m/s",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "met" and (value > 4 or value < 1):
-                warnings.warn(
-                    "ASHRAE met applicability limits between 1.0 and 4.0 met",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "clo" and (value > 1.5 or value < 0):
-                warnings.warn(
-                    "ASHRAE clo applicability limits between 0.0 and 1.5 clo",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "v_limited" and value > 0.2:
-                raise ValueError(
-                    "This equation is only applicable for air speed lower than 0.2 m/s"
-                )
-
-    elif params["standard"] == "iso":  # based on ISO 7730:2005 page 3
-        for key, value in params.items():
-            if key == "tdb" and (value > 30 or value < 10):
-                warnings.warn(
-                    "ISO air temperature applicability limits between 10 and 30 °C",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "tr" and (value > 40 or value < 10):
-                warnings.warn(
-                    "ISO mean radiant temperature applicability limits between 10 and"
-                    " 40 °C",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key in ["v", "vr"] and (value > 1 or value < 0):
-                warnings.warn(
-                    "ISO air speed applicability limits between 0 and 1 m/s",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "met" and (value > 4 or value < 0.8):
-                warnings.warn(
-                    "ISO met applicability limits between 0.8 and 4.0 met",
-                    UserWarning,
-                    stacklevel=2,
-                )
-            if key == "clo" and (value > 2 or value < 0):
-                warnings.warn(
-                    "ISO clo applicability limits between 0.0 and 2 clo",
-                    UserWarning,
-                    stacklevel=2,
-                )
-
-
-def check_standard_compliance_array(standard, **kwargs):
+def _check_standard_compliance_array(standard, **kwargs):
     default_kwargs = {"airspeed_control": True}
     params = {**default_kwargs, **kwargs}
     values_to_return = {}
@@ -727,27 +634,6 @@ def units_converter(from_units="ip", **kwargs):
                 results.append(value / 101325)
 
     return results
-
-
-def mapping(value, map_dictionary, right=True):
-    """Maps a temperature array to stress categories.
-
-    Parameters
-    ----------
-    value : float, array-like
-        Temperature to map.
-    map_dictionary: dict
-        Dictionary used to map the values
-    right: bool, optional
-        Indicating whether the intervals include the right or the left bin edge.
-
-    Returns
-    -------
-    Stress category for each input temperature.
-    """
-    bins = np.array(list(map_dictionary.keys()))
-    words = np.append(np.array(list(map_dictionary.values())), "unknown")
-    return words[np.digitize(value, bins, right=right)]
 
 
 def operative_tmp(
