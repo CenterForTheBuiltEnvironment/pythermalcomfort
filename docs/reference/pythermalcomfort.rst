@@ -450,6 +450,15 @@ Right now, would you prefer ... ?
    * - +1
      - More air movement
 
+Clothing and activity
+^^^^^^^^^^^^^^^^^^^^^
+
+Clothing and activity level can be assessed using the following questions:
+
+.. image:: images/clothing_and_activity.png
+  :width: 600
+  :alt: Clothing and activity surveys
+
 Satisfaction Surveys
 --------------------
 
