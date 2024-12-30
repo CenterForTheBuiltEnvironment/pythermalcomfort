@@ -315,12 +315,12 @@ def mean_radiant_tmp(
 
         return np.around(tr, 1)
 
-    if standard == "iso":
+    if standard == "iso":  # pragma: no branch
         tg = np.add(tg, c_to_k)
         tdb = np.add(tdb, c_to_k)
 
         # calculate heat transfer coefficient
-        h_n = np.power(1.4 * (np.abs(tg - tdb) / d), 0.25)  # natural convection
+        h_n = 1.4 * np.power(np.abs(tg - tdb) / d, 0.25)  # natural convection
         h_f = 6.3 * np.power(v, 0.6) / np.power(d, 0.4)  # forced convection
 
         # get the biggest between the two coefficients
