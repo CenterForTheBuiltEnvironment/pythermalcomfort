@@ -9,6 +9,8 @@ numba = "*"
 numpy = "*"
 setuptools = "*"
 tox = "*"
+black = "*"
+epw = {ref = "master", git = "https://github.com/building-energy/epw.git"}
 
 [dev-packages]
 pytest = "*"
@@ -25,4 +27,4 @@ bump-my-version = "*"
 
 [requires]
 python_version = "3.12"
-python_full_version = "3.12.4"
+python_full_version = "3.12.5"
