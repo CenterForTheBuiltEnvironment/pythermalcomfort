@@ -302,7 +302,7 @@ const_sw = math.exp(-1 / 10)
 
 
 @np.vectorize
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _phs_optimized(
     tdb,
     tr,
