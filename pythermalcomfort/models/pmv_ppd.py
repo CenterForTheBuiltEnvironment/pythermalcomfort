@@ -243,6 +243,7 @@ def pmv_ppd(
             float64,
         )
     ],
+    cache=True,
 )
 def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     pa = rh * 10 * np.exp(16.6536 - 4030.183 / (tdb + 235))

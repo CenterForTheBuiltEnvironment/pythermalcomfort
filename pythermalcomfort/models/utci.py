@@ -153,6 +153,7 @@ def utci(
             float64,
         )
     ],
+    cache=True,
 )
 def _utci_optimized(tdb, v, delta_t_tr, pa):
     return (

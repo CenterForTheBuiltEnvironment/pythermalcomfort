@@ -203,7 +203,7 @@ def two_nodes(
     return TwoNodes(**output)
 
 
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _two_nodes_optimized(
     tdb,
     tr,
@@ -549,6 +549,7 @@ def _two_nodes_optimized(
             float64,
         )
     ],
+    cache=True,
 )
 def _two_nodes_optimized_return_set(
     tdb,
