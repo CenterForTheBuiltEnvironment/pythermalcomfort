@@ -19,7 +19,7 @@ from pythermalcomfort.models.pmv import pmv
 from pythermalcomfort.models.pmv_ppd import pmv_ppd
 from pythermalcomfort.models.set_tmp import set_tmp
 from pythermalcomfort.models.solar_gain import solar_gain
-from pythermalcomfort.models.two_nodes import two_nodes
+from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.models.use_fans_heatwaves import use_fans_heatwaves
 from pythermalcomfort.models.utci import utci
 from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
@@ -40,7 +40,7 @@ __all__ = [
     "a_pmv",
     "e_pmv",
     "set_tmp",
-    "two_nodes",
+    "gagge_two_nodes",
     "use_fans_heatwaves",
     "adaptive_ashrae",
     "adaptive_en",

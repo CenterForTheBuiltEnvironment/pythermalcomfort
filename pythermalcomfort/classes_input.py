@@ -643,7 +643,7 @@ class SolarGainInputs(BaseInputs):
 
 
 @dataclass
-class TwoNodesInputs(BaseInputs):
+class GaggeTwoNodesInputs(BaseInputs):
     def __init__(
         self,
         tdb,

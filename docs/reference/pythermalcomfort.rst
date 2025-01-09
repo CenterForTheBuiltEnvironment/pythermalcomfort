@@ -81,6 +81,14 @@ Discomfort Index (DI)
 .. autoclass:: pythermalcomfort.classes_return.DI
     :members:
 
+Gagge two-node model
+--------------------
+
+.. autofunction:: pythermalcomfort.models.gagge_two_nodes.gagge_two_nodes
+
+.. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodes
+    :members:
+
 Heat Index (HI)
 ---------------
 
@@ -159,14 +167,6 @@ Standard Effective Temperature (SET)
 .. autofunction:: pythermalcomfort.models.set_tmp.set_tmp
 
 .. autoclass:: pythermalcomfort.classes_return.SET
-    :members:
-
-Two-node model
---------------
-
-.. autofunction:: pythermalcomfort.models.two_nodes.two_nodes
-
-.. autoclass:: pythermalcomfort.classes_return.TwoNodes
     :members:
 
 Universal Thermal Climate Index (UTCI)

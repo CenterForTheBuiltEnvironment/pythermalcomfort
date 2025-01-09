@@ -5,12 +5,12 @@ import math
 import numpy as np
 from numba import float64, jit, vectorize
 
-from pythermalcomfort.classes_input import TwoNodesInputs
-from pythermalcomfort.classes_return import SET, TwoNodes
+from pythermalcomfort.classes_input import GaggeTwoNodesInputs
+from pythermalcomfort.classes_return import SET, GaggeTwoNodes
 from pythermalcomfort.utilities import p_sat_torr
 
 
-def two_nodes(
+def gagge_two_nodes(
     tdb: float | list[float],
     tr: float | list[float],
     v: float | list[float],
@@ -26,8 +26,8 @@ def two_nodes(
     max_sweating: float | list[float] = 500,
     w_max: float | list[float] = False,
     calculate_ce: bool = False,
-) -> SET | TwoNodes:
-    """Two-node model of human temperature regulation Gagge et al. (1986).
+) -> SET | GaggeTwoNodes:
+    """Gagge Two-node model of human temperature regulation Gagge et al. (1986).
     [10]_ This model can be used to calculate a variety of indices, including:
 
     * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [10]_.
@@ -78,7 +78,7 @@ def two_nodes(
 
     Returns
     -------
-    TwoNodes
+    GaggeTwoNodes
         A dataclass containing the results of the two-node model of human temperature regulation.
         See :py:class:`~pythermalcomfort.models.two_nodes.TwoNodes` for more details.
         To access the results, use the corresponding attributes of the returned `TwoNodes` instance, e.g., `result.e_skin`.
@@ -96,7 +96,7 @@ def two_nodes(
         print(result.e_skin)  # [100.0, 100.0]
     """
     # Validate inputs using the TwoNodesInputs class
-    TwoNodesInputs(
+    GaggeTwoNodesInputs(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -125,7 +125,7 @@ def two_nodes(
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
     if calculate_ce:
-        result = _two_nodes_optimized_return_set(
+        result = _gagge_two_nodes_optimized_return_set(
             tdb,
             tr,
             v,
@@ -158,7 +158,7 @@ def two_nodes(
         pmv_set,
         disc,
         t_sens,
-    ) = np.vectorize(_two_nodes_optimized, cache=True)(
+    ) = np.vectorize(_gagge_two_nodes_optimized, cache=True)(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -200,11 +200,11 @@ def two_nodes(
         for key in output.keys():
             output[key] = np.around(output[key], 2)
 
-    return TwoNodes(**output)
+    return GaggeTwoNodes(**output)
 
 
 @jit(nopython=True, cache=True)
-def _two_nodes_optimized(
+def _gagge_two_nodes_optimized(
     tdb,
     tr,
     v,
@@ -551,7 +551,7 @@ def _two_nodes_optimized(
     ],
     cache=True,
 )
-def _two_nodes_optimized_return_set(
+def _gagge_two_nodes_optimized_return_set(
     tdb,
     tr,
     v,
@@ -563,7 +563,7 @@ def _two_nodes_optimized_return_set(
     p_atm,
     position,
 ):
-    return _two_nodes_optimized(
+    return _gagge_two_nodes_optimized(
         tdb,
         tr,
         v,

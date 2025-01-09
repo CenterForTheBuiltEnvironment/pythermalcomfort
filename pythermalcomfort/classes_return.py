@@ -417,7 +417,7 @@ class SolarGain:
 
 
 @dataclass(frozen=True)
-class TwoNodes:
+class GaggeTwoNodes:
     """Dataclass to represent the results of the two-node model of human temperature
     regulation.
 
