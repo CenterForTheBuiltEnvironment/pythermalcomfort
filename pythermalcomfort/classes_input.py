@@ -395,20 +395,23 @@ class EPMVInputs(BaseInputs):
         )
 
 
+class HIModels(Enum):
+    rothfusz = "rothfusz"
+    lu_romps = "lu-romps"
+
+
 @dataclass
 class HIInputs(BaseInputs):
     def __init__(
         self,
         tdb,
         rh,
-        units,
         round_output,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
-            units=units,
             round_output=round_output,
         )
 
