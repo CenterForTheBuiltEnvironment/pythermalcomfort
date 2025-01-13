@@ -668,6 +668,26 @@ def operative_tmp(
         return a * tdb + (1 - a) * tr
 
 
+def intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
+    """Calculates the intrinsic insulation of a clothing ensemble based on individual
+    garments. This equation is in accordance with the ISO 9920:2009 standard [29]_.
+    It should be noted that this equation is only valid for clothing ensembles with
+    rather uniform insulation values across the body.
+
+    Parameters
+    ----------
+    clo_garments:  floats or list of floats
+        list of floats containing the clothing insulation for each individual garment
+
+    Returns
+    -------
+    i_cl: float
+        intrinsic insulation of the clothing ensemble, [clo]
+    """
+    clo_garments = np.array(clo_garments)
+    return np.sum(clo_garments) * 0.835 + 0.161
+
+
 #: Met values of typical tasks.
 met_typical_tasks = {
     "Sleeping": 0.7,
