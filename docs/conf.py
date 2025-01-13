@@ -18,7 +18,7 @@ extensions = [
 source_suffix = ".rst"
 master_doc = "index"
 project = "pythermalcomfort"
-year = "2019"
+year = "2025"
 author = "Federico Tartarini"
 project_copyright = f"{year}, {author}"
 version = release = "2.11.3"

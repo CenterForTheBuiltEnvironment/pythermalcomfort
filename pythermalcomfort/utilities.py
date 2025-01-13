@@ -668,11 +668,11 @@ def operative_tmp(
         return a * tdb + (1 - a) * tr
 
 
-def intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
+def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
     """Calculates the intrinsic insulation of a clothing ensemble based on individual
-    garments. This equation is in accordance with the ISO 9920:2009 standard [29]_.
-    It should be noted that this equation is only valid for clothing ensembles with
-    rather uniform insulation values across the body.
+    garments. This equation is in accordance with the ISO 9920:2009 standard [29]_
+    Section 4.3. It should be noted that this equation is only valid for clothing
+    ensembles with rather uniform insulation values across the body.
 
     Parameters
     ----------
@@ -686,6 +686,28 @@ def intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
     """
     clo_garments = np.array(clo_garments)
     return np.sum(clo_garments) * 0.835 + 0.161
+
+
+def clo_area_factor(i_cl: Union[float, list[float]]):
+    """Calculates the clothing area factor (f_cl) of the clothing ensemble as a function
+    of the intrinsic insulation of the clothing ensemble. This equation is in accordance
+    with the ISO 9920:2009 standard [29]_ Section 5. The standard warns that the
+    correlation between f_cl and i_cl is low especially for non-western clothing
+    ensembles. The application of this equation is limited to clothing ensembles with
+    clo values between 0.2 and 1.7 clo.
+
+    Parameters
+    ----------
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, [clo]
+
+    Returns
+    -------
+    f_cl: float or list of floats
+        area factor of the clothing ensemble, [m2]
+    """
+    i_cl = np.array(i_cl)
+    return 1 + 0.28 * i_cl
 
 
 #: Met values of typical tasks.

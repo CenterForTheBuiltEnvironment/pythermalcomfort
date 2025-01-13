@@ -230,20 +230,10 @@ Dew point temperature
 
 .. autofunction:: pythermalcomfort.utilities.dew_point_tmp
 
-Dynamic clothing
-----------------
-
-.. autofunction:: pythermalcomfort.utilities.clo_dynamic
-
 Enthalpy
 --------
 
 .. autofunction:: pythermalcomfort.utilities.enthalpy_air
-
-Intrinsic clothing insulation ensemble (Icl)
---------------------------------------------
-
-.. autofunction:: pythermalcomfort.utilities.intrinsic_insulation_ensemble
 
 Mean radiant temperature
 ------------------------
@@ -289,6 +279,24 @@ Wet bulb temperature
 --------------------
 
 .. autofunction:: pythermalcomfort.utilities.wet_bulb_tmp
+
+Clothing
+--------
+
+Clothing area factor (f_cl)
+---------------------------
+
+.. autofunction:: pythermalcomfort.utilities.clo_area_factor
+
+Dynamic clothing
+----------------
+
+.. autofunction:: pythermalcomfort.utilities.clo_dynamic
+
+Intrinsic clothing insulation ensemble (Icl)
+--------------------------------------------
+
+.. autofunction:: pythermalcomfort.utilities.clo_intrinsic_insulation_ensemble
 
 Reference values clo and met
 ============================

@@ -9,15 +9,21 @@ from pythermalcomfort.utilities import (
     transpose_sharp_altitude,
     units_converter,
     v_relative,
-    intrinsic_insulation_ensemble,
+    clo_intrinsic_insulation_ensemble,
+    clo_area_factor,
 )
 
 
 def test_intrinsic_insulation_ensemble():
-    assert intrinsic_insulation_ensemble([0.5, 0.5]) == 0.835 + 0.161
-    assert intrinsic_insulation_ensemble([1, 1]) == 2 * 0.835 + 0.161
-    assert intrinsic_insulation_ensemble(2) == 2 * 0.835 + 0.161
-    assert intrinsic_insulation_ensemble([0]) == 0.161
+    assert clo_intrinsic_insulation_ensemble([0.5, 0.5]) == 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble([1, 1]) == 2 * 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble(2) == 2 * 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble([0]) == 0.161
+
+
+def test_clo_area_factor():
+    assert clo_area_factor(1) == 1.28
+    assert np.allclose(clo_area_factor(i_cl=[1, 2]), np.array([1.28, 1.56]))
 
 
 def test_transpose_sharp_altitude():
