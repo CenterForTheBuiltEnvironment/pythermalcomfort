@@ -3,17 +3,17 @@ import pytest
 
 from pythermalcomfort.utilities import (
     body_surface_area,
+    clo_area_factor,
+    clo_correction_factor_environment,
     clo_dynamic,
+    clo_insulation_air_layer,
+    clo_intrinsic_insulation_ensemble,
+    clo_total_insulation,
     f_svv,
     running_mean_outdoor_temperature,
     transpose_sharp_altitude,
     units_converter,
     v_relative,
-    clo_intrinsic_insulation_ensemble,
-    clo_area_factor,
-    clo_insulation_air_layer,
-    clo_total_insulation,
-    clo_correction_factor_environment,
 )
 
 
@@ -44,7 +44,6 @@ def test_clo_air_layer_insulation():
 
 
 def test_clo_total_insulation():
-
     # test that the normal_clothing function works as expected
     assert np.allclose(
         clo_total_insulation(
@@ -112,7 +111,6 @@ def test_clo_total_insulation():
 
 
 def test_clo_correction_factor_environment():
-
     # test that the normal_clothing function works as expected
     assert np.allclose(
         clo_correction_factor_environment(
