@@ -710,6 +710,126 @@ def clo_area_factor(i_cl: Union[float, list[float]]):
     return 1 + 0.28 * i_cl
 
 
+def clo_insulation_air_layer(
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_a_static: Union[float, list[float]],
+):
+    """Calculates the insulation of the boundary air layer (I_a). The static boundary
+    air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to 0.15 m/s.
+    Thus, for static conditions, the standard recommends using the value of 0.7 clo
+    (0.109 m2K/W) for the boundary air layer insulation. For walking conditions, the
+    boundary air layer insulation is calculated based on the walking speed (v_walk) and
+    the relative air speed (vr). This equation is extracted from the ISO 9920:2009
+    standard [29]_ Section 6.
+
+    Parameters
+    ----------
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_a_static: float or list of floats
+        static boundary air layer insulation, [clo]
+
+    Returns
+    -------
+    i_a: float or list of floats
+        boundary air layer insulation, [clo]
+    """
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_a_static = np.array(i_a_static)
+
+    return (
+        np.exp(
+            -0.533 * (vr - 0.15)
+            + 0.069 * (vr - 0.15) ** 2
+            - 0.462 * v_walk
+            + 0.201 * v_walk**2
+        )
+        * i_a_static
+    )
+
+
+def clo_total_insulation(
+    i_t: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_a_static: Union[float, list[float]],
+    i_cl: Union[float, list[float]],
+):
+    """Calculates the total insulation of the clothing ensemble (I\ :sub:`T,r`) which is
+    the actual thermal insulation from the body surface to the environment, considering
+    all clothing, enclosed air layers, and boundary air layers under given environmental
+    conditions and activities. It accounts for the effects of movements and wind. The
+    ISO 7790 standard [29]_ provides different equations to calculate it as a function
+    of the total thermal insulation of clothing (I\ :sub:`T`), the insulation of the
+    boundary air layer (I\ :sub:`a`), the walking speed (v\ :sub:`walk`), and the
+    relative air speed (v\ :sub:`r`). These different equations are used if the person
+    is clothed in normal clothing (0.6 clo < (I\ :sub:`cl`) < 1.4 clo or 1.2 clo < (I\
+    :sub:`T`) < 2.0 clo), nude (I\ :sub:`cl` = 0 clo), and if the person is clothed in
+    very light clothing (I\ :sub:`cl` < 0.6 clo). Here we have not implemented the
+    equation for high clothing (I\ :sub:`T` > 2.0 clo). Hence the applicability of this
+    function is limited to 0 clo < (I\ :sub:`T`) < 2.0 clo). You can find all the inputs
+    required in this function in the ISO 9920:2009 standard [29]_ Annex A.
+
+    Parameters
+    ----------
+    i_t: float or list of floats
+        total thermal insulation of clothing under static reference conditions [clo]
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_a_static: float or list of floats
+        static boundary air layer insulation, [clo]
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, this is the thermal insulation
+        from the skin surface to the outer clothing surface [clo]
+
+    Returns
+    -------
+    i_t_r: float or list of floats
+        total insulation of the clothing ensemble, [clo]
+    """
+    i_t = np.array(i_t)
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_a_static = np.array(i_a_static)
+    i_cl = np.array(i_cl)
+
+    def normal_clothing(_vr, _vw, _i_t):
+        return _i_t * np.exp(
+            -0.281 * (_vr - 0.15)
+            + 0.044 * (_vr - 0.15) ** 2
+            - 0.492 * _vw
+            + 0.176 * _vw**2
+        )
+
+    def nude(_vr, _vw, _i_a_static):
+        return _i_a_static * np.exp(
+            -0.533 * (_vr - 0.15)
+            + 0.069 * (_vr - 0.15) ** 2
+            - 0.462 * _vw
+            + 0.201 * _vw**2
+        )
+
+    def low_clothing(_vr, _vw, _i_a_static, _i_cl):
+        return (
+            (0.6 - _i_cl) * nude(_vr, _vw, _i_a_static)
+            + _i_cl * normal_clothing(_vr, _vw, _i_cl)
+        ) / 0.6
+
+    i_t_r = np.where(
+        i_cl <= 0.6,
+        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl),
+        normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
+    )
+    i_t_r = np.where(i_t == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
+    return i_t_r
+
+
 #: Met values of typical tasks.
 met_typical_tasks = {
     "Sleeping": 0.7,

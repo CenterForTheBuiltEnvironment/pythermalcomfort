@@ -27,12 +27,12 @@ def pmv_ppd(
     airspeed_control: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
-    """Returns Predicted Mean Vote (PMV) and Predicted Percentage of
-    Dissatisfied (PPD) calculated in accordance with main thermal comfort
-    Standards. The PMV is an index that predicts the mean value of the thermal
-    sensation votes (self-reported perceptions) of a large group of people on a
-    sensation scale expressed from –3 to +3 corresponding to the categories:
-    cold, cool, slightly cool, neutral, slightly warm, warm, and hot. [1]_
+    """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+    calculated in accordance with main thermal comfort Standards. The PMV is an index
+    that predicts the mean value of the thermal sensation votes (self-reported
+    perceptions) of a large group of people on a sensation scale expressed from –3 to +3
+    corresponding to the categories: cold, cool, slightly cool, neutral, slightly warm,
+    warm, and hot. [1]_
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
     ASHRAE 55 PMV equation, the SET is used to calculate the cooling effect first,
@@ -64,11 +64,17 @@ def pmv_ppd(
         Clothing insulation, [clo].
 
         .. note::
+            this is the basic also known as the intrinsic clothing insulation value of the
+            clothing ensemble (I :sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under static
+            reference conditions. This value is not the total insulation (I :sub:`T,r`)
+
+        .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
             the clothing insulation shall be corrected. The ASHRAE 55 Standard corrects
             for the effect of the body movement for met equal or higher than 1.2 met using
-            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
+            the equation clo = (I :sub:`cl,r`), × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
             can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
 
