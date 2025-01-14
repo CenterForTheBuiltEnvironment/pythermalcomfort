@@ -37,7 +37,7 @@ def e_pmv(
     vr : float or list of floats
         Relative air speed, default in [m/s] in [fps] if `units` = 'IP'.
 
-        .. warning::
+        .. note::
             vr is the relative air speed caused by body movement and not the air
             speed measured by the air speed sensor. The relative air speed is the sum of the
             average air speed measured by the sensor plus the activity-generated air speed
@@ -52,7 +52,7 @@ def e_pmv(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
             the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects

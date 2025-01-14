@@ -41,7 +41,7 @@ def ankle_draft(
     vr : float or list of floats
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        .. warning::
+        .. note::
             `vr` is the relative air speed caused by body movement and not the air speed measured by the air speed sensor.
             The relative air speed is the sum of the average air speed measured by the sensor plus the activity-generated air speed (Vag).
             Vag is the activity-generated air speed caused by motion of individual body parts.
@@ -56,7 +56,7 @@ def ankle_draft(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             The activity as well as the air speed modify the insulation characteristics of the clothing and the adjacent air layer.
             Consequently, the ISO 7730 states that the clothing insulation shall be corrected.
             The ASHRAE 55 Standard corrects for the effect of the body movement for met equal or higher than 1.2 met using the equation

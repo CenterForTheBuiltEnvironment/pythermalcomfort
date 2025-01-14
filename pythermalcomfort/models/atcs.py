@@ -67,9 +67,12 @@ class ATCS(JOS3):
             Relative humidity [%].
         clo : float or list of floats
             Clothing insulation [clo].
-            Note: If you want to input clothing insulation to each body part,
+
+            .. note::
+            If you want to input clothing insulation to each body part,
             it can be input using the dictionaly in "utilities.py" in "jos3_function" folder.
             :py:meth:`pythermalcomfort.jos3_functions.utilities.local_clo_typical_ensembles`.
+
         par : float
             Physical activity ratio [-].
             This equals the ratio of metabolic rate to basal metabolic rate.

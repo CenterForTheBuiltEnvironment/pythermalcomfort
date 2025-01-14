@@ -916,7 +916,7 @@ def calculate_overall_thermal_comfort(
     is_transient : bool, optional
         A flag indicating if the environment is in a transient state. Default is False.
 
-        Note : The way to determine whether transient or not is not described in the paper.
+        .. note:: The way to determine whether transient or not is not described in the paper.
         Original CBE's C++ code always returns False (It might be determined by the time derivative of skin temperature and so on).
 
     is_controlled : bool, optional
