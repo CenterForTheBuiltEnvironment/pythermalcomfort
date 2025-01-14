@@ -13,6 +13,7 @@ from pythermalcomfort.utilities import (
     clo_area_factor,
     clo_insulation_air_layer,
     clo_total_insulation,
+    clo_correction_factor_environment,
 )
 
 
@@ -106,6 +107,64 @@ def test_clo_total_insulation():
             i_cl=[0.6, 0],
         ),
         [0.6, 0.6],
+        atol=0.001,
+    )
+
+
+def test_clo_correction_factor_environment():
+
+    # test that the normal_clothing function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [1, 1, 1],
+        atol=0.001,
+    )
+
+    # compare the normal_clothing results with the figure in the standard
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=2,
+            v_walk=[1, 0.5, 0.25],
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [0.503, 0.564, 0.618],
+        atol=0.001,
+    )
+
+    # test that the nude function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=0,
+        ),
+        [1],
+        atol=0.001,
+    )
+
+    # compare the nude results with the figure in the standard
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=[0.5, 2, 3],
+            v_walk=0.5,
+            i_cl=0,
+        ),
+        [0.698, 0.394, 0.320],
+        atol=0.001,
+    )
+
+    # test that the low_clothing function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=[0.6, 0],
+        ),
+        [1, 1],
         atol=0.001,
     )
 

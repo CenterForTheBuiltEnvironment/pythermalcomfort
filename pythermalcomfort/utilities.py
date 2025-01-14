@@ -800,20 +800,10 @@ def clo_total_insulation(
     i_cl = np.array(i_cl)
 
     def normal_clothing(_vr, _vw, _i_t):
-        return _i_t * np.exp(
-            -0.281 * (_vr - 0.15)
-            + 0.044 * (_vr - 0.15) ** 2
-            - 0.492 * _vw
-            + 0.176 * _vw**2
-        )
+        return _i_t * _correction_normal_clothing(_vw=_vw, _vr=_vr)
 
     def nude(_vr, _vw, _i_a_static):
-        return _i_a_static * np.exp(
-            -0.533 * (_vr - 0.15)
-            + 0.069 * (_vr - 0.15) ** 2
-            - 0.462 * _vw
-            + 0.201 * _vw**2
-        )
+        return _i_a_static * _correction_nude(_vr=_vr, _vw=_vw)
 
     def low_clothing(_vr, _vw, _i_a_static, _i_cl):
         return (
@@ -826,8 +816,68 @@ def clo_total_insulation(
         low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl),
         normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
     )
-    i_t_r = np.where(i_t == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
+    i_t_r = np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
     return i_t_r
+
+
+def clo_correction_factor_environment(
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_cl: Union[float, list[float]],
+):
+    """This function returns the correction factor for the total insulation of the
+    clothing ensemble (I\ :sub:`T`) or the basic/intrinsic insulation (I\ :sub:`cl`).
+    This correction factor takes into account of the fact that the values of (I\
+    :sub:`T`) and (I\ :sub:`cl`) are estimated in static conditions. In real
+    environments the person may be walking, activity may pump air through the clothing,
+    etc.
+
+    Parameters
+    ----------
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, this is the thermal insulation
+        from the skin surface to the outer clothing surface [clo]
+
+    Returns
+    -------
+    correction_factor: float or list of floats
+        correction factor for the total insulation of the clothing ensemble
+        (I\ :sub:`T,r` / (I\ :sub:`T`)) or the basic/intrinsic insulation
+        (I\ :sub:`cl,r` / (I\ :sub:`cl`))
+    """
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_cl = np.array(i_cl)
+
+    def correction_low_clothing(_vr, _vw, _i_cl):
+        return (
+            (0.6 - _i_cl) * _correction_nude(_vr, _vw)
+            + _i_cl * _correction_normal_clothing(_vr, _vw)
+        ) / 0.6
+
+    c_f = np.where(
+        i_cl <= 0.6,
+        correction_low_clothing(_vr=vr, _vw=v_walk, _i_cl=i_cl),
+        _correction_normal_clothing(_vr=vr, _vw=v_walk),
+    )
+    c_f = np.where(i_cl == 0, _correction_nude(_vr=vr, _vw=v_walk), c_f)
+    return c_f
+
+
+def _correction_nude(_vr, _vw):
+    return np.exp(
+        -0.533 * (_vr - 0.15) + 0.069 * (_vr - 0.15) ** 2 - 0.462 * _vw + 0.201 * _vw**2
+    )
+
+
+def _correction_normal_clothing(_vr, _vw):
+    return np.exp(
+        -0.281 * (_vr - 0.15) + 0.044 * (_vr - 0.15) ** 2 - 0.492 * _vw + 0.176 * _vw**2
+    )
 
 
 #: Met values of typical tasks.
