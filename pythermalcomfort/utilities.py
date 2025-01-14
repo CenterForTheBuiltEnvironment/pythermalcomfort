@@ -715,12 +715,12 @@ def clo_insulation_air_layer(
     v_walk: Union[float, list[float]],
     i_a_static: Union[float, list[float]],
 ):
-    """Calculates the insulation of the boundary air layer (I_a). The static boundary
-    air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to 0.15 m/s.
-    Thus, for static conditions, the standard recommends using the value of 0.7 clo
-    (0.109 m2K/W) for the boundary air layer insulation. For walking conditions, the
-    boundary air layer insulation is calculated based on the walking speed (v_walk) and
-    the relative air speed (vr). This equation is extracted from the ISO 9920:2009
+    """Calculates the insulation of the boundary air layer (`I`:sub:`a`). The static
+    boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
+    0.15 m/s. Thus, for static conditions, the standard recommends using the value of
+    0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
+    the boundary air layer insulation is calculated based on the walking speed (v_walk)
+    and the relative air speed (vr). This equation is extracted from the ISO 9920:2009
     standard [29]_ Section 6.
 
     Parameters
@@ -759,19 +759,19 @@ def clo_total_insulation(
     i_a_static: Union[float, list[float]],
     i_cl: Union[float, list[float]],
 ):
-    """Calculates the total insulation of the clothing ensemble (I\ :sub:`T,r`) which is
+    """Calculates the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
     ISO 7790 standard [29]_ provides different equations to calculate it as a function
-    of the total thermal insulation of clothing (I\ :sub:`T`), the insulation of the
-    boundary air layer (I\ :sub:`a`), the walking speed (v\ :sub:`walk`), and the
-    relative air speed (v\ :sub:`r`). These different equations are used if the person
-    is clothed in normal clothing (0.6 clo < (I\ :sub:`cl`) < 1.4 clo or 1.2 clo < (I\
-    :sub:`T`) < 2.0 clo), nude (I\ :sub:`cl` = 0 clo), and if the person is clothed in
-    very light clothing (I\ :sub:`cl` < 0.6 clo). Here we have not implemented the
-    equation for high clothing (I\ :sub:`T` > 2.0 clo). Hence the applicability of this
-    function is limited to 0 clo < (I\ :sub:`T`) < 2.0 clo). You can find all the inputs
+    of the total thermal insulation of clothing (`I`:sub:`T`), the insulation of the
+    boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
+    relative air speed (`v`:sub:`r`). These different equations are used if the person
+    is clothed in normal clothing (0.6 clo < (`I`:sub:`cl`) < 1.4 clo or 1.2 clo <
+    (`I`:sub:`T`) < 2.0 clo), nude (`I`:sub:`cl` = 0 clo), and if the person is clothed
+    in very light clothing (`I`:sub:`cl` < 0.6 clo). Here we have not implemented the
+    equation for high clothing (`I`:sub:`T` > 2.0 clo). Hence the applicability of this
+    function is limited to 0 clo < (`I`:sub:`T`) < 2.0 clo). You can find all the inputs
     required in this function in the ISO 9920:2009 standard [29]_ Annex A.
 
     Parameters
@@ -826,9 +826,9 @@ def clo_correction_factor_environment(
     i_cl: Union[float, list[float]],
 ):
     """This function returns the correction factor for the total insulation of the
-    clothing ensemble (I\ :sub:`T`) or the basic/intrinsic insulation (I\ :sub:`cl`).
-    This correction factor takes into account of the fact that the values of (I\
-    :sub:`T`) and (I\ :sub:`cl`) are estimated in static conditions. In real
+    clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+    This correction factor takes into account of the fact that the values of
+    (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
     environments the person may be walking, activity may pump air through the clothing,
     etc.
 
@@ -846,8 +846,8 @@ def clo_correction_factor_environment(
     -------
     correction_factor: float or list of floats
         correction factor for the total insulation of the clothing ensemble
-        (I\ :sub:`T,r` / (I\ :sub:`T`)) or the basic/intrinsic insulation
-        (I\ :sub:`cl,r` / (I\ :sub:`cl`))
+        (`I`:sub:`T,r` / (`I`:sub:`T`)) or the basic/intrinsic insulation
+        (`I`:sub:`cl,r` / (`I`:sub:`cl`))
     """
     vr = np.array(vr)
     v_walk = np.array(v_walk)
