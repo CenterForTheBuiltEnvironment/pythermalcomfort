@@ -57,6 +57,19 @@ def test_clo_total_insulation():
         atol=0.001,
     )
 
+    # compare the normal_clothing results with the figure in the standard
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=[1.21, 1.26, 1.56],
+            vr=2,
+            v_walk=[1, 0.5, 0.25],
+            i_a_static=0.5,
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [1.21 * 0.5, 1.26 * 0.565, 1.56 * 0.62],
+        atol=0.005,
+    )
+
     # test that the nude function works as expected
     assert np.allclose(
         clo_total_insulation(
@@ -70,6 +83,19 @@ def test_clo_total_insulation():
         atol=0.001,
     )
 
+    # compare the nude results with the figure in the standard
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=0,
+            vr=[0.5, 2, 3],
+            v_walk=0.5,
+            i_a_static=[0.71, 0.61, 0.5],
+            i_cl=0,
+        ),
+        [0.71 * 0.7, 0.61 * 0.4, 0.50 * 0.32],
+        atol=0.004,
+    )
+
     # test that the low_clothing function works as expected
     assert np.allclose(
         clo_total_insulation(
@@ -79,7 +105,7 @@ def test_clo_total_insulation():
             i_a_static=[0.6, 0.6],
             i_cl=[0.6, 0],
         ),
-        [1.2, 0.6],
+        [0.6, 0.6],
         atol=0.001,
     )
 
