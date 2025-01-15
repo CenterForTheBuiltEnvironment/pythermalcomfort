@@ -1,4 +1,4 @@
-from pythermalcomfort.models import athb
+from pythermalcomfort.models import pmv_athb
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -12,6 +12,6 @@ def test_athb(get_test_url, retrieve_data):
         inputs = entry["inputs"]
         outputs = entry["outputs"]
 
-        result = athb(**inputs)
+        result = pmv_athb(**inputs)
 
         validate_result(result, outputs, tolerance)

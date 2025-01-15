@@ -4,10 +4,10 @@ import numpy as np
 
 from pythermalcomfort.classes_input import APMVInputs
 from pythermalcomfort.classes_return import APMV
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 
 
-def a_pmv(
+def pmv_a(
     tdb: Union[float, list[float]],
     tr: Union[float, list[float]],
     vr: Union[float, list[float]],
@@ -107,7 +107,7 @@ def a_pmv(
         units=units,
     )
 
-    _pmv = pmv(
+    _pmv = pmv_ppd_iso(
         tdb,
         tr,
         vr,
@@ -115,7 +115,7 @@ def a_pmv(
         met,
         clo,
         wme,
-        standard="ISO",
+        model="7730-2005",
         units=units,
         limit_inputs=limit_inputs,
     ).pmv

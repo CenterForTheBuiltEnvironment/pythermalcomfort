@@ -27,7 +27,6 @@ class BaseInputs:
     with_solar_load: bool = field(default=False)
     airspeed_control: bool = field(default=True)
     units: str = field(default="SI")
-    standard: str = field(default="ISO")
     a_coefficient: Union[float, int] = field(default=None)
     e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
@@ -58,8 +57,6 @@ class BaseInputs:
         # Only validate attributes that are not None
         if self.units.lower() not in ["si", "ip"]:
             raise ValueError("Units must be either 'SI' or 'IP'")
-        if self.standard.lower() not in ["ashrae", "iso"]:
-            raise ValueError("Standard must be either 'ASHRAE', 'ISO'")
         if self.position is not None:
             if self.position.lower() not in [
                 "sitting",
@@ -530,7 +527,6 @@ class PMVInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        standard="ISO",
         units="SI",
         limit_inputs=True,
         airspeed_control=True,
@@ -544,7 +540,6 @@ class PMVInputs(BaseInputs):
             met=met,
             clo=clo,
             wme=wme,
-            standard=standard,
             units=units,
             limit_inputs=limit_inputs,
             airspeed_control=airspeed_control,
@@ -562,7 +557,6 @@ class PMVPPDInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        standard="ISO",
         units="SI",
         limit_inputs=True,
         airspeed_control=True,
@@ -576,7 +570,6 @@ class PMVPPDInputs(BaseInputs):
             met=met,
             clo=clo,
             wme=wme,
-            standard=standard,
             units=units,
             limit_inputs=limit_inputs,
             airspeed_control=airspeed_control,

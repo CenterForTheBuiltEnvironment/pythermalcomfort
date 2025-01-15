@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
     units_converter,
@@ -114,7 +114,7 @@ def ankle_draft(
             "This equation is only applicable for air speed lower than 0.2 m/s"
         )
 
-    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae").pmv
+    tsv = pmv_ppd_ashrae(tdb, tr, vr, rh, met, clo, model="55-2023").pmv
     ppd_val = np.around(
         np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)
         / (1 + np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv))

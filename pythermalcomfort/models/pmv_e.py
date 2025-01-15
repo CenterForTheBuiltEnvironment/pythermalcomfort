@@ -4,10 +4,10 @@ import numpy as np
 
 from pythermalcomfort.classes_input import EPMVInputs
 from pythermalcomfort.classes_return import EPMV
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 
 
-def e_pmv(
+def pmv_e(
     tdb: Union[float, list[float]],
     tr: Union[float, list[float]],
     vr: Union[float, list[float]],
@@ -118,9 +118,29 @@ def e_pmv(
 
     default_kwargs = {"units": units, "limit_inputs": limit_inputs}
     met = np.array(met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
+    _pmv = pmv_ppd_iso(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        model="7730-2005",
+        **default_kwargs,
+    ).pmv
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
+    _pmv = pmv_ppd_iso(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        model="7730-2005",
+        **default_kwargs,
+    ).pmv
 
     e_pmv_value = np.around(_pmv * e_coefficient, 2)
 

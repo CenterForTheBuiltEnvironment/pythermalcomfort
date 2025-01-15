@@ -17,30 +17,6 @@ Adaptive EN
 .. autoclass:: pythermalcomfort.classes_return.AdaptiveEN
     :members:
 
-Adaptive Predicted Mean Vote (aPMV)
------------------------------------
-
-.. autofunction:: pythermalcomfort.models.a_pmv.a_pmv
-
-.. autoclass:: pythermalcomfort.classes_return.APMV
-    :members:
-
-Adaptive Thermal Heat Balance (ATHB)
-------------------------------------
-
-.. autofunction:: pythermalcomfort.models.athb.athb
-
-.. autoclass:: pythermalcomfort.classes_return.ATHB
-    :members:
-
-Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
------------------------------------------------------------
-
-.. autofunction:: pythermalcomfort.models.e_pmv.e_pmv
-
-.. autoclass:: pythermalcomfort.classes_return.EPMV
-    :members:
-
 Apparent Temperature (AT)
 -------------------------
 
@@ -140,17 +116,87 @@ Physiological Equivalent Temperature (PET)
 Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 ------------------------------------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.pmv_ppd.pmv_ppd
+The Predicted Mean Vote (PMV) is an index that aims to predict the mean value of thermal sensation votes from a large group of people, based on a seven-point scale ranging from "cold" (-3) to "hot" (+3).
+It was developed by Fanger [30]_.
+
+The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [2]_.
+It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [1]_.
+
+The PMV can be used to check if a thermal environment meets comfort criteria and to establish requirements for different levels of acceptability.
+The PMV model is applicable to healthy men and women exposed to indoor environments where thermal comfort is desirable, but moderate deviations from thermal comfort occur, in the design of new environments or the assessment of existing ones.
+The PMV is intended to be used for moderate thermal environments.
+
+The PMV calculation considers several factors:
+  *   **Dry-bulb air temperature** (`T` :sub:`db`).
+  *   **Mean radiant temperature** (`T` :sub:`r`).
+  *   **Relative humidity** (RH).
+  *   **Relative air velocity** (`V` :sub:`r`), the relative air speed caused by body movement and not the air speed measured by the air speed sensor
+  *   **Metabolic rate** (M), which is the rate of heat production in the body. Metabolic rate data is available in the ASHRAE Handbook—Fundamentals and users should use their judgement to match activities to comparable activities in the table.
+  *   **Clothing insulation** (`I` :sub:`cl,r`), dynamic intrinsic insulation, this is the thermal insulation from the skin surface to the outer clothing surface, including enclosed air layers, under the environmental conditions.
+
+The PMV model is applicable when the six main parameters are within specific intervals.
+These values are specified by the ASHRAE 55 [1]_ and ISO 7730 standards [2]_.
+The ISO also states that the PMV model is only applicable for PMV between -2 and +2 [2]_.
+
+The PMV model has been shown to have low accuracy in predicting thermal sensation votes, especially outside thermal neutrality, with a prediction accuracy of approximately 34% [31]_.
+For this reason, it is recommended that the use of the PMV be restricted to values between -0.5 and +0.5, where an environment may be deemed thermally neutral by a large group of occupants.
+
+The Predicted Percentage Dissatisfied (PPD) is an index that provides a **quantitative prediction of the percentage of people likely to feel too warm or too cool in a given environment**.
+The PPD is derived from the PMV.
+Specifically, **the PPD predicts the number of thermally dissatisfied persons among a large group of people,** where thermally dissatisfied people are those who would vote hot, warm, cool, or cold on a seven-point thermal sensation scale.
+
+
+PMV formulations
+~~~~~~~~~~~~~~~~
+After Fanger developed the original PMV model which it is still included in the ISO 7330 in its original form, several other PMV formulations have been proposed.
+These include but are not limited to:
+
+  *  the aPMV model [25]_ :py:meth:`pythermalcomfort.models.pmv_a.pmv_a`,
+  *  the ASHRAE 55 PMV model [1]_ :py:meth:`pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae`,
+  *  the ATHB model [27]_ :py:meth:`pythermalcomfort.models.pmv_athb.pmv_athb`,
+  *  the ePMV model [26]_ :py:meth:`pythermalcomfort.models.pmv_e.pmv_e`.
+
+
+ISO 7730 - PMV and PPD
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.pmv_ppd_iso.pmv_ppd_iso
 
 .. autoclass:: pythermalcomfort.classes_return.PMVPPD
     :members:
 
-Predicted Mean Vote (PMV)
--------------------------
 
-.. autofunction:: pythermalcomfort.models.pmv.pmv
+ASHRAE 55 - PMV and PPD
+~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: pythermalcomfort.classes_return.PMV
+.. autofunction:: pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae
+
+.. autoclass:: pythermalcomfort.classes_return.PMVPPD
+    :noindex:
+    :members:
+
+Adaptive Predicted Mean Vote (aPMV)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.pmv_a.pmv_a
+
+.. autoclass:: pythermalcomfort.classes_return.APMV
+    :members:
+
+Adaptive Thermal Heat Balance (ATHB)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.pmv_athb.pmv_athb
+
+.. autoclass:: pythermalcomfort.classes_return.ATHB
+    :members:
+
+Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.pmv_e.pmv_e
+
+.. autoclass:: pythermalcomfort.classes_return.EPMV
     :members:
 
 Solar gain on people
@@ -405,6 +451,11 @@ Air insulation layer (I\ :sub:`a`)
 
 .. autofunction:: pythermalcomfort.utilities.clo_insulation_air_layer
 
+Correction factor for (I\ :sub:`T`)
+-----------------------------------
+
+.. autofunction:: pythermalcomfort.utilities.clo_correction_factor_environment
+
 Clothing area factor (f\ :sub:`cl`)
 -----------------------------------
 
@@ -617,7 +668,7 @@ Proper planning and execution ensure their effectiveness in diagnosing issues an
 References
 ==========
 
-.. [1] ANSI, & ASHRAE. (2020). Thermal Environmental Conditions for Human Occupancy. Atlanta.
+.. [1] ANSI, & ASHRAE. (2023). Thermal Environmental Conditions for Human Occupancy. Atlanta.
 .. [2] ISO. (2005). ISO 7730 - Ergonomics of the thermal environment — Analytical determination and interpretation of thermal comfort using calculation of the PMV and PPD indices and local thermal comfort criteria.
 .. [3] EN, & BSI. (2019). Energy performance of buildings - Ventilation for buildings. BSI Standards Limited 2019.
 .. [4] Schiavon, S., & Lee, K. H. (2013). Dynamic predictive clothing insulation models based on outdoor air and indoor operative temperatures. Building and Environment, 59, 250–260. doi.org/10.1016/j.buildenv.2012.08.024
@@ -645,4 +696,7 @@ References
 .. [27] Schweiker, M., 2022. Combining adaptive and heat balance models for thermal sensation prediction: A new approach towards a theory and data‐driven adaptive thermal heat balance model. Indoor Air 32, 1–19. DOI: doi.org/10.1111/ina.13018
 .. [28] Lu, Y.C. and Romps, D.M., Extending the Heat Index to Quantify the Physiological Response to Future Warming: A Modelling Study. Available at SSRN 3739854.
 .. [29] ISO, EN (2009). ISO 9920 - Ergonomics of the thermal environment. Estimation of thermal insulation and water vapour resistance of a clothing ensemble
+.. [30] Fanger, P. O. (1970). Thermal comfort: analysis and applications in environmental engineering. McGraw-Hill, New York.
+.. [31] T. Cheung, S. Schiavon, T. Parkinson, P. Li, G. Brager, Analysis of the accuracy on PMV – PPD model using the ASHRAE Global Thermal Comfort Database II, Building and Environment 153
+(2019) 205–217. doi:10.1016/j.buildenv.2019.01.055.
 

@@ -134,7 +134,7 @@ def set_tmp(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            "ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
+            standard="ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
         )
         all_valid = ~(
             np.isnan(tdb_valid)
