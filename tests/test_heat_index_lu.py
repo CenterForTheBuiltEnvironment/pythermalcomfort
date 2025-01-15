@@ -1,23 +1,6 @@
 import numpy as np
-import pytest
 
-from pythermalcomfort.classes_input import HIModels
-from pythermalcomfort.models import heat_index
-from tests.conftest import Urls, retrieve_reference_table, validate_result
-
-
-def test_heat_index(get_test_url, retrieve_data):
-    reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.HEAT_INDEX.name
-    )
-    tolerance = reference_table["tolerance"]
-
-    for entry in reference_table["data"]:
-        inputs = entry["inputs"]
-        outputs = entry["outputs"]
-        result = heat_index(**inputs, model=HIModels.rothfusz.value)
-
-        validate_result(result, outputs, tolerance)
+from pythermalcomfort.models import heat_index_lu
 
 
 def test_extended_heat_index():
@@ -80,16 +63,11 @@ def test_extended_heat_index():
     ]
     for t in range(200, 380, 10):
         for rh in [0, 0.5, 1]:
-            hi = heat_index(t - 273.15, rh * 100, model=HIModels.lu_romps.value).hi
+            hi = heat_index_lu(t - 273.15, rh * 100).hi
             assert np.isclose(hi + 273.15, hi_test_values[index], atol=1)
             index += 1
 
 
 def test_extended_heat_index_array_input():
-    hi = heat_index([20, 40], 50, model=HIModels.lu_romps.value).hi
+    hi = heat_index_lu([20, 40], 50).hi
     assert np.allclose(hi, [19.0, 63.4], atol=0.1)
-
-
-def test_wrong_model():
-    with pytest.raises(ValueError):
-        heat_index(tdb=25, rh=50, model="random")

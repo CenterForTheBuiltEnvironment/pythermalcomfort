@@ -102,9 +102,30 @@ Gagge two-node model
 Heat Index (HI)
 ---------------
 
-.. autofunction:: pythermalcomfort.models.heat_index.heat_index
+The Heat Index (HI) is a commonly used metric to estimate apparent temperature (AT) incorporating the effects of humidity based on Steadman’s model [13]_ of human thermoregulation.
+
+Lu and Romps (2022) [28]_ found that Steadman’s model produces unrealistic results under extreme conditions, such as excessively hot and humid or cold and dry environments, rendering the heat index undefined.
+For instance, at 80% relative humidity, the heat index is only valid within a temperature range of 288–304 K.
+To address this issue, Lu and Romps (2022) [28]_ developed a new model that extends the range of validity of the heat index.
+
+pythermalcomfort therefore includes two equations to calculate the Heat Index. One in accordance with the new Lu and Romps (2022) model which is an extension of the first version of Steadman’s (1979) apparent temperature :py:class:`~pythermalcomfort.models.heat_index_lu.heat_index_lu`.
+The other is developed by Rothfusz (1990) and it is a simplified model derived by multiple regression analysis in temperature and relative humidity from the first version of Steadman’s (1979) apparent temperature (AT) [12]_ :py:class:`~pythermalcomfort.models.heat_index_rothfusz.heat_index_rothfusz`.
+
+Heat Index (HI) Lu and Romps (2022)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.heat_index_lu.heat_index_lu
 
 .. autoclass:: pythermalcomfort.classes_return.HI
+    :members:
+
+Heat Index (HI) Rothfusz (1990)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.models.heat_index_rothfusz.heat_index_rothfusz
+
+.. autoclass:: pythermalcomfort.classes_return.HI
+    :noindex:
     :members:
 
 Humidex

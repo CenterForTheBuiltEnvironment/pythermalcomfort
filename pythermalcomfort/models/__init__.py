@@ -7,7 +7,8 @@ from pythermalcomfort.models.clo_tout import clo_tout
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.discomfort_index import discomfort_index
 from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
-from pythermalcomfort.models.heat_index import heat_index
+from pythermalcomfort.models.heat_index_lu import heat_index_lu
+from pythermalcomfort.models.heat_index_rothfusz import heat_index_rothfusz
 from pythermalcomfort.models.humidex import humidex
 from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.net import net
@@ -28,7 +29,8 @@ from pythermalcomfort.models.wci import wci
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
 
 __all__ = [
-    "heat_index",
+    "heat_index_lu",
+    "heat_index_rothfusz",
     "pet_steady",
     "wci",
     "humidex",

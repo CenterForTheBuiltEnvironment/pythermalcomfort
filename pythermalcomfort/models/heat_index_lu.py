@@ -7,27 +7,12 @@ from pythermalcomfort.classes_input import HIInputs, HIModels
 from pythermalcomfort.classes_return import HI
 
 
-def heat_index(
+def heat_index_lu(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
     round_output: bool = True,
-    model: str = "default",
 ) -> HI:
-    """The Heat Index (HI) is a commonly used metric to estimate apparent temperature
-    (AT) incorporating the effects of humidity based on Steadman’s model [13]_ of human
-    thermoregulation. Lu and Romps (2022) [28]_ found that Steadman’s model produces
-    unrealistic results under extreme conditions, such as excessively hot and humid or
-    cold and dry environments, rendering the heat index undefined. For instance, at 80%
-    relative humidity, the heat index is only valid within a temperature range of
-    288–304 K. To address this issue, Lu and Romps (2022) [28]_ developed a new model
-    that extends the range of validity of the heat index.
-
-    pythermalcomfort therefore includes two equations to calculate the Heat Index.
-    One in accordance with the new Lu and Romps (2022) model which is an extension of
-    the first version of Steadman’s (1979) apparent temperature. The other is developed by
-    Rothfusz (1990) and it is a simplified model derived by multiple regression analysis
-    in temperature and relative humidity from the first version of Steadman’s (1979)
-    apparent temperature (AT) [12]_.
+    """The Heat Index (HI) calculated in accordance with the Lu and Romps (2022) model [28]_.
 
     Parameters
     ----------
@@ -37,26 +22,20 @@ def heat_index(
         Relative humidity, [%].
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
-    model : str, optional
-        The model to be used for the calculation. Options are 'rothfusz' and 'lu-romps'. Defaults to 'lu-romps'.
-
-        .. note::
-            The 'rothfusz' model is the Rothfusz (1990) model [12]_.
-            The 'lu-romps' model is the Lu and Romps (2022) [28]_ model.
 
     Returns
     -------
     HI
-        A dataclass containing the Heat Index. See :py:class:`~pythermalcomfort.models.heat_index.HI` for more details.
+        A dataclass containing the Heat Index. See :py:class:`~pythermalcomfort.classes_return.HI` for more details.
         To access the `hi` value, use the `hi` attribute of the returned `HI` instance, e.g., `result.hi`.
 
     Examples
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import heat_index
+        from pythermalcomfort.models import heat_index_lu
 
-        result = heat_index(tdb=25, rh=50)
+        result = heat_index_lu(tdb=25, rh=50)
         print(result.hi)  # 25.9
     """
     # Validate inputs using the HeatIndexInputs class
@@ -66,23 +45,10 @@ def heat_index(
         round_output=round_output,
     )
 
-    if model not in [model.value for model in HIModels]:
-        raise ValueError(
-            "Invalid model. The model must be either 'rothfusz' or 'lu-romps'"
-        )
-
     tdb = np.array(tdb)
     rh = np.array(rh)
 
-    hi = None
-
-    if model == HIModels.rothfusz.value:
-        hi = -8.784695 + 1.61139411 * tdb + 2.338549 * rh - 0.14611605 * tdb * rh
-        hi += -1.2308094 * 10**-2 * tdb**2 - 1.6424828 * 10**-2 * rh**2
-        hi += 2.211732 * 10**-3 * tdb**2 * rh + 7.2546 * 10**-4 * tdb * rh**2
-        hi += -3.582 * 10**-6 * tdb**2 * rh**2
-    elif model == HIModels.lu_romps.value:
-        hi = _lu_heat_index_vectorized(tdb + 273.15, rh / 100) - 273.15
+    hi = _lu_heat_index_vectorized(tdb + 273.15, rh / 100) - 273.15
 
     if round_output:
         hi = np.around(hi, 1)
