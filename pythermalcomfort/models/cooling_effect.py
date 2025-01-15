@@ -21,7 +21,7 @@ def cooling_effect(
     units: Literal["SI", "IP"] = "SI",
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
-    with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
+    with the ASHRAE 55 2020 Standard [ASHRAE552023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under
     still air as in the first `SET`_ calculation under elevated air speed. The
@@ -42,7 +42,7 @@ def cooling_effect(
         .. note::
             The cooling effect is calculated only for air speed higher than 0.1 m/s. If the air speed is lower than 0.1 m/s the function will return 0.
 
-        .. warning::
+        .. note::
             vr is the relative air speed caused by body movement and not the air
             speed measured by the air speed sensor. The relative air speed is the sum of the
             average air speed measured by the sensor plus the activity-generated air speed
@@ -57,10 +57,10 @@ def cooling_effect(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
-            the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
             for the effect of the body movement for met equal or higher than 1.2 met using
             the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
             can be calculated using the function
@@ -75,12 +75,12 @@ def cooling_effect(
     Returns
     -------
     CE
-        A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.models.cooling_effect.CoolingEffect` for more details.
+        A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.classes_return.CoolingEffect` for more details.
         To access the `ce` value, use the `ce` attribute of the returned `CoolingEffect` instance, e.g., `result.ce`.
 
     Notes
     -----
-    .. warning::
+    .. note::
         Limitations:
         - This equation may not be accurate for extreme temperature ranges.
 

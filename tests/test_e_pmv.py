@@ -1,4 +1,4 @@
-from pythermalcomfort.models import e_pmv
+from pythermalcomfort.models import pmv_e
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -11,6 +11,6 @@ def test_e_pmv(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        result = e_pmv(**inputs)
+        result = pmv_e(**inputs)
 
         validate_result(result, outputs, tolerance)

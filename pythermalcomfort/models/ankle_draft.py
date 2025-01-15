@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
     units_converter,
@@ -22,7 +22,7 @@ def ankle_draft(
     units: str = "SI",
 ) -> AnkleDraft:
     """Calculates the percentage of thermally dissatisfied people with the
-    ankle draft (0.1 m) above floor level [23]_.
+    ankle draft (0.1 m) above floor level [liu2017]_.
 
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
@@ -41,7 +41,7 @@ def ankle_draft(
     vr : float or list of floats
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        .. warning::
+        .. note::
             `vr` is the relative air speed caused by body movement and not the air speed measured by the air speed sensor.
             The relative air speed is the sum of the average air speed measured by the sensor plus the activity-generated air speed (Vag).
             Vag is the activity-generated air speed caused by motion of individual body parts.
@@ -56,7 +56,7 @@ def ankle_draft(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             The activity as well as the air speed modify the insulation characteristics of the clothing and the adjacent air layer.
             Consequently, the ISO 7730 states that the clothing insulation shall be corrected.
             The ASHRAE 55 Standard corrects for the effect of the body movement for met equal or higher than 1.2 met using the equation
@@ -72,7 +72,7 @@ def ankle_draft(
     Returns
     -------
     AnkleDraft
-        Dataclass containing the results of the ankle draft calculation. See :py:class:`~pythermalcomfort.models.ankle_draft.AnkleDraft` for more details.
+        Dataclass containing the results of the ankle draft calculation. See :py:class:`~pythermalcomfort.classes_return.AnkleDraft` for more details.
 
     Examples
     --------
@@ -114,7 +114,7 @@ def ankle_draft(
             "This equation is only applicable for air speed lower than 0.2 m/s"
         )
 
-    tsv = pmv(tdb, tr, vr, rh, met, clo, standard="ashrae").pmv
+    tsv = pmv_ppd_ashrae(tdb, tr, vr, rh, met, clo, model="55-2023").pmv
     ppd_val = np.around(
         np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)
         / (1 + np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv))

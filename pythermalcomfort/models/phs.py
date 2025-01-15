@@ -25,7 +25,7 @@ def phs(
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [8]_. The ISO 7933 provides a method for
+    with the ISO 7933:2004 Standard [iso79332004]_. The ISO 7933 provides a method for
     the analytical evaluation and interpretation of the thermal stress
     experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
@@ -105,7 +105,7 @@ def phs(
     Returns
     -------
     PHS
-        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.models.phs.PHS` for more details.
+        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.classes_return.PHS` for more details.
         To access the individual attributes, use the corresponding attribute of the returned `PHS` instance, e.g., `result.t_re`.
 
     Examples
@@ -302,7 +302,7 @@ const_sw = math.exp(-1 / 10)
 
 
 @np.vectorize
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _phs_optimized(
     tdb,
     tr,

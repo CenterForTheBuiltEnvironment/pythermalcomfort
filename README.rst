@@ -1,6 +1,39 @@
-========
-Overview
-========
+================
+pythermalcomfort
+================
+
+The `pythermalcomfort` Python package provides tools for calculating thermal comfort indices and metrics based on various international standards. Key features include:
+
+- **Comprehensive Thermal Comfort Calculations**: Supports multiple thermal comfort models, including PMV, PPD, adaptive comfort, and SET.
+- **Standards Compliance**: Implements calculations based on many standards including: ASHRAE 55, ISO 7730, and EN 16798 standards.
+- **Ease of Use**: Simple and intuitive API for integrating thermal comfort calculations into your projects.
+- **Extensive Documentation**: Detailed documentation and examples to help users understand and utilize the package effectively.
+- **Active Development**: Regular updates and improvements based on user feedback and advancements in thermal comfort research.
+
+Benefits for users:
+
+- **Accurate Assessments**: Provides reliable and accurate thermal comfort assessments for various environments.
+- **Time-Saving**: Reduces the time and effort required to perform complex thermal comfort calculations.
+- **Versatility**: Suitable for researchers, engineers, and professionals in the field of building science and environmental design.
+- **Enhanced Decision-Making**: Helps in making informed decisions regarding HVAC system design, building performance, and occupant comfort.
+
+====
+Cite
+====
+
+Please cite the package as follows: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578
+
+.. include:: ./installation.rst
+
+=============
+Documentation
+=============
+
+The full documentation is available at: https://pythermalcomfort.readthedocs.io/
+
+=====
+Stats
+=====
 
 .. start-badges
 
@@ -66,39 +99,3 @@ Overview
     :target: https://pypi.org/project/pythermalcomfort
 
 .. end-badges
-
-pythermalcomfort
-================
-
-`pythermalcomfort` is a Python package for calculating several thermal comfort indices (e.g., PMV, PPD, SET, adaptive) and converting physical variables.
-Please check the `Functions documentation Section <https://pythermalcomfort.readthedocs.io/en/latest/reference/index.html>`_ for a list of all the functions available in the package.
-
-**Please cite us if you use this package:**
-
-Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578
-
-Installation
-============
-
-To install `pythermalcomfort`, use pip:
-
-::
-
-    pip install pythermalcomfort
-
-Documentation
-=============
-
-The full documentation is available at: https://pythermalcomfort.readthedocs.io/
-
-Examples and Tutorials
-======================
-
-We have provided examples on how to use all the functions in the documentation page right below the function definition.
-
-Find example files and tutorials on how to use some of the functions at: https://pythermalcomfort.readthedocs.io/en/latest/usage.html
-
-Contributing
-============
-
-Contributions are welcome and greatly appreciated! Every little bit helps, and credit will always be given. Learn more about how to contribute to the project here: https://pythermalcomfort.readthedocs.io/en/latest/contributing.html

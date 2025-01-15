@@ -51,13 +51,13 @@ def adaptive_ashrae(
     limit_inputs : bool, optional
         If True, returns nan for inputs outside standard limits. Defaults to True.
 
-        .. warning::
+        .. note::
             ASHRAE 55 2020 limits: 10 < tdb [°C] < 40, 10 < tr [°C] < 40, 0 < vr [m/s] < 2, 10 < t_running_mean [°C] < 33.5.
 
     Returns
     -------
     AdaptiveASHRAE
-        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE` for more details.
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.classes_return.AdaptiveASHRAE` for more details.
 
     Examples
     --------

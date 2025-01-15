@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
-from pythermalcomfort.models.two_nodes import two_nodes
+from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
 )
@@ -30,7 +30,7 @@ def set_tmp(
     (20 fpm) average air speed (v), and tr = tdb, in which the total heat loss
     from the skin of an imaginary occupant wearing clothing, standardized for
     the activity concerned is the same as that from a person in the actual
-    environment with actual clothing and activity level. [10]_
+    environment with actual clothing and activity level. [gagge1986]_
 
     Parameters
     ----------
@@ -73,7 +73,7 @@ def set_tmp(
     Returns
     -------
     SET
-        A dataclass containing the Standard Effective Temperature. See :py:class:`~pythermalcomfort.models.set.SetTmp` for more details.
+        A dataclass containing the Standard Effective Temperature. See :py:class:`~pythermalcomfort.classes_return.SetTmp` for more details.
         To access the `set` value, use the corresponding attribute of the returned `SetTmp` instance, e.g., `result.set`.
 
     Examples
@@ -111,7 +111,7 @@ def set_tmp(
         limit_inputs=limit_inputs,
     )
 
-    set_array = two_nodes(
+    set_array = gagge_two_nodes(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -134,7 +134,7 @@ def set_tmp(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            "ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
+            standard="ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
         )
         all_valid = ~(
             np.isnan(tdb_valid)

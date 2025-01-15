@@ -27,7 +27,7 @@ def utci(
     heat stress in outdoor spaces. The parameters that are taken into account for
     calculating UTCI involve dry bulb temperature, mean radiation temperature, the
     pressure of water vapor or relative humidity, and wind speed (at the elevation of 10
-    m above the ground). [7]_
+    m above the ground). [zare2018]_
 
     Parameters
     ----------
@@ -53,7 +53,7 @@ def utci(
     -------
     UTCI
         A dataclass containing the Universal Thermal Climate Index and stress category.
-        See :py:class:`~pythermalcomfort.models.utci.Utci` for more details. To access the
+        See :py:class:`~pythermalcomfort.classes_return.UTCI` for more details. To access the
         `utci` and `stress_category` values, use the corresponding attributes of the
         returned `Utci` instance, e.g., `result.utci`.
 
@@ -153,6 +153,7 @@ def utci(
             float64,
         )
     ],
+    cache=True,
 )
 def _utci_optimized(tdb, v, delta_t_tr, pa):
     return (

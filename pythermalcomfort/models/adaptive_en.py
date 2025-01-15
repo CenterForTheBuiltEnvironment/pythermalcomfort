@@ -17,7 +17,7 @@ def adaptive_en(
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> AdaptiveEN:
-    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [3]_
+    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [EN2019]_
 
     Parameters
     ----------
@@ -50,7 +50,7 @@ def adaptive_en(
     Returns
     -------
     AdaptiveEN
-        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_en.AdaptiveEN` for more details.
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.classes_return.AdaptiveEN` for more details.
 
 
     Examples

@@ -25,9 +25,9 @@ def net(
     (37°C). The NET is still in use in Germany, where medical check-ups for
     subjects working in the heat are decided on by prevailing levels of ET,
     depending on metabolic rates. The NET is also constantly monitored by the
-    Hong Kong Observatory [16]_. In central Europe the following thresholds are
+    Hong Kong Observatory [Blazejczyk2012]_. In central Europe the following thresholds are
     in use: <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
-    23–27 = warm; >27°C = hot [16]_.
+    23–27 = warm; >27°C = hot [Blazejczyk2012]_.
 
     Parameters
     ----------
@@ -43,7 +43,7 @@ def net(
     Returns
     -------
     NET
-        A dataclass containing the Normal Effective Temperature. See :py:class:`~pythermalcomfort.models.net.Net` for more details.
+        A dataclass containing the Normal Effective Temperature. See :py:class:`~pythermalcomfort.classes_return.Net` for more details.
         To access the `net` value, use the `net` attribute of the returned `Net` instance, e.g., `result.net`.
 
     Examples

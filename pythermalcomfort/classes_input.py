@@ -27,7 +27,6 @@ class BaseInputs:
     with_solar_load: bool = field(default=False)
     airspeed_control: bool = field(default=True)
     units: str = field(default="SI")
-    standard: str = field(default="ISO")
     a_coefficient: Union[float, int] = field(default=None)
     e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
@@ -58,8 +57,6 @@ class BaseInputs:
         # Only validate attributes that are not None
         if self.units.lower() not in ["si", "ip"]:
             raise ValueError("Units must be either 'SI' or 'IP'")
-        if self.standard.lower() not in ["ashrae", "iso"]:
-            raise ValueError("Standard must be either 'ASHRAE', 'ISO'")
         if self.position is not None:
             if self.position.lower() not in [
                 "sitting",
@@ -395,20 +392,23 @@ class EPMVInputs(BaseInputs):
         )
 
 
+class HIModels(Enum):
+    rothfusz = "rothfusz"
+    lu_romps = "lu-romps"
+
+
 @dataclass
 class HIInputs(BaseInputs):
     def __init__(
         self,
         tdb,
         rh,
-        units,
         round_output,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
-            units=units,
             round_output=round_output,
         )
 
@@ -527,7 +527,6 @@ class PMVInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        standard="ISO",
         units="SI",
         limit_inputs=True,
         airspeed_control=True,
@@ -541,7 +540,6 @@ class PMVInputs(BaseInputs):
             met=met,
             clo=clo,
             wme=wme,
-            standard=standard,
             units=units,
             limit_inputs=limit_inputs,
             airspeed_control=airspeed_control,
@@ -559,7 +557,6 @@ class PMVPPDInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        standard="ISO",
         units="SI",
         limit_inputs=True,
         airspeed_control=True,
@@ -573,7 +570,6 @@ class PMVPPDInputs(BaseInputs):
             met=met,
             clo=clo,
             wme=wme,
-            standard=standard,
             units=units,
             limit_inputs=limit_inputs,
             airspeed_control=airspeed_control,
@@ -643,7 +639,7 @@ class SolarGainInputs(BaseInputs):
 
 
 @dataclass
-class TwoNodesInputs(BaseInputs):
+class GaggeTwoNodesInputs(BaseInputs):
     def __init__(
         self,
         tdb,

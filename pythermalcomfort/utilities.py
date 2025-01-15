@@ -163,7 +163,7 @@ def wet_bulb_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the wet-bulb temperature using the Stull equation [6]_
+    """Calculates the wet-bulb temperature using the Stull equation [stull2011]_
 
     Parameters
     ----------
@@ -228,7 +228,7 @@ def mean_radiant_tmp(
 ):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [5]_.
+    7726:1998 Standard [ISO77261998]_.
 
     Parameters
     ----------
@@ -249,7 +249,7 @@ def mean_radiant_tmp(
         to better determine the free and forced convection coefficient used in the
         calculation of the mean radiant temperature. They also showed that mean radiant
         temperature measured with ping-pong ball-sized globe thermometers is not reliable
-        due to a stochastic convective bias [22]_. The Mixed Convection model has only
+        due to a stochastic convective bias [Teitelbaum]_. The Mixed Convection model has only
         been validated for globe sensors with a diameter between 0.04 and 0.15 m.
 
     Returns
@@ -315,12 +315,12 @@ def mean_radiant_tmp(
 
         return np.around(tr, 1)
 
-    if standard == "iso":
+    if standard == "iso":  # pragma: no branch
         tg = np.add(tg, c_to_k)
         tdb = np.add(tdb, c_to_k)
 
         # calculate heat transfer coefficient
-        h_n = np.power(1.4 * (np.abs(tg - tdb) / d), 0.25)  # natural convection
+        h_n = 1.4 * np.power(np.abs(tg - tdb) / d, 0.25)  # natural convection
         h_f = 6.3 * np.power(v, 0.6) / np.power(d, 0.4)  # forced convection
 
         # get the biggest between the two coefficients
@@ -525,7 +525,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     Estimates the dynamic clothing insulation of a moving occupant. The activity as well
     as the air speed modify the insulation characteristics of the clothing and the
     adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
-    shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect of the body
+    shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects for the effect of the body
     movement for met equal or higher than 1.2 met using the equation clo = Icl × (0.6 +
     0.4/met)
 
@@ -567,9 +567,9 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
         t_{day-n}]`.
         Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
-        16798-1 2019 [3]_ states that n should be equal to 7
+        16798-1 2019 [EN2019]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
+        constant between 0 and 1. The EN 16798-1 2019 [EN2019]_ recommends a value of 0.8,
         while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
@@ -641,7 +641,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998 [5]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [ISO77261998]_
 
     Parameters
     ----------
@@ -666,6 +666,218 @@ def operative_tmp(
         a = np.where(v < 0.6, 0.6, 0.7)
         a = np.where(v < 0.2, 0.5, a)
         return a * tdb + (1 - a) * tr
+
+
+def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
+    """Calculates the intrinsic insulation of a clothing ensemble based on individual
+    garments. This equation is in accordance with the ISO 9920:2009 standard [iso9920]_
+    Section 4.3. It should be noted that this equation is only valid for clothing
+    ensembles with rather uniform insulation values across the body.
+
+    Parameters
+    ----------
+    clo_garments:  floats or list of floats
+        list of floats containing the clothing insulation for each individual garment
+
+    Returns
+    -------
+    i_cl: float
+        intrinsic insulation of the clothing ensemble, [clo]
+    """
+    clo_garments = np.array(clo_garments)
+    return np.sum(clo_garments) * 0.835 + 0.161
+
+
+def clo_area_factor(i_cl: Union[float, list[float]]):
+    """Calculates the clothing area factor (f_cl) of the clothing ensemble as a function
+    of the intrinsic insulation of the clothing ensemble. This equation is in accordance
+    with the ISO 9920:2009 standard [iso9920]_ Section 5. The standard warns that the
+    correlation between f_cl and i_cl is low especially for non-western clothing
+    ensembles. The application of this equation is limited to clothing ensembles with
+    clo values between 0.2 and 1.7 clo.
+
+    Parameters
+    ----------
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, [clo]
+
+    Returns
+    -------
+    f_cl: float or list of floats
+        area factor of the clothing ensemble, [m2]
+    """
+    i_cl = np.array(i_cl)
+    return 1 + 0.28 * i_cl
+
+
+def clo_insulation_air_layer(
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_a_static: Union[float, list[float]],
+):
+    """Calculates the insulation of the boundary air layer (`I`:sub:`a`). The static
+    boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
+    0.15 m/s. Thus, for static conditions, the standard recommends using the value of
+    0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
+    the boundary air layer insulation is calculated based on the walking speed (v_walk)
+    and the relative air speed (vr). This equation is extracted from the ISO 9920:2009
+    standard [iso9920]_ Section 6.
+
+    Parameters
+    ----------
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_a_static: float or list of floats
+        static boundary air layer insulation, [clo]
+
+    Returns
+    -------
+    i_a: float or list of floats
+        boundary air layer insulation, [clo]
+    """
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_a_static = np.array(i_a_static)
+
+    return (
+        np.exp(
+            -0.533 * (vr - 0.15)
+            + 0.069 * (vr - 0.15) ** 2
+            - 0.462 * v_walk
+            + 0.201 * v_walk**2
+        )
+        * i_a_static
+    )
+
+
+def clo_total_insulation(
+    i_t: Union[float, list[float]],
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_a_static: Union[float, list[float]],
+    i_cl: Union[float, list[float]],
+):
+    """Calculates the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
+    the actual thermal insulation from the body surface to the environment, considering
+    all clothing, enclosed air layers, and boundary air layers under given environmental
+    conditions and activities. It accounts for the effects of movements and wind. The
+    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a function
+    of the total thermal insulation of clothing (`I`:sub:`T`), the insulation of the
+    boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
+    relative air speed (`v`:sub:`r`). These different equations are used if the person
+    is clothed in normal clothing (0.6 clo < (`I`:sub:`cl`) < 1.4 clo or 1.2 clo <
+    (`I`:sub:`T`) < 2.0 clo), nude (`I`:sub:`cl` = 0 clo), and if the person is clothed
+    in very light clothing (`I`:sub:`cl` < 0.6 clo). Here we have not implemented the
+    equation for high clothing (`I`:sub:`T` > 2.0 clo). Hence the applicability of this
+    function is limited to 0 clo < (`I`:sub:`T`) < 2.0 clo). You can find all the inputs
+    required in this function in the ISO 9920:2009 standard [iso9920]_ Annex A.
+
+    Parameters
+    ----------
+    i_t: float or list of floats
+        total thermal insulation of clothing under static reference conditions [clo]
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_a_static: float or list of floats
+        static boundary air layer insulation, [clo]
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, this is the thermal insulation
+        from the skin surface to the outer clothing surface [clo]
+
+    Returns
+    -------
+    i_t_r: float or list of floats
+        total insulation of the clothing ensemble, [clo]
+    """
+    i_t = np.array(i_t)
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_a_static = np.array(i_a_static)
+    i_cl = np.array(i_cl)
+
+    def normal_clothing(_vr, _vw, _i_t):
+        return _i_t * _correction_normal_clothing(_vw=_vw, _vr=_vr)
+
+    def nude(_vr, _vw, _i_a_static):
+        return _i_a_static * _correction_nude(_vr=_vr, _vw=_vw)
+
+    def low_clothing(_vr, _vw, _i_a_static, _i_cl):
+        return (
+            (0.6 - _i_cl) * nude(_vr, _vw, _i_a_static)
+            + _i_cl * normal_clothing(_vr, _vw, _i_cl)
+        ) / 0.6
+
+    i_t_r = np.where(
+        i_cl <= 0.6,
+        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl),
+        normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
+    )
+    i_t_r = np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
+    return i_t_r
+
+
+def clo_correction_factor_environment(
+    vr: Union[float, list[float]],
+    v_walk: Union[float, list[float]],
+    i_cl: Union[float, list[float]],
+):
+    """This function returns the correction factor for the total insulation of the
+    clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+    This correction factor takes into account of the fact that the values of
+    (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
+    environments the person may be walking, activity may pump air through the clothing,
+    etc.
+
+    Parameters
+    ----------
+    vr: float or list of floats
+        relative air speed, [m/s]
+    v_walk: float or list of floats
+        walking speed, [m/s]
+    i_cl: float or list of floats
+        intrinsic insulation of the clothing ensemble, this is the thermal insulation
+        from the skin surface to the outer clothing surface [clo]
+
+    Returns
+    -------
+    correction_factor: float or list of floats
+        correction factor for the total insulation of the clothing ensemble
+        (`I`:sub:`T,r` / (`I`:sub:`T`)) or the basic/intrinsic insulation
+        (`I`:sub:`cl,r` / (`I`:sub:`cl`))
+    """
+    vr = np.array(vr)
+    v_walk = np.array(v_walk)
+    i_cl = np.array(i_cl)
+
+    def correction_low_clothing(_vr, _vw, _i_cl):
+        return (
+            (0.6 - _i_cl) * _correction_nude(_vr, _vw)
+            + _i_cl * _correction_normal_clothing(_vr, _vw)
+        ) / 0.6
+
+    c_f = np.where(
+        i_cl <= 0.6,
+        correction_low_clothing(_vr=vr, _vw=v_walk, _i_cl=i_cl),
+        _correction_normal_clothing(_vr=vr, _vw=v_walk),
+    )
+    c_f = np.where(i_cl == 0, _correction_nude(_vr=vr, _vw=v_walk), c_f)
+    return c_f
+
+
+def _correction_nude(_vr, _vw):
+    return np.exp(
+        -0.533 * (_vr - 0.15) + 0.069 * (_vr - 0.15) ** 2 - 0.462 * _vw + 0.201 * _vw**2
+    )
+
+
+def _correction_normal_clothing(_vr, _vw):
+    return np.exp(
+        -0.281 * (_vr - 0.15) + 0.044 * (_vr - 0.15) ** 2 - 0.492 * _vw + 0.176 * _vw**2
+    )
 
 
 #: Met values of typical tasks.

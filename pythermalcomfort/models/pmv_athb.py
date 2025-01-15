@@ -4,10 +4,10 @@ import numpy as np
 
 from pythermalcomfort.classes_input import ATHBInputs
 from pythermalcomfort.classes_return import ATHB
-from pythermalcomfort.models.pmv_ppd import _pmv_ppd_optimized
+from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
 
 
-def athb(
+def pmv_athb(
     tdb: Union[float, list[float]],
     tr: Union[float, list[float]],
     vr: Union[float, list[float]],
@@ -17,7 +17,7 @@ def athb(
     clo: Union[bool, float, list[float]] = False,
 ) -> ATHB:
     """Return the PMV value calculated with the Adaptive Thermal Heat Balance
-    Framework [27]_. The adaptive thermal heat balance (ATHB) framework
+    Framework [schweiker22]_. The adaptive thermal heat balance (ATHB) framework
     introduced a method to account for the three adaptive principals, namely
     physiological, behavioral, and psychological adaptation, individually
     within existing heat balance models. The objective is a predictive model of
@@ -58,7 +58,7 @@ def athb(
     Returns
     -------
     ATHBResults
-        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.models.athb.ATHBResults` for more details.
+        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHBResults` for more details.
 
     Examples
     --------

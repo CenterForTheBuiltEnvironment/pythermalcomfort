@@ -19,10 +19,10 @@ Documentation Improvements
 
 pythermalcomfort can always use more documentation, whether as part of the official docs, in docstrings, or even on the web in blog posts, articles, and such.
 
-Feature Requests and Feedback
+Issues, Features and Feedback
 =============================
 
-The best way to send feedback is to file an issue at https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues.
+The best way to send feedback is to submit an `issue <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_.
 
 If you are proposing a feature:
 
@@ -108,17 +108,17 @@ To run a subset of tests:
 
     tox -e envname -- pytest -k test_myfeature
 
-To run all the test environments in *parallel* (you need to ``pip install detox``):
+To run all the test environments in *parallel*:
 
 .. code-block:: bash
 
-    detox
+    tox --parallel
 
 To Add a Function
 ^^^^^^^^^^^^^^^^^
 
 1. Add the function to the Python file `pythermalcomfort/models/` and document it.
-2. Add any related functions that are used by your function either in `pythermalcomfort/utilities.py` or `src/pythermalcomfort/psychrometrics.py`. See existing code as examples.
-3. Ensure that all new functions accept arrays as input and return a dataclass. You can use the code in `pmv_ppd.py` as a template.
+2. Add any related functions that are used by your function either in `pythermalcomfort/utilities.py`. See existing code as examples.
+3. Ensure that all new functions accept arrays as input and return a dataclass. You can use the code in `pmv_ppd_iso.py` as a template.
 4. Test your function by writing a test in `tests/test_XXXX.py`. Test it by running `tox -e pyXX` where `XX` is the Python version you want to use, e.g., `37`.
 5. Add `autofunction` to `doc.reference.pythermalcomfort.py`.

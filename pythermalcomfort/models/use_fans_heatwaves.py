@@ -5,7 +5,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import UseFansHeatwavesInputs
 from pythermalcomfort.classes_return import UseFansHeatwaves
-from pythermalcomfort.models.two_nodes import two_nodes
+from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
 )
@@ -76,7 +76,7 @@ def use_fans_heatwaves(
     -------
     UseFansHeatwaves
         A dataclass containing the results of using fans during heatwaves.
-        See :py:class:`~pythermalcomfort.models.use_fans_heatwaves.UseFansHeatwaves` for more details.
+        See :py:class:`~pythermalcomfort.classes_return.UseFansHeatwaves` for more details.
         To access the results, use the corresponding attributes of the returned `UseFansHeatwaves` instance, e.g., `result.e_skin`.
 
     Examples
@@ -113,7 +113,7 @@ def use_fans_heatwaves(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    output = two_nodes(
+    output = gagge_two_nodes(
         tdb,
         tr,
         v,

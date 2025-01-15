@@ -15,10 +15,10 @@ def humidex(
 ) -> Humidex:
     """Calculates the humidex (short for "humidity index"). It has been
     developed by the Canadian Meteorological service. It was introduced in 1965
-    and then it was revised by Masterson and Richardson (1979) [14]_. It aims
+    and then it was revised by Masterson and Richardson (1979) [Masterson]_. It aims
     to describe how hot, humid weather is felt by the average person. The
     Humidex differs from the heat index in being related to the dew point
-    rather than relative humidity [15]_.
+    rather than relative humidity [Havenith2016]_.
 
     Parameters
     ----------
@@ -33,14 +33,14 @@ def humidex(
 
         .. note::
             The 'rana' model is the Humidex model proposed by `Rana et al. (2013)`_.
-            The 'masterson' model is the Humidex model proposed by Masterson and Richardson (1979) [14]_.
+            The 'masterson' model is the Humidex model proposed by Masterson and Richardson (1979) [Masterson]_.
 
             .. _Rana et al. (2013): https://doi.org/10.1016/j.enbuild.2013.04.019
 
     Returns
     -------
     Humidex
-        A dataclass containing the Humidex value and its discomfort category. See :py:class:`~pythermalcomfort.models.humidex.Humidex` for more details.
+        A dataclass containing the Humidex value and its discomfort category. See :py:class:`~pythermalcomfort.classes_return.Humidex` for more details.
         To access the `humidex` and `discomfort` values, use the respective attributes of the returned `Humidex` instance, e.g., `result.humidex`.
 
     Examples

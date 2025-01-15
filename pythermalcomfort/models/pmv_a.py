@@ -4,10 +4,10 @@ import numpy as np
 
 from pythermalcomfort.classes_input import APMVInputs
 from pythermalcomfort.classes_return import APMV
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 
 
-def a_pmv(
+def pmv_a(
     tdb: Union[float, list[float]],
     tr: Union[float, list[float]],
     vr: Union[float, list[float]],
@@ -19,7 +19,7 @@ def a_pmv(
     units: Literal["SI", "IP"] = "SI",
     limit_inputs: bool = True,
 ) -> APMV:
-    """Returns Adaptive Predicted Mean Vote (aPMV) [25]_. This index was
+    """Returns Adaptive Predicted Mean Vote (aPMV) [yao2009]_. This index was
     developed by Yao, R. et al. (2009). The model takes into account factors
     such as culture, climate, social, psychological, and behavioral
     adaptations, which have an impact on the senses used to detect thermal
@@ -35,8 +35,9 @@ def a_pmv(
     vr : float or list of floats
         Relative air speed, default in [m/s] or [fps] if `units` = 'IP'.
 
-        .. warning::
-            vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag). Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
+        .. note::
+            vr is the sum of the average air speed measured by the sensor and the activity-generated air speed (Vag).
+            Calculate vr using :py:meth:`pythermalcomfort.utilities.v_relative`.
 
     rh : float or list of floats
         Relative humidity, [%].
@@ -45,7 +46,7 @@ def a_pmv(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
 
     a_coefficient : float
@@ -57,14 +58,17 @@ def a_pmv(
     limit_inputs : bool, optional
         If True, returns nan for inputs outside standard limits. Defaults to True.
 
-        .. warning::
-            ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4, 0 < clo [clo] < 2, -2 < PMV < 2.
+        .. note::
+            ISO 7730 2005 limits: 10 < tdb [°C] < 30, 10 < tr [°C] < 40, 0 < vr [m/s] < 1, 0.8 < met [met] < 4,
+            0 < clo [clo] < 2, -2 < PMV < 2.
 
     Returns
     -------
     APMV
-        A dataclass containing the Predicted Mean Vote (a_pmv). See :py:class:`~pythermalcomfort.models.a_pmv.AdaptivePMV` for more details.
-        To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance, e.g., `result.a_pmv`.
+        A dataclass containing the Predicted Mean Vote (a_pmv). See
+        :py:class:`~pythermalcomfort.classes_return.AdaptivePMV` for more details.
+        To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance,
+        e.g., `result.a_pmv`.
 
     Examples
     --------
@@ -103,7 +107,7 @@ def a_pmv(
         units=units,
     )
 
-    _pmv = pmv(
+    _pmv = pmv_ppd_iso(
         tdb,
         tr,
         vr,
@@ -111,7 +115,7 @@ def a_pmv(
         met,
         clo,
         wme,
-        standard="ISO",
+        model="7730-2005",
         units=units,
         limit_inputs=limit_inputs,
     ).pmv

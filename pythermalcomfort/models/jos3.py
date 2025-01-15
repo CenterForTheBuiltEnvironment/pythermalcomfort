@@ -21,7 +21,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
@@ -447,7 +447,7 @@ class JOS3:
 
         # Main loop for finding PMV=0
         for i in range(max_iterations):
-            pmv_value = pmv(to, to, va, rh, met, clo).pmv
+            pmv_value = pmv_ppd_iso(to, to, va, rh, met, clo, model="7730-2005").pmv
 
             # Check for NaN and handle retries
             if np.isnan(pmv_value):
@@ -457,7 +457,9 @@ class JOS3:
                 for retry in range(retry_attempts):
                     adjustment_factor = retry_adjustment_factor
                     to = initial_to  # Reset to initial temperature for retry
-                    pmv_value = pmv(to, to, va, rh, met, clo).pmv
+                    pmv_value = pmv_ppd_iso(
+                        to, to, va, rh, met, clo, model="7730-2005"
+                    ).pmv
                     logger.info(
                         f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}"
                     )

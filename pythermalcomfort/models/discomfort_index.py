@@ -14,7 +14,7 @@ def discomfort_index(
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usually divided into 6 discomfort categories and it only applies to
-    warm environments: [24]_
+    warm environments: [polydoros2015]_
 
     * class 1 - DI < 21 °C - No discomfort
     * class 2 - 21 <= DI < 24 °C - Less than 50% feels discomfort
@@ -33,7 +33,7 @@ def discomfort_index(
     Returns
     -------
     DI
-        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.models.discomfort_index.DI` for more details.
+        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.classes_return.DI` for more details.
         To access the `di` and `discomfort_condition` values, use the respective attributes of the returned `DI` instance, e.g., `result.di`.
 
     Examples

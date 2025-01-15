@@ -14,14 +14,20 @@ Changelog
 
     .. code-block:: python
 
-        from pythermalcomfort.models import pmv_ppd
-        result = pmv_ppd(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5)
+        from pythermalcomfort.models import pmv_ppd_iso
+        result = pmv_ppd_iso(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model='7730-2005')
         print(result.pmv)  # [-0.  0.41]
 
     This update aims to make the package more user-friendly and to provide a more organized way to access all calculation results.
 
     **Moved functions**
     Moved all the functions that were in the `psychrometrics.py` file to the `utilities.py` file.
+
+    **Changed function names**
+    All the PMV functions have been renamed using the following format: `pmv_XXX` where XXX is the standard or the model name.
+
+    **PMV function**
+    The pmv_ppd function now has been split into two functions: pmv_ppd_iso and pmv_ppd_ashrae.
 
 .. note::
     We have updated all functions to accept Numpy arrays as inputs, allowing you to pass multiple values at once for faster results.
@@ -31,10 +37,12 @@ Changelog
     Other improvements include:
 
     * Enhanced documentation with more examples.
+    * Better described the models.
     * Added more tests to ensure calculation accuracy.
     * Implemented input validation to ensure inputs are within model applicability limits.
     * Harmonized input names across all functions.
     * Added surveys to assess thermal comfort to the documentation.
+    * Added a detailed section about clothing insulation.
 
 2.10.0 (2024-03-18)
 -------------------

@@ -3,13 +3,168 @@ import pytest
 
 from pythermalcomfort.utilities import (
     body_surface_area,
+    clo_area_factor,
+    clo_correction_factor_environment,
     clo_dynamic,
+    clo_insulation_air_layer,
+    clo_intrinsic_insulation_ensemble,
+    clo_total_insulation,
     f_svv,
     running_mean_outdoor_temperature,
     transpose_sharp_altitude,
     units_converter,
     v_relative,
 )
+
+
+def test_intrinsic_insulation_ensemble():
+    assert clo_intrinsic_insulation_ensemble([0.5, 0.5]) == 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble([1, 1]) == 2 * 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble(2) == 2 * 0.835 + 0.161
+    assert clo_intrinsic_insulation_ensemble([0]) == 0.161
+
+
+def test_clo_area_factor():
+    assert clo_area_factor(1) == 1.28
+    assert np.allclose(clo_area_factor(i_cl=[1, 2]), np.array([1.28, 1.56]))
+
+
+def test_clo_air_layer_insulation():
+    assert np.isclose(
+        clo_insulation_air_layer(vr=1, v_walk=1, i_a_static=0.71), 0.365, atol=0.001
+    )
+    assert np.isclose(
+        clo_insulation_air_layer(vr=0.2, v_walk=1, i_a_static=0.71), 0.532, atol=0.001
+    )
+    assert np.allclose(
+        clo_insulation_air_layer(vr=[0.2, 1], v_walk=1, i_a_static=0.71),
+        [0.532, 0.365],
+        atol=0.001,
+    )
+
+
+def test_clo_total_insulation():
+    # test that the normal_clothing function works as expected
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=[1.21, 1.26, 1.56],
+            vr=0.15,
+            v_walk=0,
+            i_a_static=0.5,
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [1.21, 1.26, 1.56],
+        atol=0.001,
+    )
+
+    # compare the normal_clothing results with the figure in the standard
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=[1.21, 1.26, 1.56],
+            vr=2,
+            v_walk=[1, 0.5, 0.25],
+            i_a_static=0.5,
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [1.21 * 0.5, 1.26 * 0.565, 1.56 * 0.62],
+        atol=0.005,
+    )
+
+    # test that the nude function works as expected
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=0,
+            vr=0.15,
+            v_walk=0,
+            i_a_static=[0.71, 0.61, 0.5],
+            i_cl=0,
+        ),
+        [0.71, 0.61, 0.5],
+        atol=0.001,
+    )
+
+    # compare the nude results with the figure in the standard
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=0,
+            vr=[0.5, 2, 3],
+            v_walk=0.5,
+            i_a_static=[0.71, 0.61, 0.5],
+            i_cl=0,
+        ),
+        [0.71 * 0.7, 0.61 * 0.4, 0.50 * 0.32],
+        atol=0.004,
+    )
+
+    # test that the low_clothing function works as expected
+    assert np.allclose(
+        clo_total_insulation(
+            i_t=1.2,
+            vr=0.15,
+            v_walk=0,
+            i_a_static=[0.6, 0.6],
+            i_cl=[0.6, 0],
+        ),
+        [0.6, 0.6],
+        atol=0.001,
+    )
+
+
+def test_clo_correction_factor_environment():
+    # test that the normal_clothing function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [1, 1, 1],
+        atol=0.001,
+    )
+
+    # compare the normal_clothing results with the figure in the standard
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=2,
+            v_walk=[1, 0.5, 0.25],
+            i_cl=[0.61, 0.71, 1.01],
+        ),
+        [0.503, 0.564, 0.618],
+        atol=0.001,
+    )
+
+    # test that the nude function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=0,
+        ),
+        [1],
+        atol=0.001,
+    )
+
+    # compare the nude results with the figure in the standard
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=[0.5, 2, 3],
+            v_walk=0.5,
+            i_cl=0,
+        ),
+        [0.698, 0.394, 0.320],
+        atol=0.001,
+    )
+
+    # test that the low_clothing function works as expected
+    assert np.allclose(
+        clo_correction_factor_environment(
+            vr=0.15,
+            v_walk=0,
+            i_cl=[0.6, 0],
+        ),
+        [1, 1],
+        atol=0.001,
+    )
 
 
 def test_transpose_sharp_altitude():

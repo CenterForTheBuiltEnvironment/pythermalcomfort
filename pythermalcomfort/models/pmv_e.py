@@ -4,10 +4,10 @@ import numpy as np
 
 from pythermalcomfort.classes_input import EPMVInputs
 from pythermalcomfort.classes_return import EPMV
-from pythermalcomfort.models.pmv import pmv
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 
 
-def e_pmv(
+def pmv_e(
     tdb: Union[float, list[float]],
     tr: Union[float, list[float]],
     vr: Union[float, list[float]],
@@ -26,7 +26,7 @@ def e_pmv(
     expectations, but a metabolic rate that is estimated too high can also
     contribute to explaining the difference. An extension of the PMV model that
     includes an expectancy factor is introduced for use in non-air-conditioned
-    buildings in warm climates [26]_.
+    buildings in warm climates [fanger2002]_.
 
     Parameters
     ----------
@@ -37,7 +37,7 @@ def e_pmv(
     vr : float or list of floats
         Relative air speed, default in [m/s] in [fps] if `units` = 'IP'.
 
-        .. warning::
+        .. note::
             vr is the relative air speed caused by body movement and not the air
             speed measured by the air speed sensor. The relative air speed is the sum of the
             average air speed measured by the sensor plus the activity-generated air speed
@@ -52,10 +52,10 @@ def e_pmv(
     clo : float or list of floats
         Clothing insulation, [clo].
 
-        .. warning::
+        .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
             for the effect of the body movement for met equal or higher than 1.2 met using
             the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
             can be calculated using the function
@@ -80,7 +80,7 @@ def e_pmv(
     Returns
     -------
     EPMV
-        A dataclass containing the Adjusted Predicted Mean Votes with Expectancy Factor. See :py:class:`~pythermalcomfort.models.e_pmv.EPMV` for more details.
+        A dataclass containing the Adjusted Predicted Mean Votes with Expectancy Factor. See :py:class:`~pythermalcomfort.classes_return.EPMV` for more details.
         To access the `e_pmv` value, use the `e_pmv` attribute of the returned `e_pmv` instance, e.g., `result.e_pmv`.
 
     Examples
@@ -118,9 +118,29 @@ def e_pmv(
 
     default_kwargs = {"units": units, "limit_inputs": limit_inputs}
     met = np.array(met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
+    _pmv = pmv_ppd_iso(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        model="7730-2005",
+        **default_kwargs,
+    ).pmv
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
-    _pmv = pmv(tdb, tr, vr, rh, met, clo, wme, "ISO", **default_kwargs).pmv
+    _pmv = pmv_ppd_iso(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        model="7730-2005",
+        **default_kwargs,
+    ).pmv
 
     e_pmv_value = np.around(_pmv * e_coefficient, 2)
 

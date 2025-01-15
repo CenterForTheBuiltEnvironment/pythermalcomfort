@@ -11,7 +11,7 @@ def wci(
     v: Union[float, list[float]],
     round_output: bool = True,
 ) -> WCI:
-    """Calculates the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [18]_.
+    """Calculates the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [ashrae2017]_.
 
     The wind chill index (WCI) is an empirical index based on cooling measurements
     taken on a cylindrical flask partially filled with water in Antarctica
@@ -25,7 +25,7 @@ def wci(
     in a cold environment. Furthermore, the equation's values peak at 90 km/h and then
     decline as velocity increases. Nonetheless, this score reliably represents the
     combined effects of temperature and wind on subjective discomfort for velocities
-    below 80 km/h [18]_.
+    below 80 km/h [ashrae2017]_.
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ def wci(
     Returns
     -------
     WCI
-        A dataclass containing the Wind Chill Index. See :py:class:`~pythermalcomfort.models.wc.WCI` for more details.
+        A dataclass containing the Wind Chill Index. See :py:class:`~pythermalcomfort.classes_return.WCI` for more details.
         To access the `wci` value, use the `wci` attribute of the returned `WCI` instance, e.g., `result.wci`.
 
     Examples

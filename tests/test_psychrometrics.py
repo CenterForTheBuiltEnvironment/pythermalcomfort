@@ -59,13 +59,13 @@ def test_p_sat():
 def test_t_mrt():
     np.testing.assert_equal(
         mean_radiant_tmp(
-            tg=[53.2, 55],
+            tg=[53.2, 55, 55],
             tdb=30,
-            v=0.3,
+            v=[0.3, 0.3, 0.1],
             d=0.1,
             standard="ISO",
         ),
-        [74.8, 77.8],
+        [74.8, 77.8, 71.9],
     )
     np.testing.assert_equal(
         mean_radiant_tmp(

@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import VerticalTGradPPDInputs
 from pythermalcomfort.classes_return import VerticalTGradPPD
-from pythermalcomfort.models import pmv
+from pythermalcomfort.models import pmv_ppd_ashrae
 from pythermalcomfort.utilities import _check_standard_compliance_array
 
 
@@ -19,7 +19,7 @@ def vertical_tmp_grad_ppd(
     round_output: bool = True,
 ) -> VerticalTGradPPD:
     """Calculates the percentage of thermally dissatisfied people with a
-    vertical temperature gradient between feet and head [1]_. This equation is
+    vertical temperature gradient between feet and head [ASHRAE552023]_. This equation is
     only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
@@ -70,7 +70,7 @@ def vertical_tmp_grad_ppd(
     -------
     VerticalTGradPPD
         A dataclass containing the Predicted Percentage of Dissatisfied occupants with vertical temperature gradient and acceptability.
-        See :py:class:`~pythermalcomfort.models.vertical_tmp_grad_ppd.VerticalTmpGradPPD` for more details.
+        See :py:class:`~pythermalcomfort.classes_return.VerticalTmpGradPPD` for more details.
         To access the `ppd_vg` and `acceptability` values, use the corresponding attributes of the returned `VerticalTmpGradPPD` instance, e.g., `result.ppd_vg`.
 
     Examples
@@ -113,7 +113,9 @@ def vertical_tmp_grad_ppd(
         standard="ashrae", tdb=tdb, tr=tr, v_limited=vr, met=met, clo=clo
     )
 
-    tsv = pmv(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, standard="ashrae").pmv
+    tsv = pmv_ppd_ashrae(
+        tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, model="55-2023"
+    ).pmv
     numerator = np.exp(0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = (numerator / (1 + numerator) - 0.345) * 100
     acceptability = ppd_val <= 5
