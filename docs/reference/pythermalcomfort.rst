@@ -1,16 +1,50 @@
 Comfort models
 ==============
 
-Adaptive ASHRAE
----------------
+Adaptive Model
+--------------
+
+The adaptive thermal comfort model is a method that relates indoor design temperatures or acceptable temperature ranges to outdoor meteorological or climatological parameters.
+It's specifically intended for **occupant-controlled naturally conditioned spaces**, where the thermal conditions are primarily regulated by occupants through the use of openings in the building envelope, such as windows.
+The adaptive model is based on the idea that people in naturally ventilated spaces adjust to their environment through a variety of behavioural and physiological adaptations.
+
+Below are some key characteristics and criteria of the adaptive model, according to the ASHRAE 55-2023 standard [1]_:
+
+**Applicability**: The adaptive model can only be applied in spaces that meet specific criteria:
+  *   There is no mechanical cooling or heating system in operation.
+  *   Occupants have metabolic rates ranging from 1.0 to 1.5 met.
+  *   Occupants are able to adjust their clothing to indoor or outdoor thermal conditions within a range of 0.5 to 1.0 clo.
+  *   The prevailing mean outdoor temperature is between 10°C (50°F) and 33.5°C (92.3°F).
+  *   The space has operable fenestration that can be readily opened and adjusted by the occupants.
+
+**Methodology**: The model uses the prevailing mean outdoor air temperature to determine acceptable indoor operative temperatures. The prevailing mean outdoor temperature is calculated as a running average of the mean daily outdoor temperatures over a period of days.
+  *   The calculation of the prevailing mean outdoor temperature gives more weight to recent days, since these have a greater influence on occupants' comfort temperatures.
+
+**Comfort Zone**: The adaptive model defines comfort zones differently from the PMV model. Instead of using a heat balance approach to determine an ideal temperature, it relies on an empirical model that links satisfaction with the prevailing mean outdoor temperature.
+  *   The comfort zone is defined by the 80% or 90% acceptability limits.
+  *   The model does not require estimation of clothing values, since it accounts for clothing adaptation by relating the range of satisfactory indoor temperatures to the outdoor climate.
+
+**Air Speed**: When using the adaptive model, no humidity or air speed limits are required. However, if elevated air movement is present, air movement extensions to the comfort zone's lower and upper operative temperature limits can be used.
+
+**Underlying Basis**: The adaptive model is derived from a global database of measurements taken primarily in office buildings. It is based on the observation that people adapt to their environment over time.
+
+**Purpose**: The adaptive model is specifically intended for use in naturally conditioned spaces, where occupants have a degree of control over their environment. It is not appropriate for other types of spaces.
+
+The adaptive model, in contrast to the PMV model, does not rely on a heat-balance approach. Instead, it uses an empirical model that relates satisfaction to the prevailing mean outdoor air temperature. The comfort zone is defined by the percentage of people who find the environment acceptable. The adaptive model is based on the idea that people adjust to their environment over time.
+
+The use of the adaptive model requires documentation of the compliance time periods, the prevailing mean outdoor design temperature, and any increased air speed adjustments.
+
+
+ASHRAE 55
+~~~~~~~~~
 
 .. autofunction:: pythermalcomfort.models.adaptive_ashrae.adaptive_ashrae
 
 .. autoclass:: pythermalcomfort.classes_return.AdaptiveASHRAE
     :members:
 
-Adaptive EN
------------
+EN 16798-1 2019
+~~~~~~~~~~~~~~~
 
 .. autofunction:: pythermalcomfort.models.adaptive_en.adaptive_en
 
@@ -697,6 +731,5 @@ References
 .. [28] Lu, Y.C. and Romps, D.M., Extending the Heat Index to Quantify the Physiological Response to Future Warming: A Modelling Study. Available at SSRN 3739854.
 .. [29] ISO, EN (2009). ISO 9920 - Ergonomics of the thermal environment. Estimation of thermal insulation and water vapour resistance of a clothing ensemble
 .. [30] Fanger, P. O. (1970). Thermal comfort: analysis and applications in environmental engineering. McGraw-Hill, New York.
-.. [31] T. Cheung, S. Schiavon, T. Parkinson, P. Li, G. Brager, Analysis of the accuracy on PMV – PPD model using the ASHRAE Global Thermal Comfort Database II, Building and Environment 153
-(2019) 205–217. doi:10.1016/j.buildenv.2019.01.055.
+.. [31] T. Cheung, S. Schiavon, T. Parkinson, P. Li, G. Brager, Analysis of the accuracy on PMV – PPD model using the ASHRAE Global Thermal Comfort Database II, Building and Environment 153 (2019) 205–217. doi:10.1016/j.buildenv.2019.01.055.
 
