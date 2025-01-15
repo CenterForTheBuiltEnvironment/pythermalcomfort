@@ -78,7 +78,7 @@ def solar_gain(
     -------
     SolarGain
         A dataclass containing the solar gain to the human body and delta mean radiant temperature.
-        See :py:class:`~pythermalcomfort.models.solar_gain.SolarGain` for more details.
+        See :py:class:`~pythermalcomfort.classes_return.SolarGain` for more details.
         To access the `erf` and `delta_mrt` values, use the corresponding attributes of the returned `SolarGain` instance, e.g., `result.erf`.
 
     Examples

@@ -90,14 +90,14 @@ def pmv_ppd_iso(
     Returns
     -------
     PMVPPD
-        A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.models.pmv_ppd.pmv_ppd` for more details.
+        A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for more details.
         To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `pmv_ppd` instance, e.g., `result.pmv`.
 
     Examples
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import pmv_ppd
+        from pythermalcomfort.models import pmv_ppd_iso
         from pythermalcomfort.utilities import v_relative
 
         tdb = 25

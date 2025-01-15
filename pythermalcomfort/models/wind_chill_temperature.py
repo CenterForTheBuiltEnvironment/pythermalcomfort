@@ -31,7 +31,7 @@ def wct(
     Returns
     -------
     WCT
-        A dataclass containing the Wind Chill Temperature. See :py:class:`~pythermalcomfort.models.wct.WCT` for more details.
+        A dataclass containing the Wind Chill Temperature. See :py:class:`~pythermalcomfort.classes_return.WCT` for more details.
         To access the `wct` value, use the `wct` attribute of the returned `WCT` instance, e.g., `result.wct`.
 
     Examples

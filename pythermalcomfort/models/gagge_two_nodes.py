@@ -80,7 +80,7 @@ def gagge_two_nodes(
     -------
     GaggeTwoNodes
         A dataclass containing the results of the two-node model of human temperature regulation.
-        See :py:class:`~pythermalcomfort.models.two_nodes.TwoNodes` for more details.
+        See :py:class:`~pythermalcomfort.classes_return.TwoNodes` for more details.
         To access the results, use the corresponding attributes of the returned `TwoNodes` instance, e.g., `result.e_skin`.
 
     Examples

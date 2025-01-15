@@ -74,7 +74,7 @@ def pet_steady(
     Returns
     -------
     PETSteady
-        A dataclass containing the Physiological Equivalent Temperature. See :py:class:`~pythermalcomfort.models.pet_steady.PETSteady` for more details.
+        A dataclass containing the Physiological Equivalent Temperature. See :py:class:`~pythermalcomfort.classes_return.PETSteady` for more details.
         To access the `pet` value, use the `pet` attribute of the returned `PETSteady` instance, e.g., `result.pet`.
 
     Examples

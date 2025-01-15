@@ -39,7 +39,7 @@ def wci(
     Returns
     -------
     WCI
-        A dataclass containing the Wind Chill Index. See :py:class:`~pythermalcomfort.models.wc.WCI` for more details.
+        A dataclass containing the Wind Chill Index. See :py:class:`~pythermalcomfort.classes_return.WCI` for more details.
         To access the `wci` value, use the `wci` attribute of the returned `WCI` instance, e.g., `result.wci`.
 
     Examples

@@ -58,7 +58,7 @@ def pmv_athb(
     Returns
     -------
     ATHBResults
-        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.models.athb.ATHBResults` for more details.
+        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHBResults` for more details.
 
     Examples
     --------

@@ -72,7 +72,7 @@ def ankle_draft(
     Returns
     -------
     AnkleDraft
-        Dataclass containing the results of the ankle draft calculation. See :py:class:`~pythermalcomfort.models.ankle_draft.AnkleDraft` for more details.
+        Dataclass containing the results of the ankle draft calculation. See :py:class:`~pythermalcomfort.classes_return.AnkleDraft` for more details.
 
     Examples
     --------

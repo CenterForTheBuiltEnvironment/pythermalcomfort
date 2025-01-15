@@ -57,7 +57,7 @@ def adaptive_ashrae(
     Returns
     -------
     AdaptiveASHRAE
-        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_ashrae.AdaptiveASHRAE` for more details.
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.classes_return.AdaptiveASHRAE` for more details.
 
     Examples
     --------

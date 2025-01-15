@@ -75,7 +75,7 @@ def cooling_effect(
     Returns
     -------
     CE
-        A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.models.cooling_effect.CoolingEffect` for more details.
+        A dataclass containing the Cooling Effect value. See :py:class:`~pythermalcomfort.classes_return.CoolingEffect` for more details.
         To access the `ce` value, use the `ce` attribute of the returned `CoolingEffect` instance, e.g., `result.ce`.
 
     Notes

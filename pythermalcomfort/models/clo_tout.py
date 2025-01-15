@@ -25,7 +25,7 @@ def clo_tout(
     Returns
     -------
     CloTOut
-        A dataclass containing the representative clothing insulation Icl. See :py:class:`~pythermalcomfort.models.clo_tout.CloTOut` for more details.
+        A dataclass containing the representative clothing insulation Icl. See :py:class:`~pythermalcomfort.classes_return.CloTOut` for more details.
         To access the `clo_tout` value, use the `clo_tout` attribute of the returned `CloTOut` instance, e.g., `result.clo_tout`.
 
     Raises

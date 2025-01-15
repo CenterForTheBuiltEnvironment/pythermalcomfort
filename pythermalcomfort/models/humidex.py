@@ -40,7 +40,7 @@ def humidex(
     Returns
     -------
     Humidex
-        A dataclass containing the Humidex value and its discomfort category. See :py:class:`~pythermalcomfort.models.humidex.Humidex` for more details.
+        A dataclass containing the Humidex value and its discomfort category. See :py:class:`~pythermalcomfort.classes_return.Humidex` for more details.
         To access the `humidex` and `discomfort` values, use the respective attributes of the returned `Humidex` instance, e.g., `result.humidex`.
 
     Examples

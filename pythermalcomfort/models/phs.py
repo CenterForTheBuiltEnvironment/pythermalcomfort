@@ -105,7 +105,7 @@ def phs(
     Returns
     -------
     PHS
-        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.models.phs.PHS` for more details.
+        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.classes_return.PHS` for more details.
         To access the individual attributes, use the corresponding attribute of the returned `PHS` instance, e.g., `result.t_re`.
 
     Examples

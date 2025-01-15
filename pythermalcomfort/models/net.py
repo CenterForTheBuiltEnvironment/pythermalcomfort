@@ -43,7 +43,7 @@ def net(
     Returns
     -------
     NET
-        A dataclass containing the Normal Effective Temperature. See :py:class:`~pythermalcomfort.models.net.Net` for more details.
+        A dataclass containing the Normal Effective Temperature. See :py:class:`~pythermalcomfort.classes_return.Net` for more details.
         To access the `net` value, use the `net` attribute of the returned `Net` instance, e.g., `result.net`.
 
     Examples

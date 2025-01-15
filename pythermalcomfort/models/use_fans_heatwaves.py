@@ -76,7 +76,7 @@ def use_fans_heatwaves(
     -------
     UseFansHeatwaves
         A dataclass containing the results of using fans during heatwaves.
-        See :py:class:`~pythermalcomfort.models.use_fans_heatwaves.UseFansHeatwaves` for more details.
+        See :py:class:`~pythermalcomfort.classes_return.UseFansHeatwaves` for more details.
         To access the results, use the corresponding attributes of the returned `UseFansHeatwaves` instance, e.g., `result.e_skin`.
 
     Examples

@@ -33,7 +33,7 @@ def discomfort_index(
     Returns
     -------
     DI
-        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.models.discomfort_index.DI` for more details.
+        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.classes_return.DI` for more details.
         To access the `di` and `discomfort_condition` values, use the respective attributes of the returned `DI` instance, e.g., `result.di`.
 
     Examples

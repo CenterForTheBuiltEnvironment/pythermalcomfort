@@ -66,7 +66,7 @@ def pmv_a(
     -------
     APMV
         A dataclass containing the Predicted Mean Vote (a_pmv). See
-        :py:class:`~pythermalcomfort.models.a_pmv.AdaptivePMV` for more details.
+        :py:class:`~pythermalcomfort.classes_return.AdaptivePMV` for more details.
         To access the `a_pmv` value, use the `a_pmv` attribute of the returned `AdaptivePMV` instance,
         e.g., `result.a_pmv`.
 

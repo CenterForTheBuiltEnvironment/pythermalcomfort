@@ -50,7 +50,7 @@ def adaptive_en(
     Returns
     -------
     AdaptiveEN
-        A dataclass containing the results. See :py:class:`~pythermalcomfort.models.adaptive_en.AdaptiveEN` for more details.
+        A dataclass containing the results. See :py:class:`~pythermalcomfort.classes_return.AdaptiveEN` for more details.
 
 
     Examples

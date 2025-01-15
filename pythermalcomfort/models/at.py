@@ -44,7 +44,7 @@ def at(
     Returns
     -------
     AT
-        Dataclass containing the apparent temperature, [°C]. See :py:class:`~pythermalcomfort.models.at.AT` for more details.
+        Dataclass containing the apparent temperature, [°C]. See :py:class:`~pythermalcomfort.classes_return.AT` for more details.
 
     Examples
     --------
