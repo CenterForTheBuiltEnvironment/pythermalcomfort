@@ -19,7 +19,7 @@ def vertical_tmp_grad_ppd(
     round_output: bool = True,
 ) -> VerticalTGradPPD:
     """Calculates the percentage of thermally dissatisfied people with a
-    vertical temperature gradient between feet and head [1]_. This equation is
+    vertical temperature gradient between feet and head [ASHRAE552023]_. This equation is
     only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters

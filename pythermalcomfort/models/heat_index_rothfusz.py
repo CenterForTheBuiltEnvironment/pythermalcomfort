@@ -11,7 +11,7 @@ def heat_index_rothfusz(
     rh: Union[float, list[float]],
     round_output: bool = True,
 ) -> HI:
-    """The Heat Index (HI) calculated in accordance with the Rothfusz (1990) model [12]_.
+    """The Heat Index (HI) calculated in accordance with the Rothfusz (1990) model [Rothfusz]_.
 
     Parameters
     ----------

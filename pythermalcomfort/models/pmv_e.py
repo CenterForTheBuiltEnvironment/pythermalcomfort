@@ -26,7 +26,7 @@ def pmv_e(
     expectations, but a metabolic rate that is estimated too high can also
     contribute to explaining the difference. An extension of the PMV model that
     includes an expectancy factor is introduced for use in non-air-conditioned
-    buildings in warm climates [26]_.
+    buildings in warm climates [fanger2002]_.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def pmv_e(
         .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
             for the effect of the body movement for met equal or higher than 1.2 met using
             the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
             can be calculated using the function

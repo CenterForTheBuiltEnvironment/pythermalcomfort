@@ -1,4 +1,3 @@
-
 Authors
 =======
 
@@ -35,3 +34,14 @@ Acknowledgements
 .. _CBE Comfort Tool: https://comfort.cbe.berkeley.edu
 .. _ladybug-comfort: https://pypi.org/project/ladybug-comfort/
 .. _UTCI: https://www.utci.org/
+
+Contact us
+==========
+
+If you need help, would like to ask a question about the tool, give us a feedback, or suggest a new feature you can now use `GitHub discussions <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/discussions>`_.
+
+Bug reports
+===========
+
+You can report bugs or request new features using `GitHub issues <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_.
+

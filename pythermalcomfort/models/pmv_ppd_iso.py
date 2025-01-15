@@ -28,7 +28,7 @@ def pmv_ppd_iso(
     """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
     calculated in accordance with the ISO 7730.
 
-    The ISO uses the same formulation of the PMV as published by Fanger [30]_.
+    The ISO uses the same formulation of the PMV as published by Fanger [fanger1970]_.
 
     Parameters
     ----------
@@ -91,7 +91,7 @@ def pmv_ppd_iso(
     -------
     PMVPPD
         A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for more details.
-        To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `pmv_ppd` instance, e.g., `result.pmv`.
+        To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
 
     Examples
     --------

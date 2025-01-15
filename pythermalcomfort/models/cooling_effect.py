@@ -21,7 +21,7 @@ def cooling_effect(
     units: Literal["SI", "IP"] = "SI",
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
-    with the ASHRAE 55 2020 Standard [1]_. The `CE`_ of the elevated air speed
+    with the ASHRAE 55 2020 Standard [ASHRAE552023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under
     still air as in the first `SET`_ calculation under elevated air speed. The
@@ -60,7 +60,7 @@ def cooling_effect(
         .. note::
             The activity as well as the air speed modify the insulation characteristics
             of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
-            the clothing insulation shall be corrected [2]_. The ASHRAE 55 Standard corrects
+            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
             for the effect of the body movement for met equal or higher than 1.2 met using
             the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
             can be calculated using the function

@@ -12,7 +12,7 @@ def clo_tout(
     units: Literal["SI", "IP"] = "SI",
 ) -> CloTOut:
     """Representative clothing insulation Icl as a function of outdoor air
-    temperature at 06:00 a.m [4]_.
+    temperature at 06:00 a.m [Schiavon2013]_.
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ def clo_tout(
     -----
     .. note::
         The ASHRAE 55 2020 states that it is acceptable to determine the clothing
-        insulation Icl using this equation in mechanically conditioned buildings [1]_.
+        insulation Icl using this equation in mechanically conditioned buildings [ASHRAE552023]_.
 
     .. note::
         Limitations:

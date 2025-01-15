@@ -12,7 +12,7 @@ def heat_index_lu(
     rh: Union[float, list[float]],
     round_output: bool = True,
 ) -> HI:
-    """The Heat Index (HI) calculated in accordance with the Lu and Romps (2022) model [28]_.
+    """The Heat Index (HI) calculated in accordance with the Lu and Romps (2022) model [lu]_.
 
     Parameters
     ----------

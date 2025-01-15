@@ -1,12 +1,23 @@
-======================
-Examples and Tutorials
-======================
+========
+Examples
+========
 
-`Examples`_ files on how to use some of the functions
+Code snippets
+=============
+
+Each function contains a few examples in the documentation.
+
+Example files
+=============
+
+You can also check the `Examples`_ files on how to use some of the functions
 
 .. _Examples: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/tree/master/examples
 
-YouTube `tutorials`_ playlist
+Video tutorials
+===============
+
+If instead of reading you prefer watching, you can check the YouTube `tutorials`_ playlist
 
 .. _tutorials: https://youtube.com/playlist?list=PLY91jl6VVD7zMaJjRVrVkaBtI56U7ztQC
 

@@ -163,7 +163,7 @@ def wet_bulb_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the wet-bulb temperature using the Stull equation [6]_
+    """Calculates the wet-bulb temperature using the Stull equation [stull2011]_
 
     Parameters
     ----------
@@ -228,7 +228,7 @@ def mean_radiant_tmp(
 ):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [5]_.
+    7726:1998 Standard [ISO77261998]_.
 
     Parameters
     ----------
@@ -249,7 +249,7 @@ def mean_radiant_tmp(
         to better determine the free and forced convection coefficient used in the
         calculation of the mean radiant temperature. They also showed that mean radiant
         temperature measured with ping-pong ball-sized globe thermometers is not reliable
-        due to a stochastic convective bias [22]_. The Mixed Convection model has only
+        due to a stochastic convective bias [Teitelbaum]_. The Mixed Convection model has only
         been validated for globe sensors with a diameter between 0.04 and 0.15 m.
 
     Returns
@@ -525,7 +525,7 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
     Estimates the dynamic clothing insulation of a moving occupant. The activity as well
     as the air speed modify the insulation characteristics of the clothing and the
     adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
-    shall be corrected [2]_. The ASHRAE 55 Standard corrects for the effect of the body
+    shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects for the effect of the body
     movement for met equal or higher than 1.2 met using the equation clo = Icl × (0.6 +
     0.4/met)
 
@@ -567,9 +567,9 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
         t_{day-n}]`.
         Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
-        16798-1 2019 [3]_ states that n should be equal to 7
+        16798-1 2019 [EN2019]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [3]_ recommends a value of 0.8,
+        constant between 0 and 1. The EN 16798-1 2019 [EN2019]_ recommends a value of 0.8,
         while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
@@ -641,7 +641,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998 [5]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [ISO77261998]_
 
     Parameters
     ----------
@@ -670,7 +670,7 @@ def operative_tmp(
 
 def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
     """Calculates the intrinsic insulation of a clothing ensemble based on individual
-    garments. This equation is in accordance with the ISO 9920:2009 standard [29]_
+    garments. This equation is in accordance with the ISO 9920:2009 standard [iso9920]_
     Section 4.3. It should be noted that this equation is only valid for clothing
     ensembles with rather uniform insulation values across the body.
 
@@ -691,7 +691,7 @@ def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
 def clo_area_factor(i_cl: Union[float, list[float]]):
     """Calculates the clothing area factor (f_cl) of the clothing ensemble as a function
     of the intrinsic insulation of the clothing ensemble. This equation is in accordance
-    with the ISO 9920:2009 standard [29]_ Section 5. The standard warns that the
+    with the ISO 9920:2009 standard [iso9920]_ Section 5. The standard warns that the
     correlation between f_cl and i_cl is low especially for non-western clothing
     ensembles. The application of this equation is limited to clothing ensembles with
     clo values between 0.2 and 1.7 clo.
@@ -721,7 +721,7 @@ def clo_insulation_air_layer(
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
     the boundary air layer insulation is calculated based on the walking speed (v_walk)
     and the relative air speed (vr). This equation is extracted from the ISO 9920:2009
-    standard [29]_ Section 6.
+    standard [iso9920]_ Section 6.
 
     Parameters
     ----------
@@ -763,7 +763,7 @@ def clo_total_insulation(
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
-    ISO 7790 standard [29]_ provides different equations to calculate it as a function
+    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a function
     of the total thermal insulation of clothing (`I`:sub:`T`), the insulation of the
     boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
     relative air speed (`v`:sub:`r`). These different equations are used if the person
@@ -772,7 +772,7 @@ def clo_total_insulation(
     in very light clothing (`I`:sub:`cl` < 0.6 clo). Here we have not implemented the
     equation for high clothing (`I`:sub:`T` > 2.0 clo). Hence the applicability of this
     function is limited to 0 clo < (`I`:sub:`T`) < 2.0 clo). You can find all the inputs
-    required in this function in the ISO 9920:2009 standard [29]_ Annex A.
+    required in this function in the ISO 9920:2009 standard [iso9920]_ Annex A.
 
     Parameters
     ----------

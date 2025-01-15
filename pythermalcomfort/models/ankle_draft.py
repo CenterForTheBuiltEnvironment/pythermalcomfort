@@ -22,7 +22,7 @@ def ankle_draft(
     units: str = "SI",
 ) -> AnkleDraft:
     """Calculates the percentage of thermally dissatisfied people with the
-    ankle draft (0.1 m) above floor level [23]_.
+    ankle draft (0.1 m) above floor level [liu2017]_.
 
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 

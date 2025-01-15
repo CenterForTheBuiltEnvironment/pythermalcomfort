@@ -39,16 +39,45 @@ extlinks = {
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
-html_theme = "sphinx_rtd_theme"
-
-html_use_smartypants = True
-html_last_updated_fmt = "%b %d, %Y"
-html_split_index = False
-html_sidebars = {
-    "**": ["searchbox.html", "globaltoc.html", "sourcelink.html"],
-}
-html_short_title = f"{project}-{version}"
+html_theme = "pydata_sphinx_theme"
 
 napoleon_use_ivar = True
 napoleon_use_rtype = False
 napoleon_use_param = False
+
+html_title = f"pythermalcomfort {version}"
+html_short_title = f"{project}-{version}"
+
+html_use_smartypants = True
+html_last_updated_fmt = "%b %d, %Y"
+html_split_index = False
+
+html_sidebars = {
+    "**": ["sidebar-nav-bs"],
+    "installation": [],
+    "contributing": [],
+    "authors": [],
+}
+
+html_theme_options = {
+    "icon_links": [
+        {
+            # Label for this link
+            "name": "GitHub",
+            # URL where the link will redirect
+            "url": "https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort",  # required
+            # Icon class (if "type": "fontawesome"), or path to local image (if "type": "local")
+            "icon": "fa-brands fa-square-github",
+            # The type of image to be used (see below for details)
+            "type": "fontawesome",
+        },
+        {
+            "name": "LinkedIn",
+            "url": "https://www.linkedin.com/in/federico-tartarini",  # required
+            "icon": "fa-brands fa-linkedin",
+            "type": "fontawesome",
+        },
+    ],
+    "secondary_sidebar_items": ["page-toc", "edit-this-page"],
+    "content_footer_items": ["last-updated"],
+}

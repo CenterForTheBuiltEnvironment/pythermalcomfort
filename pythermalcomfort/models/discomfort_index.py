@@ -14,7 +14,7 @@ def discomfort_index(
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usually divided into 6 discomfort categories and it only applies to
-    warm environments: [24]_
+    warm environments: [polydoros2015]_
 
     * class 1 - DI < 21 °C - No discomfort
     * class 2 - 21 <= DI < 24 °C - Less than 50% feels discomfort
