@@ -77,6 +77,16 @@ html_theme_options = {
             "icon": "fa-brands fa-linkedin",
             "type": "fontawesome",
         },
+        {
+            "name": "Google Scholar",
+            "url": "https://scholar.google.com/citations?view_op=list_works&hl=en&hl=en&user=QcamSPwAAAAJ",
+            "icon": "fa-brands fa-google-scholar",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/pythermalcomfort/",
+            "icon": "fa-brands fa-python",
+        },
     ],
     "secondary_sidebar_items": ["page-toc", "edit-this-page"],
     "content_footer_items": ["last-updated"],
