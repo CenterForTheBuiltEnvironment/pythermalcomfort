@@ -9,6 +9,8 @@ from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
     units_converter,
+    Models,
+    Units,
 )
 
 
@@ -20,8 +22,8 @@ def pmv_ppd_iso(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    model: str = "2005",
-    units: str = "SI",
+    model: str = Models.iso_7730_2005.value,
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
@@ -141,11 +143,11 @@ def pmv_ppd_iso(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     model = model.lower()
-    if model not in ["7730-2005"]:
+    if model not in [Models.iso_7730_2005.value]:
         raise ValueError(
             "PMV calculations can only be performed in compliance with ISO 7730-2005"
         )

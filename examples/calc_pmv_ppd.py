@@ -41,7 +41,7 @@ print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
 # for users who want to use the IP system
 results_ip = pmv_ppd_iso(
-    tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP", model="7730-2005"
+    tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP"
 )
 print(results_ip)
 
@@ -96,6 +96,6 @@ print(end - start)
 
 # ISO PMV
 start = time.time()
-pmv_ppd_iso(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d, model="7730-2005")
+pmv_ppd_iso(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d)
 end = time.time()
 print(end - start)

@@ -5,6 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import EPMVInputs
 from pythermalcomfort.classes_return import EPMV
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_e(
@@ -16,7 +17,7 @@ def pmv_e(
     clo: Union[float, list[float]],
     e_coefficient: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    units: str = "SI",
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
 ) -> EPMV:
     """Returns Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
@@ -126,7 +127,7 @@ def pmv_e(
         met=met,
         clo=clo,
         wme=wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         **default_kwargs,
     ).pmv
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
@@ -138,7 +139,7 @@ def pmv_e(
         met=met,
         clo=clo,
         wme=wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         **default_kwargs,
     ).pmv
 

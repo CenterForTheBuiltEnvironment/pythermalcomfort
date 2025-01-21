@@ -3,6 +3,7 @@ import pytest
 
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models import pmv_ppd_ashrae
+from pythermalcomfort.utilities import Models
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -19,7 +20,7 @@ def test_pmv_ppd(get_test_url, retrieve_data):
         if "standard" not in inputs.keys():
             inputs["standard"] = "iso"
         if inputs["standard"] == "ashrae":
-            inputs["model"] = "55-2023"
+            inputs["model"] = Models.ashrae_55_2023.value
             del inputs["standard"]
             result = pmv_ppd_ashrae(**inputs)
 
@@ -38,7 +39,7 @@ class TestPmvPpd:
                 50,
                 [1.1, 1.1, 1.1, 1.3, 1.3, 1.3],
                 [0.5, 0.5, 0.5, 0.7, 0.7, 0.7],
-                model="55-2023",
+                model=Models.ashrae_55_2023.value,
                 airspeed_control=False,
             ).pmv,
             [np.nan, np.nan, np.nan, -0.14, -0.43, -0.57],
@@ -52,14 +53,21 @@ class TestPmvPpd:
                 50,
                 [1.1, 1.1, 1.1, 0.7, 1.1, 3.9],
                 [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
-                model="55-2023",
+                model=Models.ashrae_55_2023.value,
             ).pmv,
             np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         np.testing.assert_equal(
             pmv_ppd_ashrae(
-                41, 41, 2, 50, 0.7, 2.1, model="55-2023", limit_inputs=False
+                41,
+                41,
+                2,
+                50,
+                0.7,
+                2.1,
+                model=Models.ashrae_55_2023.value,
+                limit_inputs=False,
             ),
             PMVPPD(pmv=np.float64(4.48), ppd=np.float64(100.0)),
         )

@@ -5,6 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import APMVInputs
 from pythermalcomfort.classes_return import APMV
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_a(
@@ -16,7 +17,7 @@ def pmv_a(
     clo: Union[float, list[float]],
     a_coefficient: Union[float, int],
     wme: Union[float, list[float]] = 0,
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> APMV:
     """Returns Adaptive Predicted Mean Vote (aPMV) [yao2009]_. This index was
@@ -115,7 +116,7 @@ def pmv_a(
         met,
         clo,
         wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         units=units,
         limit_inputs=limit_inputs,
     ).pmv

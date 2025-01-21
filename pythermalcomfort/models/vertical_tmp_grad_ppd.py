@@ -5,7 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import VerticalTGradPPDInputs
 from pythermalcomfort.classes_return import VerticalTGradPPD
 from pythermalcomfort.models import pmv_ppd_ashrae
-from pythermalcomfort.utilities import _check_standard_compliance_array
+from pythermalcomfort.utilities import _check_standard_compliance_array, Models
 
 
 def vertical_tmp_grad_ppd(
@@ -114,7 +114,13 @@ def vertical_tmp_grad_ppd(
     )
 
     tsv = pmv_ppd_ashrae(
-        tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, model="55-2023"
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        model=Models.ashrae_55_2023.value,
     ).pmv
     numerator = np.exp(0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = (numerator / (1 + numerator) - 0.345) * 100

@@ -5,6 +5,7 @@ import pytest
 
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, Units
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -21,7 +22,7 @@ def test_pmv_ppd(get_test_url, retrieve_data):
         if "standard" not in inputs.keys():
             inputs["standard"] = "iso"
         if inputs["standard"] == "iso":
-            inputs["model"] = "7730-2005"
+            inputs["model"] = Models.iso_7730_2005.value
             del inputs["standard"]
             result = pmv_ppd_iso(**inputs)
 
@@ -40,7 +41,9 @@ class TestPmvPpd:
         clo = [0.5, 1.8]
 
         # Act
-        result = pmv_ppd_iso(tdb, tr, vr, rh, met, clo, model="7730-2005")
+        result = pmv_ppd_iso(
+            tdb, tr, vr, rh, met, clo, model=Models.iso_7730_2005.value
+        )
 
         # Assert
         assert math.isnan(result.pmv[1])
@@ -49,7 +52,14 @@ class TestPmvPpd:
         assert (
             round(
                 pmv_ppd_iso(
-                    67.28, 67.28, 0.328084, 86, 1.1, 1, units="ip", model="7730-2005"
+                    67.28,
+                    67.28,
+                    0.328084,
+                    86,
+                    1.1,
+                    1,
+                    units=Units.IP.value,
+                    model=Models.iso_7730_2005.value,
                 ).pmv,
                 1,
             )
@@ -58,7 +68,14 @@ class TestPmvPpd:
         np.testing.assert_equal(
             np.around(
                 pmv_ppd_iso(
-                    [70, 70], 67.28, 0.328084, 86, 1.1, 1, units="ip", model="7730-2005"
+                    [70, 70],
+                    67.28,
+                    0.328084,
+                    86,
+                    1.1,
+                    1,
+                    units=Units.IP.value,
+                    model=Models.iso_7730_2005.value,
                 ).pmv,
                 1,
             ),
@@ -74,14 +91,23 @@ class TestPmvPpd:
                 50,
                 [1.1, 1.1, 1.1, 0.7, 1.1, 4.1],
                 [0.5, 0.5, 0.5, 0.5, 2.1, 0.1],
-                model="7730-2005",
+                model=Models.iso_7730_2005.value,
             ).pmv,
             np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         # check results with limit_inputs disabled
         np.testing.assert_equal(
-            pmv_ppd_iso(31, 41, 2, 50, 0.7, 2.1, model="7730-2005", limit_inputs=False),
+            pmv_ppd_iso(
+                31,
+                41,
+                2,
+                50,
+                0.7,
+                2.1,
+                model=Models.iso_7730_2005.value,
+                limit_inputs=False,
+            ),
             PMVPPD(pmv=np.float64(2.4), ppd=np.float64(91.0)),
         )
 
@@ -92,7 +118,14 @@ class TestPmvPpd:
     def test_no_rounding(self):
         np.isclose(
             pmv_ppd_iso(
-                25, 25, 0.1, 50, 1.1, 0.5, round_output=False, model="7730-2005"
+                25,
+                25,
+                0.1,
+                50,
+                1.1,
+                0.5,
+                round_output=False,
+                model=Models.iso_7730_2005.value,
             ).pmv,
             -0.13201636,
             atol=0.01,

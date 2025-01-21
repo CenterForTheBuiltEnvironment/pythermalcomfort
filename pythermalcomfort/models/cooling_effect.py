@@ -7,7 +7,7 @@ from scipy import optimize
 from pythermalcomfort.classes_input import CEInputs
 from pythermalcomfort.classes_return import CE
 from pythermalcomfort.models.set_tmp import set_tmp
-from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import units_converter, Units
 
 
 def cooling_effect(
@@ -18,7 +18,7 @@ def cooling_effect(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [ASHRAE552023]_. The `CE`_ of the elevated air speed
@@ -124,7 +124,7 @@ def cooling_effect(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     still_air_threshold = 0.1
@@ -140,7 +140,7 @@ def cooling_effect(
         vr=vr,
     )
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         _ce = _ce / 1.8 * 3.28
 
     return CE(ce=np.around(_ce, 2))

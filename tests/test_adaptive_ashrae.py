@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from pythermalcomfort.models import adaptive_ashrae
+from pythermalcomfort.utilities import Units
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -14,7 +15,7 @@ def test_adaptive_ashrae(get_test_url, retrieve_data):
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        units = inputs.get("units", "SI")
+        units = inputs.get("units", Units.SI.value)
         result = adaptive_ashrae(
             inputs["tdb"], inputs["tr"], inputs["t_running_mean"], inputs["v"], units
         )

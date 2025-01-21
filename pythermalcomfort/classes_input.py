@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import validate_type
+from pythermalcomfort.utilities import validate_type, Units
 
 
 @dataclass
@@ -26,7 +26,7 @@ class BaseInputs:
     limit_inputs: bool = field(default=True)
     with_solar_load: bool = field(default=False)
     airspeed_control: bool = field(default=True)
-    units: str = field(default="SI")
+    units: str = field(default=Units.SI.value)
     a_coefficient: Union[float, int] = field(default=None)
     e_coefficient: Union[float, int] = field(default=None)
     v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
@@ -55,7 +55,7 @@ class BaseInputs:
 
     def __post_init__(self):
         # Only validate attributes that are not None
-        if self.units.lower() not in ["si", "ip"]:
+        if self.units.upper() not in [Units.SI.value, Units.IP.value]:
             raise ValueError("Units must be either 'SI' or 'IP'")
         if self.position is not None:
             if self.position.lower() not in [
@@ -187,7 +187,7 @@ class APMVInputs(BaseInputs):
         clo,
         a_coefficient,
         wme=0,
-        units="SI",
+        units=Units.SI.value,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
@@ -254,7 +254,7 @@ class AnkleDraftInputs(BaseInputs):
         met,
         clo,
         v_ankle,
-        units="SI",
+        units=Units.SI.value,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
@@ -315,7 +315,7 @@ class CloTOutInputs(BaseInputs):
     def __init__(
         self,
         tout,
-        units: str = "SI",
+        units: str = Units.SI.value,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
@@ -527,7 +527,7 @@ class PMVInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        units="SI",
+        units=Units.SI.value,
         limit_inputs=True,
         airspeed_control=True,
     ):
@@ -557,7 +557,7 @@ class PMVPPDInputs(BaseInputs):
         met,
         clo,
         wme=0,
-        units="SI",
+        units=Units.SI.value,
         limit_inputs=True,
         airspeed_control=True,
     ):
@@ -590,7 +590,7 @@ class SETInputs(BaseInputs):
         body_surface_area=1.8258,
         p_atm=101325,
         position="standing",
-        units="SI",
+        units=Units.SI.value,
         limit_inputs=True,
     ):
         # Initialize with only required fields, setting others to None
@@ -718,7 +718,7 @@ class UTCIInputs(BaseInputs):
         tr,
         v,
         rh,
-        units="SI",
+        units=Units.SI.value,
         limit_inputs=True,
     ):
         # Initialize with only required fields, setting others to None
@@ -743,7 +743,7 @@ class VerticalTGradPPDInputs(BaseInputs):
         met,
         clo,
         vertical_tmp_grad,
-        units="SI",
+        units=Units.SI.value,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(

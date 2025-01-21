@@ -9,6 +9,8 @@ from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
     units_converter,
+    Models,
+    Units,
 )
 
 
@@ -20,8 +22,8 @@ def pmv_ppd_ashrae(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    model: str = "55-2023",
-    units: str = "SI",
+    model: str = Models.ashrae_55_2023.value,
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
     airspeed_control: bool = True,
     round_output: bool = True,
@@ -150,13 +152,13 @@ def pmv_ppd_ashrae(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     model = model.lower()
-    if model not in ["55-2023"]:
+    if model not in [Models.ashrae_55_2023.value]:
         raise ValueError(
-            "PMV calculations can only be performed in compliance with ASHRAE 55-2023"
+            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
         )
 
     (

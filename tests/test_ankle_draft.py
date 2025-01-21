@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from pythermalcomfort.models.ankle_draft import AnkleDraft, ankle_draft
+from pythermalcomfort.utilities import Units
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
@@ -45,7 +46,7 @@ def test_ankle_draft_list_inputs():
         met=[1.2, 1.2, 1.2],
         clo=[0.5, 0.5, 0.5],
         v_ankle=[0.1, 0.1, 0.1],
-        units="SI",
+        units=Units.SI.value,
     )
     assert isinstance(results, AnkleDraft)
     assert len(results.ppd_ad) == 3
@@ -62,5 +63,5 @@ def test_ankle_draft_invalid_list_inputs():
             met=[1.2, 1.2, 1.2],
             clo=[0.5, 0.5, 0.5],
             v_ankle=[0.1, 0.1, 0.1],
-            units="SI",
+            units=Units.SI.value,
         )

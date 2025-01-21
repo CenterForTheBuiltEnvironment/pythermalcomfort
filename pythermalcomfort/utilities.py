@@ -26,6 +26,11 @@ class Models(Enum):
     iso_9920_2007 = "9920-2007"
 
 
+class Units(Enum):
+    SI = "SI"
+    IP = "IP"
+
+
 def p_sat_torr(tdb: Union[float, list[float]]):
     """Estimates the saturation vapor pressure in [torr]
 
@@ -627,7 +632,9 @@ def clo_dynamic_iso(
     return i_t_r - i_a_r / f_cl
 
 
-def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
+def running_mean_outdoor_temperature(
+    temp_array: list[float], alpha: float = 0.8, units: str = Units.SI.value
+):
     """Estimates the running mean temperature also known as prevailing mean outdoor
     temperature.
 
@@ -654,20 +661,21 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     t_rm  : float
         running mean outdoor temperature
     """
-    if units.lower() == "ip":
+    units = units.upper()
+    if units == Units.IP.value:
         for ix, _x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
     coeff = [alpha**ix for ix, x in enumerate(temp_array)]
     t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
 
-    if units.lower() == "ip":
-        t_rm = units_converter(tmp=t_rm, from_units="si")[0]
+    if units == Units.IP.value:
+        t_rm = units_converter(tmp=t_rm, from_units=Units.SI.value.lower())[0]
 
     return round(t_rm, 1)
 
 
-def units_converter(from_units="ip", **kwargs):
+def units_converter(from_units=Units.IP.value, **kwargs):
     """Converts IP values to SI units.
 
     Parameters
@@ -681,7 +689,8 @@ def units_converter(from_units="ip", **kwargs):
     converted values in SI units
     """
     results = list()
-    if from_units == "ip":
+    from_units = from_units.upper()
+    if from_units == Units.IP.value:
         for key, value in kwargs.items():
             if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value - 32) * 5 / 9)
@@ -692,7 +701,7 @@ def units_converter(from_units="ip", **kwargs):
             if key == "pressure":
                 results.append(value * 101325)
 
-    elif from_units == "si":
+    elif from_units == Units.SI.value:
         for key, value in kwargs.items():
             if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value * 9 / 5) + 32)
