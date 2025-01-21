@@ -43,23 +43,17 @@ print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 results_ip = pmv_ppd_iso(tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP")
 print(results_ip)
 
-# If you want you can also pass an array of inputs
+# If you want you can also pass pandas series or arrays as inputs
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
-ta = df["tdb"].values
-tr = df["tr"].values
-vel = df["v"].values
-rh = df["rh"].values
-met = df["met"].values
-clo = df["clo"].values
-
-v_rel = v_relative(vel, met)
-clo_d = clo_dynamic_ashrae(clo, met)
-results = pmv_ppd_ashrae(ta, tr, v_rel, rh, met, clo_d, 0)
+v_rel = v_relative(df["v"], df["met"])
+clo_d = clo_dynamic_ashrae(df["clo"], df["met"])
+results = pmv_ppd_ashrae(df["tdb"], df["tr"], v_rel, df["rh"], df["met"], clo_d, 0)
+print(results)
 
 df["vr"] = v_rel
 df["clo_d"] = clo_d
-df["pmv"] = results["pmv"]
+df["pmv"] = results.pmv  # you can also use results["pmv"]
 df["ppd"] = results["ppd"]
 
 print(df.head())
