@@ -48,7 +48,7 @@ def pmv_a(
         Clothing insulation, [clo].
 
         .. note::
-            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic_iso`.
 
     a_coefficient : float
         Adaptive coefficient.
@@ -76,8 +76,8 @@ def pmv_a(
     .. code-block:: python
         :emphasize-lines: 9,12,14
 
-        from pythermalcomfort.models import a_pmv
-        from pythermalcomfort.utilities import v_relative, clo_dynamic
+        from pythermalcomfort.models import pmv_a
+        from pythermalcomfort.utilities import v_relative, clo_dynamic_iso
 
         v = 0.1
         met = 1.4
@@ -87,13 +87,13 @@ def pmv_a(
         v_r = v_relative(v=v, met=met)
 
         # Calculate dynamic clothing
-        clo_d = clo_dynamic(clo=clo, met=met)
+        clo_d = clo_dynamic_iso(clo=clo, met=met, v=v)
 
-        results = a_pmv(
+        results = pmv_a(
             tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
-        print(results.a_pmv)  # 0.74
+        print(results.a_pmv)  # 0.71
     """
     # Validate inputs using the APMVInputs class
     APMVInputs(

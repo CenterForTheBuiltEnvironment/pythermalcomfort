@@ -142,7 +142,11 @@ Clothing area factor (f\ :sub:`cl`)
 Dynamic clothing
 ----------------
 
-.. autofunction:: pythermalcomfort.utilities.clo_dynamic
+Below are the two functions to calculate the dynamic clothing in accordance with ISO and ASHRAE.
+
+.. autofunction:: pythermalcomfort.utilities.clo_dynamic_iso
+
+.. autofunction:: pythermalcomfort.utilities.clo_dynamic_ashrae
 
 Intrinsic clothing insulation ensemble (I\ :sub:`cl`)
 -----------------------------------------------------

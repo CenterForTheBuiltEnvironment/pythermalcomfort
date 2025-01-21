@@ -53,13 +53,12 @@ def vertical_tmp_grad_ppd(
         Clothing insulation, [clo].
 
         .. note::
-            The activity as well as the air speed modify the insulation characteristics
-            of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected. The ASHRAE 55 Standard corrects
-            for the effect of the body movement for met equal or higher than 1.2 met using
-            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-            can be calculated using the function
-            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            this is the basic insulation also known as the intrinsic clothing insulation value of the
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under actual
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     vertical_tmp_grad : float or list of floats
         Vertical temperature gradient between the feet and the head, [°C/m].

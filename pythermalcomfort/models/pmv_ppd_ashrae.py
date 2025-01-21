@@ -65,12 +65,9 @@ def pmv_ppd_ashrae(
             this is the basic insulation also known as the intrinsic clothing insulation value of the
             clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
             surface to the outer clothing surface, including enclosed air layers, under actual
-            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`)
-
-        .. note::
-            The ASHRAE 55 Standard corrects for the effect of the body movement for met equal or higher
-            than 1.2 met using the equation clo = (I :sub:`cl,r`), × (0.6 + 0.4/met) The dynamic clothing
-            insulation, clo, can be calculated using the function :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     wme : float or list of floats, optional
         External work, [met]. Defaults to 0.
@@ -113,7 +110,7 @@ def pmv_ppd_ashrae(
     .. code-block:: python
 
         from pythermalcomfort.models import pmv_ppd_ashrae
-        from pythermalcomfort.utilities import v_relative, clo_dynamic
+        from pythermalcomfort.utilities import v_relative, clo_dynamic_ashrae
 
         tdb = 25
         tr = 25
@@ -124,7 +121,7 @@ def pmv_ppd_ashrae(
         # calculate relative air speed
         v_r = v_relative(v=v, met=met)
         # calculate dynamic clothing
-        clo_d = clo_dynamic(clo=clo, met=met)
+        clo_d = clo_dynamic_ashrae(clo=clo, met=met)
         results = pmv_ppd_ashrae(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, model="55-2023")
         print(results.pmv)  # 0.0
         print(results.ppd)  # 5.0
