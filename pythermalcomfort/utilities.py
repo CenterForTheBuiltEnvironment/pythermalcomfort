@@ -506,17 +506,16 @@ def f_svv(w, h, d):
     )
 
 
-def v_relative(v, met):
+def v_relative(v: Union[float, list[float]], met: Union[float, list[float]]):
     """Estimates the relative air speed which combines the average air speed of the
-    space plus the relative air speed caused by the body movement. Vag is assumed to be
-    0 for metabolic rates equal and lower than 1 met and otherwise equal to Vag = 0.3 (M
-    – 1) (m/s)
+    space plus the relative air speed caused by the body movement. The same equation is
+    used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
 
     Parameters
     ----------
     v : float or list of floats
         air speed measured by the sensor, [m/s]
-    met : float
+    met : float or list of floats
         metabolic rate, [met]
 
     Returns
@@ -524,6 +523,8 @@ def v_relative(v, met):
     vr  : float or list of floats
         relative air speed, [m/s]
     """
+    v = np.array(v)
+    met = np.array(met)
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
