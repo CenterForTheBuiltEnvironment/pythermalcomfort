@@ -781,12 +781,13 @@ def clo_area_factor(i_cl: Union[float, list[float]]):
     return 1 + 0.28 * i_cl
 
 
+# todo implement the vr and v_walk functions as a function of the met
 def clo_insulation_air_layer(
     vr: Union[float, list[float]],
     v_walk: Union[float, list[float]],
     i_a_static: Union[float, list[float]],
 ):
-    """Calculates the insulation of the boundary air layer (`I`:sub:`a`). The static
+    """Calculates the insulation of the boundary air layer (`I`:sub:`a,r`). The static
     boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
     0.15 m/s. Thus, for static conditions, the standard recommends using the value of
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
@@ -805,7 +806,7 @@ def clo_insulation_air_layer(
 
     Returns
     -------
-    i_a: float or list of floats
+    i_a_r: float or list of floats
         boundary air layer insulation, [clo]
     """
     vr = np.array(vr)
@@ -834,9 +835,9 @@ def clo_total_insulation(
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
-    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a function
-    of the total thermal insulation of clothing (`I`:sub:`T`), the insulation of the
-    boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
+    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a
+    function of the total thermal insulation of clothing (`I`:sub:`T`), the insulation
+    of the boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
     relative air speed (`v`:sub:`r`). These different equations are used if the person
     is clothed in normal clothing (0.6 clo < (`I`:sub:`cl`) < 1.4 clo or 1.2 clo <
     (`I`:sub:`T`) < 2.0 clo), nude (`I`:sub:`cl` = 0 clo), and if the person is clothed
@@ -876,15 +877,15 @@ def clo_total_insulation(
     def nude(_vr, _vw, _i_a_static):
         return _i_a_static * _correction_nude(_vr=_vr, _vw=_vw)
 
-    def low_clothing(_vr, _vw, _i_a_static, _i_cl):
+    def low_clothing(_vr, _vw, _i_a_static, _i_cl, _i_t):
         return (
             (0.6 - _i_cl) * nude(_vr, _vw, _i_a_static)
-            + _i_cl * normal_clothing(_vr, _vw, _i_cl)
+            + _i_cl * normal_clothing(_vr, _vw, _i_t)
         ) / 0.6
 
     i_t_r = np.where(
         i_cl <= 0.6,
-        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl),
+        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl, _i_t=i_t),
         normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
     )
     i_t_r = np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
