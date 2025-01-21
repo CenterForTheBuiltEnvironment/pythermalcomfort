@@ -28,6 +28,31 @@ def test_pmv_ppd(get_test_url, retrieve_data):
 
 
 class TestPmvPpd:
+
+    def test_thermal_sensation(self):
+        np.testing.assert_equal(
+            pmv_ppd_ashrae(
+                [16, 21, 24, 26, 29, 32, 34, 33.47, 33.46],
+                [16, 21, 24, 26, 29, 32, 34, 33.47, 33.46],
+                0.2,
+                50,
+                1,
+                0.5,
+                model=Models.ashrae_55_2023.value,
+            ).tsv,
+            [
+                "Cold",
+                "Cool",
+                "Slightly Cool",
+                "Neutral",
+                "Slightly Warm",
+                "Warm",
+                "Hot",
+                "Warm",
+                "Hot",
+            ],
+        )
+
     #  Returns NaN for invalid input values
     def test_returns_nan_for_invalid_input_values(self):
         # test airspeed limits

@@ -358,10 +358,13 @@ class PMVPPD:
         Predicted Mean Vote.
     ppd : float or list of floats
         Predicted Percentage of Dissatisfied.
+    tsv : float or list of floats
+        Predicted thermal sensation vote.
     """
 
     pmv: Union[float, list[float]]
     ppd: Union[float, list[float]]
+    tsv: Union[float, list[float]]
 
     def __getitem__(self, item):
         return getattr(self, item)

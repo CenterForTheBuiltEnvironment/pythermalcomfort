@@ -5,7 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
-from pythermalcomfort.shared_functions import valid_range
+from pythermalcomfort.shared_functions import valid_range, mapping
 from pythermalcomfort.utilities import (
     Models,
     Units,
@@ -92,8 +92,10 @@ def pmv_ppd_iso(
     Returns
     -------
     PMVPPD
-        A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for more details.
-        To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
+        A dataclass containing the Predicted Mean Vote and Predicted Percentage of
+        Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for
+        more details. To access the `pmv`, `ppd`, `tsv` values, use the corresponding
+        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
 
     Examples
     --------
@@ -192,4 +194,18 @@ def pmv_ppd_iso(
         pmv_array = np.round(pmv_array, 2)
         ppd_array = np.round(ppd_array, 1)
 
-    return PMVPPD(pmv=pmv_array, ppd=ppd_array)
+    thermal_sensation = {
+        -2.5: "Cold",
+        -1.5: "Cool",
+        -0.5: "Slightly Cool",
+        0.5: "Neutral",
+        1.5: "Slightly Warm",
+        2.5: "Warm",
+        10: "Hot",
+    }
+
+    return PMVPPD(
+        pmv=pmv_array,
+        ppd=ppd_array,
+        tsv=mapping(pmv_array, thermal_sensation, right=False),
+    )
