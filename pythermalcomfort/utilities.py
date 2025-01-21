@@ -1,5 +1,6 @@
 import math
 import warnings
+from enum import Enum
 from typing import NamedTuple, Union
 
 import numpy as np
@@ -17,6 +18,12 @@ cp_air = 1004
 h_fg = 2501000
 r_air = 287.055
 g = 9.81  # m/s2
+
+
+class Models(Enum):
+    ashrae_55_2023 = "55-2023"
+    iso_7730_2005 = "7730-2005"
+    iso_9920_2007 = "9920-2007"
 
 
 def p_sat_torr(tdb: Union[float, list[float]]):
@@ -520,14 +527,62 @@ def v_relative(v, met):
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
-def clo_dynamic(clo, met, standard="ASHRAE"):
+def clo_dynamic_ashrae(
+    clo: Union[float, list[float]],
+    met: Union[float, list[float]],
+    model: str = Models.ashrae_55_2023.value,
+):
+    """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The ASHRAE
+    55:2023 refers to it as (I :sub:`cl,active`). The activity as well as the air speed
+    modify the insulation characteristics of the clothing. Consequently, the ASHRAE 55
+    standard provides a correction factor for the clothing insulation (I :sub:`cl`)
+    based on the metabolic rate.
+
+    Parameters
+    ----------
+    clo : float or list of floats
+        clothing insulation, [clo]
+
+        .. note::
+            this is the basic insulation (I :sub:`cl`) also known as the intrinsic
+            clothing insulation value under reference conditions
+
+    met : float or list of floats
+        metabolic rate, [met]
+    model : str, optional
+        Select the version of the ASHRAE 55 Standard to use. Currently, the only
+        option available is "55-2023".
+
+    Returns
+    -------
+    clo : float or list of floats
+        dynamic clothing insulation (I :sub:`cl,r`), [clo]
     """
-    Estimates the dynamic clothing insulation of a moving occupant. The activity as well
-    as the air speed modify the insulation characteristics of the clothing and the
-    adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
-    shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects for the effect of the body
-    movement for met equal or higher than 1.2 met using the equation clo = Icl × (0.6 +
-    0.4/met)
+    clo = np.array(clo)
+    met = np.array(met)
+
+    model = model.lower()
+    if model not in [Models.ashrae_55_2023.value]:
+        raise ValueError(
+            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        )
+
+    return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
+
+
+def clo_dynamic_iso(
+    clo: Union[float, list[float]],
+    met: Union[float, list[float]],
+    v: Union[float, list[float]],
+    i_a: Union[float, list[float]] = 0.7,
+    model: str = Models.iso_9920_2007.value,
+):
+    """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
+    as well as the air speed modify the insulation characteristics of the clothing.
+    Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
+    [ISO77302005]_. However, the ISO 7730:2005 contains insufficient information to
+    calculate (I :sub:`cl,r`). Therefore, we implemented the equations provided in the
+    ISO 9920:2007 standard [iso9920]_.
 
     Parameters
     ----------
@@ -535,25 +590,40 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
         clothing insulation, [clo]
     met : float or list of floats
         metabolic rate, [met]
-    standard: str (default="ASHRAE")
-        - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
+    v : float or list of floats
+        air speed, [m/s]
+    i_a : float or list of floats
+        thermal insulation of the boundary (surface) air layer around the outer clothing
+        or, when nude, around the skin surface, [clo]
+    model : str, optional
+        Select the version of the ISO standard to use. Currently, the only
+        option available is "9920-2007".
 
     Returns
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
     """
-    standard = standard.lower()
-
-    if standard not in ["ashrae", "iso"]:
+    model = model.lower()
+    if model not in [Models.iso_9920_2007.value]:
         raise ValueError(
-            "only the ISO 7730 and ASHRAE 55 2020 models have been implemented"
+            f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
         )
 
-    if standard == "ashrae":
-        return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
-    else:
-        return np.where(met > 1, np.around(clo * (0.6 + 0.4 / met), 3), clo)
+    clo = np.array(clo)
+    met = np.array(met)
+    i_a = np.array(i_a)
+    v = np.array(v)
+
+    f_cl = clo_area_factor(i_cl=clo)
+    i_t = clo + i_a / f_cl
+    v_walk = v_relative(v=v, met=met) - v
+    v_r = v_relative(v=v, met=met)
+    i_t_r = clo_total_insulation(
+        i_t=i_t, vr=v_r, v_walk=v_walk, i_a_static=i_a, i_cl=clo
+    )
+    i_a_r = clo_insulation_air_layer(vr=v_r, v_walk=v_walk, i_a_static=i_a)
+    return i_t_r - i_a_r / f_cl
 
 
 def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
