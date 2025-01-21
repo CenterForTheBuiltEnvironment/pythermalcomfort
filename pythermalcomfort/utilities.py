@@ -175,7 +175,7 @@ def wet_bulb_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the wet-bulb temperature using the Stull equation [stull2011]_
+    """Calculates the wet-bulb temperature using the Stull equation [Stull2011]_
 
     Parameters
     ----------
@@ -240,7 +240,7 @@ def mean_radiant_tmp(
 ):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [ISO77261998]_.
+    7726:1998 Standard [ISO_7726_1998]_.
 
     Parameters
     ----------
@@ -586,7 +586,7 @@ def clo_dynamic_iso(
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
     as well as the air speed modify the insulation characteristics of the clothing.
     Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
-    [ISO77302005]_. However, the ISO 7730:2005 contains insufficient information to
+    [ISO_7730_2005]_. However, the ISO 7730:2005 contains insufficient information to
     calculate (I :sub:`cl,r`). Therefore, we implemented the equations provided in the
     ISO 9920:2007 standard [iso9920]_.
 
@@ -645,9 +645,9 @@ def running_mean_outdoor_temperature(
         newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
         t_{day-n}]`.
         Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
-        16798-1 2019 [EN2019]_ states that n should be equal to 7
+        16798-1 2019 [EN_16798_2019]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [EN2019]_ recommends a value of 0.8,
+        constant between 0 and 1. The EN 16798-1 2019 [EN_16798_2019]_ recommends a value of 0.8,
         while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
@@ -721,7 +721,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998 [ISO77261998]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [ISO_7726_1998]_
 
     Parameters
     ----------

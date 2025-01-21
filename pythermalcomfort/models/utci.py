@@ -27,7 +27,7 @@ def utci(
     heat stress in outdoor spaces. The parameters that are taken into account for
     calculating UTCI involve dry bulb temperature, mean radiation temperature, the
     pressure of water vapor or relative humidity, and wind speed (at the elevation of 10
-    m above the ground). [zare2018]_
+    m above the ground). [Zare2018]_
 
     Parameters
     ----------

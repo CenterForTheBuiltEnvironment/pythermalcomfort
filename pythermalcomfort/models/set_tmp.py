@@ -30,7 +30,7 @@ def set_tmp(
     (20 fpm) average air speed (v), and tr = tdb, in which the total heat loss
     from the skin of an imaginary occupant wearing clothing, standardized for
     the activity concerned is the same as that from a person in the actual
-    environment with actual clothing and activity level. [gagge1986]_
+    environment with actual clothing and activity level. [Gagge1986]_
 
     Parameters
     ----------

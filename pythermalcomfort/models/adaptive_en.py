@@ -17,7 +17,7 @@ def adaptive_en(
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> AdaptiveEN:
-    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [EN2019]_
+    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [EN_16798_2019]_
 
     Parameters
     ----------

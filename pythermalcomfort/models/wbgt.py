@@ -15,7 +15,7 @@ def wbgt(
     round_output: bool = True,
 ) -> WBGT:
     """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance
-    with the ISO 7243 Standard [iso72432017]_. The WBGT is a heat stress index that
+    with the ISO 7243 Standard [ISO_7243_2017]_. The WBGT is a heat stress index that
     measures the thermal environment to which a person is exposed. In most
     situations, this index is simple to calculate. It should be used as a
     screening tool to determine whether heat stress is present. The PHS model
@@ -25,7 +25,7 @@ def wbgt(
     The WBGT determines the impact of heat on a person throughout the course of a working
     day (up to 8 hours). It does not apply to very brief heat exposures. It pertains to
     the evaluation of male and female people who are fit for work in both indoor and
-    outdoor occupational environments, as well as other sorts of surroundings [iso72432017]_.
+    outdoor occupational environments, as well as other sorts of surroundings [ISO_7243_2017]_.
 
     The WBGT is defined as a function of only twb and tg if the person is not exposed to
     direct radiant heat from the sun. When a person is exposed to direct radiant heat,

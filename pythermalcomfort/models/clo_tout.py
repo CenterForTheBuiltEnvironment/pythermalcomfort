@@ -39,7 +39,7 @@ def clo_tout(
     -----
     .. note::
         The ASHRAE 55 2020 states that it is acceptable to determine the clothing
-        insulation Icl using this equation in mechanically conditioned buildings [ASHRAE552023]_.
+        insulation Icl using this equation in mechanically conditioned buildings [ASHRAE_55_2023]_.
 
     .. note::
         Limitations:

@@ -21,7 +21,7 @@ def cooling_effect(
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
-    with the ASHRAE 55 2020 Standard [ASHRAE552023]_. The `CE`_ of the elevated air speed
+    with the ASHRAE 55 2020 Standard [ASHRAE_55_2023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under
     still air as in the first `SET`_ calculation under elevated air speed. The
