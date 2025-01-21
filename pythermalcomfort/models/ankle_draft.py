@@ -6,10 +6,10 @@ from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
 from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.utilities import (
-    _check_standard_compliance_array,
-    units_converter,
     Models,
     Units,
+    _check_standard_compliance_array,
+    units_converter,
 )
 
 

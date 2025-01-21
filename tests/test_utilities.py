@@ -2,10 +2,12 @@ import numpy as np
 import pytest
 
 from pythermalcomfort.utilities import (
+    Units,
     body_surface_area,
     clo_area_factor,
     clo_correction_factor_environment,
     clo_dynamic_ashrae,
+    clo_dynamic_iso,
     clo_insulation_air_layer,
     clo_intrinsic_insulation_ensemble,
     clo_total_insulation,
@@ -14,8 +16,6 @@ from pythermalcomfort.utilities import (
     transpose_sharp_altitude,
     units_converter,
     v_relative,
-    clo_dynamic_iso,
-    Units,
 )
 
 

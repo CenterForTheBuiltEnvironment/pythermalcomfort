@@ -7,10 +7,10 @@ from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
-    _check_standard_compliance_array,
-    units_converter,
     Models,
     Units,
+    _check_standard_compliance_array,
+    units_converter,
 )
 
 

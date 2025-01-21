@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import CloTOutInputs
 from pythermalcomfort.classes_return import CloTOut
-from pythermalcomfort.utilities import units_converter, Units
+from pythermalcomfort.utilities import Units, units_converter
 
 
 def clo_tout(

@@ -7,7 +7,7 @@ from scipy import optimize
 from pythermalcomfort.classes_input import CEInputs
 from pythermalcomfort.classes_return import CE
 from pythermalcomfort.models.set_tmp import set_tmp
-from pythermalcomfort.utilities import units_converter, Units
+from pythermalcomfort.utilities import Units, units_converter
 
 
 def cooling_effect(

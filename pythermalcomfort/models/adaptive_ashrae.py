@@ -7,10 +7,10 @@ from pythermalcomfort.classes_input import ASHRAEInputs
 from pythermalcomfort.classes_return import AdaptiveASHRAE
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
+    Units,
     _check_standard_compliance_array,
     operative_tmp,
     units_converter,
-    Units,
 )
 
 

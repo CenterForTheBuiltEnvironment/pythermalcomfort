@@ -40,9 +40,7 @@ print(results)
 print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
 # for users who want to use the IP system
-results_ip = pmv_ppd_iso(
-    tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP"
-)
+results_ip = pmv_ppd_iso(tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP")
 print(results_ip)
 
 # If you want you can also pass an array of inputs

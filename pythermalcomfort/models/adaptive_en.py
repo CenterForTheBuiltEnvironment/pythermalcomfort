@@ -6,7 +6,7 @@ import numpy.typing as npt
 from pythermalcomfort.classes_input import ENInputs
 from pythermalcomfort.classes_return import AdaptiveEN
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import operative_tmp, units_converter, Units
+from pythermalcomfort.utilities import Units, operative_tmp, units_converter
 
 
 def adaptive_en(

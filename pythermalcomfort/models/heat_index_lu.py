@@ -3,7 +3,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.classes_input import HIInputs, HIModels
+from pythermalcomfort.classes_input import HIInputs
 from pythermalcomfort.classes_return import HI
 
 
