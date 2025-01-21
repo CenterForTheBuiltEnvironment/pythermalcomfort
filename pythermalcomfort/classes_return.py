@@ -358,7 +358,7 @@ class PMVPPD:
         Predicted Mean Vote.
     ppd : float or list of floats
         Predicted Percentage of Dissatisfied.
-    tsv : float or list of floats
+    tsv : str or list of strings
         Predicted thermal sensation vote.
     """
 

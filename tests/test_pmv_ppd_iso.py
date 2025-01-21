@@ -108,7 +108,7 @@ class TestPmvPpd:
                 model=Models.iso_7730_2005.value,
                 limit_inputs=False,
             ),
-            PMVPPD(pmv=np.float64(2.4), ppd=np.float64(91.0)),
+            PMVPPD(pmv=np.float64(2.4), ppd=np.float64(91.0), tsv="Warm"),
         )
 
     def test_wrong_standard(self):

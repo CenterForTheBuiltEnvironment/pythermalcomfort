@@ -48,8 +48,8 @@ class TestPmvPpd:
                 "Slightly Warm",
                 "Warm",
                 "Hot",
-                "Warm",
                 "Hot",
+                "Warm",
             ],
         )
 
@@ -94,7 +94,7 @@ class TestPmvPpd:
                 model=Models.ashrae_55_2023.value,
                 limit_inputs=False,
             ),
-            PMVPPD(pmv=np.float64(4.48), ppd=np.float64(100.0)),
+            PMVPPD(pmv=np.float64(4.48), ppd=np.float64(100.0), tsv=np.str_("Hot")),
         )
 
     def test_wrong_standard(self):
