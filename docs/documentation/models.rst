@@ -1,6 +1,12 @@
 Models
 ======
 
+This section of the documentation provides detailed documentation on the various thermal comfort models, heat and cold indexes implemented in the `pythermalcomfort` package.
+These models are used to assess and predict thermal comfort, heat stress, physiological variables and more as a function of both environmental and personal parameters.
+Each model is accompanied by detailed descriptions, usage examples, and references to relevant standards and research.
+This documentation aims to provide a comprehensive understanding of how to use these models to evaluate thermal comfort in various scenarios.
+Please note that models are shown in alphabetical order and are not sorted based on their accuracy.
+
 Adaptive Model
 --------------
 
