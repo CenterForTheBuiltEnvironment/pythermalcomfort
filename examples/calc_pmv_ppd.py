@@ -6,7 +6,7 @@ import pandas as pd
 
 from pythermalcomfort.models import pmv_ppd_ashrae, pmv_ppd_iso
 from pythermalcomfort.utilities import (
-    clo_dynamic,
+    clo_dynamic_ashrae,
     clo_individual_garments,
     met_typical_tasks,
     v_relative,
@@ -28,10 +28,10 @@ icl = sum(
 # calculate the relative air velocity
 vr = v_relative(v=v, met=met)
 # calculate the dynamic clothing insulation
-clo = clo_dynamic(clo=icl, met=met)
+clo = clo_dynamic_ashrae(clo=icl, met=met)
 
 # calculate PMV in accordance with the ASHRAE 55 2020
-results = pmv_ppd_iso(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, standard="ASHRAE")
+results = pmv_ppd_iso(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo)
 
 # print the results
 print(results)
@@ -56,8 +56,8 @@ met = df["met"].values
 clo = df["clo"].values
 
 v_rel = v_relative(vel, met)
-clo_d = clo_dynamic(clo, met)
-results = pmv_ppd_ashrae(ta, tr, v_rel, rh, met, clo_d, 0, "SI", model="55-2023")
+clo_d = clo_dynamic_ashrae(clo, met)
+results = pmv_ppd_ashrae(ta, tr, v_rel, rh, met, clo_d, 0)
 
 df["vr"] = v_rel
 df["clo_d"] = clo_d
@@ -73,15 +73,24 @@ print(df.head())
 iterations = 10000
 tdb = np.empty(iterations)
 tdb.fill(25)
+tdb = tdb.tolist()
 met = np.empty(iterations)
 met.fill(1.5)
+met = met.tolist()
 
 v_rel = v_relative(0.1, met)
-clo_d = clo_dynamic(1, met)
+clo_d = clo_dynamic_ashrae(1, met)
 
 # ASHRAE PMV
 start = time.time()
-pmv_ppd_ashrae(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d, model="55-2023")
+pmv_ppd_ashrae(
+    tdb=tdb,
+    tr=23,
+    vr=v_rel,
+    rh=40,
+    met=1.2,
+    clo=clo_d,
+)
 end = time.time()
 print(end - start)
 
