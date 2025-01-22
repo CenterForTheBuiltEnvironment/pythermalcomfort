@@ -1108,7 +1108,9 @@ class JOS3:
             jos3_model = JOS3(height=1.75, weight=70, age=25, sex="female")
             jos3_model.simulate(times=30, dtime=60)
             results = jos3_model.dict_results()
-            print(results["t_skin_mean"])  # Access the mean skin temperature time series
+            print(
+                results["t_skin_mean"]
+            )  # Access the mean skin temperature time series
         """
         if not self._history:
             print("The model has no data.")

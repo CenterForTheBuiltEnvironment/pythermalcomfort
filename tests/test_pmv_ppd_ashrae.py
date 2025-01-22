@@ -28,7 +28,6 @@ def test_pmv_ppd(get_test_url, retrieve_data):
 
 
 class TestPmvPpd:
-
     def test_thermal_sensation(self):
         np.testing.assert_equal(
             pmv_ppd_ashrae(
