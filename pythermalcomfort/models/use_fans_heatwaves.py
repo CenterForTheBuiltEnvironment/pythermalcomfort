@@ -7,6 +7,7 @@ from pythermalcomfort.classes_input import UseFansHeatwavesInputs
 from pythermalcomfort.classes_return import UseFansHeatwaves
 from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
+    Postures,
     _check_standard_compliance_array,
 )
 
@@ -21,7 +22,7 @@ def use_fans_heatwaves(
     wme: Union[float, list[float]] = 0,
     body_surface_area: Union[float, list[float]] = 1.8258,
     p_atm: Union[float, list[float]] = 101325,
-    position: str = "standing",
+    position: str = Postures.standing.value,
     max_skin_blood_flow: float = 80,
     limit_inputs: bool = True,
     round_output: bool = True,

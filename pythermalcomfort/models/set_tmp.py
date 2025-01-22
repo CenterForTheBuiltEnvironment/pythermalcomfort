@@ -6,6 +6,7 @@ from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
+    Postures,
     _check_standard_compliance_array,
 )
 
@@ -20,7 +21,7 @@ def set_tmp(
     wme: Union[float, list[float]] = 0,
     body_surface_area: Union[float, list[float]] = 1.8258,
     p_atm: Union[float, list[float]] = 101325,
-    position: str = "standing",
+    position: str = Postures.standing.value,
     limit_inputs: bool = True,
     round_output: bool = True,
     calculate_ce: bool = False,
@@ -30,7 +31,7 @@ def set_tmp(
     (20 fpm) average air speed (v), and tr = tdb, in which the total heat loss
     from the skin of an imaginary occupant wearing clothing, standardized for
     the activity concerned is the same as that from a person in the actual
-    environment with actual clothing and activity level. [gagge1986]_
+    environment with actual clothing and activity level. [Gagge1986]_
 
     Parameters
     ----------

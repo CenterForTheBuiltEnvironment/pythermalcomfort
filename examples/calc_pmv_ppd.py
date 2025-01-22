@@ -6,7 +6,7 @@ import pandas as pd
 
 from pythermalcomfort.models import pmv_ppd_ashrae, pmv_ppd_iso
 from pythermalcomfort.utilities import (
-    clo_dynamic,
+    clo_dynamic_ashrae,
     clo_individual_garments,
     met_typical_tasks,
     v_relative,
@@ -28,10 +28,10 @@ icl = sum(
 # calculate the relative air velocity
 vr = v_relative(v=v, met=met)
 # calculate the dynamic clothing insulation
-clo = clo_dynamic(clo=icl, met=met)
+clo = clo_dynamic_ashrae(clo=icl, met=met)
 
 # calculate PMV in accordance with the ASHRAE 55 2020
-results = pmv_ppd_iso(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, standard="ASHRAE")
+results = pmv_ppd_iso(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo)
 
 # print the results
 print(results)
@@ -40,28 +40,20 @@ print(results)
 print(f"pmv={results['pmv']}, ppd={results['ppd']}%")
 
 # for users who want to use the IP system
-results_ip = pmv_ppd_iso(
-    tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP", model="7730-2005"
-)
+results_ip = pmv_ppd_iso(tdb=77, tr=77, vr=0.6, rh=50, met=1.1, clo=0.5, units="IP")
 print(results_ip)
 
-# If you want you can also pass an array of inputs
+# If you want you can also pass pandas series or arrays as inputs
 df = pd.read_csv(os.getcwd() + "/examples/template-SI.csv")
 
-ta = df["tdb"].values
-tr = df["tr"].values
-vel = df["v"].values
-rh = df["rh"].values
-met = df["met"].values
-clo = df["clo"].values
-
-v_rel = v_relative(vel, met)
-clo_d = clo_dynamic(clo, met)
-results = pmv_ppd_ashrae(ta, tr, v_rel, rh, met, clo_d, 0, "SI", model="55-2023")
+v_rel = v_relative(df["v"], df["met"])
+clo_d = clo_dynamic_ashrae(df["clo"], df["met"])
+results = pmv_ppd_ashrae(df["tdb"], df["tr"], v_rel, df["rh"], df["met"], clo_d, 0)
+print(results)
 
 df["vr"] = v_rel
 df["clo_d"] = clo_d
-df["pmv"] = results["pmv"]
+df["pmv"] = results.pmv  # you can also use results["pmv"]
 df["ppd"] = results["ppd"]
 
 print(df.head())
@@ -73,20 +65,29 @@ print(df.head())
 iterations = 10000
 tdb = np.empty(iterations)
 tdb.fill(25)
+tdb = tdb.tolist()
 met = np.empty(iterations)
 met.fill(1.5)
+met = met.tolist()
 
 v_rel = v_relative(0.1, met)
-clo_d = clo_dynamic(1, met)
+clo_d = clo_dynamic_ashrae(1, met)
 
 # ASHRAE PMV
 start = time.time()
-pmv_ppd_ashrae(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d, model="55-2023")
+pmv_ppd_ashrae(
+    tdb=tdb,
+    tr=23,
+    vr=v_rel,
+    rh=40,
+    met=1.2,
+    clo=clo_d,
+)
 end = time.time()
 print(end - start)
 
 # ISO PMV
 start = time.time()
-pmv_ppd_iso(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d, model="7730-2005")
+pmv_ppd_iso(tdb=tdb, tr=23, vr=v_rel, rh=40, met=1.2, clo=clo_d)
 end = time.time()
 print(end - start)

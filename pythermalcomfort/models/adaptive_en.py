@@ -6,7 +6,7 @@ import numpy.typing as npt
 from pythermalcomfort.classes_input import ENInputs
 from pythermalcomfort.classes_return import AdaptiveEN
 from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import operative_tmp, units_converter
+from pythermalcomfort.utilities import Units, operative_tmp, units_converter
 
 
 def adaptive_en(
@@ -14,10 +14,10 @@ def adaptive_en(
     tr: Union[float, npt.ArrayLike],
     t_running_mean: Union[float, npt.ArrayLike],
     v: Union[float, npt.ArrayLike],
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> AdaptiveEN:
-    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [EN2019]_
+    """Determines the adaptive thermal comfort based on EN 16798-1 2019 [EN_16798_2019]_
 
     Parameters
     ----------
@@ -87,7 +87,7 @@ def adaptive_en(
     v = np.array(v)
     standard = "iso"
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, t_running_mean, v = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
@@ -119,16 +119,16 @@ def adaptive_en(
     acceptability_ii = (t_cmf_ii_lower <= to) & (to <= t_cmf_ii_upper)
     acceptability_iii = (t_cmf_iii_lower <= to) & (to <= t_cmf_iii_upper)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         t_cmf, t_cmf_i_upper, t_cmf_ii_upper, t_cmf_iii_upper = units_converter(
-            from_units="si",
+            from_units=Units.SI.value.lower(),
             tmp_cmf=t_cmf,
             tmp_cmf_cat_i_up=t_cmf_i_upper,
             tmp_cmf_cat_ii_up=t_cmf_ii_upper,
             tmp_cmf_cat_iii_up=t_cmf_iii_upper,
         )
         t_cmf_i_lower, t_cmf_ii_lower, t_cmf_iii_lower = units_converter(
-            from_units="si",
+            from_units=Units.SI.value.lower(),
             tmp_cmf_cat_i_low=t_cmf_i_lower,
             tmp_cmf_cat_ii_low=t_cmf_ii_lower,
             tmp_cmf_cat_iii_low=t_cmf_iii_lower,

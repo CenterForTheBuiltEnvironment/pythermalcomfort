@@ -7,7 +7,9 @@ from numba import jit
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
+    Postures,
     _check_standard_compliance_array,
+    met_to_w_m2,
     p_sat,
 )
 
@@ -25,7 +27,7 @@ def phs(
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [iso79332004]_. The ISO 7933 provides a method for
+    with the ISO 7933:2004 Standard [ISO_7933_2004]_. The ISO 7933 provides a method for
     the analytical evaluation and interpretation of the thermal stress
     experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
@@ -169,9 +171,9 @@ def phs(
     tr = np.array(tr)
     v = np.array(v)
     rh = np.array(rh)
-    met = np.array(met) * 58.15
+    met = np.array(met) * met_to_w_m2
     clo = np.array(clo)
-    wme = np.array(wme) * 58.15
+    wme = np.array(wme) * met_to_w_m2
     posture = np.array(posture)
 
     i_mst = kwargs["i_mst"]
@@ -356,9 +358,9 @@ def _phs_optimized(
 
     # radiating area dubois
     a_r_du = 0.7
-    if posture == "standing":
+    if posture == Postures.standing.value:
         a_r_du = 0.77
-    if posture == "crouching":
+    if posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate

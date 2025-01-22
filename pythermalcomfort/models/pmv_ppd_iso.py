@@ -5,8 +5,10 @@ import numpy as np
 from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
-from pythermalcomfort.shared_functions import valid_range
+from pythermalcomfort.shared_functions import mapping, valid_range
 from pythermalcomfort.utilities import (
+    Models,
+    Units,
     _check_standard_compliance_array,
     units_converter,
 )
@@ -20,8 +22,8 @@ def pmv_ppd_iso(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    model: str = "2005",
-    units: str = "SI",
+    model: str = Models.iso_7730_2005.value,
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
@@ -56,15 +58,11 @@ def pmv_ppd_iso(
 
         .. note::
             this is the basic insulation also known as the intrinsic clothing insulation value of the
-            clothing ensemble (I :sub:`cl,r`), this is the thermal insulation from the skin
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
             surface to the outer clothing surface, including enclosed air layers, under actual
-            environmental conditions. This value is not the total insulation (I :sub:`T,r`)
-
-        .. note::
-            The activity as well as the air speed modify the insulation characteristics
-            of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected. The correction factor can be estimated using
-            :py:meth:`pythermalcomfort.utilities.clo_correction_factor_environment`.
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_iso`.
 
     wme : float or list of floats, optional
         External work, [met]. Defaults to 0.
@@ -90,8 +88,10 @@ def pmv_ppd_iso(
     Returns
     -------
     PMVPPD
-        A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for more details.
-        To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
+        A dataclass containing the Predicted Mean Vote and Predicted Percentage of
+        Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for
+        more details. To access the `pmv`, `ppd`, `tsv` values, use the corresponding
+        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
 
     Examples
     --------
@@ -141,11 +141,11 @@ def pmv_ppd_iso(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     model = model.lower()
-    if model not in ["7730-2005"]:
+    if model not in [Models.iso_7730_2005.value]:
         raise ValueError(
             "PMV calculations can only be performed in compliance with ISO 7730-2005"
         )
@@ -190,4 +190,18 @@ def pmv_ppd_iso(
         pmv_array = np.round(pmv_array, 2)
         ppd_array = np.round(ppd_array, 1)
 
-    return PMVPPD(pmv=pmv_array, ppd=ppd_array)
+    thermal_sensation = {
+        -2.5: "Cold",
+        -1.5: "Cool",
+        -0.5: "Slightly Cool",
+        0.5: "Neutral",
+        1.5: "Slightly Warm",
+        2.5: "Warm",
+        10: "Hot",
+    }
+
+    return PMVPPD(
+        pmv=pmv_array,
+        ppd=ppd_array,
+        tsv=mapping(pmv_array, thermal_sensation, right=False),
+    )

@@ -1,8 +1,10 @@
 import math
 import warnings
+from enum import Enum
 from typing import NamedTuple, Union
 
 import numpy as np
+from numba import jit
 
 from pythermalcomfort.classes_return import PsychrometricValues
 from pythermalcomfort.shared_functions import valid_range
@@ -17,6 +19,23 @@ cp_air = 1004
 h_fg = 2501000
 r_air = 287.055
 g = 9.81  # m/s2
+met_to_w_m2 = 58.15
+
+
+class Models(Enum):
+    ashrae_55_2023 = "55-2023"
+    iso_7730_2005 = "7730-2005"
+    iso_9920_2007 = "9920-2007"
+
+
+class Units(Enum):
+    SI = "SI"
+    IP = "IP"
+
+
+class Sex(Enum):
+    male = "male"
+    female = "female"
 
 
 def p_sat_torr(tdb: Union[float, list[float]]):
@@ -106,6 +125,23 @@ def p_sat(tdb: Union[float, list[float]]):
     return pascals
 
 
+@jit(nopython=True, cache=True)
+def antoine(x: float) -> float:
+    """Calculate saturated vapor pressure using Antoine equation [kPa].
+
+    Parameters
+    ----------
+    x : float
+        Temperature [°C].
+
+    Returns
+    -------
+    float
+        Saturated vapor pressure [kPa].
+    """
+    return np.exp(16.6536 - 4030.183 / (x + 235))
+
+
 def psy_ta_rh(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
@@ -163,7 +199,7 @@ def wet_bulb_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the wet-bulb temperature using the Stull equation [stull2011]_
+    """Calculates the wet-bulb temperature using the Stull equation [Stull2011]_
 
     Parameters
     ----------
@@ -228,7 +264,7 @@ def mean_radiant_tmp(
 ):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [ISO77261998]_.
+    7726:1998 Standard [ISO_7726_1998]_.
 
     Parameters
     ----------
@@ -443,35 +479,68 @@ def _check_standard_compliance_array(standard, **kwargs):
         return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
 
 
-def body_surface_area(weight, height, formula="dubois"):
-    """Returns the body surface area in square meters.
+class Postures(Enum):
+    standing = "standing"
+    sitting = "sitting"
+    sedentary = "sedentary"
+    reclining = "reclining"
+    lying = "lying"
+    supine = "supine"
+    crouching = "crouching"
+
+
+class BodySurfaceAreaEquations(Enum):
+    dubois = "dubois"
+    takahira = "takahira"
+    fujimoto = "fujimoto"
+    kurazumi = "kurazumi"
+
+
+def body_surface_area(
+    weight: float, height: float, formula: str = BodySurfaceAreaEquations.dubois.value
+) -> float:
+    """Calculate the body surface area (BSA) in square meters.
 
     Parameters
     ----------
     weight : float
-        body weight, [kg]
+        Body weight in kilograms.
     height : float
-        height, [m]
-    formula : str, optional,
-        formula used to calculate the body surface area. default="dubois"
-        Choose a name from "dubois", "takahira", "fujimoto", or "kurazumi".
+        Body height in meters.
+    formula : str, optional
+        Formula used to calculate the body surface area. Default is "dubois".
+        Choose one from BodySurfaceAreaEquations.
 
     Returns
     -------
-    body_surface_area : float
-        body surface area, [m2]
+    float
+        Body surface area in square meters.
+
+    Raises
+    ------
+    ValueError
+        If the specified formula is not recognized.
+
+    Examples
+    --------
+    Calculate BSA using the DuBois formula:
+
+    .. code-block:: python
+
+        bsa = body_surface_area(weight=70, height=1.75, formula="dubois")
+        print(bsa)
     """
-    if formula == "dubois":
+    if formula == BodySurfaceAreaEquations.dubois.value:
         return 0.202 * (weight**0.425) * (height**0.725)
-    elif formula == "takahira":
+    elif formula == BodySurfaceAreaEquations.takahira.value:
         return 0.2042 * (weight**0.425) * (height**0.725)
-    elif formula == "fujimoto":
+    elif formula == BodySurfaceAreaEquations.fujimoto.value:
         return 0.1882 * (weight**0.444) * (height**0.663)
-    elif formula == "kurazumi":
+    elif formula == BodySurfaceAreaEquations.kurazumi.value:
         return 0.2440 * (weight**0.383) * (height**0.693)
     else:
         raise ValueError(
-            f"This {formula} to calculate the body_surface_area does not exists."
+            f"Formula '{formula}' for calculating body surface area is not recognized."
         )
 
 
@@ -499,17 +568,16 @@ def f_svv(w, h, d):
     )
 
 
-def v_relative(v, met):
+def v_relative(v: Union[float, list[float]], met: Union[float, list[float]]):
     """Estimates the relative air speed which combines the average air speed of the
-    space plus the relative air speed caused by the body movement. Vag is assumed to be
-    0 for metabolic rates equal and lower than 1 met and otherwise equal to Vag = 0.3 (M
-    – 1) (m/s)
+    space plus the relative air speed caused by the body movement. The same equation is
+    used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
 
     Parameters
     ----------
     v : float or list of floats
         air speed measured by the sensor, [m/s]
-    met : float
+    met : float or list of floats
         metabolic rate, [met]
 
     Returns
@@ -517,17 +585,67 @@ def v_relative(v, met):
     vr  : float or list of floats
         relative air speed, [m/s]
     """
+    v = np.array(v)
+    met = np.array(met)
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
-def clo_dynamic(clo, met, standard="ASHRAE"):
+def clo_dynamic_ashrae(
+    clo: Union[float, list[float]],
+    met: Union[float, list[float]],
+    model: str = Models.ashrae_55_2023.value,
+):
+    """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The ASHRAE
+    55:2023 refers to it as (I :sub:`cl,active`). The activity as well as the air speed
+    modify the insulation characteristics of the clothing. Consequently, the ASHRAE 55
+    standard provides a correction factor for the clothing insulation (I :sub:`cl`)
+    based on the metabolic rate.
+
+    Parameters
+    ----------
+    clo : float or list of floats
+        clothing insulation, [clo]
+
+        .. note::
+            this is the basic insulation (I :sub:`cl`) also known as the intrinsic
+            clothing insulation value under reference conditions
+
+    met : float or list of floats
+        metabolic rate, [met]
+    model : str, optional
+        Select the version of the ASHRAE 55 Standard to use. Currently, the only
+        option available is "55-2023".
+
+    Returns
+    -------
+    clo : float or list of floats
+        dynamic clothing insulation (I :sub:`cl,r`), [clo]
     """
-    Estimates the dynamic clothing insulation of a moving occupant. The activity as well
-    as the air speed modify the insulation characteristics of the clothing and the
-    adjacent air layer. Consequently, the ISO 7730 states that the clothing insulation
-    shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects for the effect of the body
-    movement for met equal or higher than 1.2 met using the equation clo = Icl × (0.6 +
-    0.4/met)
+    clo = np.array(clo)
+    met = np.array(met)
+
+    model = model.lower()
+    if model not in [Models.ashrae_55_2023.value]:
+        raise ValueError(
+            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        )
+
+    return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
+
+
+def clo_dynamic_iso(
+    clo: Union[float, list[float]],
+    met: Union[float, list[float]],
+    v: Union[float, list[float]],
+    i_a: Union[float, list[float]] = 0.7,
+    model: str = Models.iso_9920_2007.value,
+):
+    """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
+    as well as the air speed modify the insulation characteristics of the clothing.
+    Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
+    [ISO_7730_2005]_. However, the ISO 7730:2005 contains insufficient information to
+    calculate (I :sub:`cl,r`). Therefore, we implemented the equations provided in the
+    ISO 9920:2007 standard [iso9920]_.
 
     Parameters
     ----------
@@ -535,28 +653,45 @@ def clo_dynamic(clo, met, standard="ASHRAE"):
         clothing insulation, [clo]
     met : float or list of floats
         metabolic rate, [met]
-    standard: str (default="ASHRAE")
-        - If "ASHRAE", uses Equation provided in Section 5.2.2.2 of ASHRAE 55 2020
+    v : float or list of floats
+        air speed, [m/s]
+    i_a : float or list of floats
+        thermal insulation of the boundary (surface) air layer around the outer clothing
+        or, when nude, around the skin surface, [clo]
+    model : str, optional
+        Select the version of the ISO standard to use. Currently, the only
+        option available is "9920-2007".
 
     Returns
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
     """
-    standard = standard.lower()
-
-    if standard not in ["ashrae", "iso"]:
+    model = model.lower()
+    if model not in [Models.iso_9920_2007.value]:
         raise ValueError(
-            "only the ISO 7730 and ASHRAE 55 2020 models have been implemented"
+            f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
         )
 
-    if standard == "ashrae":
-        return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
-    else:
-        return np.where(met > 1, np.around(clo * (0.6 + 0.4 / met), 3), clo)
+    clo = np.array(clo)
+    met = np.array(met)
+    i_a = np.array(i_a)
+    v = np.array(v)
+
+    f_cl = clo_area_factor(i_cl=clo)
+    i_t = clo + i_a / f_cl
+    v_walk = v_relative(v=v, met=met) - v
+    v_r = v_relative(v=v, met=met)
+    i_t_r = clo_total_insulation(
+        i_t=i_t, vr=v_r, v_walk=v_walk, i_a_static=i_a, i_cl=clo
+    )
+    i_a_r = clo_insulation_air_layer(vr=v_r, v_walk=v_walk, i_a_static=i_a)
+    return i_t_r - i_a_r / f_cl
 
 
-def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
+def running_mean_outdoor_temperature(
+    temp_array: list[float], alpha: float = 0.8, units: str = Units.SI.value
+):
     """Estimates the running mean temperature also known as prevailing mean outdoor
     temperature.
 
@@ -567,9 +702,9 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
         newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
         t_{day-n}]`.
         Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
-        16798-1 2019 [EN2019]_ states that n should be equal to 7
+        16798-1 2019 [EN_16798_2019]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [EN2019]_ recommends a value of 0.8,
+        constant between 0 and 1. The EN 16798-1 2019 [EN_16798_2019]_ recommends a value of 0.8,
         while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
@@ -583,20 +718,21 @@ def running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI"):
     t_rm  : float
         running mean outdoor temperature
     """
-    if units.lower() == "ip":
+    units = units.upper()
+    if units == Units.IP.value:
         for ix, _x in enumerate(temp_array):
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
     coeff = [alpha**ix for ix, x in enumerate(temp_array)]
     t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
 
-    if units.lower() == "ip":
-        t_rm = units_converter(tmp=t_rm, from_units="si")[0]
+    if units == Units.IP.value:
+        t_rm = units_converter(tmp=t_rm, from_units=Units.SI.value.lower())[0]
 
     return round(t_rm, 1)
 
 
-def units_converter(from_units="ip", **kwargs):
+def units_converter(from_units=Units.IP.value, **kwargs):
     """Converts IP values to SI units.
 
     Parameters
@@ -610,7 +746,8 @@ def units_converter(from_units="ip", **kwargs):
     converted values in SI units
     """
     results = list()
-    if from_units == "ip":
+    from_units = from_units.upper()
+    if from_units == Units.IP.value:
         for key, value in kwargs.items():
             if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value - 32) * 5 / 9)
@@ -621,7 +758,7 @@ def units_converter(from_units="ip", **kwargs):
             if key == "pressure":
                 results.append(value * 101325)
 
-    elif from_units == "si":
+    elif from_units == Units.SI.value:
         for key, value in kwargs.items():
             if "tmp" in key or key == "tr" or key == "tdb":
                 results.append((value * 9 / 5) + 32)
@@ -641,7 +778,8 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998 [ISO77261998]_
+    """Calculates operative temperature in accordance with ISO 7726:1998
+    [ISO_7726_1998]_
 
     Parameters
     ----------
@@ -710,12 +848,13 @@ def clo_area_factor(i_cl: Union[float, list[float]]):
     return 1 + 0.28 * i_cl
 
 
+# todo implement the vr and v_walk functions as a function of the met
 def clo_insulation_air_layer(
     vr: Union[float, list[float]],
     v_walk: Union[float, list[float]],
     i_a_static: Union[float, list[float]],
 ):
-    """Calculates the insulation of the boundary air layer (`I`:sub:`a`). The static
+    """Calculates the insulation of the boundary air layer (`I`:sub:`a,r`). The static
     boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
     0.15 m/s. Thus, for static conditions, the standard recommends using the value of
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
@@ -734,7 +873,7 @@ def clo_insulation_air_layer(
 
     Returns
     -------
-    i_a: float or list of floats
+    i_a_r: float or list of floats
         boundary air layer insulation, [clo]
     """
     vr = np.array(vr)
@@ -763,9 +902,9 @@ def clo_total_insulation(
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
-    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a function
-    of the total thermal insulation of clothing (`I`:sub:`T`), the insulation of the
-    boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
+    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a
+    function of the total thermal insulation of clothing (`I`:sub:`T`), the insulation
+    of the boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
     relative air speed (`v`:sub:`r`). These different equations are used if the person
     is clothed in normal clothing (0.6 clo < (`I`:sub:`cl`) < 1.4 clo or 1.2 clo <
     (`I`:sub:`T`) < 2.0 clo), nude (`I`:sub:`cl` = 0 clo), and if the person is clothed
@@ -805,15 +944,15 @@ def clo_total_insulation(
     def nude(_vr, _vw, _i_a_static):
         return _i_a_static * _correction_nude(_vr=_vr, _vw=_vw)
 
-    def low_clothing(_vr, _vw, _i_a_static, _i_cl):
+    def low_clothing(_vr, _vw, _i_a_static, _i_cl, _i_t):
         return (
             (0.6 - _i_cl) * nude(_vr, _vw, _i_a_static)
-            + _i_cl * normal_clothing(_vr, _vw, _i_cl)
+            + _i_cl * normal_clothing(_vr, _vw, _i_t)
         ) / 0.6
 
     i_t_r = np.where(
         i_cl <= 0.6,
-        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl),
+        low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl, _i_t=i_t),
         normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
     )
     i_t_r = np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)

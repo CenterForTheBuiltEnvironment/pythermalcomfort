@@ -5,7 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import VerticalTGradPPDInputs
 from pythermalcomfort.classes_return import VerticalTGradPPD
 from pythermalcomfort.models import pmv_ppd_ashrae
-from pythermalcomfort.utilities import _check_standard_compliance_array
+from pythermalcomfort.utilities import Models, _check_standard_compliance_array
 
 
 def vertical_tmp_grad_ppd(
@@ -19,7 +19,7 @@ def vertical_tmp_grad_ppd(
     round_output: bool = True,
 ) -> VerticalTGradPPD:
     """Calculates the percentage of thermally dissatisfied people with a
-    vertical temperature gradient between feet and head [ASHRAE552023]_. This equation is
+    vertical temperature gradient between feet and head [ASHRAE_55_2023]_. This equation is
     only applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
@@ -53,13 +53,12 @@ def vertical_tmp_grad_ppd(
         Clothing insulation, [clo].
 
         .. note::
-            The activity as well as the air speed modify the insulation characteristics
-            of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected. The ASHRAE 55 Standard corrects
-            for the effect of the body movement for met equal or higher than 1.2 met using
-            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-            can be calculated using the function
-            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            this is the basic insulation also known as the intrinsic clothing insulation value of the
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under actual
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     vertical_tmp_grad : float or list of floats
         Vertical temperature gradient between the feet and the head, [°C/m].
@@ -114,7 +113,13 @@ def vertical_tmp_grad_ppd(
     )
 
     tsv = pmv_ppd_ashrae(
-        tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, model="55-2023"
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        model=Models.ashrae_55_2023.value,
     ).pmv
     numerator = np.exp(0.13 * (tsv - 1.91) ** 2 + 0.15 * vertical_tmp_grad - 1.6)
     ppd_val = (numerator / (1 + numerator) - 0.345) * 100

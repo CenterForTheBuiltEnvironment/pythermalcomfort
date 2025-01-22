@@ -4,12 +4,12 @@ import numpy as np
 
 from pythermalcomfort.classes_input import CloTOutInputs
 from pythermalcomfort.classes_return import CloTOut
-from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import Units, units_converter
 
 
 def clo_tout(
     tout: Union[float, list[float]],
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CloTOut:
     """Representative clothing insulation Icl as a function of outdoor air
     temperature at 06:00 a.m [Schiavon2013]_.
@@ -39,7 +39,7 @@ def clo_tout(
     -----
     .. note::
         The ASHRAE 55 2020 states that it is acceptable to determine the clothing
-        insulation Icl using this equation in mechanically conditioned buildings [ASHRAE552023]_.
+        insulation Icl using this equation in mechanically conditioned buildings [ASHRAE_55_2023]_.
 
     .. note::
         Limitations:
@@ -67,7 +67,7 @@ def clo_tout(
     tout = np.array(tout)
 
     # Convert units if necessary
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tout = units_converter(tmp=tout)[0]
 
     clo = np.where(tout < 26, np.power(10, -0.1635 - 0.0066 * tout), 0.46)

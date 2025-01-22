@@ -1,6 +1,12 @@
 Models
 ======
 
+This section of the documentation provides detailed documentation on the various thermal comfort models, heat and cold indexes implemented in the `pythermalcomfort` package.
+These models are used to assess and predict thermal comfort, heat stress, physiological variables and more as a function of both environmental and personal parameters.
+Each model is accompanied by detailed descriptions, usage examples, and references to relevant standards and research.
+This documentation aims to provide a comprehensive understanding of how to use these models to evaluate thermal comfort in various scenarios.
+Please note that models are shown in alphabetical order and are not sorted based on their accuracy.
+
 Adaptive Model
 --------------
 
@@ -8,7 +14,7 @@ The adaptive thermal comfort model is a method that relates indoor design temper
 It's specifically intended for **occupant-controlled naturally conditioned spaces**, where the thermal conditions are primarily regulated by occupants through the use of openings in the building envelope, such as windows.
 The adaptive model is based on the idea that people in naturally ventilated spaces adjust to their environment through a variety of behavioural and physiological adaptations.
 
-Below are some key characteristics and criteria of the adaptive model, according to the ASHRAE 55-2023 standard [ASHRAE552023]_:
+Below are some key characteristics and criteria of the adaptive model, according to the ASHRAE 55-2023 standard [ASHRAE_55_2023]_:
 
 **Applicability**: The adaptive model can only be applied in spaces that meet specific criteria:
   *   There is no mechanical cooling or heating system in operation.
@@ -143,6 +149,7 @@ Joint system thermoregulation model (JOS-3)
     :members:
     :undoc-members:
     :special-members: __init__
+    :exclude-members: tdb, tr, to, rh, v, posture, clo, par, body_temp, bsa, r_t, r_et, w, w_mean, t_skin_mean, t_skin, t_core, t_cb, t_artery, t_vein, t_superficial_vein, t_muscle, t_fat, body_names, results, bmr
 
 Normal Effective Temperature (NET)
 ----------------------------------
@@ -174,8 +181,8 @@ Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 The Predicted Mean Vote (PMV) is an index that aims to predict the mean value of thermal sensation votes from a large group of people, based on a seven-point scale ranging from "cold" (-3) to "hot" (+3).
 It was developed by Fanger [fanger1970]_.
 
-The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [ISO77302005]_.
-It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [ASHRAE552023]_.
+The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [ISO_7730_2005]_.
+It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [ASHRAE_55_2023]_.
 
 The PMV can be used to check if a thermal environment meets comfort criteria and to establish requirements for different levels of acceptability.
 The PMV model is applicable to healthy men and women exposed to indoor environments where thermal comfort is desirable, but moderate deviations from thermal comfort occur, in the design of new environments or the assessment of existing ones.
@@ -190,8 +197,8 @@ The PMV calculation considers several factors:
   *   **Clothing insulation** (`I` :sub:`cl,r`), dynamic intrinsic insulation, this is the thermal insulation from the skin surface to the outer clothing surface, including enclosed air layers, under the environmental conditions.
 
 The PMV model is applicable when the six main parameters are within specific intervals.
-These values are specified by the ASHRAE 55 [ASHRAE552023]_ and ISO 7730 standards [ISO77302005]_.
-The ISO also states that the PMV model is only applicable for PMV between -2 and +2 [ISO77302005]_.
+These values are specified by the ASHRAE 55 [ASHRAE_55_2023]_ and ISO 7730 standards [ISO_7730_2005]_.
+The ISO also states that the PMV model is only applicable for PMV between -2 and +2 [ISO_7730_2005]_.
 
 The PMV model has been shown to have low accuracy in predicting thermal sensation votes, especially outside thermal neutrality, with a prediction accuracy of approximately 34% [cheung]_.
 For this reason, it is recommended that the use of the PMV be restricted to values between -0.5 and +0.5, where an environment may be deemed thermally neutral by a large group of occupants.
@@ -207,7 +214,7 @@ After Fanger developed the original PMV model which it is still included in the 
 These include but are not limited to:
 
   *  the aPMV model [yao2009]_ :py:meth:`pythermalcomfort.models.pmv_a.pmv_a`,
-  *  the ASHRAE 55 PMV model [ASHRAE552023]_ :py:meth:`pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae`,
+  *  the ASHRAE 55 PMV model [ASHRAE_55_2023]_ :py:meth:`pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae`,
   *  the ATHB model [schweiker22]_ :py:meth:`pythermalcomfort.models.pmv_athb.pmv_athb`,
   *  the ePMV model [fanger2002]_ :py:meth:`pythermalcomfort.models.pmv_e.pmv_e`.
 

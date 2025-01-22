@@ -5,6 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import APMVInputs
 from pythermalcomfort.classes_return import APMV
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_a(
@@ -16,7 +17,7 @@ def pmv_a(
     clo: Union[float, list[float]],
     a_coefficient: Union[float, int],
     wme: Union[float, list[float]] = 0,
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> APMV:
     """Returns Adaptive Predicted Mean Vote (aPMV) [yao2009]_. This index was
@@ -47,7 +48,7 @@ def pmv_a(
         Clothing insulation, [clo].
 
         .. note::
-            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            Correct for body movement effects using :py:meth:`pythermalcomfort.utilities.clo_dynamic_iso`.
 
     a_coefficient : float
         Adaptive coefficient.
@@ -75,8 +76,8 @@ def pmv_a(
     .. code-block:: python
         :emphasize-lines: 9,12,14
 
-        from pythermalcomfort.models import a_pmv
-        from pythermalcomfort.utilities import v_relative, clo_dynamic
+        from pythermalcomfort.models import pmv_a
+        from pythermalcomfort.utilities import v_relative, clo_dynamic_iso
 
         v = 0.1
         met = 1.4
@@ -86,13 +87,13 @@ def pmv_a(
         v_r = v_relative(v=v, met=met)
 
         # Calculate dynamic clothing
-        clo_d = clo_dynamic(clo=clo, met=met)
+        clo_d = clo_dynamic_iso(clo=clo, met=met, v=v)
 
-        results = a_pmv(
+        results = pmv_a(
             tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
-        print(results.a_pmv)  # 0.74
+        print(results.a_pmv)  # 0.71
     """
     # Validate inputs using the APMVInputs class
     APMVInputs(
@@ -115,7 +116,7 @@ def pmv_a(
         met,
         clo,
         wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         units=units,
         limit_inputs=limit_inputs,
     ).pmv

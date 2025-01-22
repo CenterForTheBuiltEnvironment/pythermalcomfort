@@ -7,7 +7,7 @@ from scipy import optimize
 from pythermalcomfort.classes_input import CEInputs
 from pythermalcomfort.classes_return import CE
 from pythermalcomfort.models.set_tmp import set_tmp
-from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import Units, units_converter
 
 
 def cooling_effect(
@@ -18,10 +18,10 @@ def cooling_effect(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
     """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
-    with the ASHRAE 55 2020 Standard [ASHRAE552023]_. The `CE`_ of the elevated air speed
+    with the ASHRAE 55 2020 Standard [ASHRAE_55_2023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under
     still air as in the first `SET`_ calculation under elevated air speed. The
@@ -58,13 +58,12 @@ def cooling_effect(
         Clothing insulation, [clo].
 
         .. note::
-            The activity as well as the air speed modify the insulation characteristics
-            of the clothing and the adjacent air layer. Consequently the ISO 7730 states that
-            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
-            for the effect of the body movement for met equal or higher than 1.2 met using
-            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-            can be calculated using the function
-            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            this is the basic insulation also known as the intrinsic clothing insulation value of the
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under actual
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     wme : float or list of floats, optional
         External work, [met]. Defaults to 0.
@@ -124,7 +123,7 @@ def cooling_effect(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     still_air_threshold = 0.1
@@ -140,7 +139,7 @@ def cooling_effect(
         vr=vr,
     )
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         _ce = _ce / 1.8 * 3.28
 
     return CE(ce=np.around(_ce, 2))

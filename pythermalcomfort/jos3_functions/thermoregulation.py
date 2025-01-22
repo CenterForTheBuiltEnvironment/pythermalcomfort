@@ -8,28 +8,221 @@ following order: "head", "neck", "chest", "back", "pelvis",
 "right_leg" and "right_hand".
 """
 
-import math
+from typing import Union
 
 import numpy as np
 
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
+from pythermalcomfort.utilities import Postures, Sex, antoine
+
+
+def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
+    """
+    Calculate the natural convection heat transfer coefficient based on posture.
+
+    Parameters
+    ----------
+    posture : str
+        The posture of the subject. Valid options are "standing", "sitting", "lying", "sedentary", "supine".
+    tdb : float
+        Dry bulb temperature [°C].
+    t_skin : float
+        Skin temperature [°C].
+
+    Returns
+    -------
+    hc_natural : numpy.ndarray
+        Natural convection heat transfer coefficient body segments.
+
+    Raises
+    ------
+    ValueError
+        If the posture is not one of the valid options.
+    """
+    if posture.lower() == Postures.standing.value:
+        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+        hc_natural = np.array(
+            [
+                4.48,
+                4.48,
+                2.97,
+                2.91,
+                2.85,
+                3.61,
+                3.55,
+                3.67,
+                3.61,
+                3.55,
+                3.67,
+                2.80,
+                2.04,
+                2.04,
+                2.80,
+                2.04,
+                2.04,
+            ]
+        )
+    elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
+        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+        hc_natural = np.array(
+            [
+                4.75,
+                4.75,
+                3.12,
+                2.48,
+                1.84,
+                3.76,
+                3.62,
+                2.06,
+                3.76,
+                3.62,
+                2.06,
+                2.98,
+                2.98,
+                2.62,
+                2.98,
+                2.98,
+                2.62,
+            ]
+        )
+    elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
+        # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
+        # The values are applied under cold environment.
+        hc_a = np.array(
+            [
+                1.105,
+                1.105,
+                1.211,
+                1.211,
+                1.211,
+                0.913,
+                2.081,
+                2.178,
+                0.913,
+                2.081,
+                2.178,
+                0.945,
+                0.385,
+                0.200,
+                0.945,
+                0.385,
+                0.200,
+            ]
+        )
+        hc_b = np.array(
+            [
+                0.345,
+                0.345,
+                0.046,
+                0.046,
+                0.046,
+                0.373,
+                0.850,
+                0.297,
+                0.373,
+                0.850,
+                0.297,
+                0.447,
+                0.580,
+                0.966,
+                0.447,
+                0.580,
+                0.966,
+            ]
+        )
+        hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
+    else:
+        valid_postures = [
+            Postures.standing.value,
+            Postures.sitting.value,
+            Postures.lying.value,
+            Postures.sedentary.value,
+            Postures.supine.value,
+        ]
+        raise ValueError(
+            f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
+        )
+    return hc_natural
+
+
+def forced_convection(v: float) -> np.ndarray:
+    """
+    Calculate the forced convection heat transfer coefficient.
+    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+
+    Parameters
+    ----------
+    v : float
+        Air velocity [m/s].
+
+    Returns
+    -------
+    np.ndarray
+        Forced convection heat transfer coefficient body segments.
+    """
+    hc_a = np.array(
+        [
+            15.0,
+            15.0,
+            11.0,
+            17.0,
+            13.0,
+            17.0,
+            17.0,
+            20.0,
+            17.0,
+            17.0,
+            20.0,
+            14.0,
+            15.8,
+            15.1,
+            14.0,
+            15.8,
+            15.1,
+        ]
+    )
+    hc_b = np.array(
+        [
+            0.62,
+            0.62,
+            0.67,
+            0.49,
+            0.60,
+            0.59,
+            0.61,
+            0.60,
+            0.59,
+            0.61,
+            0.60,
+            0.61,
+            0.74,
+            0.62,
+            0.61,
+            0.74,
+            0.62,
+        ]
+    )
+    hc_forced = hc_a * (v**hc_b)
+    return hc_forced
 
 
 def conv_coef(
-    posture=Default.posture,
-    v=Default.air_speed,
-    tdb=Default.dry_bulb_air_temperature,
-    t_skin=Default.skin_temperature,
-):
-    """Calculate convective heat transfer coefficient (hc) [W/(m2*K)]
+    posture: str = Default.posture,
+    v: Union[float, np.ndarray] = Default.air_speed,
+    tdb: Union[float, np.ndarray] = Default.dry_bulb_air_temperature,
+    t_skin: Union[float, np.ndarray] = Default.skin_temperature,
+) -> np.ndarray:
+    """
+    Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
+    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+    Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
 
     Parameters
     ----------
     posture : str, optional
         Select posture from standing, sitting, lying, sedentary or supine.
-        The default is "standing".
     v : float or iter, optional
         Air velocity [m/s]. If iter is input, its length should be 17.
         The default is 0.1.
@@ -42,192 +235,30 @@ def conv_coef(
 
     Returns
     -------
-    hc : numpy.ndarray
+    np.ndarray
         Convective heat transfer coefficient (hc) [W/(m2*K)].
-
-    References
-    ----------
-    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-    Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
     """
-
-    # Natural convection
-    def natural_convection(posture, tdb, t_skin):
-        if posture.lower() == "standing":
-            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-            hc_natural = np.array(
-                [
-                    4.48,
-                    4.48,
-                    2.97,
-                    2.91,
-                    2.85,
-                    3.61,
-                    3.55,
-                    3.67,
-                    3.61,
-                    3.55,
-                    3.67,
-                    2.80,
-                    2.04,
-                    2.04,
-                    2.80,
-                    2.04,
-                    2.04,
-                ]
-            )
-        elif posture.lower() in ["sitting", "sedentary"]:
-            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-            hc_natural = np.array(
-                [
-                    4.75,
-                    4.75,
-                    3.12,
-                    2.48,
-                    1.84,
-                    3.76,
-                    3.62,
-                    2.06,
-                    3.76,
-                    3.62,
-                    2.06,
-                    2.98,
-                    2.98,
-                    2.62,
-                    2.98,
-                    2.98,
-                    2.62,
-                ]
-            )
-        elif posture.lower() in ["lying", "supine"]:
-            # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
-            # The values are applied under cold environment.
-            hc_a = np.array(
-                [
-                    1.105,
-                    1.105,
-                    1.211,
-                    1.211,
-                    1.211,
-                    0.913,
-                    2.081,
-                    2.178,
-                    0.913,
-                    2.081,
-                    2.178,
-                    0.945,
-                    0.385,
-                    0.200,
-                    0.945,
-                    0.385,
-                    0.200,
-                ]
-            )
-            hc_b = np.array(
-                [
-                    0.345,
-                    0.345,
-                    0.046,
-                    0.046,
-                    0.046,
-                    0.373,
-                    0.850,
-                    0.297,
-                    0.373,
-                    0.850,
-                    0.297,
-                    0.447,
-                    0.580,
-                    0.966,
-                    0.447,
-                    0.580,
-                    0.966,
-                ]
-            )
-            hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
-        else:
-            valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
-            raise ValueError(
-                f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
-            )
-        return hc_natural
-
-    # Forced convection
-    def forced_convection(v):
-        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_a = np.array(
-            [
-                15.0,
-                15.0,
-                11.0,
-                17.0,
-                13.0,
-                17.0,
-                17.0,
-                20.0,
-                17.0,
-                17.0,
-                20.0,
-                14.0,
-                15.8,
-                15.1,
-                14.0,
-                15.8,
-                15.1,
-            ]
-        )
-        hc_b = np.array(
-            [
-                0.62,
-                0.62,
-                0.67,
-                0.49,
-                0.60,
-                0.59,
-                0.61,
-                0.60,
-                0.59,
-                0.61,
-                0.60,
-                0.61,
-                0.74,
-                0.62,
-                0.61,
-                0.74,
-                0.62,
-            ]
-        )
-        hc_forced = hc_a * (v**hc_b)
-        return hc_forced
-
-    # Calculate natural convection
     hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
-
-    # Calculate forced convection
     hc_forced = forced_convection(v=v)
-
-    # Select natural or forced hc.
-    # If the local v is less than 0.2 m/s, it is considered natural convection;
-    # if it is greater than 0.2 m/s, it is considered forced convection.
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
 
 
-def rad_coef(posture=Default.posture):
-    """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
+def rad_coef(posture: str = Default.posture) -> np.ndarray:
+    """
+    Calculate radiative heat transfer coefficient (hr) [W/(m2*K)].
 
     Parameters
     ----------
     posture : str, optional
         Select posture from standing, sitting, lying, sedentary or supine.
-        The default is "standing".
 
     Returns
     -------
-    hr : numpy.ndarray
+    np.ndarray
         Radiative heat transfer coefficient (hr) [W/(m2*K)].
     """
-    if posture.lower() == "standing":
+    if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
         hr = np.array(
             [
@@ -250,7 +281,7 @@ def rad_coef(posture=Default.posture):
                 6.14,
             ]
         )
-    elif posture.lower() in ["sitting", "sedentary"]:
+    elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
         hr = np.array(
             [
@@ -273,7 +304,7 @@ def rad_coef(posture=Default.posture):
                 6.36,
             ]
         )
-    elif posture.lower() in ["lying", "supine"]:
+    elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
         hr = np.array(
             [
@@ -297,15 +328,35 @@ def rad_coef(posture=Default.posture):
             ]
         )
     else:
-        valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
+        valid_postures = [
+            Postures.standing.value,
+            Postures.sitting.value,
+            Postures.lying.value,
+            Postures.sedentary.value,
+            Postures.supine.value,
+        ]
         raise ValueError(
             f"Invalid posture '{posture}'. Must be one of {valid_postures}"
         )
     return hr
 
 
-def fixed_hc(hc, v):
-    """Fixes hc values to fit two-node-model's values."""
+def fixed_hc(hc: np.ndarray, v: float) -> np.ndarray:
+    """
+    Fixes hc values to fit two-node-model's values.
+
+    Parameters
+    ----------
+    hc : np.ndarray
+        Convective heat transfer coefficient (hc) [W/(m2*K)].
+    v : float
+        Air velocity [m/s].
+
+    Returns
+    -------
+    np.ndarray
+        Fixed convective heat transfer coefficient (hc) [W/(m2*K)].
+    """
     mean_hc = np.average(hc, weights=cons.Default.local_bsa)
     mean_va = np.average(v, weights=cons.Default.local_bsa)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
@@ -313,13 +364,26 @@ def fixed_hc(hc, v):
     return _fixed_hc
 
 
-def fixed_hr(hr):
-    """Fixes hr values to fit two-node-model's values."""
+def fixed_hr(hr: np.ndarray) -> np.ndarray:
+    """
+    Fixes hr values to fit two-node-model's values.
+
+    Parameters
+    ----------
+    hr : np.ndarray
+        Radiative heat transfer coefficient (hr) [W/(m2*K)].
+
+    Returns
+    -------
+    np.ndarray
+        Fixed radiative heat transfer coefficient (hr) [W/(m2*K)].
+    """
     mean_hr = np.average(hr, weights=cons.Default.local_bsa)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
 
 
+# todo this function is a duplicate in utils
 def operative_temp(tdb, tr, hc, hr):
     """Calculate operative temperature [°C]
 
@@ -343,6 +407,7 @@ def operative_temp(tdb, tr, hc, hr):
     return to
 
 
+# todo this function is a duplicate in utils and they are different
 def clo_area_factor(clo):
     """Calculate clothing area factor [-]
 
@@ -360,6 +425,7 @@ def clo_area_factor(clo):
     return fcl
 
 
+# todo this function is different from ISO 9920
 def dry_r(hc, hr, clo):
     """Calculate total sensible thermal resistance (between the skin and
     ambient air).
@@ -375,8 +441,13 @@ def dry_r(hc, hr, clo):
 
     Returns
     -------
-    r_t : float or array
+    np.ndarray
         Total sensible thermal resistance between skin and ambient.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are negative.
     """
     if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
         raise ValueError("Input parameters hc and hr must be non-negative.")
@@ -410,8 +481,13 @@ def wet_r(
 
     Returns
     -------
-    r_et : float or array
+    np.ndarray
         Total evaporative thermal resistance.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are negative.
     """
     if (np.array(hc) < 0).any():
         raise ValueError("Input parameters hc must be non-negative.")
@@ -429,19 +505,14 @@ def error_signals(err_sk=0.0):
 
     Parameters
     ----------
-    err_sk : float or array, optional
-        Difference between set-point and skin temperatures [°C].
-        If array, its length should be 17.
-        The default is 0.
+    err_sk : float or np.ndarray, optional
+        Difference between set-point and skin temperatures [°C]. The default is 0.
 
     Returns
     -------
-    wrms : array
-        Warm signal (WRMS) [°C].
-    clds : array
-        Cold signal (CLDS) [°C].
+    tuple
+        Warm signal (WRMS) [°C] and Cold signal (CLDS) [°C].
     """
-    # Convert err_sk to float if it's not already
     err_sk = np.array(err_sk, dtype=float)
 
     # SKINR (Distribution coefficients of thermal receptor) [-]
@@ -468,24 +539,29 @@ def error_signals(err_sk=0.0):
     )
 
     # wrms signal
-    wrm = np.maximum(err_sk, 0)
-    wrm *= receptor
-    wrms = wrm.sum()
+    wrm = np.maximum(err_sk, 0) * receptor
+    warm_signal_sum = wrm.sum()
+
     # clds signal
-    cld = np.minimum(err_sk, 0)
-    cld *= -receptor
-    clds = cld.sum()
-
-    return wrms, clds
+    cld = np.minimum(err_sk, 0) * -receptor
+    cold_signal_sum = cld.sum()
+    return warm_signal_sum, cold_signal_sum
 
 
-# Antoine equation [kPa]
-def antoine(x):
-    return math.e ** (16.6536 - (4030.183 / (x + 235)))
+def tetens(x: float) -> float:
+    """
+    Calculate saturated vapor pressure using Tetens equation [kPa].
 
+    Parameters
+    ----------
+    x : float
+        Temperature [°C].
 
-# Tetens equation [kPa]
-def tetens(x):
+    Returns
+    -------
+    float
+        Saturated vapor pressure [kPa].
+    """
     return 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 
 
@@ -516,14 +592,13 @@ def evaporation(
     ret : array
         Total evaporative thermal resistances [m2.K/W].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
 
     Returns
     -------
@@ -582,7 +657,7 @@ def evaporation(
 
     # Signal decrement by aging
     if age < 60:
-        sd_sweat = np.ones(17)
+        sd_sweat = np.ones(Default.num_body_parts)
     else:  # age >= 60
         sd_sweat = np.array(
             [
@@ -629,16 +704,15 @@ def skin_blood_flow(
     err_cr, err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index [L/min/㎡].
 
     Returns
     -------
@@ -721,8 +795,8 @@ def skin_blood_flow(
 
     # Signal decrement by aging
     if age < 60:
-        sd_dilat = np.ones(17)
-        sd_stric = np.ones(17)
+        sd_dilat = np.ones(Default.num_body_parts)
+        sd_stric = np.ones(Default.num_body_parts)
     else:  # age >= 60
         sd_dilat = np.array(
             [
@@ -745,7 +819,7 @@ def skin_blood_flow(
                 0.31,
             ]
         )
-        sd_stric = np.ones(17)
+        sd_stric = np.ones(Default.num_body_parts)
 
     # Skin blood flow [L/h]
     bf_skin = (
@@ -783,16 +857,15 @@ def ava_blood_flow(
     err_cr, err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/m2]. The default is 2.59.
+        Cardiac index [L/min/m2].
 
     Returns
     -------
@@ -858,20 +931,20 @@ def basal_met(
         Basal metabolic rate [W].
     """
     if bmr_equation == "harris-benedict":
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 88.362 + 13.397 * weight + 500.3 * height - 5.677 * age
         else:
             bmr = 447.593 + 9.247 * weight + 479.9 * height - 4.330 * age
 
     elif bmr_equation == "harris-benedict_origin":
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 66.4730 + 13.7516 * weight + 500.33 * height - 6.7550 * age
         else:
             bmr = 655.0955 + 9.5634 * weight + 184.96 * height - 4.6756 * age
 
     elif bmr_equation == "japanese" or bmr_equation == "ganpule":
         # Ganpule et al., 2007, https://doi.org/10.1038/sj.ejcn.1602645
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.4235
         else:
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
@@ -897,11 +970,11 @@ def basal_met(
 
 
 def local_mbase(
-    height=Default.height,
-    weight=Default.weight,
-    age=Default.age,
-    sex=Default.sex,
-    bmr_equation=Default.bmr_equation,
+    height: float = Default.height,
+    weight: float = Default.weight,
+    age: int = Default.age,
+    sex: str = Default.sex,
+    bmr_equation: str = Default.bmr_equation,
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -911,10 +984,10 @@ def local_mbase(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    age : float, optional
+    age : int, optional
         age [years]. The default is 20.
     sex : str, optional
-        Choose male or female. The default is "male".
+        Choose male or female.
     bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
@@ -1093,18 +1166,17 @@ def shivering(
     t_core, t_skin : array
         Core and skin temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     sex : str, optional
-        Choose male or female. The default is "male".
+        Choose male or female.
     dtime : float, optional
-        Interval of analysis time. The default is 60.
+        Interval of analysis time.
 
     Returns
     -------
@@ -1148,7 +1220,7 @@ def shivering(
             if tskm < 31:
                 thres = 36.6
             else:
-                if sex == "male":
+                if sex == Sex.male.value:
                     thres = -0.2436 * tskm + 44.10
                 else:  # sex == "female":
                     thres = -0.2250 * tskm + 43.05
@@ -1156,6 +1228,7 @@ def shivering(
             if thres < t_core[0]:
                 sig_shiv = 0
 
+    # todo I do not think this is well written code
     global PRE_SHIV  # Previous shivering thermogenesis [W]
     if options:
         if options["limit_dshiv/dt"]:
@@ -1172,19 +1245,19 @@ def shivering(
 
     # Signal sd_shiv by aging
     if age < 30:
-        sd_shiv = np.ones(17)
+        sd_shiv = np.ones(Default.num_body_parts)
     elif age < 40:
-        sd_shiv = np.ones(17) * 0.97514
+        sd_shiv = np.ones(Default.num_body_parts) * 0.97514
     elif age < 50:
-        sd_shiv = np.ones(17) * 0.95028
+        sd_shiv = np.ones(Default.num_body_parts) * 0.95028
     elif age < 60:
-        sd_shiv = np.ones(17) * 0.92818
+        sd_shiv = np.ones(Default.num_body_parts) * 0.92818
     elif age < 70:
-        sd_shiv = np.ones(17) * 0.90055
+        sd_shiv = np.ones(Default.num_body_parts) * 0.90055
     elif age < 80:
-        sd_shiv = np.ones(17) * 0.86188
+        sd_shiv = np.ones(Default.num_body_parts) * 0.86188
     else:  # age >= 80
-        sd_shiv = np.ones(17) * 0.82597
+        sd_shiv = np.ones(Default.num_body_parts) * 0.82597
 
     # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, bsa_equation)
@@ -1210,14 +1283,13 @@ def nonshivering(
     err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     cold_acclimation : bool, optional
         Whether the subject acclimates cold environment or not.
         The default is False.
@@ -1358,16 +1430,15 @@ def cr_ms_fat_blood_flow(
     q_shiv : array
         Heat production by shivering [W].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index [L/min/㎡].
 
     Returns
     -------
@@ -1472,7 +1543,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
         Blood flow rate in the skin region [L/h].
     bf_ava_hand : array
         AVA blood flow rate in one hand [L/h].
-    bf_ava_foot: array
+    bf_ava_foot : array
         AVA blood flow rate in one foot [L/h].
 
     Returns
@@ -1497,17 +1568,19 @@ def resp_heat_loss(tdb, p_a, q_thermogenesis_total):
     Parameters
     ----------
     tdb : float
-        Dry bulb air temperature [oC].
+        Dry bulb air temperature [°C].
     p_a : float
-        Water vapor pressure in the ambient air  [kPa].
-    q_thermogenesis_total: float
+        Water vapor pressure in the ambient air [kPa].
+    q_thermogenesis_total : float
         Total thermogenesis [W].
 
     Returns
     -------
-    res_sh, res_lh : float
-        Sensible and latent heat loss by respiration [W].
+    res_sh : float
+        Sensible heat loss by respiration [W].
+    res_lh : float
+        Latent heat loss by respiration [W].
     """
-    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # sensible heat loss
-    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # latent heat loss
+    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # Sensible heat loss
+    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # Latent heat loss
     return res_sh, res_lh

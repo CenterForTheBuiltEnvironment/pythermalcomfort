@@ -5,6 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import EPMVInputs
 from pythermalcomfort.classes_return import EPMV
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_e(
@@ -16,7 +17,7 @@ def pmv_e(
     clo: Union[float, list[float]],
     e_coefficient: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    units: str = "SI",
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
 ) -> EPMV:
     """Returns Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
@@ -53,13 +54,12 @@ def pmv_e(
         Clothing insulation, [clo].
 
         .. note::
-            The activity as well as the air speed modify the insulation characteristics
-            of the clothing and the adjacent air layer. Consequently, the ISO 7730 states that
-            the clothing insulation shall be corrected [ISO77302005]_. The ASHRAE 55 Standard corrects
-            for the effect of the body movement for met equal or higher than 1.2 met using
-            the equation clo = Icl × (0.6 + 0.4/met) The dynamic clothing insulation, clo,
-            can be calculated using the function
-            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            this is the basic insulation also known as the intrinsic clothing insulation value of the
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under actual
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_iso`.
 
     e_coefficient : float or list of floats
         Expectancy factor.
@@ -87,8 +87,8 @@ def pmv_e(
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import e_pmv
-        from pythermalcomfort.utilities import v_relative, clo_dynamic
+        from pythermalcomfort.models import pmv_e
+        from pythermalcomfort.utilities import v_relative, clo_dynamic_iso
 
         tdb = 28
         tr = 28
@@ -98,10 +98,10 @@ def pmv_e(
         clo = 0.5
         # calculate relative air speed
         v_r = v_relative(v=v, met=met)
-        # calculate dynamic clothing
-        clo_d = clo_dynamic(clo=clo, met=met)
-        results = e_pmv(tdb, tr, v_r, rh, met, clo_d, e_coefficient=0.6)
-        print(results.e_pmv)  # 0.51
+        # Calculate dynamic clothing
+        clo_d = clo_dynamic_iso(clo=clo, met=met, v=v)
+        results = pmv_e(tdb, tr, v_r, rh, met, clo_d, e_coefficient=0.6)
+        print(results.e_pmv)  # 0.48
     """
     # Validate inputs using the EPMVInputs class
     EPMVInputs(
@@ -126,7 +126,7 @@ def pmv_e(
         met=met,
         clo=clo,
         wme=wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         **default_kwargs,
     ).pmv
     met = np.where(_pmv > 0, met * (1 + _pmv * (-0.067)), met)
@@ -138,7 +138,7 @@ def pmv_e(
         met=met,
         clo=clo,
         wme=wme,
-        model="7730-2005",
+        model=Models.iso_7730_2005.value,
         **default_kwargs,
     ).pmv
 

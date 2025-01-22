@@ -7,7 +7,7 @@ from numba import float64, jit, vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesInputs
 from pythermalcomfort.classes_return import SET, GaggeTwoNodes
-from pythermalcomfort.utilities import p_sat_torr
+from pythermalcomfort.utilities import Postures, met_to_w_m2, p_sat_torr
 
 
 def gagge_two_nodes(
@@ -20,7 +20,7 @@ def gagge_two_nodes(
     wme: float | list[float] = 0,
     body_surface_area: float | list[float] = 1.8258,
     p_atm: float | list[float] = 101325,
-    position: str = "standing",
+    position: str = Postures.standing.value,
     max_skin_blood_flow: float | list[float] = 90,
     round_output: bool = True,
     max_sweating: float | list[float] = 500,
@@ -28,11 +28,11 @@ def gagge_two_nodes(
     calculate_ce: bool = False,
 ) -> SET | GaggeTwoNodes:
     """Gagge Two-node model of human temperature regulation Gagge et al. (1986).
-    [gagge1986]_ This model can be used to calculate a variety of indices, including:
+    [Gagge1986]_ This model can be used to calculate a variety of indices, including:
 
-    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [gagge1986]_.
-    * PMV SET and the predicted thermal sensation based on SET [gagge1986]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
-    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [gagge1986]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (5). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [gagge1986]_.
+    * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [Gagge1986]_.
+    * PMV SET and the predicted thermal sensation based on SET [Gagge1986]_. This function is similar in all aspects to the :py:meth:`pythermalcomfort.models.pmv_gagge` however, it uses the :py:meth:`pythermalcomfort.models.set` equation to calculate the dry heat loss by convection.
+    * Thermal discomfort (DISC) as the relative thermoregulatory strain necessary to restore a state of comfort and thermal equilibrium by sweating [Gagge1986]_. DISC is described numerically as: comfortable and pleasant (0), slightly uncomfortable but acceptable (1), uncomfortable and unpleasant (2), very uncomfortable (3), limited tolerance (4), and intolerable (5). The range of each category is ± 0.5 numerically. In the cold, the classical negative category descriptions used for Fanger's PMV apply [Gagge1986]_.
     * Heat gains and losses via convection, radiation, and conduction.
     * The Standard Effective Temperature (SET).
     * The New Effective Temperature (ET).
@@ -310,7 +310,7 @@ def _gagge_two_nodes_optimized(
 
         while not tc_converged:
             # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
-            if position == "sitting":
+            if position == Postures.sitting.value:
                 # 0.7 ratio between radiation area of the body and the body area
                 h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.7
             else:  # if standing
@@ -486,8 +486,12 @@ def _gagge_two_nodes_optimized(
         dx = et - et_old
         et_old = et
 
-    tbm_l = (0.194 / 58.15) * rm + 36.301  # lower limit for evaporative regulation
-    tbm_h = (0.347 / 58.15) * rm + 36.669  # upper limit for evaporative regulation
+    tbm_l = (
+        0.194 / met_to_w_m2
+    ) * rm + 36.301  # lower limit for evaporative regulation
+    tbm_h = (
+        0.347 / met_to_w_m2
+    ) * rm + 36.669  # upper limit for evaporative regulation
 
     t_sens = 0.4685 * (t_body - tbm_l)  # predicted thermal sensation
     if (t_body >= tbm_l) & (t_body < tbm_h):

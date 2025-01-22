@@ -6,7 +6,10 @@ from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.shared_functions import mapping
 from pythermalcomfort.utilities import (
+    Models,
+    Units,
     _check_standard_compliance_array,
     units_converter,
 )
@@ -20,8 +23,8 @@ def pmv_ppd_ashrae(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     wme: Union[float, list[float]] = 0,
-    model: str = "55-2023",
-    units: str = "SI",
+    model: str = Models.ashrae_55_2023.value,
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
     airspeed_control: bool = True,
     round_output: bool = True,
@@ -62,12 +65,9 @@ def pmv_ppd_ashrae(
             this is the basic insulation also known as the intrinsic clothing insulation value of the
             clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
             surface to the outer clothing surface, including enclosed air layers, under actual
-            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`)
-
-        .. note::
-            The ASHRAE 55 Standard corrects for the effect of the body movement for met equal or higher
-            than 1.2 met using the equation clo = (I :sub:`cl,r`), × (0.6 + 0.4/met) The dynamic clothing
-            insulation, clo, can be calculated using the function :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     wme : float or list of floats, optional
         External work, [met]. Defaults to 0.
@@ -100,15 +100,17 @@ def pmv_ppd_ashrae(
     Returns
     -------
     PMVPPD
-        A dataclass containing the Predicted Mean Vote and Predicted Percentage of Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for more details.
-        To access the `pmv` and `ppd` values, use the corresponding attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
+        A dataclass containing the Predicted Mean Vote and Predicted Percentage of
+        Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for
+        more details. To access the `pmv`, `ppd`, `tsv` values, use the corresponding
+        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
 
     Examples
     --------
     .. code-block:: python
 
         from pythermalcomfort.models import pmv_ppd_ashrae
-        from pythermalcomfort.utilities import v_relative, clo_dynamic
+        from pythermalcomfort.utilities import v_relative, clo_dynamic_ashrae
 
         tdb = 25
         tr = 25
@@ -119,7 +121,7 @@ def pmv_ppd_ashrae(
         # calculate relative air speed
         v_r = v_relative(v=v, met=met)
         # calculate dynamic clothing
-        clo_d = clo_dynamic(clo=clo, met=met)
+        clo_d = clo_dynamic_ashrae(clo=clo, met=met)
         results = pmv_ppd_ashrae(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, model="55-2023")
         print(results.pmv)  # 0.0
         print(results.ppd)  # 5.0
@@ -150,13 +152,13 @@ def pmv_ppd_ashrae(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)
 
     model = model.lower()
-    if model not in ["55-2023"]:
+    if model not in [Models.ashrae_55_2023.value]:
         raise ValueError(
-            "PMV calculations can only be performed in compliance with ASHRAE 55-2023"
+            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
         )
 
     (
@@ -208,4 +210,18 @@ def pmv_ppd_ashrae(
         pmv_array = np.round(pmv_array, 2)
         ppd_array = np.round(ppd_array, 1)
 
-    return PMVPPD(pmv=pmv_array, ppd=ppd_array)
+    thermal_sensation = {
+        -2.5: "Cold",
+        -1.5: "Cool",
+        -0.5: "Slightly Cool",
+        0.5: "Neutral",
+        1.5: "Slightly Warm",
+        2.5: "Warm",
+        10: "Hot",
+    }
+
+    return PMVPPD(
+        pmv=pmv_array,
+        ppd=ppd_array,
+        tsv=mapping(pmv_array, thermal_sensation, right=False),
+    )

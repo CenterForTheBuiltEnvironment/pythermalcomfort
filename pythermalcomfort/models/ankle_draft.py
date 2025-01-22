@@ -6,6 +6,8 @@ from pythermalcomfort.classes_input import AnkleDraftInputs
 from pythermalcomfort.classes_return import AnkleDraft
 from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.utilities import (
+    Models,
+    Units,
     _check_standard_compliance_array,
     units_converter,
 )
@@ -19,7 +21,7 @@ def ankle_draft(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     v_ankle: Union[float, list[float]],
-    units: str = "SI",
+    units: str = Units.SI.value,
 ) -> AnkleDraft:
     """Calculates the percentage of thermally dissatisfied people with the
     ankle draft (0.1 m) above floor level [liu2017]_.
@@ -57,11 +59,12 @@ def ankle_draft(
         Clothing insulation, [clo].
 
         .. note::
-            The activity as well as the air speed modify the insulation characteristics of the clothing and the adjacent air layer.
-            Consequently, the ISO 7730 states that the clothing insulation shall be corrected.
-            The ASHRAE 55 Standard corrects for the effect of the body movement for met equal or higher than 1.2 met using the equation
-            `clo = Icl × (0.6 + 0.4/met)`. The dynamic clothing insulation, `clo`, can be calculated using the function
-            :py:meth:`pythermalcomfort.utilities.clo_dynamic`.
+            this is the basic insulation also known as the intrinsic clothing insulation value of the
+            clothing ensemble (`I`:sub:`cl,r`), this is the thermal insulation from the skin
+            surface to the outer clothing surface, including enclosed air layers, under actual
+            environmental conditions. This value is not the total insulation (`I`:sub:`T,r`).
+            The dynamic clothing insulation, clo, can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.clo_dynamic_ashrae`.
 
     v_ankle : float or list of floats
         Air speed at 0.1 m (4 in.) above the floor, default in [m/s] or [fps] if `units` = 'IP'.
@@ -98,7 +101,7 @@ def ankle_draft(
     clo = np.array(clo)
     v_ankle = np.array(v_ankle)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)
 
     tdb_valid, tr_valid, v_valid, v_limited = _check_standard_compliance_array(
@@ -114,7 +117,9 @@ def ankle_draft(
             "This equation is only applicable for air speed lower than 0.2 m/s"
         )
 
-    tsv = pmv_ppd_ashrae(tdb, tr, vr, rh, met, clo, model="55-2023").pmv
+    tsv = pmv_ppd_ashrae(
+        tdb, tr, vr, rh, met, clo, model=Models.ashrae_55_2023.value
+    ).pmv
     ppd_val = np.around(
         np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)
         / (1 + np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv))

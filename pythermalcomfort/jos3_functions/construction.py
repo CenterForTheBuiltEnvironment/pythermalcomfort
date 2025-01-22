@@ -1,38 +1,44 @@
-"""This code provides models for calculating the surface area of different body
-parts, weight ratio, basal blood flow ratio, and thermal conductance and
-thermal capacity.
-
-The values of a NumPy array containing 17 elements correspond to the
-following order: "head", "neck", "chest", "back", "pelvis",
-"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm",
-"right_hand", "left_thigh", "left_leg", "left_hand", "right_thigh",
-"right_leg" and "right_hand".
 """
+This module provides models for calculating various body parameters including surface area,
+weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
+
+The values of a NumPy array containing 17 elements correspond to the following body parts:
+"head", "neck", "chest", "back", "pelvis", "left_shoulder", "left_arm", "left_hand",
+"right_shoulder", "right_arm", "right_hand", "left_thigh", "left_leg", "left_hand",
+"right_thigh", "right_leg", and "right_hand".
+"""
+
+import logging
 
 import numpy as np
 
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT, NUM_NODES
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort.utilities import body_surface_area
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Models, body_surface_area
+
+logging.basicConfig(level=logging.WARN)
+logger = logging.getLogger(__name__)
 
 
 def validate_body_parameters(
-    height=Default.height,
-    weight=Default.weight,
-    age=Default.age,
-    body_fat=Default.body_fat,
+    height: float = Default.height,
+    weight: float = Default.weight,
+    age: int = Default.age,
+    body_fat: float = Default.body_fat,
 ):
-    """Validate the parameters: height, weight, age, and body fat percentage.
+    """
+    Validate the body parameters: height, weight, age, and body fat percentage.
 
     Parameters
     ----------
-    height : float
+    height : float, optional
         The height of the person in meters.
-    weight : float
+    weight : float, optional
         The weight of the person in kilograms.
-    age : int
+    age : int, optional
         The age of the person in years.
-    body_fat : float
+    body_fat : float, optional
         The body fat percentage as a fraction of total body mass.
 
     Raises
@@ -40,6 +46,13 @@ def validate_body_parameters(
     ValueError
         If any of the parameters are out of the specified range.
 
+    Examples
+    --------
+    Validate parameters for a person with height 1.80 meters, weight 75 kilograms, age 30 years, and body fat 20%:
+
+    .. code-block:: python
+
+        validate_body_parameters(height=1.80, weight=75, age=30, body_fat=20)
     """
     if not (0.5 <= height <= 3.0):
         raise ValueError("Height must be in the range [0.5, 3.0] meters.")
@@ -51,10 +64,12 @@ def validate_body_parameters(
         raise ValueError("Age must be in the range [5, 100] years.")
 
     if not (1 <= body_fat <= 90):
-        raise ValueError("Body Fat must be in the range [1, 90] (1% to 90%).")
+        raise ValueError(
+            "Body fat percentage must be in the range [1, 90] (1% to 90%)."
+        )
 
 
-def _to17array(inp):
+def to_array_body_parts(inp):
     """Create a NumPy array of shape (17,) with the given input.
 
     Parameters
@@ -74,47 +89,62 @@ def _to17array(inp):
         If the input type is not supported or if the input list or ndarray is not of length 17.
     """
     if isinstance(inp, (int, float)):
-        array = np.ones(17) * inp
+        return np.full(Default.num_body_parts, inp)
     elif isinstance(inp, dict):
         return np.array([inp[key] for key in BODY_NAMES])
     elif isinstance(inp, (list, np.ndarray)):
         inp = np.asarray(inp)
-        if inp.shape == (17,):
-            array = inp
+        if inp.shape == (Default.num_body_parts,):
+            return inp.copy()
         else:
-            raise ValueError("The input list or ndarray is not of length 17")
+            raise ValueError(
+                f"The input list or ndarray is not of length {Default.num_body_parts}"
+            )
     else:
         raise ValueError(
             "Unsupported input type. Supported types: int, float, list, dict, ndarray"
         )
 
-    return array.copy()
-
 
 def bsa_rate(
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-):
-    """Calculate the rate of bsa to standard body.
+    height: float = Default.height,
+    weight: float = Default.weight,
+    bsa_equation: str = Default.bsa_equation,
+) -> float:
+    """
+    Calculate the ratio of body surface area (BSA) to the standard body.
+
+    This function computes the ratio of an individual's body surface area to that of a standard body,
+    based on the given height, weight, and BSA calculation equation.
 
     Parameters
     ----------
     height : float, optional
-        Body height [m]. The default is 1.72.
+        The height of the person in meters.
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        The weight of the person in kilograms.
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name for BSA calculation. Choose one from BodySurfaceAreaEquations
 
     Returns
     -------
-    bsa_rate : float
-        The ratio of bsa to the standard body [-].
-    """
-    validate_body_parameters(height=height, weight=weight)
+    float
+        The ratio of the individual's BSA to the standard body BSA.
 
+    Raises
+    ------
+    ValueError
+        If the parameters are out of the specified range.
+
+    Examples
+    --------
+    Calculate the BSA ratio for a person with height 1.80 meters and weight 75 kilograms:
+
+    .. code-block:: python
+
+        bsa_ratio = bsa_rate(height=1.80, weight=75, bsa_equation="dubois")
+        print(bsa_ratio)
+    """
     bsa_all = body_surface_area(
         height=height,
         weight=weight,
@@ -126,109 +156,115 @@ def bsa_rate(
 
 
 def local_bsa(
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-):
-    """Calculate local body surface area (bsa) [m2].
+    height: float = Default.height,
+    weight: float = Default.weight,
+    bsa_equation: str = Default.bsa_equation,
+) -> np.ndarray:
+    """
+    Calculate local body surface area (BSA) in square meters.
 
     The local body surface area has been derived from 65MN.
-    The head have been divided to head and neck based on Smith's model.
-        head = 0.1396*0.1117/0.1414 (65MN_Head * Smith_Head / Smith_Head+neck)
-        neck = 0.1396*0.0297/0.1414 (65MN_Head * Smith_Neck / Smith_Head+neck)
+    The head has been divided into head and neck based on Smith's model.
+        head = 0.1396 * 0.1117 / 0.1414 (65MN_Head * Smith_Head / Smith_Head+neck)
+        neck = 0.1396 * 0.0297 / 0.1414 (65MN_Head * Smith_Neck / Smith_Head+neck)
 
     Parameters
     ----------
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height in meters.
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight in kilograms.
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name for BSA calculation. Choose one from BodySurfaceAreaEquations.
 
     Returns
     -------
-    local_bsa : ndarray(17,)
-        Local body surface area (bsa) [m2].
+    np.ndarray
+        Local body surface area (BSA) in square meters.
+
+    Raises
+    ------
+    ValueError
+        If any of the parameters are out of the specified range.
+
+    Examples
+    --------
+    Calculate the local BSA for a person with height 1.80 meters and weight 75 kilograms:
+
+    .. code-block:: python
+
+        local_bsa_values = local_bsa(height=1.80, weight=75, bsa_equation="dubois")
+        print(local_bsa_values)
     """
-    validate_body_parameters(height=height, weight=weight)
-    _bsa_rate = bsa_rate(
-        height=height,
-        weight=weight,
-        bsa_equation=bsa_equation,
-    )  # The bsa ratio to the standard body (1.87m2)
-    local_bsa = Default.local_bsa * _bsa_rate
-    return local_bsa
+    bsa_ratio = bsa_rate(height=height, weight=weight, bsa_equation=bsa_equation)
+    return Default.local_bsa * bsa_ratio
 
 
-def weight_rate(
-    weight=Default.weight,
-):
-    """Calculate the ratio of the body weight to the standard body (74.43 kg).
-
-    The standard values of local body weights are as below.
-        weight_local = np.array([
-            3.18, 0.84, 12.4, 11.03, 17.57,
-            2.16, 1.37, 0.34, 2.16, 1.37, 0.34,
-            7.01, 3.34, 0.48, 7.01, 3.34, 0.48])
-    The data have been derived from 65MN.
-    The weight of neck is extracted from the weight of 65MN's head based on
-    the local body surface area of Smith's model.
+def weight_rate(weight: float = Default.weight) -> float:
+    """
+    Calculate the ratio of the body weight to the standard body.
 
     Parameters
     ----------
     weight : float, optional
-        The body weight [kg]. The default is 74.43.
+        The body weight in kilograms.
 
     Returns
     -------
-    weight_rate : float
-        The ratio of the body weight to the standard body (74.43 kg).
-        weight_rate = weight / 74.43
+    float
+        The ratio of the body weight to the standard body.
     """
-    validate_body_parameters(weight=weight)
     return weight / Default.weight
 
 
 def bfb_rate(
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    ci=Default.cardiac_index,
-):
-    """Calculate the ratio of basal blood flow (BFB) of the standard body (290
-    L/h).
+    height: float = Default.height,
+    weight: float = Default.weight,
+    bsa_equation: str = Default.bsa_equation,
+    age: int = Default.age,
+    ci: float = Default.cardiac_index,
+) -> float:
+    """
+    Calculate the ratio of basal blood flow (BFB) to the standard body.
+
+    This function computes the basal blood flow rate based on the given height, weight,
+    BSA calculation equation, age, and cardiac index.
 
     Parameters
     ----------
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height in meters.
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight in kilograms.
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
-    age : float, optional
-        age [years]. The default is 20.
+        The equation name for BSA calculation. Choose one from BodySurfaceAreaEquations.
+    age : int, optional
+        Age in years.
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index in L/min/m².
 
     Returns
     -------
-    bfb_rate : float
+    float
         Basal blood flow rate.
+
+    Raises
+    ------
+    ValueError
+        If any of the parameters are out of the specified range.
+
+    Examples
+    --------
+    Calculate the BFB rate for a person with height 1.80 meters, weight 75 kilograms, age 30 years, and cardiac index 2.59:
+
+    .. code-block:: python
+
+        bfb_ratio = bfb_rate(height=1.80, weight=75, age=30, ci=2.59)
+        print(bfb_ratio)
     """
-    validate_body_parameters(
-        height=height,
-        weight=weight,
-        age=age,
-    )
+    ci *= 60  # Convert unit from L/min/m² to L/h/m²
 
-    ci *= 60  # Change unit [L/min/㎡] to [L/h/㎡]
-
-    # Decrease of BFB by aging
+    # Adjust cardiac index based on age
     if age < 50:
         ci *= 1
     elif age < 60:
@@ -238,31 +274,106 @@ def bfb_rate(
     else:  # age >= 70
         ci *= 0.7
 
-    bfb_all = (
-        ci * bsa_rate(height, weight, bsa_equation) * Default.local_bsa.sum()
-    )  # [L/h]
-    return bfb_all / Default.blood_flow_rate
+    bsa_ratio = bsa_rate(height, weight, bsa_equation)
+    bfb_all = ci * bsa_ratio * Default.local_bsa.sum()  # Total BFB in L/h
+    return bfb_all / Default.blood_flow_rate  # Ratio to the standard body (290 L/h)
+
+
+def calculate_operative_temp_when_pmv_is_zero(
+    va: float = Default.air_speed,
+    rh: float = Default.relative_humidity,
+    met: float = Default.metabolic_rate,
+    clo: float = Default.clothing_insulation,
+) -> float:
+    """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
+    logic.
+
+    Parameters
+    ----------
+    va : float, optional
+        Air velocity [m/s]. The default is 0.1.
+    rh : float, optional
+        Relative humidity [%]. The default is 50.
+    met : float, optional
+        Metabolic rate [met]. The default is 1.
+    clo : float, optional
+        Clothing insulation [clo]. The default is 0.
+
+    Returns
+    -------
+    to : float
+        Operative temperature [°C].
+    """
+    # Default parameters
+    initial_to = 28
+    tolerance = 0.001
+    max_iterations = 100
+    adjustment_factor = 3
+    retry_adjustment_factor = adjustment_factor * 200
+    retry_attempts = 100
+
+    to = initial_to
+
+    # Main loop for finding PMV=0
+    for i in range(max_iterations):
+        pmv_value = pmv_ppd_iso(
+            to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
+        ).pmv
+
+        # Check for NaN and handle retries
+        if np.isnan(pmv_value):
+            logger.warning(
+                f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step."
+            )
+            for retry in range(retry_attempts):
+                adjustment_factor = retry_adjustment_factor
+                to = initial_to  # Reset to initial temperature for retry
+                pmv_value = pmv_ppd_iso(
+                    to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
+                ).pmv
+                logger.info(f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}")
+
+                if abs(pmv_value) < tolerance:
+                    logger.info(f"Converged to PMV=0 at to={to:.2f}°C during retry.")
+                    return to
+
+                # Adjust the temperature during retry
+                to = to - pmv_value / adjustment_factor
+
+            # If retries fail, log a warning and stop the loop
+            logger.error("Retries failed to achieve convergence after NaN detection.")
+            return to
+
+        # Check if the PMV is within tolerance
+        if abs(pmv_value) < tolerance:
+            logger.info(f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations.")
+            return to
+
+        # Adjust the operative temperature using the adjustment factor
+        to = to - pmv_value / adjustment_factor
+
+    logger.warning("Maximum iterations reached without achieving convergence.")
+    return to
 
 
 def conductance(
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    fat=Default.body_fat,
+    height: float = Default.height,
+    weight: float = Default.weight,
+    bsa_equation: str = Default.bsa_equation,
+    fat: float = Default.body_fat,
 ):
     """Calculate thermal conductance between layers [W/K].
 
     Parameters
     ----------
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     fat : float, optional
-        Body fat rate [%]. The default is 15.
+        Body fat rate [%].
 
     Returns
     -------
@@ -270,12 +381,6 @@ def conductance(
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
     """
-    validate_body_parameters(
-        height=height,
-        weight=weight,
-        body_fat=fat,
-    )
-
     if fat < 12.5:
         cdt_cr_sk = np.array(
             [
@@ -387,9 +492,9 @@ def conductance(
             ]
         )
 
-    cdt_cr_ms = np.zeros(17)  # core to muscle [W/K]
-    cdt_ms_fat = np.zeros(17)  # muscle to fat [W/K]
-    cdt_fat_sk = np.zeros(17)  # fat to skin [W/K]
+    cdt_cr_ms = np.zeros(Default.num_body_parts)  # core to muscle [W/K]
+    cdt_ms_fat = np.zeros(Default.num_body_parts)  # muscle to fat [W/K]
+    cdt_fat_sk = np.zeros(Default.num_body_parts)  # fat to skin [W/K]
 
     # head and pelvis consists of 65MN's conductances
     cdt_cr_ms[0] = 1.601  # head
@@ -451,7 +556,7 @@ def conductance(
 
     # art to vein (counter-flow) [W/K]
     # The data has been derived Mitchell's model.
-    # THe values = 15.869 [W/(m･K)] * the segment length [m]
+    # The values = 15.869 [W/(m･K)] * the segment length [m]
     cdt_art_vein = np.array(
         [
             0,
@@ -525,12 +630,12 @@ def conductance(
 
 
 def capacity(
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    ci=Default.cardiac_index,
-):
+    height: float = Default.height,
+    weight: float = Default.weight,
+    bsa_equation: str = Default.bsa_equation,
+    age: int = Default.age,
+    ci: float = Default.cardiac_index,
+) -> np.ndarray:
     """Calculate the thermal capacity [J/K].
 
     The values of vascular and central blood capacity have been derived from
@@ -540,28 +645,24 @@ def capacity(
     Parameters
     ----------
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
-    age : float, optional
-        age [years]. The default is 20.
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
+    age : int, optional
+        Age [years].
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index [L/min/㎡].
 
     Returns
     -------
-    capacity : numpy.ndarray.
-        Thermal capacity [W/K].
+    np.ndarray
+        Thermal capacity [J/K].
         The shape is (NUM_NODES).
     """
-    validate_body_parameters(
-        height=height,
-        weight=weight,
-        age=age,
-    )
+    # Define capacities [Wh/K]
+
     # artery [Wh/K]
     cap_art = np.array(
         [
@@ -726,7 +827,7 @@ def capacity(
         ]
     )
 
-    # Changes the values based on the standard body
+    # Adjust capacities based on body parameters
     bfbr = bfb_rate(height, weight, bsa_equation, age, ci)
     wr = weight_rate(weight)
     cap_art *= bfbr
@@ -738,12 +839,12 @@ def capacity(
     cap_fat *= wr
     cap_sk *= wr
 
+    # Initialize capacity array
     cap_whole = np.zeros(NUM_NODES)
     cap_whole[0] = cap_cb
 
     for i, bn in enumerate(BODY_NAMES):
-        # Dictionary of indices in each body segment
-        # key = layer name, value = index of matrix
+        # Dictionary of indices in each body segment key = layer name, value = index of matrix
         index_of = IDICT[bn]
 
         # Common
@@ -761,5 +862,5 @@ def capacity(
             cap_whole[index_of["muscle"]] = cap_ms[i]
             cap_whole[index_of["fat"]] = cap_fat[i]
 
-    cap_whole *= 3600  # Changes unit [Wh/K] to [J/K]
+    cap_whole *= 3600  # Convert [Wh/K] to [J/K]
     return cap_whole

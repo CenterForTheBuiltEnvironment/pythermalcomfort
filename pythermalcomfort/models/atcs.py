@@ -2,10 +2,13 @@ import logging
 
 import numpy as np
 
+from pythermalcomfort.jos3_functions.construction import (
+    calculate_operative_temp_when_pmv_is_zero,
+)
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
-from pythermalcomfort.utilities import DefaultSkinTemperature
+from pythermalcomfort.utilities import DefaultSkinTemperature, met_to_w_m2
 
 # Set logging config as WARNING
 logging.basicConfig(level=logging.WARNING)
@@ -42,8 +45,8 @@ class ATCS(JOS3):
             The default is "harris-benedict" equation created uding Caucasian's data. (DOI: doi.org/10.1073/pnas.4.12.370)
             If the Ganpule's equation (DOI: doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
         bsa_equation : str, optional
-            The equation used to calculate body surface area (bsa). Choose a bsa equation.
-            You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
+            The equation used to calculate body surface area (bsa).
+            Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations. Default is "dubois".
             The body surface area can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.body_surface_area`.
         ex_output : None, list or "all", optional
@@ -131,14 +134,14 @@ class ATCS(JOS3):
         >>> model.to_csv("atcs_example1 (default output).csv"))
         """
         # Initialize instance variables for this class.
-        self.cached_clo = np.ones(17) * Default.clothing_insulation
+        self.cached_clo = np.ones(Default.num_body_parts) * Default.clothing_insulation
         self.cached_par = Default.physical_activity_ratio
         self.cached_overall_clo = np.average(self.cached_clo, weights=Default.local_bsa)
 
         # Initialize parent class
         self.comfort_setpt_skin = np.array(list(DefaultSkinTemperature()._asdict()))
-        self.t_skin_used = np.ones(17) * Default.skin_temperature
-        self.t_skin_wet = np.ones(17) * Default.skin_temperature
+        self.t_skin_used = np.ones(Default.num_body_parts) * Default.skin_temperature
+        self.t_skin_wet = np.ones(Default.num_body_parts) * Default.skin_temperature
         self.t_skin_previous_time_step = None
         self.t_core_previous_time_step = None
         self.overall_clo = Default.clothing_insulation
@@ -186,7 +189,7 @@ class ATCS(JOS3):
         else:
             # Calculate the metabolic rate based on the provided 'par' value.
             min_met = 1.0
-            met = max(self.bmr * self.par / 58.15, min_met)
+            met = max(self.bmr * self.par / met_to_w_m2, min_met)
 
             # Calculate the metabolic rate based on the provided 'par' value.
             overall_clo = np.average(self._clo, weights=Default.local_bsa)
@@ -196,7 +199,7 @@ class ATCS(JOS3):
             self.cached_overall_clo = self.overall_clo
 
             # Use the parent class's method to calculate the operative temperature where PMV is zero.
-            self.to = self._calculate_operative_temp_when_pmv_is_zero(
+            self.to = calculate_operative_temp_when_pmv_is_zero(
                 met=met, clo=overall_clo
             )
 

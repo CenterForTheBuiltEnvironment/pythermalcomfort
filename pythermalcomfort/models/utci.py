@@ -6,7 +6,7 @@ from numba import float64, vectorize
 from pythermalcomfort.classes_input import UTCIInputs
 from pythermalcomfort.classes_return import UTCI
 from pythermalcomfort.shared_functions import mapping, valid_range
-from pythermalcomfort.utilities import units_converter
+from pythermalcomfort.utilities import Units, units_converter
 
 
 def utci(
@@ -14,7 +14,7 @@ def utci(
     tr: Union[float, list[float]],
     v: Union[float, list[float]],
     rh: Union[float, list[float]],
-    units: str = "SI",
+    units: str = Units.SI.value,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UTCI:
@@ -27,7 +27,7 @@ def utci(
     heat stress in outdoor spaces. The parameters that are taken into account for
     calculating UTCI involve dry bulb temperature, mean radiation temperature, the
     pressure of water vapor or relative humidity, and wind speed (at the elevation of 10
-    m above the ground). [zare2018]_
+    m above the ground). [Zare2018]_
 
     Parameters
     ----------
@@ -85,7 +85,7 @@ def utci(
     v = np.array(v)
     rh = np.array(rh)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
     def exponential(t_db):
@@ -119,8 +119,10 @@ def utci(
         all_valid = ~(np.isnan(tdb_valid) | np.isnan(diff_valid) | np.isnan(v_valid))
         utci_approx = np.where(all_valid, utci_approx, np.nan)
 
-    if units.lower() == "ip":
-        utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
+    if units.upper() == Units.IP.value:
+        utci_approx = units_converter(
+            tmp=utci_approx, from_units=Units.SI.value.lower()
+        )[0]
 
     stress_categories = {
         -40.0: "extreme cold stress",

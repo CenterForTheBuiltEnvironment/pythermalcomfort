@@ -5,6 +5,7 @@ import numpy as np
 from pythermalcomfort.classes_input import ATHBInputs
 from pythermalcomfort.classes_return import ATHB
 from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.utilities import met_to_w_m2
 
 
 def pmv_athb(
@@ -107,7 +108,7 @@ def pmv_athb(
         )
 
     pmv_res = _pmv_ppd_optimized(tdb, tr, vr, rh, met_adapted, clo_adapted, 0)
-    ts = 0.303 * np.exp(-0.036 * met_adapted * 58.15) + 0.028
+    ts = 0.303 * np.exp(-0.036 * met_adapted * met_to_w_m2) + 0.028
     l_adapted = pmv_res / ts
 
     # Predicted thermal sensation vote

@@ -7,6 +7,7 @@ from pythermalcomfort.classes_input import ASHRAEInputs
 from pythermalcomfort.classes_return import AdaptiveASHRAE
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
+    Units,
     _check_standard_compliance_array,
     operative_tmp,
     units_converter,
@@ -18,7 +19,7 @@ def adaptive_ashrae(
     tr: Union[float, npt.ArrayLike],
     t_running_mean: Union[float, npt.ArrayLike],
     v: Union[float, npt.ArrayLike],
-    units: Literal["SI", "IP"] = "SI",
+    units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
     """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
@@ -102,7 +103,7 @@ def adaptive_ashrae(
     v = np.array(v)
     standard = "ashrae"
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, t_running_mean, v = units_converter(
             tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
         )
@@ -142,10 +143,10 @@ def adaptive_ashrae(
     acceptability_80 = (tmp_cmf_80_low <= to) & (to <= tmp_cmf_80_up)
     acceptability_90 = (tmp_cmf_90_low <= to) & (to <= tmp_cmf_90_up)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, tmp_cmf_90_low, tmp_cmf_90_up = (
             units_converter(
-                from_units="si",
+                from_units=Units.SI.value,
                 tmp_cmf=t_cmf,
                 tmp_cmf_80_low=tmp_cmf_80_low,
                 tmp_cmf_80_up=tmp_cmf_80_up,
