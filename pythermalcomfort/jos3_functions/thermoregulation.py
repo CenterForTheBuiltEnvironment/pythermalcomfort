@@ -15,6 +15,186 @@ import numpy as np
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
+from pythermalcomfort.utilities import Postures
+
+
+# Natural convection
+def natural_convection(posture, tdb, t_skin):
+    """
+    Calculate the natural convection heat transfer coefficient based on posture.
+
+    Parameters
+    ----------
+    posture : str
+        The posture of the subject. Valid options are "standing", "sitting", "lying", "sedentary", "supine".
+    tdb : float
+        Dry bulb temperature [°C].
+    t_skin : float
+        Skin temperature [°C].
+
+    Returns
+    -------
+    hc_natural : numpy.ndarray
+        Natural convection heat transfer coefficient for 17 body segments.
+
+    Raises
+    ------
+    ValueError
+        If the posture is not one of the valid options.
+    """
+    if posture.lower() == Postures.standing.value:
+        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+        hc_natural = np.array(
+            [
+                4.48,
+                4.48,
+                2.97,
+                2.91,
+                2.85,
+                3.61,
+                3.55,
+                3.67,
+                3.61,
+                3.55,
+                3.67,
+                2.80,
+                2.04,
+                2.04,
+                2.80,
+                2.04,
+                2.04,
+            ]
+        )
+    elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
+        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+        hc_natural = np.array(
+            [
+                4.75,
+                4.75,
+                3.12,
+                2.48,
+                1.84,
+                3.76,
+                3.62,
+                2.06,
+                3.76,
+                3.62,
+                2.06,
+                2.98,
+                2.98,
+                2.62,
+                2.98,
+                2.98,
+                2.62,
+            ]
+        )
+    elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
+        # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
+        # The values are applied under cold environment.
+        hc_a = np.array(
+            [
+                1.105,
+                1.105,
+                1.211,
+                1.211,
+                1.211,
+                0.913,
+                2.081,
+                2.178,
+                0.913,
+                2.081,
+                2.178,
+                0.945,
+                0.385,
+                0.200,
+                0.945,
+                0.385,
+                0.200,
+            ]
+        )
+        hc_b = np.array(
+            [
+                0.345,
+                0.345,
+                0.046,
+                0.046,
+                0.046,
+                0.373,
+                0.850,
+                0.297,
+                0.373,
+                0.850,
+                0.297,
+                0.447,
+                0.580,
+                0.966,
+                0.447,
+                0.580,
+                0.966,
+            ]
+        )
+        hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
+    else:
+        valid_postures = [
+            Postures.standing.value,
+            Postures.sitting.value,
+            Postures.lying.value,
+            Postures.sedentary.value,
+            Postures.supine.value,
+        ]
+        raise ValueError(
+            f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
+        )
+    return hc_natural
+
+
+# Forced convection
+def forced_convection(v):
+    # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+    hc_a = np.array(
+        [
+            15.0,
+            15.0,
+            11.0,
+            17.0,
+            13.0,
+            17.0,
+            17.0,
+            20.0,
+            17.0,
+            17.0,
+            20.0,
+            14.0,
+            15.8,
+            15.1,
+            14.0,
+            15.8,
+            15.1,
+        ]
+    )
+    hc_b = np.array(
+        [
+            0.62,
+            0.62,
+            0.67,
+            0.49,
+            0.60,
+            0.59,
+            0.61,
+            0.60,
+            0.59,
+            0.61,
+            0.60,
+            0.61,
+            0.74,
+            0.62,
+            0.61,
+            0.74,
+            0.62,
+        ]
+    )
+    hc_forced = hc_a * (v**hc_b)
+    return hc_forced
 
 
 def conv_coef(
@@ -29,7 +209,6 @@ def conv_coef(
     ----------
     posture : str, optional
         Select posture from standing, sitting, lying, sedentary or supine.
-        The default is "standing".
     v : float or iter, optional
         Air velocity [m/s]. If iter is input, its length should be 17.
         The default is 0.1.
@@ -51,155 +230,6 @@ def conv_coef(
     Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
     """
 
-    # Natural convection
-    def natural_convection(posture, tdb, t_skin):
-        if posture.lower() == "standing":
-            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-            hc_natural = np.array(
-                [
-                    4.48,
-                    4.48,
-                    2.97,
-                    2.91,
-                    2.85,
-                    3.61,
-                    3.55,
-                    3.67,
-                    3.61,
-                    3.55,
-                    3.67,
-                    2.80,
-                    2.04,
-                    2.04,
-                    2.80,
-                    2.04,
-                    2.04,
-                ]
-            )
-        elif posture.lower() in ["sitting", "sedentary"]:
-            # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-            hc_natural = np.array(
-                [
-                    4.75,
-                    4.75,
-                    3.12,
-                    2.48,
-                    1.84,
-                    3.76,
-                    3.62,
-                    2.06,
-                    3.76,
-                    3.62,
-                    2.06,
-                    2.98,
-                    2.98,
-                    2.62,
-                    2.98,
-                    2.98,
-                    2.62,
-                ]
-            )
-        elif posture.lower() in ["lying", "supine"]:
-            # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
-            # The values are applied under cold environment.
-            hc_a = np.array(
-                [
-                    1.105,
-                    1.105,
-                    1.211,
-                    1.211,
-                    1.211,
-                    0.913,
-                    2.081,
-                    2.178,
-                    0.913,
-                    2.081,
-                    2.178,
-                    0.945,
-                    0.385,
-                    0.200,
-                    0.945,
-                    0.385,
-                    0.200,
-                ]
-            )
-            hc_b = np.array(
-                [
-                    0.345,
-                    0.345,
-                    0.046,
-                    0.046,
-                    0.046,
-                    0.373,
-                    0.850,
-                    0.297,
-                    0.373,
-                    0.850,
-                    0.297,
-                    0.447,
-                    0.580,
-                    0.966,
-                    0.447,
-                    0.580,
-                    0.966,
-                ]
-            )
-            hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
-        else:
-            valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
-            raise ValueError(
-                f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
-            )
-        return hc_natural
-
-    # Forced convection
-    def forced_convection(v):
-        # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_a = np.array(
-            [
-                15.0,
-                15.0,
-                11.0,
-                17.0,
-                13.0,
-                17.0,
-                17.0,
-                20.0,
-                17.0,
-                17.0,
-                20.0,
-                14.0,
-                15.8,
-                15.1,
-                14.0,
-                15.8,
-                15.1,
-            ]
-        )
-        hc_b = np.array(
-            [
-                0.62,
-                0.62,
-                0.67,
-                0.49,
-                0.60,
-                0.59,
-                0.61,
-                0.60,
-                0.59,
-                0.61,
-                0.60,
-                0.61,
-                0.74,
-                0.62,
-                0.61,
-                0.74,
-                0.62,
-            ]
-        )
-        hc_forced = hc_a * (v**hc_b)
-        return hc_forced
-
     # Calculate natural convection
     hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
 
@@ -220,14 +250,13 @@ def rad_coef(posture=Default.posture):
     ----------
     posture : str, optional
         Select posture from standing, sitting, lying, sedentary or supine.
-        The default is "standing".
 
     Returns
     -------
     hr : numpy.ndarray
         Radiative heat transfer coefficient (hr) [W/(m2*K)].
     """
-    if posture.lower() == "standing":
+    if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
         hr = np.array(
             [
@@ -250,7 +279,7 @@ def rad_coef(posture=Default.posture):
                 6.14,
             ]
         )
-    elif posture.lower() in ["sitting", "sedentary"]:
+    elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
         hr = np.array(
             [
@@ -273,7 +302,7 @@ def rad_coef(posture=Default.posture):
                 6.36,
             ]
         )
-    elif posture.lower() in ["lying", "supine"]:
+    elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
         hr = np.array(
             [
@@ -297,7 +326,13 @@ def rad_coef(posture=Default.posture):
             ]
         )
     else:
-        valid_postures = ["standing", "sitting", "lying", "sedentary", "supine"]
+        valid_postures = [
+            Postures.standing.value,
+            Postures.sitting.value,
+            Postures.lying.value,
+            Postures.sedentary.value,
+            Postures.supine.value,
+        ]
         raise ValueError(
             f"Invalid posture '{posture}'. Must be one of {valid_postures}"
         )
@@ -1466,7 +1501,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
         Blood flow rate in the skin region [L/h].
     bf_ava_hand : array
         AVA blood flow rate in one hand [L/h].
-    bf_ava_foot: array
+    bf_ava_foot : array
         AVA blood flow rate in one foot [L/h].
 
     Returns
@@ -1491,17 +1526,19 @@ def resp_heat_loss(tdb, p_a, q_thermogenesis_total):
     Parameters
     ----------
     tdb : float
-        Dry bulb air temperature [oC].
+        Dry bulb air temperature [°C].
     p_a : float
-        Water vapor pressure in the ambient air  [kPa].
-    q_thermogenesis_total: float
+        Water vapor pressure in the ambient air [kPa].
+    q_thermogenesis_total : float
         Total thermogenesis [W].
 
     Returns
     -------
-    res_sh, res_lh : float
-        Sensible and latent heat loss by respiration [W].
+    res_sh : float
+        Sensible heat loss by respiration [W].
+    res_lh : float
+        Latent heat loss by respiration [W].
     """
-    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # sensible heat loss
-    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # latent heat loss
+    res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # Sensible heat loss
+    res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # Latent heat loss
     return res_sh, res_lh

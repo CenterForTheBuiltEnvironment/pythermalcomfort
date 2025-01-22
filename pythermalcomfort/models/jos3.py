@@ -24,6 +24,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
+from pythermalcomfort.utilities import Postures
 
 
 class JOS3:
@@ -466,6 +467,7 @@ class JOS3:
         self._time = dt.timedelta(0)  # Elapsed time
         self._cycle = 0  # Cycle time
         self.model_name = "JOS3"  # Model name
+        # todo expose them as single properties and not as a dict
         self.options = {
             "nonshivering_thermogenesis": True,
             "cold_acclimated": False,
@@ -1258,22 +1260,24 @@ class JOS3:
     @posture.setter
     def posture(self, inp):
         if inp == 0:
-            self._posture = "standing"
+            self._posture = Postures.standing.value
         elif inp == 1:
-            self._posture = "sitting"
+            self._posture = Postures.sitting.value
         elif inp == 2:
-            self._posture = "lying"
+            self._posture = Postures.lying.value
         elif isinstance(inp, str):
-            if inp.lower() == "standing":
-                self._posture = "standing"
-            elif inp.lower() in ["sitting", "sedentary"]:
-                self._posture = "sitting"
-            elif inp.lower() in ["lying", "supine"]:
-                self._posture = "lying"
+            if inp.lower() == Postures.standing.value:
+                self._posture = Postures.standing.value
+            elif inp.lower() in [Postures.sitting.value, Postures.sedentary.value]:
+                self._posture = Postures.sitting.value
+            elif inp.lower() in [Postures.lying.value, Postures.supine.value]:
+                self._posture = Postures.lying.value
         else:
-            self._posture = "standing"
-            print('posture must be 0="standing", 1="sitting" or 2="lying".')
-            print('posture was set "standing".')
+            self._posture = Postures.standing.value
+            print(
+                f"posture must be 0={Postures.standing.value}, 1={Postures.sitting.value} or 2={Postures.lying.value}."
+            )
+            print(f"posture was set {Postures.standing.value}.")
 
     @property
     def clo(self):

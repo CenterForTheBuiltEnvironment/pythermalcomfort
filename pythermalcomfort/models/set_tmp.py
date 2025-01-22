@@ -7,6 +7,7 @@ from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
+    Postures,
 )
 
 
@@ -20,7 +21,7 @@ def set_tmp(
     wme: Union[float, list[float]] = 0,
     body_surface_area: Union[float, list[float]] = 1.8258,
     p_atm: Union[float, list[float]] = 101325,
-    position: str = "standing",
+    position: str = Postures.standing.value,
     limit_inputs: bool = True,
     round_output: bool = True,
     calculate_ce: bool = False,

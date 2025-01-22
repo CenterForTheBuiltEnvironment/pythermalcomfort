@@ -455,6 +455,16 @@ def _check_standard_compliance_array(standard, **kwargs):
         return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
 
 
+class Postures(Enum):
+    standing = "standing"
+    sitting = "sitting"
+    sedentary = "sedentary"
+    reclining = "reclining"
+    lying = "lying"
+    supine = "supine"
+    crouching = "crouching"
+
+
 class BodySurfaceAreaEquations(Enum):
     dubois = "dubois"
     takahira = "takahira"

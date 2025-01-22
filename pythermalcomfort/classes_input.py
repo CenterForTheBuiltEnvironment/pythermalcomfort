@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Units, validate_type
+from pythermalcomfort.utilities import Units, validate_type, Postures
 
 
 @dataclass
@@ -65,8 +65,8 @@ class BaseInputs:
             raise ValueError("Units must be either 'SI' or 'IP'")
         if self.position is not None:
             if self.position.lower() not in [
-                "sitting",
-                "standing",
+                Postures.sitting.value,
+                Postures.standing.value,
                 "standing, forced convection",
             ]:
                 raise ValueError(
@@ -74,7 +74,11 @@ class BaseInputs:
                     "forced convection'"
                 )
         if self.posture is not None:
-            if self.posture.lower() not in ["sitting", "standing", "crouching"]:
+            if self.posture.lower() not in [
+                Postures.sitting.value,
+                Postures.standing.value,
+                Postures.crouching.value,
+            ]:
                 raise ValueError(
                     "posture must be either 'sitting', 'standing', or 'crouching'"
                 )
@@ -628,7 +632,7 @@ class SETInputs(BaseInputs):
         wme=0,
         body_surface_area=1.8258,
         p_atm=101325,
-        position="standing",
+        position=Postures.standing.value,
         units=Units.SI.value,
         limit_inputs=True,
     ):
@@ -660,7 +664,7 @@ class SolarGainInputs(BaseInputs):
         f_svv,
         f_bes,
         asw=0.7,
-        posture="sitting",
+        posture=Postures.sitting.value,
         floor_reflectance=0.6,
     ):
         # Initialize with only required fields, setting others to None
@@ -690,7 +694,7 @@ class GaggeTwoNodesInputs(BaseInputs):
         wme=0,
         body_surface_area=1.8258,
         p_atm=101325,
-        position="standing",
+        position=Postures.standing.value,
         max_skin_blood_flow=90,
         round_output=True,
         max_sweating=500,
@@ -728,7 +732,7 @@ class UseFansHeatwavesInputs(BaseInputs):
         wme=0,
         body_surface_area=1.8258,
         p_atm=101325,
-        position="standing",
+        position=Postures.standing.value,
         max_skin_blood_flow=80,
         limit_inputs=True,
     ):

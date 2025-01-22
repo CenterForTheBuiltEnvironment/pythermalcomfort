@@ -6,7 +6,7 @@ from scipy import optimize
 
 from pythermalcomfort.classes_input import PETSteadyInputs
 from pythermalcomfort.classes_return import PETSteady
-from pythermalcomfort.utilities import body_surface_area, p_sat
+from pythermalcomfort.utilities import body_surface_area, p_sat, Postures
 
 
 def pet_steady(
@@ -17,7 +17,7 @@ def pet_steady(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     p_atm: Union[float, list[float]] = 1013.25,
-    position: Union[str, list[str]] = "sitting",
+    position: Union[str, list[str]] = Postures.sitting.value,
     age: Union[int, list[int]] = 23,
     sex: Union[int, list[int]] = "male",
     weight: Union[float, list[float]] = 75,
@@ -314,7 +314,9 @@ def _pet_steady_vectorised(
         f_a_cl = (173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
-        f_eff = 0.696 if position == "standing" else 0.725  # effective radiation factor
+        f_eff = (
+            0.696 if position == Postures.standing.value else 0.725
+        )  # effective radiation factor
 
         a_r_eff = (
             a_dubois * f_eff
@@ -327,7 +329,7 @@ def _pet_steady_vectorised(
 
         # Convection coefficient depending on wind velocity and subject position
         hc = 2.67 + 6.5 * _v**0.67  # sitting
-        if position == "standing":  # standing
+        if position == Postures.standing.value:  # standing
             hc = 2.26 + 7.42 * _v**0.67
         if position == "standing, forced convection":  # standing, forced convection
             hc = 8.6 * _v**0.513

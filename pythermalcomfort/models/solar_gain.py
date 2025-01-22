@@ -5,7 +5,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import SolarGainInputs
 from pythermalcomfort.classes_return import SolarGain
-from pythermalcomfort.utilities import transpose_sharp_altitude
+from pythermalcomfort.utilities import transpose_sharp_altitude, Postures
 
 
 def solar_gain(
@@ -16,7 +16,7 @@ def solar_gain(
     f_svv: Union[float, list[float]],
     f_bes: Union[float, list[float]],
     asw: Union[float, list[float]] = 0.7,
-    posture: str = "sitting",
+    posture: str = Postures.sitting.value,
     floor_reflectance: Union[float, list[float]] = 0.6,
     round_output: bool = True,
 ) -> SolarGain:
@@ -122,7 +122,11 @@ def solar_gain(
     floor_reflectance = np.array(floor_reflectance)
 
     posture = posture.lower()
-    if posture not in ["standing", "supine", "sitting"]:
+    if posture not in [
+        Postures.standing.value,
+        Postures.supine.value,
+        Postures.sitting.value,
+    ]:
         raise ValueError("Posture has to be either standing, supine or sitting")
 
     erf, d_mrt = _solar_gain_vectorised(
@@ -182,7 +186,7 @@ def _solar_gain_vectorised(
         [0.344, 0.344, 0.304, 0.244, 0.19, 0.128, 0.082],
         [0.347, 0.347, 0.308, 0.246, 0.191, 0.128, 0.082],
     ]
-    if posture == "sitting":
+    if posture == Postures.sitting.value:
         fp_table = [
             [0.29, 0.324, 0.305, 0.303, 0.262, 0.224, 0.177],
             [0.292, 0.328, 0.294, 0.288, 0.268, 0.227, 0.177],
@@ -199,7 +203,7 @@ def _solar_gain_vectorised(
             [0.3, 0.24, 0.168, 0.152, 0.152, 0.164, 0.177],
         ]
 
-    if posture == "supine":
+    if posture == Postures.supine.value:
         sharp, sol_altitude = transpose_sharp_altitude(sharp, sol_altitude)
 
     alt_range = [0, 15, 30, 45, 60, 75, 90]
@@ -221,7 +225,7 @@ def _solar_gain_vectorised(
     fp /= (az2 - az1) * (alt2 - alt1)
 
     f_eff = 0.725  # fraction of the body surface exposed to environmental radiation
-    if posture == "sitting":
+    if posture == Postures.sitting.value:
         f_eff = 0.696
 
     sw_abs = asw

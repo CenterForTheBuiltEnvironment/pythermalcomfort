@@ -7,7 +7,7 @@ from numba import float64, jit, vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesInputs
 from pythermalcomfort.classes_return import SET, GaggeTwoNodes
-from pythermalcomfort.utilities import p_sat_torr
+from pythermalcomfort.utilities import p_sat_torr, Postures
 
 
 def gagge_two_nodes(
@@ -20,7 +20,7 @@ def gagge_two_nodes(
     wme: float | list[float] = 0,
     body_surface_area: float | list[float] = 1.8258,
     p_atm: float | list[float] = 101325,
-    position: str = "standing",
+    position: str = Postures.standing.value,
     max_skin_blood_flow: float | list[float] = 90,
     round_output: bool = True,
     max_sweating: float | list[float] = 500,
@@ -310,7 +310,7 @@ def _gagge_two_nodes_optimized(
 
         while not tc_converged:
             # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
-            if position == "sitting":
+            if position == Postures.sitting.value:
                 # 0.7 ratio between radiation area of the body and the body area
                 h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.7
             else:  # if standing

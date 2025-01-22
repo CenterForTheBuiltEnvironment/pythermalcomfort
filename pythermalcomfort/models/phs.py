@@ -9,6 +9,7 @@ from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
     _check_standard_compliance_array,
     p_sat,
+    Postures,
 )
 
 
@@ -356,9 +357,9 @@ def _phs_optimized(
 
     # radiating area dubois
     a_r_du = 0.7
-    if posture == "standing":
+    if posture == Postures.standing.value:
         a_r_du = 0.77
-    if posture == "crouching":
+    if posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate
