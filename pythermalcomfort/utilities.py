@@ -33,6 +33,11 @@ class Units(Enum):
     IP = "IP"
 
 
+class Sex(Enum):
+    male = "male"
+    female = "female"
+
+
 def p_sat_torr(tdb: Union[float, list[float]]):
     """Estimates the saturation vapor pressure in [torr]
 
@@ -122,8 +127,7 @@ def p_sat(tdb: Union[float, list[float]]):
 
 @jit(nopython=True, cache=True)
 def antoine(x: float) -> float:
-    """
-    Calculate saturated vapor pressure using Antoine equation [kPa].
+    """Calculate saturated vapor pressure using Antoine equation [kPa].
 
     Parameters
     ----------

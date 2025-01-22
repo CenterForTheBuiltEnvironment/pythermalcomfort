@@ -8,14 +8,12 @@ following order: "head", "neck", "chest", "back", "pelvis",
 "right_leg" and "right_hand".
 """
 
-import math
-
 import numpy as np
 
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort.utilities import Postures, antoine
+from pythermalcomfort.utilities import Postures, Sex, antoine
 
 
 def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
@@ -407,7 +405,7 @@ def operative_temp(tdb, tr, hc, hr):
     return to
 
 
-# todo this function is a duplicate in utils
+# todo this function is a duplicate in utils and they are different
 def clo_area_factor(clo):
     """Calculate clothing area factor [-]
 
@@ -425,6 +423,7 @@ def clo_area_factor(clo):
     return fcl
 
 
+# todo this function is different from ISO 9920
 def dry_r(hc, hr, clo):
     """Calculate total sensible thermal resistance (between the skin and
     ambient air).
@@ -930,20 +929,20 @@ def basal_met(
         Basal metabolic rate [W].
     """
     if bmr_equation == "harris-benedict":
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 88.362 + 13.397 * weight + 500.3 * height - 5.677 * age
         else:
             bmr = 447.593 + 9.247 * weight + 479.9 * height - 4.330 * age
 
     elif bmr_equation == "harris-benedict_origin":
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 66.4730 + 13.7516 * weight + 500.33 * height - 6.7550 * age
         else:
             bmr = 655.0955 + 9.5634 * weight + 184.96 * height - 4.6756 * age
 
     elif bmr_equation == "japanese" or bmr_equation == "ganpule":
         # Ganpule et al., 2007, https://doi.org/10.1038/sj.ejcn.1602645
-        if sex == "male":
+        if sex == Sex.male.value:
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.4235
         else:
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
@@ -986,7 +985,7 @@ def local_mbase(
     age : int, optional
         age [years]. The default is 20.
     sex : str, optional
-        Choose male or female. The default is "male".
+        Choose male or female.
     bmr_equation : str, optional
         Choose harris-benedict or ganpule. The default is "harris-benedict".
 
@@ -1219,7 +1218,7 @@ def shivering(
             if tskm < 31:
                 thres = 36.6
             else:
-                if sex == "male":
+                if sex == Sex.male.value:
                     thres = -0.2436 * tskm + 44.10
                 else:  # sex == "female":
                     thres = -0.2250 * tskm + 43.05
@@ -1227,6 +1226,7 @@ def shivering(
             if thres < t_core[0]:
                 sig_shiv = 0
 
+    # todo I do not think this is well written code
     global PRE_SHIV  # Previous shivering thermogenesis [W]
     if options:
         if options["limit_dshiv/dt"]:

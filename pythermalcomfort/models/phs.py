@@ -9,8 +9,8 @@ from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
     Postures,
     _check_standard_compliance_array,
-    p_sat,
     met_to_w_m2,
+    p_sat,
 )
 
 

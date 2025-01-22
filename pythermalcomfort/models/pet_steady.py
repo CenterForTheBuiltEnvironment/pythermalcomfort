@@ -6,7 +6,7 @@ from scipy import optimize
 
 from pythermalcomfort.classes_input import PETSteadyInputs
 from pythermalcomfort.classes_return import PETSteady
-from pythermalcomfort.utilities import Postures, body_surface_area, p_sat
+from pythermalcomfort.utilities import Postures, Sex, body_surface_area, p_sat
 
 
 def pet_steady(
@@ -19,7 +19,7 @@ def pet_steady(
     p_atm: Union[float, list[float]] = 1013.25,
     position: Union[str, list[str]] = Postures.sitting.value,
     age: Union[int, list[int]] = 23,
-    sex: Union[int, list[int]] = "male",
+    sex: Union[int, list[int]] = Sex.male.value,
     weight: Union[float, list[float]] = 75,
     height: Union[float, list[float]] = 1.8,
     wme: Union[float, list[float]] = 0,
@@ -297,7 +297,7 @@ def _pet_steady_vectorised(
             )
         )
         # Attribution of internal energy depending on the sex of the subject
-        met_correction = met_male if sex == "male" else met_female
+        met_correction = met_male if sex == Sex.male.value else met_female
 
         # Source term : metabolic activity
         he = (_met + met_correction) / a_dubois

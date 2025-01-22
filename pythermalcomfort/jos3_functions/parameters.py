@@ -20,7 +20,7 @@ from typing import ClassVar
 
 import numpy as np
 
-from pythermalcomfort.utilities import BodySurfaceAreaEquations, Postures
+from pythermalcomfort.utilities import BodySurfaceAreaEquations, Postures, Sex
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,7 @@ class Default:
     blood_flow_rate: int = 290  # [L/h]
     physical_activity_ratio: float = 1.25  # [-]
     metabolic_rate: float = 1.0  # [met]
-    sex: str = "male"
+    sex: str = Sex.male.value
     posture: str = Postures.standing.value
     bmr_equation: str = "harris-benedict"
     bsa_equation: str = BodySurfaceAreaEquations.dubois.value

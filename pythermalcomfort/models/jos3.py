@@ -12,8 +12,8 @@ from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
-    to_array_body_parts,
     calculate_operative_temp_when_pmv_is_zero,
+    to_array_body_parts,
     validate_body_parameters,
 )
 from pythermalcomfort.jos3_functions.matrix import (
@@ -24,7 +24,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.utilities import Postures, met_to_w_m2, antoine
+from pythermalcomfort.utilities import Postures, antoine, met_to_w_m2
 
 
 class JOS3:

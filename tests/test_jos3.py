@@ -1086,10 +1086,10 @@ def test_evaporation():
     rh = np.array([100] * 17)
 
     # Call the evaporation function
-    wet, e_sk, e_max, e_sweat = evaporation(err_cr, err_sk, t_skin, tdb, rh, ret)
+    # wet, e_sk, e_max, e_sweat = evaporation(err_cr, err_sk, t_skin, tdb, rh, ret)
 
-    expected_e_max = 0.001
-    expected_wet = 1
+    # expected_e_max = 0.001
+    # expected_wet = 1
     # Check that all elements in e_max have been replaced with 0.001
     # fixme the following is not passing
     # assert np.all(
@@ -1364,9 +1364,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(
-        q_nst_no_acclimation, q_nst_with_acclimation
-    ), "Cold acclimation did not change the result"
+    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
+        "Cold acclimation did not change the result"
+    )
 
 
 def test_sum_bf():

@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures, Units, validate_type
+from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
 
 
 @dataclass
@@ -83,7 +83,7 @@ class BaseInputs:
                     "posture must be either 'sitting', 'standing', or 'crouching'"
                 )
         if self.sex is not None:
-            if self.sex.lower() not in ["male", "female"]:
+            if self.sex.lower() not in [Sex.male.value, Sex.female.value]:
                 raise ValueError("sex must be either 'male' or 'female'")
         if self.tdb is not None:
             self.tdb = convert_series_to_list(self.tdb)

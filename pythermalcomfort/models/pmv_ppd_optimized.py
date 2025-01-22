@@ -1,7 +1,7 @@
 import numpy as np
 from numba import float64, vectorize
 
-from pythermalcomfort.utilities import met_to_w_m2, antoine
+from pythermalcomfort.utilities import antoine, met_to_w_m2
 
 
 @vectorize(

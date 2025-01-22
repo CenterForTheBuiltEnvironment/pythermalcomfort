@@ -7,7 +7,7 @@ from numba import float64, jit, vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesInputs
 from pythermalcomfort.classes_return import SET, GaggeTwoNodes
-from pythermalcomfort.utilities import Postures, p_sat_torr, met_to_w_m2
+from pythermalcomfort.utilities import Postures, met_to_w_m2, p_sat_torr
 
 
 def gagge_two_nodes(
