@@ -90,15 +90,17 @@ def _to17array(inp):
         If the input type is not supported or if the input list or ndarray is not of length 17.
     """
     if isinstance(inp, (int, float)):
-        return np.full(17, inp)
+        return np.full(Default.num_body_parts, inp)
     elif isinstance(inp, dict):
         return np.array([inp[key] for key in BODY_NAMES])
     elif isinstance(inp, (list, np.ndarray)):
         inp = np.asarray(inp)
-        if inp.shape == (17,):
+        if inp.shape == (Default.num_body_parts,):
             return inp.copy()
         else:
-            raise ValueError("The input list or ndarray is not of length 17")
+            raise ValueError(
+                f"The input list or ndarray is not of length {Default.num_body_parts}"
+            )
     else:
         raise ValueError(
             "Unsupported input type. Supported types: int, float, list, dict, ndarray"
@@ -491,9 +493,9 @@ def conductance(
             ]
         )
 
-    cdt_cr_ms = np.zeros(17)  # core to muscle [W/K]
-    cdt_ms_fat = np.zeros(17)  # muscle to fat [W/K]
-    cdt_fat_sk = np.zeros(17)  # fat to skin [W/K]
+    cdt_cr_ms = np.zeros(Default.num_body_parts)  # core to muscle [W/K]
+    cdt_ms_fat = np.zeros(Default.num_body_parts)  # muscle to fat [W/K]
+    cdt_fat_sk = np.zeros(Default.num_body_parts)  # fat to skin [W/K]
 
     # head and pelvis consists of 65MN's conductances
     cdt_cr_ms[0] = 1.601  # head

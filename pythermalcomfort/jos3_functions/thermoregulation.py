@@ -35,7 +35,7 @@ def natural_convection(posture, tdb, t_skin):
     Returns
     -------
     hc_natural : numpy.ndarray
-        Natural convection heat transfer coefficient for 17 body segments.
+        Natural convection heat transfer coefficient body segments.
 
     Raises
     ------
@@ -616,7 +616,7 @@ def evaporation(
 
     # Signal decrement by aging
     if age < 60:
-        sd_sweat = np.ones(17)
+        sd_sweat = np.ones(Default.num_body_parts)
     else:  # age >= 60
         sd_sweat = np.array(
             [
@@ -754,8 +754,8 @@ def skin_blood_flow(
 
     # Signal decrement by aging
     if age < 60:
-        sd_dilat = np.ones(17)
-        sd_stric = np.ones(17)
+        sd_dilat = np.ones(Default.num_body_parts)
+        sd_stric = np.ones(Default.num_body_parts)
     else:  # age >= 60
         sd_dilat = np.array(
             [
@@ -778,7 +778,7 @@ def skin_blood_flow(
                 0.31,
             ]
         )
-        sd_stric = np.ones(17)
+        sd_stric = np.ones(Default.num_body_parts)
 
     # Skin blood flow [L/h]
     bf_skin = (
@@ -1203,19 +1203,19 @@ def shivering(
 
     # Signal sd_shiv by aging
     if age < 30:
-        sd_shiv = np.ones(17)
+        sd_shiv = np.ones(Default.num_body_parts)
     elif age < 40:
-        sd_shiv = np.ones(17) * 0.97514
+        sd_shiv = np.ones(Default.num_body_parts) * 0.97514
     elif age < 50:
-        sd_shiv = np.ones(17) * 0.95028
+        sd_shiv = np.ones(Default.num_body_parts) * 0.95028
     elif age < 60:
-        sd_shiv = np.ones(17) * 0.92818
+        sd_shiv = np.ones(Default.num_body_parts) * 0.92818
     elif age < 70:
-        sd_shiv = np.ones(17) * 0.90055
+        sd_shiv = np.ones(Default.num_body_parts) * 0.90055
     elif age < 80:
-        sd_shiv = np.ones(17) * 0.86188
+        sd_shiv = np.ones(Default.num_body_parts) * 0.86188
     else:  # age >= 80
-        sd_shiv = np.ones(17) * 0.82597
+        sd_shiv = np.ones(Default.num_body_parts) * 0.82597
 
     # Ratio of body surface area to the standard body [-]
     bsar = cons.bsa_rate(height, weight, bsa_equation)

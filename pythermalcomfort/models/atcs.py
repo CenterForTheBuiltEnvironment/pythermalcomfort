@@ -134,14 +134,14 @@ class ATCS(JOS3):
         >>> model.to_csv("atcs_example1 (default output).csv"))
         """
         # Initialize instance variables for this class.
-        self.cached_clo = np.ones(17) * Default.clothing_insulation
+        self.cached_clo = np.ones(Default.num_body_parts) * Default.clothing_insulation
         self.cached_par = Default.physical_activity_ratio
         self.cached_overall_clo = np.average(self.cached_clo, weights=Default.local_bsa)
 
         # Initialize parent class
         self.comfort_setpt_skin = np.array(list(DefaultSkinTemperature()._asdict()))
-        self.t_skin_used = np.ones(17) * Default.skin_temperature
-        self.t_skin_wet = np.ones(17) * Default.skin_temperature
+        self.t_skin_used = np.ones(Default.num_body_parts) * Default.skin_temperature
+        self.t_skin_wet = np.ones(Default.num_body_parts) * Default.skin_temperature
         self.t_skin_previous_time_step = None
         self.t_core_previous_time_step = None
         self.overall_clo = Default.clothing_insulation

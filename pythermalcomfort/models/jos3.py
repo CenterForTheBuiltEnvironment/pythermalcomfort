@@ -445,20 +445,23 @@ class JOS3:
         self._cap = cons.capacity(height, weight, bsa_equation, age, ci)
 
         # Set initial core and skin temperature set points [°C]
-        self.cr_set_point = np.ones(17) * Default.core_temperature
-        self.sk_set_point = np.ones(17) * Default.skin_temperature
+        self.cr_set_point = np.ones(Default.num_body_parts) * Default.core_temperature
+        self.sk_set_point = np.ones(Default.num_body_parts) * Default.skin_temperature
 
         # Initialize body temperature [°C]
         self._t_body = np.ones(NUM_NODES) * Default.other_body_temperature
 
         # Initialize environmental conditions and other factors
         # (Default values of input conditions)
-        self._ta = np.ones(17) * Default.dry_bulb_air_temperature
-        self._tr = np.ones(17) * Default.mean_radiant_temperature
-        self._rh = np.ones(17) * Default.relative_humidity
-        self._va = np.ones(17) * Default.air_speed
-        self._clo = np.ones(17) * Default.clothing_insulation
-        self._iclo = np.ones(17) * Default.clothing_vapor_permeation_efficiency
+        self._ta = np.ones(Default.num_body_parts) * Default.dry_bulb_air_temperature
+        self._tr = np.ones(Default.num_body_parts) * Default.mean_radiant_temperature
+        self._rh = np.ones(Default.num_body_parts) * Default.relative_humidity
+        self._va = np.ones(Default.num_body_parts) * Default.air_speed
+        self._clo = np.ones(Default.num_body_parts) * Default.clothing_insulation
+        self._iclo = (
+            np.ones(Default.num_body_parts)
+            * Default.clothing_vapor_permeation_efficiency
+        )
         self._par = Default.physical_activity_ratio
         self._posture = Default.posture
         self._hc = None  # Convective heat transfer coefficient
@@ -749,7 +752,7 @@ class JOS3:
                 self.options["bat_positive"],
             )
         else:  # not consider NST
-            q_nst = np.zeros(17)
+            q_nst = np.zeros(Default.num_body_parts)
 
         # ------------------------------------------------------------------
         # Thermogenesis
@@ -1051,7 +1054,7 @@ class JOS3:
                     keys = [key + "_" + BODY_NAMES[i] for i in VINDEX["muscle"]]
                 elif check_word_contain(key, "fat"):
                     keys = [key + "_" + BODY_NAMES[i] for i in VINDEX["fat"]]
-                elif length == 17:  # if data contains 17 values
+                elif length == Default.num_body_parts:  # if data contains 17 values
                     keys = [key + "_" + bn for bn in BODY_NAMES]
                 else:
                     keys = [key + "_" + BODY_NAMES[i] for i in range(length)]

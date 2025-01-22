@@ -71,7 +71,8 @@ class Default:
     # Clothing information
     clothing_insulation: float = 0  # [clo]
     clothing_vapor_permeation_efficiency: float = 0.45  # [-]
-    lewis_rate = 16.5  # [K/kPa]
+    lewis_rate: float = 16.5  # [K/kPa]
+    num_body_parts: int = 17  # [-]
 
 
 ALL_OUT_PARAMS = {

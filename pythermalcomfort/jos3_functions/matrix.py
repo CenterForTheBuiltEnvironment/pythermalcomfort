@@ -3,6 +3,8 @@ blood flow in different body parts and layers."""
 
 import numpy as np
 
+from pythermalcomfort.jos3_functions.parameters import Default
+
 BODY_NAMES = [
     "head",
     "neck",
@@ -188,8 +190,8 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     """Get artery and vein blood flow rate [l/h]"""
     xbf = bf_core + bf_muscle + bf_fat + bf_skin
 
-    bf_art = np.zeros(17)
-    bf_vein = np.zeros(17)
+    bf_art = np.zeros(Default.num_body_parts)
+    bf_vein = np.zeros(Default.num_body_parts)
 
     # head
     bf_art[0] = xbf[0]
@@ -208,8 +210,8 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     bf_vein[3] = xbf[3]
 
     # pelvis (+Thighs, Legs, Feet, AVA_Feet)
-    bf_art[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
-    bf_vein[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
+    bf_art[4] = xbf[4] + xbf[11 : Default.num_body_parts].sum() + 2 * bf_ava_foot
+    bf_vein[4] = xbf[4] + xbf[11 : Default.num_body_parts].sum() + 2 * bf_ava_foot
 
     # L.Shoulder (+Arm, Hand, (arteryのみAVA_Hand))
     bf_art[5] = xbf[5:8].sum() + bf_ava_hand
@@ -248,12 +250,12 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     bf_vein[13] = xbf[13]
 
     # R.Thigh (+Leg, Foot, (arteryのみAVA_Foot))
-    bf_art[14] = xbf[14:17].sum() + bf_ava_foot
-    bf_vein[14] = xbf[14:17].sum()
+    bf_art[14] = xbf[14 : Default.num_body_parts].sum() + bf_ava_foot
+    bf_vein[14] = xbf[14 : Default.num_body_parts].sum()
 
     # R.Leg (+Foot)
-    bf_art[15] = xbf[15:17].sum() + bf_ava_foot
-    bf_vein[15] = xbf[15:17].sum()
+    bf_art[15] = xbf[15 : Default.num_body_parts].sum() + bf_ava_foot
+    bf_vein[15] = xbf[15 : Default.num_body_parts].sum()
 
     # R.Foot
     bf_art[16] = xbf[16] + bf_ava_foot
