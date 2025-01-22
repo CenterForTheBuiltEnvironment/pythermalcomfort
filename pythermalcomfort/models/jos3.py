@@ -1177,7 +1177,7 @@ class JOS3:
         Returns
         -------
         ndarray
-            A NumPy array of shape (17,).
+            A NumPy array of shape (17).
         """
         return self._ta
 
@@ -1187,7 +1187,7 @@ class JOS3:
 
     @property
     def tr(self):
-        """Tr : numpy.ndarray (17,) Mean radiant temperature [°C]."""
+        """Tr : numpy.ndarray (17) Mean radiant temperature [°C]."""
         return self._tr
 
     @tr.setter
@@ -1196,7 +1196,7 @@ class JOS3:
 
     @property
     def to(self):
-        """To : numpy.ndarray (17,) Operative temperature [°C]."""
+        """To : numpy.ndarray (17) Operative temperature [°C]."""
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -1226,7 +1226,7 @@ class JOS3:
 
     @property
     def rh(self):
-        """Rh : numpy.ndarray (17,) Relative humidity [%]."""
+        """Rh : numpy.ndarray (17) Relative humidity [%]."""
         return self._rh
 
     @rh.setter
@@ -1235,7 +1235,7 @@ class JOS3:
 
     @property
     def v(self):
-        """V : numpy.ndarray (17,) Air velocity [m/s]."""
+        """V : numpy.ndarray (17) Air velocity [m/s]."""
         return self._va
 
     @v.setter
@@ -1271,7 +1271,7 @@ class JOS3:
 
     @property
     def clo(self):
-        """Clo : numpy.ndarray (17,) Clothing insulation [clo]."""
+        """Clo : numpy.ndarray (17) Clothing insulation [clo]."""
         return self._clo
 
     @clo.setter
@@ -1298,12 +1298,12 @@ class JOS3:
 
     @property
     def bsa(self):
-        """Bsa : numpy.ndarray (17,) Body surface areas by local body segments [m2]."""
+        """Bsa : numpy.ndarray (17) Body surface areas by local body segments [m2]."""
         return self._bsa.copy()
 
     @property
     def r_t(self):
-        """r_t : numpy.ndarray (17,) Dry heat resistances between the skin and ambience areas by local body segments [(m2*K)/W]."""
+        """r_t : numpy.ndarray (17) Dry heat resistances between the skin and ambience areas by local body segments [(m2*K)/W]."""
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -1322,7 +1322,8 @@ class JOS3:
 
     @property
     def r_et(self):
-        """r_et : numpy.ndarray (17,) w (Evaporative) heat resistances between the skin and ambience areas by local body segments [(m2*kPa)/W]."""
+        """r_et : numpy.ndarray (17) w (Evaporative) heat resistances between the skin and
+        ambience areas by local body segments [(m2*kPa)/W]."""
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -1336,7 +1337,7 @@ class JOS3:
 
     @property
     def w(self):
-        """W : numpy.ndarray (17,) Skin wettedness on local body segments [-]."""
+        """W : numpy.ndarray (17) Skin wettedness on local body segments [-]."""
         err_cr = self.t_core - self.cr_set_point
         err_sk = self.t_skin - self.sk_set_point
         wet, *_ = threg.evaporation(
@@ -1364,7 +1365,7 @@ class JOS3:
 
     @property
     def t_skin(self) -> np.ndarray[float]:
-        """t_skin : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
+        """t_skin : numpy.ndarray (17) Skin temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["skin"]].copy()
 
     @t_skin.setter
@@ -1373,22 +1374,22 @@ class JOS3:
 
     @property
     def t_core(self) -> np.ndarray[float]:
-        """t_core : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
+        """t_core : numpy.ndarray (17) Skin temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["core"]].copy()
 
     @property
     def t_cb(self) -> float:
-        """t_cb : numpy.ndarray (1,) Temperature at central blood pool [°C]."""
+        """t_cb : float Temperature at central blood pool [°C]."""
         return self._t_body[0].copy()
 
     @property
     def t_artery(self) -> np.ndarray[float]:
-        """t_artery : numpy.ndarray (17,) Arterial temperatures by the local body segments [°C]."""
+        """t_artery : numpy.ndarray (17) Arterial temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["artery"]].copy()
 
     @property
     def t_vein(self) -> np.ndarray[float]:
-        """t_vein : numpy.ndarray (17,) Vein temperatures by the local body segments [°C]."""
+        """t_vein : numpy.ndarray (17) Vein temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["vein"]].copy()
 
     @property
