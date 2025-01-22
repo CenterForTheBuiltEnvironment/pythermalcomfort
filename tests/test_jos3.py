@@ -12,6 +12,7 @@ from pythermalcomfort.jos3_functions.construction import (
     local_bsa,
     validate_body_parameters,
     weight_rate,
+    calculate_operative_temp_when_pmv_is_zero,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
@@ -63,10 +64,6 @@ def test_JOS3_class():
 
     # Call the simulate method
     model.simulate(times=60)
-
-    # Test: _calculate_operative_temp_when_pmv_is_zero()
-    to_neutral = model._calculate_operative_temp_when_pmv_is_zero()
-    assert to_neutral == pytest.approx(28.8, rel=1e-3)
 
     # Test: _reset_setpt()
     result = model._reset_setpt()
@@ -157,6 +154,12 @@ def test_JOS3_class():
     # Test with value out of range
     with pytest.raises(ValueError):
         JOS3(fat=91)
+
+
+def test_calculate_operative_temp_when_pmv_is_zero():
+    # Test: _calculate_operative_temp_when_pmv_is_zero()
+    to_neutral = calculate_operative_temp_when_pmv_is_zero()
+    assert to_neutral == pytest.approx(28.8, rel=1e-3)
 
 
 # test for construction.py
@@ -1360,9 +1363,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():

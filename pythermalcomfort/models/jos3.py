@@ -2,7 +2,6 @@ import csv
 import datetime as dt
 
 # Set up logging with a level of WARNING
-import logging
 import os
 import re
 
@@ -15,6 +14,7 @@ from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
     _to17array,
     validate_body_parameters,
+    calculate_operative_temp_when_pmv_is_zero,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
@@ -24,11 +24,6 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
-from pythermalcomfort.utilities import Models
-
-logging.basicConfig(level=logging.WARN)
-logger = logging.getLogger(__name__)
 
 
 class JOS3:
@@ -495,91 +490,6 @@ class JOS3:
         dictout = self._reset_setpt(par=Default.physical_activity_ratio)
         self._history.append(dictout)
 
-    def _calculate_operative_temp_when_pmv_is_zero(
-        self,
-        va: float = Default.air_speed,
-        rh: float = Default.relative_humidity,
-        met: float = Default.metabolic_rate,
-        clo: float = Default.clothing_insulation,
-    ) -> float:
-        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
-        logic.
-
-        Parameters
-        ----------
-        va : float, optional
-            Air velocity [m/s]. The default is 0.1.
-        rh : float, optional
-            Relative humidity [%]. The default is 50.
-        met : float, optional
-            Metabolic rate [met]. The default is 1.
-        clo : float, optional
-            Clothing insulation [clo]. The default is 0.
-
-        Returns
-        -------
-        to : float
-            Operative temperature [°C].
-        """
-        # Default parameters
-        initial_to = 28
-        tolerance = 0.001
-        max_iterations = 100
-        adjustment_factor = 3
-        retry_adjustment_factor = adjustment_factor * 200
-        retry_attempts = 100
-
-        to = initial_to
-
-        # Main loop for finding PMV=0
-        for i in range(max_iterations):
-            pmv_value = pmv_ppd_iso(
-                to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
-            ).pmv
-
-            # Check for NaN and handle retries
-            if np.isnan(pmv_value):
-                logger.warning(
-                    f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step."
-                )
-                for retry in range(retry_attempts):
-                    adjustment_factor = retry_adjustment_factor
-                    to = initial_to  # Reset to initial temperature for retry
-                    pmv_value = pmv_ppd_iso(
-                        to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
-                    ).pmv
-                    logger.info(
-                        f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}"
-                    )
-
-                    if abs(pmv_value) < tolerance:
-                        logger.info(
-                            f"Converged to PMV=0 at to={to:.2f}°C during retry."
-                        )
-                        return to
-
-                    # Adjust the temperature during retry
-                    to = to - pmv_value / adjustment_factor
-
-                # If retries fail, log a warning and stop the loop
-                logger.error(
-                    "Retries failed to achieve convergence after NaN detection."
-                )
-                return to
-
-            # Check if the PMV is within tolerance
-            if abs(pmv_value) < tolerance:
-                logger.info(
-                    f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations."
-                )
-                return to
-
-            # Adjust the operative temperature using the adjustment factor
-            to = to - pmv_value / adjustment_factor
-
-        logger.warning("Maximum iterations reached without achieving convergence.")
-        return to
-
     def _reset_setpt(self, par=Default.physical_activity_ratio):
         """Reset set-point temperatures under steady state calculation. Set- point
         temperatures are hypothetical core or skin temperatures in a thermally neutral
@@ -597,7 +507,7 @@ class JOS3:
         # 1 met = 58.15 W/m2
         w_per_m2_to_met = 1 / 58.15  # unit converter W/m2 to met
         met = self.bmr * par * w_per_m2_to_met  # [met]
-        self.to = self._calculate_operative_temp_when_pmv_is_zero(met=met)
+        self.to = calculate_operative_temp_when_pmv_is_zero(met=met)
         self.rh = Default.relative_humidity
         self.v = Default.air_speed
         self.clo = Default.clothing_insulation

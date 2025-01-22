@@ -2,6 +2,9 @@ import logging
 
 import numpy as np
 
+from pythermalcomfort.jos3_functions.construction import (
+    calculate_operative_temp_when_pmv_is_zero,
+)
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
@@ -196,7 +199,7 @@ class ATCS(JOS3):
             self.cached_overall_clo = self.overall_clo
 
             # Use the parent class's method to calculate the operative temperature where PMV is zero.
-            self.to = self._calculate_operative_temp_when_pmv_is_zero(
+            self.to = calculate_operative_temp_when_pmv_is_zero(
                 met=met, clo=overall_clo
             )
 
