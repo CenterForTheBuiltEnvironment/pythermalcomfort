@@ -24,7 +24,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.utilities import Postures, met_to_w_m2
+from pythermalcomfort.utilities import Postures, met_to_w_m2, antoine
 
 
 class JOS3:
@@ -816,7 +816,7 @@ class JOS3:
         )
 
         # Calculate heat loss by respiratory
-        p_a = threg.antoine(self._ta) * self._rh / 100
+        p_a = antoine(self._ta) * self._rh / 100
         res_sh, res_lh = threg.resp_heat_loss(
             self._ta[0], p_a[0], q_thermogenesis_total
         )

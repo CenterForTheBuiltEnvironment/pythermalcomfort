@@ -15,11 +15,10 @@ import numpy as np
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Postures, antoine
 
 
-# Natural convection
-def natural_convection(posture, tdb, t_skin):
+def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
     """
     Calculate the natural convection heat transfer coefficient based on posture.
 
@@ -148,9 +147,21 @@ def natural_convection(posture, tdb, t_skin):
     return hc_natural
 
 
-# Forced convection
-def forced_convection(v):
-    # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+def forced_convection(v: float) -> np.ndarray:
+    """
+    Calculate the forced convection heat transfer coefficient.
+    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+
+    Parameters
+    ----------
+    v : float
+        Air velocity [m/s].
+
+    Returns
+    -------
+    np.ndarray
+        Forced convection heat transfer coefficient body segments.
+    """
     hc_a = np.array(
         [
             15.0,
@@ -198,12 +209,15 @@ def forced_convection(v):
 
 
 def conv_coef(
-    posture=Default.posture,
-    v=Default.air_speed,
-    tdb=Default.dry_bulb_air_temperature,
-    t_skin=Default.skin_temperature,
-):
-    """Calculate convective heat transfer coefficient (hc) [W/(m2*K)]
+    posture: str = Default.posture,
+    v: float = Default.air_speed,
+    tdb: float = Default.dry_bulb_air_temperature,
+    t_skin: float = Default.skin_temperature,
+) -> np.ndarray:
+    """
+    Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
+    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
+    Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
 
     Parameters
     ----------
@@ -221,30 +235,18 @@ def conv_coef(
 
     Returns
     -------
-    hc : numpy.ndarray
+    np.ndarray
         Convective heat transfer coefficient (hc) [W/(m2*K)].
-
-    References
-    ----------
-    Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-    Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
     """
-
-    # Calculate natural convection
     hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
-
-    # Calculate forced convection
     hc_forced = forced_convection(v=v)
-
-    # Select natural or forced hc.
-    # If the local v is less than 0.2 m/s, it is considered natural convection;
-    # if it is greater than 0.2 m/s, it is considered forced convection.
     hc = np.where(v < 0.2, hc_natural, hc_forced)  # hc [W/(m2*K))]
     return hc
 
 
-def rad_coef(posture=Default.posture):
-    """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)]
+def rad_coef(posture: str = Default.posture) -> np.ndarray:
+    """
+    Calculate radiative heat transfer coefficient (hr) [W/(m2*K)].
 
     Parameters
     ----------
@@ -253,7 +255,7 @@ def rad_coef(posture=Default.posture):
 
     Returns
     -------
-    hr : numpy.ndarray
+    np.ndarray
         Radiative heat transfer coefficient (hr) [W/(m2*K)].
     """
     if posture.lower() == Postures.standing.value:
@@ -339,8 +341,22 @@ def rad_coef(posture=Default.posture):
     return hr
 
 
-def fixed_hc(hc, v):
-    """Fixes hc values to fit two-node-model's values."""
+def fixed_hc(hc: np.ndarray, v: float) -> np.ndarray:
+    """
+    Fixes hc values to fit two-node-model's values.
+
+    Parameters
+    ----------
+    hc : np.ndarray
+        Convective heat transfer coefficient (hc) [W/(m2*K)].
+    v : float
+        Air velocity [m/s].
+
+    Returns
+    -------
+    np.ndarray
+        Fixed convective heat transfer coefficient (hc) [W/(m2*K)].
+    """
     mean_hc = np.average(hc, weights=cons.Default.local_bsa)
     mean_va = np.average(v, weights=cons.Default.local_bsa)
     mean_hc_whole = max(3, 8.600001 * (mean_va**0.53))
@@ -348,13 +364,26 @@ def fixed_hc(hc, v):
     return _fixed_hc
 
 
-def fixed_hr(hr):
-    """Fixes hr values to fit two-node-model's values."""
+def fixed_hr(hr: np.ndarray) -> np.ndarray:
+    """
+    Fixes hr values to fit two-node-model's values.
+
+    Parameters
+    ----------
+    hr : np.ndarray
+        Radiative heat transfer coefficient (hr) [W/(m2*K)].
+
+    Returns
+    -------
+    np.ndarray
+        Fixed radiative heat transfer coefficient (hr) [W/(m2*K)].
+    """
     mean_hr = np.average(hr, weights=cons.Default.local_bsa)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
 
 
+# todo this function is a duplicate in utils
 def operative_temp(tdb, tr, hc, hr):
     """Calculate operative temperature [°C]
 
@@ -378,6 +407,7 @@ def operative_temp(tdb, tr, hc, hr):
     return to
 
 
+# todo this function is a duplicate in utils
 def clo_area_factor(clo):
     """Calculate clothing area factor [-]
 
@@ -410,8 +440,13 @@ def dry_r(hc, hr, clo):
 
     Returns
     -------
-    r_t : float or array
+    np.ndarray
         Total sensible thermal resistance between skin and ambient.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are negative.
     """
     if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
         raise ValueError("Input parameters hc and hr must be non-negative.")
@@ -445,8 +480,13 @@ def wet_r(
 
     Returns
     -------
-    r_et : float or array
+    np.ndarray
         Total evaporative thermal resistance.
+
+    Raises
+    ------
+    ValueError
+        If any of the input parameters are negative.
     """
     if (np.array(hc) < 0).any():
         raise ValueError("Input parameters hc must be non-negative.")
@@ -464,19 +504,14 @@ def error_signals(err_sk=0.0):
 
     Parameters
     ----------
-    err_sk : float or array, optional
-        Difference between set-point and skin temperatures [°C].
-        If array, its length should be 17.
-        The default is 0.
+    err_sk : float or np.ndarray, optional
+        Difference between set-point and skin temperatures [°C]. The default is 0.
 
     Returns
     -------
-    wrms : array
-        Warm signal (WRMS) [°C].
-    clds : array
-        Cold signal (CLDS) [°C].
+    tuple
+        Warm signal (WRMS) [°C] and Cold signal (CLDS) [°C].
     """
-    # Convert err_sk to float if it's not already
     err_sk = np.array(err_sk, dtype=float)
 
     # SKINR (Distribution coefficients of thermal receptor) [-]
@@ -503,24 +538,29 @@ def error_signals(err_sk=0.0):
     )
 
     # wrms signal
-    wrm = np.maximum(err_sk, 0)
-    wrm *= receptor
-    wrms = wrm.sum()
+    wrm = np.maximum(err_sk, 0) * receptor
+    warm_signal_sum = wrm.sum()
+
     # clds signal
-    cld = np.minimum(err_sk, 0)
-    cld *= -receptor
-    clds = cld.sum()
-
-    return wrms, clds
+    cld = np.minimum(err_sk, 0) * -receptor
+    cold_signal_sum = cld.sum()
+    return warm_signal_sum, cold_signal_sum
 
 
-# Antoine equation [kPa]
-def antoine(x):
-    return math.e ** (16.6536 - (4030.183 / (x + 235)))
+def tetens(x: float) -> float:
+    """
+    Calculate saturated vapor pressure using Tetens equation [kPa].
 
+    Parameters
+    ----------
+    x : float
+        Temperature [°C].
 
-# Tetens equation [kPa]
-def tetens(x):
+    Returns
+    -------
+    float
+        Saturated vapor pressure [kPa].
+    """
     return 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 
 
@@ -929,11 +969,11 @@ def basal_met(
 
 
 def local_mbase(
-    height=Default.height,
-    weight=Default.weight,
-    age=Default.age,
-    sex=Default.sex,
-    bmr_equation=Default.bmr_equation,
+    height: float = Default.height,
+    weight: float = Default.weight,
+    age: int = Default.age,
+    sex: str = Default.sex,
+    bmr_equation: str = Default.bmr_equation,
 ):
     """Calculate local basal metabolic rate [W].
 
@@ -943,7 +983,7 @@ def local_mbase(
         Body height [m]. The default is 1.72.
     weight : float, optional
         Body weight [kg]. The default is 74.43.
-    age : float, optional
+    age : int, optional
         age [years]. The default is 20.
     sex : str, optional
         Choose male or female. The default is "male".

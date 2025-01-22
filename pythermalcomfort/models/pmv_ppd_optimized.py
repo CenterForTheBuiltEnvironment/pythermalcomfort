@@ -1,7 +1,7 @@
 import numpy as np
 from numba import float64, vectorize
 
-from pythermalcomfort.utilities import met_to_w_m2
+from pythermalcomfort.utilities import met_to_w_m2, antoine
 
 
 @vectorize(
@@ -19,7 +19,7 @@ from pythermalcomfort.utilities import met_to_w_m2
     cache=True,
 )
 def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
-    pa = rh * 10 * np.exp(16.6536 - 4030.183 / (tdb + 235))
+    pa = rh * 10 * antoine(tdb)
 
     icl = 0.155 * clo  # thermal insulation of the clothing in M2K/W
     m = met * met_to_w_m2  # metabolic rate in W/M2
