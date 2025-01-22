@@ -7,7 +7,7 @@ from numba import float64, jit, vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesInputs
 from pythermalcomfort.classes_return import SET, GaggeTwoNodes
-from pythermalcomfort.utilities import Postures, p_sat_torr
+from pythermalcomfort.utilities import Postures, p_sat_torr, met_to_w_m2
 
 
 def gagge_two_nodes(
@@ -486,8 +486,12 @@ def _gagge_two_nodes_optimized(
         dx = et - et_old
         et_old = et
 
-    tbm_l = (0.194 / 58.15) * rm + 36.301  # lower limit for evaporative regulation
-    tbm_h = (0.347 / 58.15) * rm + 36.669  # upper limit for evaporative regulation
+    tbm_l = (
+        0.194 / met_to_w_m2
+    ) * rm + 36.301  # lower limit for evaporative regulation
+    tbm_h = (
+        0.347 / met_to_w_m2
+    ) * rm + 36.669  # upper limit for evaporative regulation
 
     t_sens = 0.4685 * (t_body - tbm_l)  # predicted thermal sensation
     if (t_body >= tbm_l) & (t_body < tbm_h):

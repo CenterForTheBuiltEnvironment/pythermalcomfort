@@ -10,6 +10,7 @@ from pythermalcomfort.utilities import (
     Postures,
     _check_standard_compliance_array,
     p_sat,
+    met_to_w_m2,
 )
 
 
@@ -170,9 +171,9 @@ def phs(
     tr = np.array(tr)
     v = np.array(v)
     rh = np.array(rh)
-    met = np.array(met) * 58.15
+    met = np.array(met) * met_to_w_m2
     clo = np.array(clo)
-    wme = np.array(wme) * 58.15
+    wme = np.array(wme) * met_to_w_m2
     posture = np.array(posture)
 
     i_mst = kwargs["i_mst"]

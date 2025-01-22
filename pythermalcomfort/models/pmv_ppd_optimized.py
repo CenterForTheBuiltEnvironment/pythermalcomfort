@@ -1,6 +1,8 @@
 import numpy as np
 from numba import float64, vectorize
 
+from pythermalcomfort.utilities import met_to_w_m2
+
 
 @vectorize(
     [
@@ -20,8 +22,8 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     pa = rh * 10 * np.exp(16.6536 - 4030.183 / (tdb + 235))
 
     icl = 0.155 * clo  # thermal insulation of the clothing in M2K/W
-    m = met * 58.15  # metabolic rate in W/M2
-    w = wme * 58.15  # external work in W/M2
+    m = met * met_to_w_m2  # metabolic rate in W/M2
+    w = wme * met_to_w_m2  # external work in W/M2
     mw = m - w  # internal heat production in the human body
     # calculation of the clothing area factor
     if icl <= 0.078:
@@ -63,8 +65,8 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     # heat loss diff. through skin
     hl1 = 3.05 * 0.001 * (5733 - (6.99 * mw) - pa)
     # heat loss by sweating
-    if mw > 58.15:
-        hl2 = 0.42 * (mw - 58.15)
+    if mw > met_to_w_m2:
+        hl2 = 0.42 * (mw - met_to_w_m2)
     else:
         hl2 = 0
     # latent respiration heat loss

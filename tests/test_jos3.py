@@ -182,47 +182,47 @@ def test_body_parameters():
 
 def test_to17array():
     # Test with integer input
-    result = construction._to17array(5)
+    result = construction.to_array_body_parts(5)
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
     assert np.all(result == 5)
 
     # Test with float input
-    result = construction._to17array(5.5)
+    result = construction.to_array_body_parts(5.5)
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
     assert np.all(result == 5.5)
 
     # Test with list input
-    result = construction._to17array(list(range(17)))
+    result = construction.to_array_body_parts(list(range(17)))
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
     assert np.all(result == np.arange(17))
 
     # Test with ndarray input
-    result = construction._to17array(np.arange(17))
+    result = construction.to_array_body_parts(np.arange(17))
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
     assert np.all(result == np.arange(17))
 
     # Test with dict input
     dict_input = {name: i for i, name in enumerate(BODY_NAMES)}
-    result = construction._to17array(dict_input)
+    result = construction.to_array_body_parts(dict_input)
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
     assert np.all(result == np.arange(17))
 
     # Test with list input of wrong length
     with pytest.raises(ValueError):
-        construction._to17array(list(range(16)))
+        construction.to_array_body_parts(list(range(16)))
 
     # Test with ndarray input of wrong length
     with pytest.raises(ValueError):
-        construction._to17array(np.arange(16))
+        construction.to_array_body_parts(np.arange(16))
 
     # Test with unsupported input type
     with pytest.raises(ValueError):
-        construction._to17array("unsupported")
+        construction.to_array_body_parts("unsupported")
 
 
 def test_bsa_rate():
@@ -1363,9 +1363,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():

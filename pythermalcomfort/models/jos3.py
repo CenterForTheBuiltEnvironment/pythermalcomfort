@@ -12,7 +12,7 @@ from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
-    _to17array,
+    to_array_body_parts,
     calculate_operative_temp_when_pmv_is_zero,
     validate_body_parameters,
 )
@@ -24,7 +24,7 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Postures, met_to_w_m2
 
 
 class JOS3:
@@ -502,8 +502,8 @@ class JOS3:
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
-        dictout = self._reset_setpt(par=Default.physical_activity_ratio)
-        self._history.append(dictout)
+        dict_results = self._reset_setpt(par=Default.physical_activity_ratio)
+        self._history.append(dict_results)
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
         """Reset set-point temperatures under steady state conditions.
@@ -520,8 +520,7 @@ class JOS3:
             Parameters of the JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
-        # 1 met = 58.15 W/m2
-        w_per_m2_to_met = 1 / 58.15  # unit converter W/m2 to met
+        w_per_m2_to_met = 1 / met_to_w_m2  # unit converter W/m2 to met
         met = self.bmr * par * w_per_m2_to_met  # [met]
         self.to = calculate_operative_temp_when_pmv_is_zero(met=met)
         self.rh = Default.relative_humidity
@@ -1207,7 +1206,7 @@ class JOS3:
 
     @tdb.setter
     def tdb(self, inp):
-        self._ta = _to17array(inp)
+        self._ta = to_array_body_parts(inp)
 
     @property
     def tr(self):
@@ -1216,7 +1215,7 @@ class JOS3:
 
     @tr.setter
     def tr(self, inp):
-        self._tr = _to17array(inp)
+        self._tr = to_array_body_parts(inp)
 
     @property
     def to(self):
@@ -1245,8 +1244,8 @@ class JOS3:
 
     @to.setter
     def to(self, inp):
-        self._ta = _to17array(inp)
-        self._tr = _to17array(inp)
+        self._ta = to_array_body_parts(inp)
+        self._tr = to_array_body_parts(inp)
 
     @property
     def rh(self):
@@ -1255,7 +1254,7 @@ class JOS3:
 
     @rh.setter
     def rh(self, inp):
-        self._rh = _to17array(inp)
+        self._rh = to_array_body_parts(inp)
 
     @property
     def v(self):
@@ -1264,7 +1263,7 @@ class JOS3:
 
     @v.setter
     def v(self, inp):
-        self._va = _to17array(inp)
+        self._va = to_array_body_parts(inp)
 
     @property
     def posture(self):
@@ -1300,7 +1299,7 @@ class JOS3:
 
     @clo.setter
     def clo(self, inp):
-        self._clo = _to17array(inp)
+        self._clo = to_array_body_parts(inp)
 
     @property
     def par(self):
@@ -1393,7 +1392,7 @@ class JOS3:
 
     @t_skin.setter
     def t_skin(self, inp):
-        self._t_body[INDEX["skin"]] = _to17array(inp)
+        self._t_body[INDEX["skin"]] = to_array_body_parts(inp)
 
     @property
     def t_core(self):

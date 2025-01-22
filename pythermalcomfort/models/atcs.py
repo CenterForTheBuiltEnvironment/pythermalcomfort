@@ -8,7 +8,7 @@ from pythermalcomfort.jos3_functions.construction import (
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.models.jos3 import JOS3
 from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
-from pythermalcomfort.utilities import DefaultSkinTemperature
+from pythermalcomfort.utilities import DefaultSkinTemperature, met_to_w_m2
 
 # Set logging config as WARNING
 logging.basicConfig(level=logging.WARNING)
@@ -189,7 +189,7 @@ class ATCS(JOS3):
         else:
             # Calculate the metabolic rate based on the provided 'par' value.
             min_met = 1.0
-            met = max(self.bmr * self.par / 58.15, min_met)
+            met = max(self.bmr * self.par / met_to_w_m2, min_met)
 
             # Calculate the metabolic rate based on the provided 'par' value.
             overall_clo = np.average(self._clo, weights=Default.local_bsa)

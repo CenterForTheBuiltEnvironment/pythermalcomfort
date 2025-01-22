@@ -18,6 +18,7 @@ cp_air = 1004
 h_fg = 2501000
 r_air = 287.055
 g = 9.81  # m/s2
+met_to_w_m2 = 58.15
 
 
 class Models(Enum):

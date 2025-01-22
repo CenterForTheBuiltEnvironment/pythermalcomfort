@@ -69,7 +69,7 @@ def validate_body_parameters(
         )
 
 
-def _to17array(inp):
+def to_array_body_parts(inp):
     """Create a NumPy array of shape (17,) with the given input.
 
     Parameters
