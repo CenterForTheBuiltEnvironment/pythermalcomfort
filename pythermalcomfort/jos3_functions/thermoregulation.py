@@ -516,14 +516,13 @@ def evaporation(
     ret : array
         Total evaporative thermal resistances [m2.K/W].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
 
     Returns
     -------
@@ -629,16 +628,15 @@ def skin_blood_flow(
     err_cr, err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index [L/min/㎡].
 
     Returns
     -------
@@ -783,16 +781,15 @@ def ava_blood_flow(
     err_cr, err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/m2]. The default is 2.59.
+        Cardiac index [L/min/m2].
 
     Returns
     -------
@@ -1093,18 +1090,17 @@ def shivering(
     t_core, t_skin : array
         Core and skin temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     sex : str, optional
-        Choose male or female. The default is "male".
+        Choose male or female.
     dtime : float, optional
-        Interval of analysis time. The default is 60.
+        Interval of analysis time.
 
     Returns
     -------
@@ -1210,14 +1206,13 @@ def nonshivering(
     err_sk : array
         Difference between set-point and body temperatures [°C].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     cold_acclimation : bool, optional
         Whether the subject acclimates cold environment or not.
         The default is False.
@@ -1358,16 +1353,15 @@ def cr_ms_fat_blood_flow(
     q_shiv : array
         Heat production by shivering [W].
     height : float, optional
-        Body height [m]. The default is 1.72.
+        Body height [m].
     weight : float, optional
-        Body weight [kg]. The default is 74.43.
+        Body weight [kg].
     bsa_equation : str, optional
-        The equation name (str) of bsa calculation. Choose a name from "dubois",
-        "takahira", "fujimoto", or "kurazumi". The default is "dubois".
+        The equation name (str) of bsa calculation. Choose one from BodySurfaceAreaEquations.
     age : float, optional
-        age [years]. The default is 20.
+        age [years].
     ci : float, optional
-        Cardiac index [L/min/㎡]. The default is 2.59.
+        Cardiac index [L/min/㎡].
 
     Returns
     -------

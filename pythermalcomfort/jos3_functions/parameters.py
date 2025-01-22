@@ -20,6 +20,8 @@ from typing import ClassVar
 
 import numpy as np
 
+from pythermalcomfort.utilities import BodySurfaceAreaEquations
+
 
 @dataclass(frozen=True)
 class Default:
@@ -35,7 +37,7 @@ class Default:
     sex: str = "male"
     posture: str = "standing"
     bmr_equation: str = "harris-benedict"
-    bsa_equation: str = "dubois"
+    bsa_equation: str = BodySurfaceAreaEquations.dubois.value
     local_bsa: ClassVar[list[float]] = np.array(  # body surface area [m2]
         [
             0.110,

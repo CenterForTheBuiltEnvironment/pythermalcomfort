@@ -455,35 +455,58 @@ def _check_standard_compliance_array(standard, **kwargs):
         return tdb_valid, tr_valid, v_valid, met_valid, clo_valid
 
 
-def body_surface_area(weight, height, formula="dubois"):
-    """Returns the body surface area in square meters.
+class BodySurfaceAreaEquations(Enum):
+    dubois = "dubois"
+    takahira = "takahira"
+    fujimoto = "fujimoto"
+    kurazumi = "kurazumi"
+
+
+def body_surface_area(
+    weight: float, height: float, formula: str = BodySurfaceAreaEquations.dubois.value
+) -> float:
+    """Calculate the body surface area (BSA) in square meters.
 
     Parameters
     ----------
     weight : float
-        body weight, [kg]
+        Body weight in kilograms.
     height : float
-        height, [m]
-    formula : str, optional,
-        formula used to calculate the body surface area. default="dubois"
-        Choose a name from "dubois", "takahira", "fujimoto", or "kurazumi".
+        Body height in meters.
+    formula : str, optional
+        Formula used to calculate the body surface area. Default is "dubois".
+        Choose one from BodySurfaceAreaEquations.
 
     Returns
     -------
-    body_surface_area : float
-        body surface area, [m2]
+    float
+        Body surface area in square meters.
+
+    Raises
+    ------
+    ValueError
+        If the specified formula is not recognized.
+
+    Examples
+    --------
+    Calculate BSA using the DuBois formula:
+
+    .. code-block:: python
+
+        bsa = body_surface_area(weight=70, height=1.75, formula="dubois")
+        print(bsa)
     """
-    if formula == "dubois":
+    if formula == BodySurfaceAreaEquations.dubois.value:
         return 0.202 * (weight**0.425) * (height**0.725)
-    elif formula == "takahira":
+    elif formula == BodySurfaceAreaEquations.takahira.value:
         return 0.2042 * (weight**0.425) * (height**0.725)
-    elif formula == "fujimoto":
+    elif formula == BodySurfaceAreaEquations.fujimoto.value:
         return 0.1882 * (weight**0.444) * (height**0.663)
-    elif formula == "kurazumi":
+    elif formula == BodySurfaceAreaEquations.kurazumi.value:
         return 0.2440 * (weight**0.383) * (height**0.693)
     else:
         raise ValueError(
-            f"This {formula} to calculate the body_surface_area does not exists."
+            f"Formula '{formula}' for calculating body surface area is not recognized."
         )
 
 

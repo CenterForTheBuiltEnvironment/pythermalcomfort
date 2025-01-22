@@ -42,8 +42,8 @@ class ATCS(JOS3):
             The default is "harris-benedict" equation created uding Caucasian's data. (DOI: doi.org/10.1073/pnas.4.12.370)
             If the Ganpule's equation (DOI: doi.org/10.1038/sj.ejcn.1602645) for Japanese people is used, input "japanese".
         bsa_equation : str, optional
-            The equation used to calculate body surface area (bsa). Choose a bsa equation.
-            You can choose "dubois", "fujimoto", "kruazumi", or "takahira". The default is "dubois".
+            The equation used to calculate body surface area (bsa).
+            Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations. Default is "dubois".
             The body surface area can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.body_surface_area`.
         ex_output : None, list or "all", optional

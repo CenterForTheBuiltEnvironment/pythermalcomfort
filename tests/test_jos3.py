@@ -142,6 +142,22 @@ def test_JOS3_class():
     # Check if t_core is of the expected type (e.g., numpy.ndarray)
     assert isinstance(t_core, np.ndarray)
 
+    # Test with value out of range
+    with pytest.raises(ValueError):
+        JOS3(weight=1)
+
+    # Test with value out of range
+    with pytest.raises(ValueError):
+        JOS3(age=1)
+
+    # Test with value out of range
+    with pytest.raises(ValueError):
+        JOS3(height=0.1)
+
+    # Test with value out of range
+    with pytest.raises(ValueError):
+        JOS3(fat=91)
+
 
 # test for construction.py
 def test_body_parameters():
@@ -278,11 +294,6 @@ def test_weight_rate():
     # Test with non-numeric weight
     with pytest.raises(TypeError):
         weight_rate(weight="non-numeric")
-
-    # Test with value out of range
-    with pytest.raises(ValueError):
-        weight = 1.0  # An invalid weight value in kg (out of range)
-        weight_rate(weight=weight)
 
 
 def test_bfb_rate():
@@ -1349,9 +1360,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():

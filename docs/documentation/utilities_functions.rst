@@ -4,6 +4,8 @@ Utilities functions
 Body Surface Area
 -----------------
 
+The body surface area (BSA) is the measured or calculated surface of a human body. It is used as a reference for the estimation of the metabolic rate of an individual. The BSA is usually measured in square meters. The most common formula to calculate the BSA is the Du Bois formula, which is based on the height and weight of the individual. All the equations implemented in pythermalcomfort are contained in pythermalcomfort.utilities.BodySurfaceAreaEquations
+
 .. autofunction:: pythermalcomfort.utilities.body_surface_area
 
 Dew point temperature

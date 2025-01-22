@@ -12,7 +12,10 @@ from pythermalcomfort.__init__ import __version__
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
-from pythermalcomfort.jos3_functions.construction import _to17array
+from pythermalcomfort.jos3_functions.construction import (
+    _to17array,
+    validate_body_parameters,
+)
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
     INDEX,
@@ -360,7 +363,7 @@ class JOS3:
         height: float = Default.height,
         weight: float = Default.weight,
         fat: float = Default.body_fat,
-        age: float = Default.age,
+        age: int = Default.age,
         sex: float = Default.sex,
         ci: float = Default.cardiac_index,
         bmr_equation: str = Default.bmr_equation,
@@ -392,8 +395,7 @@ class JOS3:
             for Caucasian data (DOI: doi.org/10.1073/pnas.4.12.370) or "japanese" for Ganpule's equation
             (DOI: doi.org/10.1038/sj.ejcn.1602645). Default is "harris-benedict".
         bsa_equation : str, optional
-            The equation used to calculate body surface area (BSA). Options are "dubois", "fujimoto",
-            "kruazumi", or "takahira". Default is "dubois".
+            The equation used to calculate body surface area (BSA). Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations. Default is "dubois".
         ex_output : None or "all", optional
             Additional output parameters. If None, no extra output is provided. If "all", all possible
             outputs are included. Default is None.
@@ -416,6 +418,9 @@ class JOS3:
         )
         version_number_string = re.findall(r"\d+\.\d+\.\d+", version_string)[0]
         self._version = version_number_string  # (ex. 'X.Y.Z')
+
+        # validate body parameters
+        validate_body_parameters(height=height, weight=weight, age=age, body_fat=fat)
 
         # Initialize basic attributes
         self._height = height
