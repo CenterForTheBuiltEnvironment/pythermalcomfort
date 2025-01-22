@@ -444,11 +444,11 @@ class JOS3:
         self._cap = cons.capacity(height, weight, bsa_equation, age, ci)
 
         # Set initial core and skin temperature set points [°C]
-        self.setpt_cr = np.ones(17) * Default.core_temperature
-        self.setpt_sk = np.ones(17) * Default.skin_temperature
+        self.cr_set_point = np.ones(17) * Default.core_temperature
+        self.sk_set_point = np.ones(17) * Default.skin_temperature
 
         # Initialize body temperature [°C]
-        self._bodytemp = np.ones(NUM_NODES) * Default.other_body_temperature
+        self._t_body = np.ones(NUM_NODES) * Default.other_body_temperature
 
         # Initialize environmental conditions and other factors
         # (Default values of input conditions)
@@ -463,7 +463,7 @@ class JOS3:
         self._hc = None  # Convective heat transfer coefficient
         self._hr = None  # Radiative heat transfer coefficient
         self.ex_q = np.zeros(NUM_NODES)  # External heat gain
-        self._t = dt.timedelta(0)  # Elapsed time
+        self._time = dt.timedelta(0)  # Elapsed time
         self._cycle = 0  # Cycle time
         self.model_name = "JOS3"  # Model name
         self.options = {
@@ -483,7 +483,7 @@ class JOS3:
         self._history = []
 
         # Set elapsed time and cycle time to 0
-        self._t = dt.timedelta(0)  # Elapsed time
+        self._time = dt.timedelta(0)  # Elapsed time
         self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
@@ -519,8 +519,8 @@ class JOS3:
             dict_out = self._run(dtime=60000, passive=True)
 
         # Set new set-point temperatures for core and skin
-        self.setpt_cr = self.t_core
-        self.setpt_sk = self.t_skin
+        self.cr_set_point = self.t_core
+        self.sk_set_point = self.t_skin
         self.options["ava_zero"] = False
 
         return dict_out
@@ -568,7 +568,7 @@ class JOS3:
         # Loop through the simulation for the given number of times
         for _ in range(times):
             # Increment the elapsed time by the time delta
-            self._t += dt.timedelta(0, dtime)
+            self._time += dt.timedelta(0, dtime)
 
             # Increment the cycle counter
             self._cycle += 1
@@ -670,8 +670,8 @@ class JOS3:
             setpt_cr = tcr.copy()
             setpt_sk = tsk.copy()
         else:
-            setpt_cr = self.setpt_cr.copy()
-            setpt_sk = self.setpt_sk.copy()
+            setpt_cr = self.cr_set_point.copy()
+            setpt_sk = self.sk_set_point.copy()
 
         # Error signal = Difference between set-point and body temperatures
         err_cr = tcr - setpt_cr
@@ -903,12 +903,12 @@ class JOS3:
 
         # Combines the current body temperature, the boundary matrix, and the heat generation matrix
         # to calculate the new body temperature distribution (arr).
-        arr = self._bodytemp + arr_b * arr_to + arr_q
+        arr = self._t_body + arr_b * arr_to + arr_q
 
         # ------------------------------------------------------------------
         # New body temp. [°C]
         # ------------------------------------------------------------------
-        self._bodytemp = np.dot(arr_a_inv, arr)
+        self._t_body = np.dot(arr_a_inv, arr)
 
         # ------------------------------------------------------------------
         # Output parameters
@@ -917,7 +917,7 @@ class JOS3:
         if output:  # Default output
             dict_out["pythermalcomfort_version"] = self._version
             dict_out["cycle_time"] = self._cycle
-            dict_out["simulation_time"] = self._t
+            dict_out["simulation_time"] = self._time
             dict_out["dt"] = dtime
             dict_out["t_skin_mean"] = np.round(self.t_skin_mean, 2)
             dict_out["t_skin"] = np.round(self.t_skin, 2)
@@ -1296,11 +1296,11 @@ class JOS3:
     @property
     def body_temp(self):
         """body_temp : numpy.ndarray (85,) All segment temperatures of JOS-3"""
-        return self._bodytemp
+        return self._t_body
 
     @body_temp.setter
     def body_temp(self, inp):
-        self._bodytemp = inp.copy()
+        self._t_body = inp.copy()
 
     @property
     def bsa(self):
@@ -1343,8 +1343,8 @@ class JOS3:
     @property
     def w(self):
         """W : numpy.ndarray (17,) Skin wettedness on local body segments [-]."""
-        err_cr = self.t_core - self.setpt_cr
-        err_sk = self.t_skin - self.setpt_sk
+        err_cr = self.t_core - self.cr_set_point
+        err_sk = self.t_skin - self.sk_set_point
         wet, *_ = threg.evaporation(
             err_cr,
             err_sk,
@@ -1366,51 +1366,51 @@ class JOS3:
     @property
     def t_skin_mean(self):
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
-        return np.average(self._bodytemp[INDEX["skin"]], weights=Default.local_bsa)
+        return np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa)
 
     @property
     def t_skin(self):
         """t_skin : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
-        return self._bodytemp[INDEX["skin"]].copy()
+        return self._t_body[INDEX["skin"]].copy()
 
     @t_skin.setter
     def t_skin(self, inp):
-        self._bodytemp[INDEX["skin"]] = _to17array(inp)
+        self._t_body[INDEX["skin"]] = _to17array(inp)
 
     @property
     def t_core(self):
         """t_core : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
-        return self._bodytemp[INDEX["core"]].copy()
+        return self._t_body[INDEX["core"]].copy()
 
     @property
     def t_cb(self):
         """t_cb : numpy.ndarray (1,) Temperature at central blood pool [°C]."""
-        return self._bodytemp[0].copy()
+        return self._t_body[0].copy()
 
     @property
     def t_artery(self):
         """t_artery : numpy.ndarray (17,) Arterial temperatures by the local body segments [°C]."""
-        return self._bodytemp[INDEX["artery"]].copy()
+        return self._t_body[INDEX["artery"]].copy()
 
     @property
     def t_vein(self):
         """t_vein : numpy.ndarray (17,) Vein temperatures by the local body segments [°C]."""
-        return self._bodytemp[INDEX["vein"]].copy()
+        return self._t_body[INDEX["vein"]].copy()
 
     @property
     def t_superficial_vein(self):
         """t_superficial_vein : numpy.ndarray (12,) Superficial vein temperatures by the local body segments [°C]."""
-        return self._bodytemp[INDEX["sfvein"]].copy()
+        return self._t_body[INDEX["sfvein"]].copy()
 
     @property
     def t_muscle(self):
         """t_muscle : numpy.ndarray (2,) Muscle temperatures of head and pelvis [°C]."""
-        return self._bodytemp[INDEX["muscle"]].copy()
+        return self._t_body[INDEX["muscle"]].copy()
 
     @property
     def t_fat(self):
         """t_fat : numpy.ndarray (2,) fat temperatures of head and pelvis  [°C]."""
-        return self._bodytemp[INDEX["fat"]].copy()
+        return self._t_body[INDEX["fat"]].copy()
 
     @property
     def body_names(self):

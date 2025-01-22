@@ -77,8 +77,8 @@ def test_JOS3_class():
     assert np.all(model.clo == 0)
     assert model.par == 1.25
     # Check if the new set-point temperatures for core and skin have been set
-    assert np.all(model.setpt_cr == model.t_core)
-    assert np.all(model.setpt_sk == model.t_skin)
+    assert np.all(model.cr_set_point == model.t_core)
+    assert np.all(model.sk_set_point == model.t_skin)
 
     # Test: JOS3 class with sex="female"
     model = JOS3(sex="female", bmr_equation="japanese")
