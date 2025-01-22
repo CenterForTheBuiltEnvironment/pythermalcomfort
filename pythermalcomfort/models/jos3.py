@@ -408,13 +408,6 @@ class JOS3:
 
             jos3_model = JOS3(height=1.75, weight=70, age=25, sex="female")
         """
-        # Version of pythermalcomfort
-        version_string = (
-            __version__  # get the current version of pythermalcomfort package
-        )
-        version_number_string = re.findall(r"\d+\.\d+\.\d+", version_string)[0]
-        self._version = version_number_string  # (ex. 'X.Y.Z')
-
         # validate body parameters
         validate_body_parameters(height=height, weight=weight, age=age, body_fat=fat)
 
@@ -930,7 +923,6 @@ class JOS3:
         # ------------------------------------------------------------------
         dict_out = {}
         if output:  # Default output
-            dict_out["pythermalcomfort_version"] = self._version
             dict_out["cycle_time"] = self._cycle
             dict_out["simulation_time"] = self._time
             dict_out["dt"] = dtime
@@ -1450,8 +1442,3 @@ class JOS3:
             self._bmr_equation,
         )
         return tcr / self.bsa.sum()
-
-    @property
-    def version(self):
-        """Version : float The current version of pythermalcomfort."""
-        return self._version
