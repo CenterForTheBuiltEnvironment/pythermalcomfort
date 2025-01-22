@@ -7,12 +7,12 @@ import pytest
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import (
     bfb_rate,
+    calculate_operative_temp_when_pmv_is_zero,
     capacity,
     conductance,
     local_bsa,
     validate_body_parameters,
     weight_rate,
-    calculate_operative_temp_when_pmv_is_zero,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
@@ -1363,9 +1363,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(
-        q_nst_no_acclimation, q_nst_with_acclimation
-    ), "Cold acclimation did not change the result"
+    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
+        "Cold acclimation did not change the result"
+    )
 
 
 def test_sum_bf():

@@ -6,7 +6,7 @@ from scipy import optimize
 
 from pythermalcomfort.classes_input import PETSteadyInputs
 from pythermalcomfort.classes_return import PETSteady
-from pythermalcomfort.utilities import body_surface_area, p_sat, Postures
+from pythermalcomfort.utilities import Postures, body_surface_area, p_sat
 
 
 def pet_steady(

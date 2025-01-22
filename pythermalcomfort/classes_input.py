@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Units, validate_type, Postures
+from pythermalcomfort.utilities import Postures, Units, validate_type
 
 
 @dataclass

@@ -5,7 +5,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import SolarGainInputs
 from pythermalcomfort.classes_return import SolarGain
-from pythermalcomfort.utilities import transpose_sharp_altitude, Postures
+from pythermalcomfort.utilities import Postures, transpose_sharp_altitude
 
 
 def solar_gain(

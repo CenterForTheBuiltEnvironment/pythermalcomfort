@@ -15,8 +15,7 @@ import numpy as np
 from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT, NUM_NODES
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
-from pythermalcomfort.utilities import Models
-from pythermalcomfort.utilities import body_surface_area
+from pythermalcomfort.utilities import Models, body_surface_area
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)

@@ -13,8 +13,8 @@ from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
     _to17array,
-    validate_body_parameters,
     calculate_operative_temp_when_pmv_is_zero,
+    validate_body_parameters,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     BODY_NAMES,
@@ -430,19 +430,29 @@ class JOS3:
         self._ex_output = ex_output
 
         # Calculate body surface area (bsa) rate
-        self._bsa_rate = cons.bsa_rate(height, weight, bsa_equation)
+        self._bsa_rate = cons.bsa_rate(
+            height=height, weight=weight, bsa_equation=bsa_equation
+        )
 
         # Calculate local body surface area
-        self._bsa = cons.local_bsa(height, weight, bsa_equation)
+        self._bsa = cons.local_bsa(
+            height=height, weight=weight, bsa_equation=bsa_equation
+        )
 
         # Calculate basal blood flow (BFB) rate [-]
-        self._bfb_rate = cons.bfb_rate(height, weight, bsa_equation, age, ci)
+        self._bfb_rate = cons.bfb_rate(
+            height=height, weight=weight, bsa_equation=bsa_equation, age=age, ci=ci
+        )
 
         # Calculate thermal conductance (CDT) [W/K]
-        self._cdt = cons.conductance(height, weight, bsa_equation, fat)
+        self._cdt = cons.conductance(
+            height=height, weight=weight, bsa_equation=bsa_equation, fat=fat
+        )
 
         # Calculate thermal capacity [J/K]
-        self._cap = cons.capacity(height, weight, bsa_equation, age, ci)
+        self._cap = cons.capacity(
+            height=height, weight=weight, bsa_equation=bsa_equation, age=age, ci=ci
+        )
 
         # Set initial core and skin temperature set points [°C]
         self.cr_set_point = np.ones(Default.num_body_parts) * Default.core_temperature
@@ -496,17 +506,18 @@ class JOS3:
         self._history.append(dictout)
 
     def _reset_setpt(self, par=Default.physical_activity_ratio):
-        """Reset set-point temperatures under steady state calculation. Set- point
-        temperatures are hypothetical core or skin temperatures in a thermally neutral
-        state when at rest (similar to room set-point temperature for air conditioning).
-        This function is used during initialization to calculate the set-point
-        temperatures as a reference for thermoregulation. Be careful, input parameters
-        (tdb, tr, rh, v, clo, par) and body temperatures are also reset.
+        """Reset set-point temperatures under steady state conditions.
+
+        Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
+        when at rest, similar to room set-point temperatures for air conditioning. This function is
+        used during initialization to calculate the set-point temperatures as a reference for
+        thermoregulation. Note that input parameters (tdb, tr, rh, v, clo, par) and body temperatures
+        are also reset.
 
         Returns
         -------
         dict
-            Parameters of JOS-3 model.
+            Parameters of the JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
         # 1 met = 58.15 W/m2

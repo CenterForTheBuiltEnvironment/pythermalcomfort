@@ -6,8 +6,8 @@ from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
 from pythermalcomfort.utilities import (
-    _check_standard_compliance_array,
     Postures,
+    _check_standard_compliance_array,
 )
 
 

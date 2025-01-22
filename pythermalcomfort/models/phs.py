@@ -7,9 +7,9 @@ from numba import jit
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
+    Postures,
     _check_standard_compliance_array,
     p_sat,
-    Postures,
 )
 
 
