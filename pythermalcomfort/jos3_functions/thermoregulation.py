@@ -8,6 +8,8 @@ following order: "head", "neck", "chest", "back", "pelvis",
 "right_leg" and "right_hand".
 """
 
+from typing import Union
+
 import numpy as np
 
 from pythermalcomfort.jos3_functions import construction as cons
@@ -208,9 +210,9 @@ def forced_convection(v: float) -> np.ndarray:
 
 def conv_coef(
     posture: str = Default.posture,
-    v: float = Default.air_speed,
-    tdb: float = Default.dry_bulb_air_temperature,
-    t_skin: float = Default.skin_temperature,
+    v: Union[float, np.ndarray] = Default.air_speed,
+    tdb: Union[float, np.ndarray] = Default.dry_bulb_air_temperature,
+    t_skin: Union[float, np.ndarray] = Default.skin_temperature,
 ) -> np.ndarray:
     """
     Calculate convective heat transfer coefficient (hc) [W/(m2*K)].

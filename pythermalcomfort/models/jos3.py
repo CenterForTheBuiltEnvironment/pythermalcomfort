@@ -3,11 +3,10 @@ import datetime as dt
 
 # Set up logging with a level of WARNING
 import os
-import re
 
 import numpy as np
 
-from pythermalcomfort.__init__ import __version__
+from pythermalcomfort.classes_return import JOS3Output
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
@@ -219,8 +218,8 @@ class JOS3:
         total clothing heat resistance (each body part) [(m2*K)/W]
     rh :
         relative humidity (each body part) [%]
-    sex :
-        sex [-]
+    sex : str
+        sex
     t_artery :
         arterial temperature (each body part) [°C]
     t_cb :
@@ -360,7 +359,7 @@ class JOS3:
         weight: float = Default.weight,
         fat: float = Default.body_fat,
         age: int = Default.age,
-        sex: float = Default.sex,
+        sex: str = Default.sex,
         ci: float = Default.cardiac_index,
         bmr_equation: str = Default.bmr_equation,
         bsa_equation: str = Default.bsa_equation,
@@ -629,10 +628,10 @@ class JOS3:
         # Convective and radiative heat transfer coefficients [W/(m2*K)]
         hc = threg.fixed_hc(
             threg.conv_coef(
-                self._posture,
-                self._va,
-                self._ta,
-                tsk,
+                posture=self._posture,
+                v=self._va,
+                tdb=self._ta,
+                t_skin=tsk,
             ),
             self._va,
         )
@@ -921,85 +920,71 @@ class JOS3:
         # ------------------------------------------------------------------
         # Output parameters
         # ------------------------------------------------------------------
-        dict_out = {}
-        if output:  # Default output
-            dict_out["cycle_time"] = self._cycle
-            dict_out["simulation_time"] = self._time
-            dict_out["dt"] = dtime
-            dict_out["t_skin_mean"] = np.round(self.t_skin_mean, 2)
-            dict_out["t_skin"] = np.round(self.t_skin, 2)
-            dict_out["t_core"] = np.round(self.t_core, 2)
-            dict_out["w_mean"] = round(np.average(wet, weights=Default.local_bsa), 2)
-            dict_out["w"] = np.round(wet, 2)
-            dict_out["weight_loss_by_evap_and_res"] = round(wlesk.sum() + wleres, 5)
-            dict_out["cardiac_output"] = round(co, 1)
-            dict_out["q_thermogenesis_total"] = round(q_thermogenesis_total, 2)
-            dict_out["q_res"] = round(res_sh + res_lh, 2)
-            dict_out["q_skin2env"] = np.round(shl_sk + e_sk, 2)
-
-        detail_out = {}
-        if self._ex_output and output:
-            detail_out["name"] = self.model_name
-            detail_out["height"] = self._height
-            detail_out["weight"] = self._weight
-            detail_out["bsa"] = self._bsa
-            detail_out["fat"] = self._fat
-            detail_out["sex"] = self._sex
-            detail_out["age"] = self._age
-            detail_out["t_core_set"] = np.round(setpt_cr, 2)
-            detail_out["t_skin_set"] = np.round(setpt_sk, 2)
-            detail_out["t_cb"] = round(self.t_cb, 2)
-            detail_out["t_artery"] = np.round(self.t_artery)
-            detail_out["t_vein"] = np.round(self.t_vein)
-            detail_out["t_superficial_vein"] = np.round(self.t_superficial_vein)
-            detail_out["t_muscle"] = np.round(self.t_muscle)
-            detail_out["t_fat"] = np.round(self.t_fat)
-            detail_out["to"] = np.round(to, 2)
-            detail_out["r_t"] = np.round(r_t, 3)
-            detail_out["r_et"] = np.round(r_et, 3)
-            detail_out["tdb"] = np.round(self._ta.copy(), 2)
-            detail_out["tr"] = np.round(self._tr.copy(), 2)
-            detail_out["rh"] = self._rh.copy()
-            detail_out["v"] = self._va.copy()
-            detail_out["par"] = self._par
-            detail_out["clo"] = self._clo.copy()
-            detail_out["e_skin"] = np.round(e_sk, 2)
-            detail_out["e_max"] = np.round(e_max, 2)
-            detail_out["e_sweat"] = np.round(e_sweat, 2)
-            detail_out["bf_core"] = np.round(bf_core, 2)
-            detail_out["bf_muscle"] = np.round(bf_muscle[VINDEX["muscle"]], 2)
-            detail_out["bf_fat"] = np.round(bf_fat[VINDEX["fat"]], 2)
-            detail_out["bf_skin"] = np.round(bf_skin, 2)
-            detail_out["bf_ava_hand"] = np.round(bf_ava_hand, 2)
-            detail_out["bf_ava_foot"] = np.round(bf_ava_foot, 2)
-            detail_out["q_bmr_core"] = np.round(q_bmr_local[0], 2)
-            detail_out["q_bmr_muscle"] = np.round(q_bmr_local[1][VINDEX["muscle"]], 2)
-            detail_out["q_bmr_fat"] = np.round(q_bmr_local[2][VINDEX["fat"]], 2)
-            detail_out["q_bmr_skin"] = np.round(q_bmr_local[3], 2)
-            detail_out["q_work"] = np.round(q_work, 2)
-            detail_out["q_shiv"] = np.round(q_shiv, 2)
-            detail_out["q_nst"] = np.round(q_nst, 2)
-            detail_out["q_thermogenesis_core"] = np.round(q_thermogenesis_core, 2)
-            detail_out["q_thermogenesis_muscle"] = np.round(
+        return JOS3Output(
+            cycle_time=self._cycle,
+            simulation_time=self._time,
+            dt=dtime,
+            t_skin_mean=np.round(self.t_skin_mean, 2),
+            t_skin=np.round(self.t_skin, 2),
+            t_core=np.round(self.t_core, 2),
+            w_mean=round(np.average(wet, weights=Default.local_bsa), 2),
+            w=np.round(wet, 2),
+            weight_loss_by_evap_and_res=round(wlesk.sum() + wleres, 5),
+            cardiac_output=round(co, 1),
+            q_thermogenesis_total=round(q_thermogenesis_total, 2),
+            q_res=round(res_sh + res_lh, 2),
+            q_skin2env=np.round(shl_sk + e_sk, 2),
+            name=self.model_name,
+            height=self._height,
+            weight=self._weight,
+            bsa=self._bsa,
+            fat=self._fat,
+            sex=self._sex,
+            age=self._age,
+            t_core_set=np.round(setpt_cr, 2),
+            t_skin_set=np.round(setpt_sk, 2),
+            t_cb=round(self.t_cb, 2),
+            t_artery=np.round(self.t_artery),
+            t_vein=np.round(self.t_vein),
+            t_superficial_vein=np.round(self.t_superficial_vein),
+            t_muscle=np.round(self.t_muscle),
+            t_fat=np.round(self.t_fat),
+            to=np.round(to, 2),
+            r_t=np.round(r_t, 3),
+            r_et=np.round(r_et, 3),
+            tdb=np.round(self._ta.copy(), 2),
+            tr=np.round(self._tr.copy(), 2),
+            rh=self._rh.copy(),
+            v=self._va.copy(),
+            par=self._par,
+            clo=self._clo.copy(),
+            e_skin=np.round(e_sk, 2),
+            e_max=np.round(e_max, 2),
+            e_sweat=np.round(e_sweat, 2),
+            bf_core=np.round(bf_core, 2),
+            bf_muscle=np.round(bf_muscle[VINDEX["muscle"]], 2),
+            bf_fat=np.round(bf_fat[VINDEX["fat"]], 2),
+            bf_skin=np.round(bf_skin, 2),
+            bf_ava_hand=np.round(bf_ava_hand, 2),
+            bf_ava_foot=np.round(bf_ava_foot, 2),
+            q_bmr_core=np.round(q_bmr_local[0], 2),
+            q_bmr_muscle=np.round(q_bmr_local[1][VINDEX["muscle"]], 2),
+            q_bmr_fat=np.round(q_bmr_local[2][VINDEX["fat"]], 2),
+            q_bmr_skin=np.round(q_bmr_local[3], 2),
+            q_work=np.round(q_work, 2),
+            q_shiv=np.round(q_shiv, 2),
+            q_nst=np.round(q_nst, 2),
+            q_thermogenesis_core=np.round(q_thermogenesis_core, 2),
+            q_thermogenesis_muscle=np.round(
                 q_thermogenesis_muscle[VINDEX["muscle"]], 2
-            )
-            detail_out["q_thermogenesis_fat"] = np.round(
-                q_thermogenesis_fat[VINDEX["fat"]], 2
-            )
-            detail_out["q_thermogenesis_skin"] = np.round(q_thermogenesis_skin, 2)
-            dict_out["q_skin2env_sensible"] = np.round(shl_sk, 2)
-            dict_out["q_skin2env_latent"] = np.round(e_sk, 2)
-            dict_out["q_res_sensible"] = np.round(res_sh, 2)
-            dict_out["q_res_latent"] = np.round(res_lh, 2)
-
-        if self._ex_output == "all":
-            dict_out.update(detail_out)
-        elif isinstance(self._ex_output, list):  # if ex_out type is list
-            out_keys = detail_out.keys()
-            for key in self._ex_output:
-                if key in out_keys:
-                    dict_out[key] = detail_out[key]
-        return dict_out
+            ),
+            q_thermogenesis_fat=np.round(q_thermogenesis_fat[VINDEX["fat"]], 2),
+            q_thermogenesis_skin=np.round(q_thermogenesis_skin, 2),
+            q_skin2env_sensible=np.round(shl_sk, 2),
+            q_skin2env_latent=np.round(e_sk, 2),
+            q_res_sensible=np.round(res_sh, 2),
+            q_res_latent=np.round(res_lh, 2),
+        )
 
     def dict_results(self):
         """
@@ -1045,7 +1030,7 @@ class JOS3:
         # If the values are iter, add the body names as suffix words.
         # If the values are not iter and the single value data, convert it to iter.
         key2keys = {}  # Column keys
-        for key, value in self._history[0].items():
+        for key, value in self._history[0].__dict__.items():
             try:
                 length = len(value)
                 if isinstance(value, str):
@@ -1067,7 +1052,7 @@ class JOS3:
         data = []
         for _i, dictout in enumerate(self._history):
             row = {}
-            for key, value in dictout.items():
+            for key, value in dictout.__dict__.items():
                 keys = key2keys[key]
                 if len(keys) == 1:
                     values = [value]  # make list if value is not iter
@@ -1373,12 +1358,12 @@ class JOS3:
         return np.average(wet, weights=Default.local_bsa)
 
     @property
-    def t_skin_mean(self):
+    def t_skin_mean(self) -> float:
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
         return np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa)
 
     @property
-    def t_skin(self):
+    def t_skin(self) -> np.ndarray[float]:
         """t_skin : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["skin"]].copy()
 
@@ -1387,52 +1372,52 @@ class JOS3:
         self._t_body[INDEX["skin"]] = to_array_body_parts(inp)
 
     @property
-    def t_core(self):
+    def t_core(self) -> np.ndarray[float]:
         """t_core : numpy.ndarray (17,) Skin temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["core"]].copy()
 
     @property
-    def t_cb(self):
+    def t_cb(self) -> float:
         """t_cb : numpy.ndarray (1,) Temperature at central blood pool [°C]."""
         return self._t_body[0].copy()
 
     @property
-    def t_artery(self):
+    def t_artery(self) -> np.ndarray[float]:
         """t_artery : numpy.ndarray (17,) Arterial temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["artery"]].copy()
 
     @property
-    def t_vein(self):
+    def t_vein(self) -> np.ndarray[float]:
         """t_vein : numpy.ndarray (17,) Vein temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["vein"]].copy()
 
     @property
-    def t_superficial_vein(self):
+    def t_superficial_vein(self) -> np.ndarray[float]:
         """t_superficial_vein : numpy.ndarray (12,) Superficial vein temperatures by the local body segments [°C]."""
         return self._t_body[INDEX["sfvein"]].copy()
 
     @property
-    def t_muscle(self):
+    def t_muscle(self) -> np.ndarray[float]:
         """t_muscle : numpy.ndarray (2,) Muscle temperatures of head and pelvis [°C]."""
         return self._t_body[INDEX["muscle"]].copy()
 
     @property
-    def t_fat(self):
+    def t_fat(self) -> np.ndarray[float]:
         """t_fat : numpy.ndarray (2,) fat temperatures of head and pelvis  [°C]."""
         return self._t_body[INDEX["fat"]].copy()
 
     @property
-    def body_names(self):
+    def body_names(self) -> np.ndarray[float]:
         """body_names : list JOS3 body names"""
         return BODY_NAMES
 
     @property
-    def results(self):
+    def results(self) -> dict:
         """Results of the model: dict."""
         return self.dict_results()
 
     @property
-    def bmr(self):
+    def bmr(self) -> float:
         """Bmr : float Basal metabolic rate [W/m2]."""
         tcr = threg.basal_met(
             self._height,

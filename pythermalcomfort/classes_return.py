@@ -1,6 +1,8 @@
+import datetime as dt
 from dataclasses import dataclass
 from typing import Union
 
+import numpy as np
 import numpy.typing as npt
 
 
@@ -630,6 +632,202 @@ class WCT:
     """
 
     wct: Union[float, list[float]]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass(frozen=True)
+class JOS3Output:
+    """Dataclass to represent the output of the JOS3 model simulation.
+
+    Attributes
+    ----------
+    cycle_time : int
+        The current cycle time.
+    simulation_time : datetime.timedelta
+        The elapsed simulation time.
+    dt : int or float
+        The time step in seconds.
+    t_skin_mean : float
+        Mean skin temperature of the whole body [°C].
+    t_skin : np.ndarray
+        Skin temperatures by the local body segments [°C].
+    t_core : np.ndarray
+        Core temperatures by the local body segments [°C].
+    w_mean : float
+        Mean skin wettedness of the whole body [-].
+    w : np.ndarray
+        Skin wettedness on local body segments [-].
+    weight_loss_by_evap_and_res : float
+        Weight loss by evaporation and respiration [g/sec].
+    cardiac_output : float
+        Cardiac output [L/h].
+    q_thermogenesis_total : float
+        Total thermogenesis [W].
+    q_res : float
+        Heat loss by respiration [W].
+    q_skin2env : np.ndarray
+        Total heat loss from the skin to the environment [W].
+    name : str
+        Name of the model.
+    height : float
+        Body height [m].
+    weight : float
+        Body weight [kg].
+    bsa : np.ndarray
+        Body surface area.
+    fat : float
+        Body fat rate [%].
+    sex : str
+        Sex.
+    age : int
+        Age [years].
+    t_core_set : np.ndarray
+        Core set point temperature [°C].
+    t_skin_set : np.ndarray
+        Skin set point temperature [°C].
+    t_cb : float
+        Central blood temperature [°C].
+    t_artery : np.ndarray
+        Arterial blood temperature [°C].
+    t_vein : np.ndarray
+        Venous blood temperature [°C].
+    t_superficial_vein : np.ndarray
+        Superficial venous blood temperature [°C].
+    t_muscle : np.ndarray
+        Muscle temperature [°C].
+    t_fat : np.ndarray
+        Fat temperature [°C].
+    to : float
+        Operative temperature [°C].
+    r_t : np.ndarray
+        Radiative heat transfer coefficient.
+    r_et : np.ndarray
+        Evaporative heat transfer coefficient.
+    tdb : np.ndarray
+        Dry bulb air temperature [°C].
+    tr : np.ndarray
+        Mean radiant temperature [°C].
+    rh : np.ndarray
+        Relative humidity [%].
+    v : np.ndarray
+        Air velocity [m/s].
+    par : float
+        Physical activity ratio.
+    clo : np.ndarray
+        Clothing insulation.
+    e_skin : np.ndarray
+        Evaporative heat loss from the skin [W].
+    e_max : np.ndarray
+        Maximum evaporative heat loss from the skin [W].
+    e_sweat : np.ndarray
+        Evaporative heat loss from the skin by only sweating [W].
+    bf_core : np.ndarray
+        Core blood flow rate [L/h].
+    bf_muscle : np.ndarray
+        Muscle blood flow rate [L/h].
+    bf_fat : np.ndarray
+        Fat blood flow rate [L/h].
+    bf_skin : np.ndarray
+        Skin blood flow rate [L/h].
+    bf_ava_hand : np.ndarray
+        AVA blood flow rate of one hand [L/h].
+    bf_ava_foot : np.ndarray
+        AVA blood flow rate of one foot [L/h].
+    q_bmr_core : np.ndarray
+        Core thermogenesis by basal metabolism [W].
+    q_bmr_muscle : np.ndarray
+        Muscle thermogenesis by basal metabolism [W].
+    q_bmr_fat : np.ndarray
+        Fat thermogenesis by basal metabolism [W].
+    q_bmr_skin : np.ndarray
+        Skin thermogenesis by basal metabolism [W].
+    q_work : np.ndarray
+        Thermogenesis by work [W].
+    q_shiv : np.ndarray
+        Thermogenesis by shivering [W].
+    q_nst : np.ndarray
+        Thermogenesis by non-shivering [W].
+    q_thermogenesis_core : np.ndarray
+        Core total thermogenesis [W].
+    q_thermogenesis_muscle : np.ndarray
+        Muscle total thermogenesis [W].
+    q_thermogenesis_fat : np.ndarray
+        Fat total thermogenesis [W].
+    q_thermogenesis_skin : np.ndarray
+        Skin total thermogenesis [W].
+    q_skin2env_sensible : np.ndarray
+        Sensible heat loss from the skin to the environment [W].
+    q_skin2env_latent : np.ndarray
+        Latent heat loss from the skin to the environment [W].
+    q_res_sensible : np.ndarray
+        Sensible heat loss by respiration [W].
+    q_res_latent : np.ndarray
+        Latent heat loss by respiration [W].
+    """
+
+    cycle_time: int
+    simulation_time: dt.timedelta
+    dt: Union[int, float]
+    t_skin_mean: float
+    t_skin: np.ndarray
+    t_core: np.ndarray
+    w_mean: float
+    w: np.ndarray
+    weight_loss_by_evap_and_res: float
+    cardiac_output: float
+    q_thermogenesis_total: float
+    q_res: float
+    q_skin2env: np.ndarray
+    name: str
+    height: float
+    weight: float
+    bsa: np.ndarray
+    fat: float
+    sex: str
+    age: int
+    t_core_set: np.ndarray
+    t_skin_set: np.ndarray
+    t_cb: float
+    t_artery: np.ndarray
+    t_vein: np.ndarray
+    t_superficial_vein: np.ndarray
+    t_muscle: np.ndarray
+    t_fat: np.ndarray
+    to: float
+    r_t: np.ndarray
+    r_et: np.ndarray
+    tdb: np.ndarray
+    tr: np.ndarray
+    rh: np.ndarray
+    v: np.ndarray
+    par: float
+    clo: np.ndarray
+    e_skin: np.ndarray
+    e_max: np.ndarray
+    e_sweat: np.ndarray
+    bf_core: np.ndarray
+    bf_muscle: np.ndarray
+    bf_fat: np.ndarray
+    bf_skin: np.ndarray
+    bf_ava_hand: np.ndarray
+    bf_ava_foot: np.ndarray
+    q_bmr_core: np.ndarray
+    q_bmr_muscle: np.ndarray
+    q_bmr_fat: np.ndarray
+    q_bmr_skin: np.ndarray
+    q_work: np.ndarray
+    q_shiv: np.ndarray
+    q_nst: np.ndarray
+    q_thermogenesis_core: np.ndarray
+    q_thermogenesis_muscle: np.ndarray
+    q_thermogenesis_fat: np.ndarray
+    q_thermogenesis_skin: np.ndarray
+    q_skin2env_sensible: np.ndarray
+    q_skin2env_latent: np.ndarray
+    q_res_sensible: np.ndarray
+    q_res_latent: np.ndarray
 
     def __getitem__(self, item):
         return getattr(self, item)

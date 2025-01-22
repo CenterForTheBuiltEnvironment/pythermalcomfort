@@ -67,7 +67,7 @@ def test_JOS3_class():
 
     # Test: _reset_setpt()
     result = model._reset_setpt()
-    assert isinstance(result, dict)
+    result = result.__dict__
     assert "t_core" in result
     assert "t_skin" in result
     # Check if the attributes of the JOS3 object have been updated as expected
@@ -1364,9 +1364,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():
