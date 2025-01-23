@@ -1562,7 +1562,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     return co
 
 
-def resp_heat_loss(tdb, p_a, q_thermogenesis_total):
+def resp_heat_loss(tdb: float, p_a: float, q_thermogenesis_total: float):
     """Calculate heat loss by respiration [W].
 
     Parameters
