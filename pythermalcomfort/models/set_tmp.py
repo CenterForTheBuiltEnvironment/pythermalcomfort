@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
-from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
+from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.utilities import (
     Postures,
     _check_standard_compliance_array,
@@ -112,7 +112,7 @@ def set_tmp(
         limit_inputs=limit_inputs,
     )
 
-    set_array = gagge_two_nodes(
+    set_array = two_nodes_gagge(
         tdb=tdb,
         tr=tr,
         v=v,

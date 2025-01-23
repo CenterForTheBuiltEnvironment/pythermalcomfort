@@ -100,7 +100,7 @@ Discomfort Index (DI)
 Gagge two-node model
 --------------------
 
-.. autofunction:: pythermalcomfort.models.gagge_two_nodes.gagge_two_nodes
+.. autofunction:: pythermalcomfort.models.two_nodes_gagge.two_nodes_gagge
 
 .. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodes
     :members:

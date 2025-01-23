@@ -17,7 +17,7 @@ class Urls(Enum):
     ADAPTIVE_EN = "ts_adaptive_en.json"
     ADAPTIVE_ASHRAE = "ts_adaptive_ashrae.json"
     A_PMV = "ts_a_pmv.json"
-    TWO_NODES = "ts_two_nodes.json"
+    TWO_NODES = "ts_two_nodes_gagge.json"
     SOLAR_GAIN = "ts_solar_gain.json"
     ANKLE_DRAFT = "ts_ankle_draft.json"
     PHS = "ts_phs.json"

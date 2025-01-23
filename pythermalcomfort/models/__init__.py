@@ -6,7 +6,7 @@ from pythermalcomfort.models.atcs import ATCS
 from pythermalcomfort.models.clo_tout import clo_tout
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.discomfort_index import discomfort_index
-from pythermalcomfort.models.gagge_two_nodes import gagge_two_nodes
+from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.models.heat_index_lu import heat_index_lu
 from pythermalcomfort.models.heat_index_rothfusz import heat_index_rothfusz
 from pythermalcomfort.models.humidex import humidex
@@ -43,7 +43,7 @@ __all__ = [
     "pmv_ppd_ashrae",
     "pmv_ppd_iso",
     "set_tmp",
-    "gagge_two_nodes",
+    "two_nodes_gagge",
     "use_fans_heatwaves",
     "adaptive_ashrae",
     "adaptive_en",
