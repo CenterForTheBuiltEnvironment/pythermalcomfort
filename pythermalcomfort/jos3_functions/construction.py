@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 def validate_body_parameters(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    age: int = Default.age,
-    body_fat: float = Default.body_fat,
+    height: float,
+    weight: float,
+    age: int,
+    body_fat: float,
 ):
     """
     Validate the body parameters: height, weight, age, and body fat percentage.
