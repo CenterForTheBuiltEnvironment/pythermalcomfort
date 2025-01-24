@@ -72,6 +72,7 @@ To set up `pythermalcomfort` for local development:
         ruff check --fix
         ruff format
         docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
+        black .
 
 5. Commit your changes and push your branch to GitHub:
 

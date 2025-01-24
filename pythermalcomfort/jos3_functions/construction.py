@@ -2,10 +2,7 @@
 This module provides models for calculating various body parameters including surface area,
 weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 
-The values of a NumPy array containing 17 elements correspond to the following body parts:
-"head", "neck", "chest", "back", "pelvis", "left_shoulder", "left_arm", "left_hand",
-"right_shoulder", "right_arm", "right_hand", "left_thigh", "left_leg", "left_hand",
-"right_thigh", "right_leg", and "right_hand".
+The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
 """
 
 import logging
@@ -13,7 +10,8 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT, NUM_NODES
+from pythermalcomfort.classes_return import JOS3BodyParts
+from pythermalcomfort.jos3_functions.matrix import IDICT, NUM_NODES
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 from pythermalcomfort.utilities import Models, body_surface_area
@@ -92,7 +90,7 @@ def to_array_body_parts(inp) -> np.ndarray:
     if isinstance(inp, (int, float)):
         return np.full(Default.num_body_parts, inp)
     elif isinstance(inp, dict):
-        return np.array([inp[key] for key in BODY_NAMES])
+        return np.array([inp[key] for key in JOS3BodyParts.get_attribute_names()])
     elif isinstance(inp, (list, np.ndarray)):
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
@@ -603,7 +601,7 @@ def conductance(
     cdt_art_vein[2:] *= bsar**2 / wr
 
     cdt_whole = np.zeros((NUM_NODES, NUM_NODES))
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # Dictionary of indices in each body segment
         # key = layer name, value = index of matrix
         index_of = IDICT[bn]
@@ -846,7 +844,7 @@ def capacity(
     cap_whole = np.zeros(NUM_NODES)
     cap_whole[0] = cap_cb
 
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # Dictionary of indices in each body segment key = layer name, value = index of matrix
         index_of = IDICT[bn]
 
@@ -867,3 +865,14 @@ def capacity(
 
     cap_whole *= 3600  # Convert [Wh/K] to [J/K]
     return cap_whole
+
+
+def pass_values_to_jos3_body_parts(values, round_digits=2, body_parts=None):
+    if body_parts is None:
+        body_parts = JOS3BodyParts.get_attribute_names()
+    return JOS3BodyParts(
+        **{
+            name: value
+            for name, value in zip(body_parts, np.round(values, round_digits))
+        }
+    )

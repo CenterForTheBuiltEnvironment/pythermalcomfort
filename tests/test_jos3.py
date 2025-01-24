@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import (
     bfb_rate,
@@ -15,7 +16,6 @@ from pythermalcomfort.jos3_functions.construction import (
     weight_rate,
 )
 from pythermalcomfort.jos3_functions.matrix import (
-    BODY_NAMES,
     IDICT,
     LAYER_NAMES,
     NUM_NODES,
@@ -206,7 +206,7 @@ def test_to17array():
     assert np.all(result == np.arange(17))
 
     # Test with dict input
-    dict_input = {name: i for i, name in enumerate(BODY_NAMES)}
+    dict_input = {name: i for i, name in enumerate(JOS3BodyParts.get_attribute_names())}
     result = construction.to_array_body_parts(dict_input)
     assert isinstance(result, np.ndarray)
     assert result.shape == (17,)
@@ -406,7 +406,7 @@ def test_index_order():
     assert isinstance(order_count, int)
 
     # Test that output has correct keys and structure
-    for key in BODY_NAMES:
+    for key in JOS3BodyParts.get_attribute_names():
         assert key in index_dict
         for sub_key in LAYER_NAMES:
             assert sub_key in index_dict[key]
@@ -417,7 +417,10 @@ def test_index_order():
 
     # Test order_count is correct
     total_layers = sum(
-        1 for bn in BODY_NAMES for ln in LAYER_NAMES if index_dict[bn][ln] is not None
+        1
+        for bn in JOS3BodyParts.get_attribute_names()
+        for ln in LAYER_NAMES
+        if index_dict[bn][ln] is not None
     )
     assert total_layers + 1 == order_count  # +1 because of the "CB" key
 
@@ -428,7 +431,9 @@ def test_index_by_layer():
         indices = index_by_layer(layer)
         assert isinstance(indices, list)
         assert len(indices) == sum(
-            1 for bn in BODY_NAMES if IDICT[bn][layer] is not None
+            1
+            for bn in JOS3BodyParts.get_attribute_names()
+            if IDICT[bn][layer] is not None
         )
 
     # Test that each index is in the correct range
@@ -440,7 +445,7 @@ def test_index_by_layer():
                 <= index
                 < sum(
                     1
-                    for bn in BODY_NAMES
+                    for bn in JOS3BodyParts.get_attribute_names()
                     for ln in LAYER_NAMES
                     if IDICT[bn][ln] is not None
                 )
@@ -454,14 +459,16 @@ def test_valid_index_by_layer():
         indices = valid_index_by_layer(layer)
         assert isinstance(indices, list)
         assert len(indices) == sum(
-            1 for bn in BODY_NAMES if IDICT[bn][layer] is not None
+            1
+            for bn in JOS3BodyParts.get_attribute_names()
+            if IDICT[bn][layer] is not None
         )
 
     # Test that each index is in the correct range
     for layer in LAYER_NAMES:
         indices = valid_index_by_layer(layer)
         for index in indices:
-            assert 0 <= index < len(BODY_NAMES)
+            assert 0 <= index < len(JOS3BodyParts.get_attribute_names())
 
     # Test for incorrect layer input
     with pytest.raises(KeyError):
@@ -470,10 +477,10 @@ def test_valid_index_by_layer():
 
 def test_local_arr():
     # Initialize some random blood flow values
-    bf_core = np.random.rand(len(BODY_NAMES))
-    bf_muscle = np.random.rand(len(BODY_NAMES))
-    bf_fat = np.random.rand(len(BODY_NAMES))
-    bf_skin = np.random.rand(len(BODY_NAMES))
+    bf_core = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
+    bf_muscle = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
+    bf_fat = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
+    bf_skin = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
     bf_ava_hand = np.random.rand(1)[0]
     bf_ava_foot = np.random.rand(1)[0]
 
@@ -487,7 +494,7 @@ def test_local_arr():
     # Check that the elements in the array are correct
     # You could add more specific checks here, depending on the expected
     # behavior of the function
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         index_of = IDICT[bn]
 
         assert np.isclose(

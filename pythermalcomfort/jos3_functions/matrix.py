@@ -3,27 +3,9 @@ blood flow in different body parts and layers."""
 
 import numpy as np
 
+from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.jos3_functions.parameters import Default
 
-BODY_NAMES = [
-    "head",
-    "neck",
-    "chest",
-    "back",
-    "pelvis",
-    "left_shoulder",
-    "left_arm",
-    "left_hand",
-    "right_shoulder",
-    "right_arm",
-    "right_hand",
-    "left_thigh",
-    "left_leg",
-    "left_foot",
-    "right_thigh",
-    "right_leg",
-    "right_foot",
-]
 LAYER_NAMES = ["artery", "vein", "sfvein", "core", "muscle", "fat", "skin"]
 
 
@@ -33,7 +15,7 @@ def index_order():
     Returns
     -------
     index_dict : nested dictionary
-        keys are BODY_NAMES and LAYER_NAMES
+        keys are the body names and layer names
     """
     # Defines existing layers as 1 or None
     index_dict = {}
@@ -60,7 +42,7 @@ def index_order():
             "skin": 1,
         }
 
-    for key in BODY_NAMES[5:]:  # limb segments
+    for key in JOS3BodyParts.get_attribute_names()[5:]:  # limb segments
         index_dict[key] = {
             "artery": 1,
             "vein": 1,
@@ -74,7 +56,7 @@ def index_order():
     # Sets ordered indices in the matrix
     index_dict["CB"] = 0
     order_count = 1
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         for ln in LAYER_NAMES:
             if index_dict[bn][ln] is not None:
                 index_dict[bn][ln] = order_count
@@ -101,7 +83,7 @@ def index_by_layer(layer):
     """
     # Gets indices by the layer name
     out_index = []
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         for ln in LAYER_NAMES:
             if (layer.lower() == ln) and IDICT[bn][ln]:
                 out_index.append(IDICT[bn][ln])
@@ -123,7 +105,7 @@ def valid_index_by_layer(layer):
     """
     # Gets valid indices of the layer name
     out_index = []
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         if IDICT[bn][layer]:
             out_index.append(i)
     return out_index
@@ -145,7 +127,7 @@ def local_arr(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     1.067 [Wh/(L･K)] * Bloodflow [L/h] = [W/K]
     """
     bf_local = np.zeros((NUM_NODES, NUM_NODES))
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # Dictionary of indecies in each body segment
         # key = layer name, value = index of matrix
         index_of = IDICT[bn]
@@ -416,7 +398,7 @@ def remove_body_name(text):
     removed = None
 
     # Remove the body part name from the parameter name
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         if bn in text:
             rtext = rtext.replace(
                 bn, ""

@@ -1,19 +1,16 @@
 """This code includes some models of jos-3 model to calculate human
 thermoregulation.
 
-The values of a NumPy array containing 17 elements correspond to the
-following order: "head", "neck", "chest", "back", "pelvis",
-"left_shoulder", "left_arm", "left_hand", "right_shoulder", "right_arm",
-"right_hand", "left_thigh", "left_leg", "left_hand", "right_thigh",
-"right_leg" and "right_hand".
+The values of a NumPy array containing 17 body parts
 """
 
 from typing import Union, Tuple
 
 import numpy as np
 
+from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.jos3_functions import construction as cons
-from pythermalcomfort.jos3_functions.matrix import BODY_NAMES, IDICT
+from pythermalcomfort.jos3_functions.matrix import IDICT
 from pythermalcomfort.jos3_functions.parameters import Default
 from pythermalcomfort.utilities import Postures, Sex, antoine
 
@@ -1397,7 +1394,7 @@ def sum_m(mbase: np.ndarray, q_work, q_shiv, q_nst):
     q_thermogenesis_fat = mbase[2].copy()
     q_thermogenesis_skin = mbase[3].copy()
 
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # If the segment has a muscle layer, muscle thermogenesis increases by the activity.
         if IDICT[bn]["muscle"] is not None:
             q_thermogenesis_muscle[i] += q_work[i] + q_shiv[i]
@@ -1519,7 +1516,7 @@ def cr_ms_fat_blood_flow(
     bf_muscle = bfb_muscle * bfb_rate
     bf_fat = bfb_fat * bfb_rate
 
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # If the segment has a muscle layer, muscle blood flow increases.
         if IDICT[bn]["muscle"] is not None:
             bf_muscle[i] += (q_work[i] + q_shiv[i]) / 1.163

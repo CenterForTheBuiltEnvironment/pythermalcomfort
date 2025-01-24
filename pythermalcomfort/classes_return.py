@@ -1,6 +1,6 @@
 import datetime as dt
-from dataclasses import dataclass
-from typing import Union
+from dataclasses import dataclass, fields
+from typing import Union, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -638,6 +638,82 @@ class WCT:
 
 
 @dataclass(frozen=True)
+class JOS3BodyParts:
+    """Dataclass to represent the body parts in the JOS3 model.
+    It is very important to keep the order of the attributes as they are defined in the
+    dataclass ['head', 'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm',
+    'left_hand', 'right_shoulder', 'right_arm', 'right_hand', 'left_thigh', 'left_leg',
+    'left_foot', 'right_thigh', 'right_leg', 'right_foot']
+
+    Attributes
+    ----------
+    head : float
+        Index of the head.
+    neck : float
+        Index of the neck.
+    chest : float
+        Index of the chest.
+    back : float
+        Index of the back.
+    pelvis : float
+        Index of the pelvis.
+    left_shoulder : float
+        Index of the left shoulder.
+    left_arm : float
+        Index of the left arm.
+    left_hand : float
+        Index of the left hand.
+    right_shoulder : float
+        Index of the right shoulder.
+    right_arm : float
+        Index of the right arm.
+    right_hand : float
+        Index of the right hand.
+    left_thigh : float
+        Index of the left thigh.
+    left_leg : float
+        Index of the left leg.
+    left_foot : float
+        Index of the left foot.
+    right_thigh : float
+        Index of the right thigh.
+    right_leg : float
+        Index of the right leg.
+    right_foot : float
+        Index of the right hand.
+    """
+
+    head: Optional[float] = None
+    neck: Optional[float] = None
+    chest: Optional[float] = None
+    back: Optional[float] = None
+    pelvis: Optional[float] = None
+    left_shoulder: Optional[float] = None
+    left_arm: Optional[float] = None
+    left_hand: Optional[float] = None
+    right_shoulder: Optional[float] = None
+    right_arm: Optional[float] = None
+    right_hand: Optional[float] = None
+    left_thigh: Optional[float] = None
+    left_leg: Optional[float] = None
+    left_foot: Optional[float] = None
+    right_thigh: Optional[float] = None
+    right_leg: Optional[float] = None
+    right_foot: Optional[float] = None
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    @classmethod
+    def get_attribute_names(cls):
+        return [field.name for field in fields(cls)]
+
+
+def get_attribute_values(cls):
+    return np.array([getattr(cls, field.name) for field in fields(cls)])
+
+
+@dataclass(frozen=True)
 class JOS3Output:
     """Dataclass to represent the output of the JOS3 model simulation.
 
@@ -768,63 +844,63 @@ class JOS3Output:
     simulation_time: dt.timedelta
     dt: Union[int, float]
     t_skin_mean: float
-    t_skin: np.ndarray
-    t_core: np.ndarray
+    t_skin: JOS3BodyParts
+    t_core: JOS3BodyParts
     w_mean: float
-    w: np.ndarray
+    w: JOS3BodyParts
     weight_loss_by_evap_and_res: float
     cardiac_output: float
     q_thermogenesis_total: float
     q_res: float
-    q_skin2env: np.ndarray
+    q_skin2env: JOS3BodyParts
     name: str
     height: float
     weight: float
-    bsa: np.ndarray
+    bsa: JOS3BodyParts
     fat: float
     sex: str
     age: int
-    t_core_set: np.ndarray
-    t_skin_set: np.ndarray
+    t_core_set: JOS3BodyParts
+    t_skin_set: JOS3BodyParts
     t_cb: float
-    t_artery: np.ndarray
-    t_vein: np.ndarray
-    t_superficial_vein: np.ndarray
-    t_muscle: np.ndarray
-    t_fat: np.ndarray
-    to: float
-    r_t: np.ndarray
-    r_et: np.ndarray
-    tdb: np.ndarray
-    tr: np.ndarray
-    rh: np.ndarray
-    v: np.ndarray
+    t_artery: JOS3BodyParts
+    t_vein: JOS3BodyParts
+    t_superficial_vein: JOS3BodyParts
+    t_muscle: JOS3BodyParts
+    t_fat: JOS3BodyParts
+    to: JOS3BodyParts
+    r_t: JOS3BodyParts
+    r_et: JOS3BodyParts
+    tdb: JOS3BodyParts
+    tr: JOS3BodyParts
+    rh: JOS3BodyParts
+    v: JOS3BodyParts
     par: float
-    clo: np.ndarray
-    e_skin: np.ndarray
-    e_max: np.ndarray
-    e_sweat: np.ndarray
-    bf_core: np.ndarray
-    bf_muscle: np.ndarray
-    bf_fat: np.ndarray
-    bf_skin: np.ndarray
-    bf_ava_hand: np.ndarray
-    bf_ava_foot: np.ndarray
-    q_bmr_core: np.ndarray
-    q_bmr_muscle: np.ndarray
-    q_bmr_fat: np.ndarray
-    q_bmr_skin: np.ndarray
-    q_work: np.ndarray
-    q_shiv: np.ndarray
-    q_nst: np.ndarray
-    q_thermogenesis_core: np.ndarray
-    q_thermogenesis_muscle: np.ndarray
-    q_thermogenesis_fat: np.ndarray
-    q_thermogenesis_skin: np.ndarray
-    q_skin2env_sensible: np.ndarray
-    q_skin2env_latent: np.ndarray
-    q_res_sensible: np.ndarray
-    q_res_latent: np.ndarray
+    clo: JOS3BodyParts
+    e_skin: JOS3BodyParts
+    e_max: JOS3BodyParts
+    e_sweat: JOS3BodyParts
+    bf_core: JOS3BodyParts
+    bf_muscle: JOS3BodyParts
+    bf_fat: JOS3BodyParts
+    bf_skin: JOS3BodyParts
+    bf_ava_hand: float
+    bf_ava_foot: float
+    q_bmr_core: JOS3BodyParts
+    q_bmr_muscle: JOS3BodyParts
+    q_bmr_fat: JOS3BodyParts
+    q_bmr_skin: JOS3BodyParts
+    q_work: JOS3BodyParts
+    q_shiv: JOS3BodyParts
+    q_nst: JOS3BodyParts
+    q_thermogenesis_core: JOS3BodyParts
+    q_thermogenesis_muscle: JOS3BodyParts
+    q_thermogenesis_fat: JOS3BodyParts
+    q_thermogenesis_skin: JOS3BodyParts
+    q_skin2env_sensible: JOS3BodyParts
+    q_skin2env_latent: JOS3BodyParts
+    q_res_sensible: float
+    q_res_latent: float
 
     def __getitem__(self, item):
         return getattr(self, item)

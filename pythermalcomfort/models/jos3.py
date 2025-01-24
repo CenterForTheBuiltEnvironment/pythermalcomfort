@@ -7,7 +7,10 @@ from typing import List
 
 import numpy as np
 
-from pythermalcomfort.classes_return import JOS3Output
+from pythermalcomfort.classes_return import (
+    JOS3Output,
+    JOS3BodyParts,
+)
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
@@ -15,9 +18,9 @@ from pythermalcomfort.jos3_functions.construction import (
     calculate_operative_temp_when_pmv_is_zero,
     to_array_body_parts,
     validate_body_parameters,
+    pass_values_to_jos3_body_parts,
 )
 from pythermalcomfort.jos3_functions.matrix import (
-    BODY_NAMES,
     INDEX,
     NUM_NODES,
     VINDEX,
@@ -488,7 +491,7 @@ class JOS3:
         threg.PRE_SHIV = 0
 
         # Initialize history to store model parameters
-        self._history = []
+        self._history: List[JOS3Output] = []
 
         # Set elapsed time to 0
         self._time = dt.timedelta(0)  # Elapsed time
@@ -589,13 +592,13 @@ class JOS3:
             self._time += dt.timedelta(0, dtime)
 
             # Execute the simulation step
-            dict_data = self._run(dtime=dtime, output=output)
+            dict_data: JOS3Output = self._run(dtime=dtime, output=output)
 
             # If output is True, append the results to the history
             if output:
                 self._history.append(dict_data)
 
-    def _run(self, dtime=60, passive=False, output=True):
+    def _run(self, dtime=60, passive=False, output=True) -> JOS3Output:
         """Run a single cycle of the JOS-3 model simulation.
 
         This method calculates various thermoregulation parameters using the input data,
@@ -616,7 +619,7 @@ class JOS3:
 
         Returns
         -------
-        dict
+        JOS3Output
             A dictionary containing the simulation results, including parameters such as
             model time, mean skin temperature, skin temperature, core temperature,
             mean skin wettedness, skin wettedness, weight loss by evaporation and respiration,
@@ -928,67 +931,82 @@ class JOS3:
         # ------------------------------------------------------------------
         # Output parameters
         # ------------------------------------------------------------------
+
         return JOS3Output(
             simulation_time=self._time,
             dt=dtime,
             t_skin_mean=np.round(self.t_skin_mean, 2),
-            t_skin=np.round(self.t_skin, 2),
-            t_core=np.round(self.t_core, 2),
+            t_skin=pass_values_to_jos3_body_parts(self.t_skin),
+            t_core=pass_values_to_jos3_body_parts(self.t_core),
             w_mean=round(np.average(wet, weights=Default.local_bsa), 2),
-            w=np.round(wet, 2),
+            w=pass_values_to_jos3_body_parts(wet),
             weight_loss_by_evap_and_res=round(wlesk.sum() + wleres, 5),
             cardiac_output=round(co, 1),
             q_thermogenesis_total=round(q_thermogenesis_total, 2),
             q_res=round(res_sh + res_lh, 2),
-            q_skin2env=np.round(shl_sk + e_sk, 2),
+            q_skin2env=pass_values_to_jos3_body_parts(shl_sk + e_sk),
             name=self.model_name,
             height=self._height,
             weight=self._weight,
-            bsa=self._bsa,
+            bsa=pass_values_to_jos3_body_parts(self._bsa),
             fat=self._fat,
             sex=self._sex,
             age=self._age,
-            t_core_set=np.round(setpt_cr, 2),
-            t_skin_set=np.round(setpt_sk, 2),
+            t_core_set=pass_values_to_jos3_body_parts(setpt_cr),
+            t_skin_set=pass_values_to_jos3_body_parts(setpt_sk),
             t_cb=round(self.t_cb, 2),
-            t_artery=np.round(self.t_artery),
-            t_vein=np.round(self.t_vein),
-            t_superficial_vein=np.round(self.t_superficial_vein),
-            t_muscle=np.round(self.t_muscle),
-            t_fat=np.round(self.t_fat),
-            to=np.round(to, 2),
-            r_t=np.round(r_t, 3),
-            r_et=np.round(r_et, 3),
-            tdb=np.round(self._ta.copy(), 2),
-            tr=np.round(self._tr.copy(), 2),
-            rh=self._rh.copy(),
-            v=self._va.copy(),
+            t_artery=pass_values_to_jos3_body_parts(self.t_artery),
+            t_vein=pass_values_to_jos3_body_parts(self.t_vein),
+            t_superficial_vein=pass_values_to_jos3_body_parts(self.t_superficial_vein),
+            t_muscle=pass_values_to_jos3_body_parts(
+                self.t_muscle, body_parts=["head", "pelvis"]
+            ),
+            t_fat=pass_values_to_jos3_body_parts(
+                self.t_fat, body_parts=["head", "pelvis"]
+            ),
+            to=pass_values_to_jos3_body_parts(to),
+            r_t=pass_values_to_jos3_body_parts(r_t, 3),
+            r_et=pass_values_to_jos3_body_parts(r_et, 3),
+            tdb=pass_values_to_jos3_body_parts(self._ta),
+            tr=pass_values_to_jos3_body_parts(self._tr),
+            rh=pass_values_to_jos3_body_parts(self._rh),
+            v=pass_values_to_jos3_body_parts(self._va),
             par=self._par,
-            clo=self._clo.copy(),
-            e_skin=np.round(e_sk, 2),
-            e_max=np.round(e_max, 2),
-            e_sweat=np.round(e_sweat, 2),
-            bf_core=np.round(bf_core, 2),
-            bf_muscle=np.round(bf_muscle[VINDEX["muscle"]], 2),
-            bf_fat=np.round(bf_fat[VINDEX["fat"]], 2),
-            bf_skin=np.round(bf_skin, 2),
+            clo=pass_values_to_jos3_body_parts(self._clo),
+            e_skin=pass_values_to_jos3_body_parts(e_sk),
+            e_max=pass_values_to_jos3_body_parts(e_max),
+            e_sweat=pass_values_to_jos3_body_parts(e_sweat),
+            bf_core=pass_values_to_jos3_body_parts(bf_core),
+            bf_muscle=pass_values_to_jos3_body_parts(
+                bf_muscle[VINDEX["muscle"]], body_parts=["head", "pelvis"]
+            ),
+            bf_fat=pass_values_to_jos3_body_parts(
+                bf_fat[VINDEX["fat"]], body_parts=["head", "pelvis"]
+            ),
+            bf_skin=pass_values_to_jos3_body_parts(bf_skin),
             bf_ava_hand=np.round(bf_ava_hand, 2),
             bf_ava_foot=np.round(bf_ava_foot, 2),
-            q_bmr_core=np.round(q_bmr_local[0], 2),
-            q_bmr_muscle=np.round(q_bmr_local[1][VINDEX["muscle"]], 2),
-            q_bmr_fat=np.round(q_bmr_local[2][VINDEX["fat"]], 2),
-            q_bmr_skin=np.round(q_bmr_local[3], 2),
-            q_work=np.round(q_work, 2),
-            q_shiv=np.round(q_shiv, 2),
-            q_nst=np.round(q_nst, 2),
-            q_thermogenesis_core=np.round(q_thermogenesis_core, 2),
-            q_thermogenesis_muscle=np.round(
-                q_thermogenesis_muscle[VINDEX["muscle"]], 2
+            q_bmr_core=pass_values_to_jos3_body_parts(q_bmr_local[0]),
+            q_bmr_muscle=pass_values_to_jos3_body_parts(
+                q_bmr_local[1][VINDEX["muscle"]], body_parts=["head", "pelvis"]
             ),
-            q_thermogenesis_fat=np.round(q_thermogenesis_fat[VINDEX["fat"]], 2),
-            q_thermogenesis_skin=np.round(q_thermogenesis_skin, 2),
-            q_skin2env_sensible=np.round(shl_sk, 2),
-            q_skin2env_latent=np.round(e_sk, 2),
+            q_bmr_fat=pass_values_to_jos3_body_parts(
+                q_bmr_local[2][VINDEX["fat"]], body_parts=["head", "pelvis"]
+            ),
+            q_bmr_skin=pass_values_to_jos3_body_parts(q_bmr_local[3]),
+            q_work=pass_values_to_jos3_body_parts(q_work),
+            q_shiv=pass_values_to_jos3_body_parts(q_shiv),
+            q_nst=pass_values_to_jos3_body_parts(q_nst),
+            q_thermogenesis_core=pass_values_to_jos3_body_parts(q_thermogenesis_core),
+            q_thermogenesis_muscle=pass_values_to_jos3_body_parts(
+                q_thermogenesis_muscle[VINDEX["muscle"]], body_parts=["head", "pelvis"]
+            ),
+            q_thermogenesis_fat=pass_values_to_jos3_body_parts(
+                q_thermogenesis_fat[VINDEX["fat"]], body_parts=["head", "pelvis"]
+            ),
+            q_thermogenesis_skin=pass_values_to_jos3_body_parts(q_thermogenesis_skin),
+            q_skin2env_sensible=pass_values_to_jos3_body_parts(shl_sk),
+            q_skin2env_latent=pass_values_to_jos3_body_parts(e_sk),
             q_res_sensible=np.round(res_sh, 2),
             q_res_latent=np.round(res_lh, 2),
         )
@@ -1043,15 +1061,29 @@ class JOS3:
                 if isinstance(value, str):
                     keys = [key]  # str is iter. Convert to list without suffix
                 elif check_word_contain(key, "sve", "sfv", "superficialvein"):
-                    keys = [key + "_" + BODY_NAMES[i] for i in VINDEX["sfvein"]]
+                    keys = [
+                        key + "_" + JOS3BodyParts.get_attribute_names()[i]
+                        for i in VINDEX["sfvein"]
+                    ]
                 elif check_word_contain(key, "ms", "muscle"):
-                    keys = [key + "_" + BODY_NAMES[i] for i in VINDEX["muscle"]]
+                    keys = [
+                        key + "_" + JOS3BodyParts.get_attribute_names()[i]
+                        for i in VINDEX["muscle"]
+                    ]
                 elif check_word_contain(key, "fat"):
-                    keys = [key + "_" + BODY_NAMES[i] for i in VINDEX["fat"]]
+                    keys = [
+                        key + "_" + JOS3BodyParts.get_attribute_names()[i]
+                        for i in VINDEX["fat"]
+                    ]
                 elif length == Default.num_body_parts:  # if data contains 17 values
-                    keys = [key + "_" + bn for bn in BODY_NAMES]
+                    keys = [
+                        key + "_" + bn for bn in JOS3BodyParts.get_attribute_names()
+                    ]
                 else:
-                    keys = [key + "_" + BODY_NAMES[i] for i in range(length)]
+                    keys = [
+                        key + "_" + JOS3BodyParts.get_attribute_names()[i]
+                        for i in range(length)
+                    ]
             except TypeError:  # if the value is not iter.
                 keys = [key]  # convert to iter
             key2keys.update({key: keys})
@@ -1374,6 +1406,7 @@ class JOS3:
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
         return float(np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa))
 
+    # todo all the properties should be returning JOS3BodyParts
     @property
     def t_skin(self) -> np.ndarray[float]:
         """t_skin : numpy.ndarray (17) Skin temperatures by the local body segments [°C]."""
@@ -1421,7 +1454,7 @@ class JOS3:
     @property
     def body_names(self) -> np.ndarray[float]:
         """body_names : list JOS3 body names"""
-        return BODY_NAMES
+        return JOS3BodyParts.get_attribute_names()
 
     @property
     def results(self) -> dict:
