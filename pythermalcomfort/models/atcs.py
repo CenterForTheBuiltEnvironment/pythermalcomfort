@@ -49,12 +49,6 @@ class ATCS(JOS3):
             Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations. Default is "dubois".
             The body surface area can be calculated using the function
             :py:meth:`pythermalcomfort.utilities.body_surface_area`.
-        ex_output : None, list or "all", optional
-            This is used when you want to display results other than the default output parameters (ex.skin temperature);
-            by default, JOS outputs only the most necessary parameters in order to reduce the computational load.
-            If the parameters other than the default output parameters are needed,
-            specify the list of the desired parameter names in string format like ["bf_skin", "bf_core", "t_artery"].
-            If you want to display all output results, set ex_output is "all".
 
         Attributes
         ----------

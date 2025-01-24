@@ -267,7 +267,6 @@ class JOS3:
         >>>     sex="male",
         >>>     bmr_equation="japanese",
         >>>     bsa_equation="fujimoto",
-        >>>     ex_output="all",
         >>> )
         >>> # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
         >>> # Set the first condition
@@ -369,7 +368,6 @@ class JOS3:
         ci: float = Default.cardiac_index,
         bmr_equation: str = Default.bmr_equation,
         bsa_equation: str = Default.bsa_equation,
-        ex_output=None,
     ):
         """Initialize a new instance of the JOS3 class, which models and simulates various
         physiological parameters related to human thermoregulation.
@@ -397,9 +395,6 @@ class JOS3:
             (DOI: doi.org/10.1038/sj.ejcn.1602645).
         bsa_equation : str, optional
             The equation used to calculate body surface area (BSA). Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations.
-        ex_output : None or "all", optional
-            Additional output parameters. If None, no extra output is provided. If "all", all possible
-            outputs are included.
 
         Returns
         -------
@@ -425,7 +420,6 @@ class JOS3:
         self._ci = ci
         self._bmr_equation = bmr_equation
         self._bsa_equation = bsa_equation
-        self._ex_output = ex_output
 
         # Calculate body surface area (bsa) rate
         self._bsa_rate = cons.bsa_rate(
@@ -628,8 +622,7 @@ class JOS3:
             model time, mean skin temperature, skin temperature, core temperature,
             mean skin wettedness, skin wettedness, weight loss by evaporation and respiration,
             cardiac output, total thermogenesis, respiratory heat loss, and total heat loss
-            from the skin to the environment. If `ex_output` is set to "all" or a list of keys,
-            additional detailed parameters are included.
+            from the skin to the environment.
         """
         # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.

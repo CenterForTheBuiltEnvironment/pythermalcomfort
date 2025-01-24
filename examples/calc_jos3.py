@@ -70,7 +70,6 @@ def detailed_simulation():
         sex="male",
         bmr_equation="japanese",
         bsa_equation="fujimoto",
-        ex_output="all",
     )
 
     # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
