@@ -1098,6 +1098,45 @@ class JOS3:
                 out_dict[k].append(row[k])
         return out_dict
 
+    def results(self) -> JOS3Output:
+        """
+        Merge the history of JOS3Output instances into a single JOS3Output instance.
+
+        This method consolidates the list of JOS3Output instances stored in the model's history
+        into a single JOS3Output instance. Each attribute of the resulting JOS3Output instance
+        will be an array of values, representing the time series data for that attribute.
+
+        Returns
+        -------
+        JOS3Output
+            A single JOS3Output instance where each attribute is an array of values
+            representing the time series data for that attribute.
+        """
+        merged_data = defaultdict(list)
+
+        for output in self._history:
+            for field in fields(JOS3Output):
+                value = getattr(output, field.name)
+                if isinstance(value, JOS3BodyParts):
+                    if field.name not in merged_data:
+                        merged_data[field.name] = defaultdict(list)
+                    for part in fields(JOS3BodyParts):
+                        merged_data[field.name][part.name].append(
+                            getattr(value, part.name)
+                        )
+                else:
+                    merged_data[field.name].append(value)
+
+        for key, value in merged_data.items():
+            if isinstance(value, defaultdict):
+                merged_data[key] = JOS3BodyParts(
+                    **{k: np.array(v) for k, v in value.items()}
+                )
+            else:
+                merged_data[key] = np.array(value)
+
+        return JOS3Output(**merged_data)
+
     def to_csv(
         self,
         path: str = None,
@@ -1447,11 +1486,6 @@ class JOS3:
     def body_names(self) -> np.ndarray[float]:
         """body_names : list JOS3 body names"""
         return JOS3BodyParts.get_attribute_names()
-
-    @property
-    def results(self) -> dict:
-        """Results of the model: dict."""
-        return self.dict_results()
 
     @property
     def bmr(self) -> float:
