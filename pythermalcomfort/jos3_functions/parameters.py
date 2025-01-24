@@ -20,7 +20,8 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 import numpy as np
-import pandas as pd
+
+# import pandas as pd
 
 from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.utilities import BodySurfaceAreaEquations, Postures, Sex
@@ -480,43 +481,44 @@ def show_out_param_docs():
     return docs
 
 
-def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
-    """Parameters
-    ----------
-    csv_name : file path that you want to convert (it should be in the same folder as this function)
-
-    Returns
-    -------
-    local_clo_dict : a dictionary including local clothing insulation values as well as that for the whole body
-
-    Notes
-    -----
-    The 17 body segments correspond to the JOS-3 model.
-
-    """
-    # Read the Excel file
-    df = pd.read_csv(csv_name)
-
-    # Create an empty dictionary
-    local_clo_dict = {}
-
-    # Add data from each row to the dictionary
-    for _index, row in df.iterrows():
-        # Get the name of the clothing combination as the key
-        key = row["clothing_ensemble"]
-        # Create a dictionary as the value
-        value = {"whole_body": row["whole_body"], "local_body_part": {}}
-        # Add data from each column to the Local body dictionary
-        for col in df.columns[2:]:
-            # Get the name of the body part
-            body_part = col
-            # Get the clo value for the local body part and add it to the Local body dictionary
-            clo = row[col]
-            value["local_body_part"][body_part] = clo
-        # Add the data to the dictionary
-        local_clo_dict[key] = value
-
-    return local_clo_dict
+# commented out this function since needs pandas
+# def convert_and_print_local_clo_values_from_csv_to_dict(csv_name):
+#     """Parameters
+#     ----------
+#     csv_name : file path that you want to convert (it should be in the same folder as this function)
+#
+#     Returns
+#     -------
+#     local_clo_dict : a dictionary including local clothing insulation values as well as that for the whole body
+#
+#     Notes
+#     -----
+#     The 17 body segments correspond to the JOS-3 model.
+#
+#     """
+#     # Read the Excel file
+#     df = pd.read_csv(csv_name)
+#
+#     # Create an empty dictionary
+#     local_clo_dict = {}
+#
+#     # Add data from each row to the dictionary
+#     for _index, row in df.iterrows():
+#         # Get the name of the clothing combination as the key
+#         key = row["clothing_ensemble"]
+#         # Create a dictionary as the value
+#         value = {"whole_body": row["whole_body"], "local_body_part": {}}
+#         # Add data from each column to the Local body dictionary
+#         for col in df.columns[2:]:
+#             # Get the name of the body part
+#             body_part = col
+#             # Get the clo value for the local body part and add it to the Local body dictionary
+#             clo = row[col]
+#             value["local_body_part"][body_part] = clo
+#         # Add the data to the dictionary
+#         local_clo_dict[key] = value
+#
+#     return local_clo_dict
 
 
 def add_prompt_to_code(code: str, prompt: str = ">>> ") -> str:
