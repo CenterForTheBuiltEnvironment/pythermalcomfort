@@ -84,7 +84,7 @@ class JOS3:
         Posture of the subject.
     par : float
         Physical activity ratio.
-    body_temp : numpy.ndarray
+    t_body : numpy.ndarray
         Body temperature.
     bsa : numpy.ndarray
         Body surface area.
@@ -461,12 +461,12 @@ class JOS3:
 
         # Initialize environmental conditions and other factors
         # (Default values of input conditions)
-        self._ta: np.ndarray = (
+        self._tdb: np.ndarray = (
             np.ones(Default.num_body_parts) * Default.dry_bulb_air_temperature
         )
         self._tr = np.ones(Default.num_body_parts) * Default.mean_radiant_temperature
         self._rh = np.ones(Default.num_body_parts) * Default.relative_humidity
-        self._va = np.ones(Default.num_body_parts) * Default.air_speed
+        self._v = np.ones(Default.num_body_parts) * Default.air_speed
         self._clo = np.ones(Default.num_body_parts) * Default.clothing_insulation
         self._iclo = (
             np.ones(Default.num_body_parts)
@@ -644,11 +644,11 @@ class JOS3:
         hc = threg.fixed_hc(
             threg.conv_coef(
                 posture=self._posture,
-                v=self._va,
-                tdb=self._ta,
+                v=self._v,
+                tdb=self._tdb,
                 t_skin=tsk,
             ),
-            self._va,
+            self._v,
         )
         hr = threg.fixed_hr(
             threg.rad_coef(
@@ -665,7 +665,7 @@ class JOS3:
         # Compute operative temp. [°C], clothing heat and evaporative resistance [m2.K/W], [m2.kPa/W]
         # Operative temp. [°C]
         to = threg.operative_temp(
-            self._ta,
+            self._tdb,
             self._tr,
             hc,
             hr,
@@ -706,7 +706,7 @@ class JOS3:
             err_cr,
             err_sk,
             tsk,
-            self._ta,
+            self._tdb,
             self._rh,
             r_et,
             self._height,
@@ -823,9 +823,9 @@ class JOS3:
         )
 
         # Calculate heat loss by respiratory
-        p_a = antoine(self._ta) * self._rh / 100
+        p_a = antoine(self._tdb) * self._rh / 100
         res_sh, res_lh = threg.resp_heat_loss(
-            self._ta[0], p_a[0], q_thermogenesis_total
+            self._tdb[0], p_a[0], q_thermogenesis_total
         )
 
         # Calculate sensible heat loss [W]
@@ -970,10 +970,10 @@ class JOS3:
             to=pass_values_to_jos3_body_parts(to),
             r_t=pass_values_to_jos3_body_parts(r_t, 3),
             r_et=pass_values_to_jos3_body_parts(r_et, 3),
-            tdb=pass_values_to_jos3_body_parts(self._ta),
+            tdb=pass_values_to_jos3_body_parts(self._tdb),
             tr=pass_values_to_jos3_body_parts(self._tr),
             rh=pass_values_to_jos3_body_parts(self._rh),
-            v=pass_values_to_jos3_body_parts(self._va),
+            v=pass_values_to_jos3_body_parts(self._v),
             par=self._par,
             clo=pass_values_to_jos3_body_parts(self._clo),
             e_skin=pass_values_to_jos3_body_parts(e_sk),
@@ -1270,15 +1270,15 @@ class JOS3:
         ndarray
             A NumPy array of shape (17).
         """
-        return self._ta
+        return self._tdb
 
     @tdb.setter
     def tdb(self, inp):
-        self._ta = to_array_body_parts(inp)
+        self._tdb = to_array_body_parts(inp)
 
     @property
     def tr(self):
-        """Tr : numpy.ndarray (17) Mean radiant temperature [°C]."""
+        """tr : numpy.ndarray (17) Mean radiant temperature [°C]."""
         return self._tr
 
     @tr.setter
@@ -1291,29 +1291,28 @@ class JOS3:
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
-                self._va,
-                self._ta,
+                self._v,
+                self._tdb,
                 self.t_skin,
             ),
-            self._va,
+            self._v,
         )
         hr = threg.fixed_hr(
             threg.rad_coef(
                 self._posture,
             )
         )
-        to = threg.operative_temp(
-            self._ta,
+        return threg.operative_temp(
+            self._tdb,
             self._tr,
             hc,
             hr,
         )
-        return to
 
     @to.setter
     # todo to should not be a setter otherwise people can erroneously overrite it
     def to(self, inp):
-        self._ta = to_array_body_parts(inp)
+        self._tdb = to_array_body_parts(inp)
         self._tr = to_array_body_parts(inp)
 
     @property
@@ -1328,11 +1327,11 @@ class JOS3:
     @property
     def v(self):
         """V : numpy.ndarray (17) Air velocity [m/s]."""
-        return self._va
+        return self._v
 
     @v.setter
     def v(self, inp):
-        self._va = to_array_body_parts(inp)
+        self._v = to_array_body_parts(inp)
 
     @property
     def posture(self):
@@ -1380,12 +1379,12 @@ class JOS3:
         self._par = inp
 
     @property
-    def body_temp(self):
-        """body_temp : numpy.ndarray (85,) All segment temperatures of JOS-3"""
+    def t_body(self):
+        """t_body : numpy.ndarray (85,) All segment temperatures of JOS-3"""
         return self._t_body
 
-    @body_temp.setter
-    def body_temp(self, inp):
+    @t_body.setter
+    def t_body(self, inp):
         self._t_body = inp.copy()
 
     @property
@@ -1399,11 +1398,11 @@ class JOS3:
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
-                self._va,
-                self._ta,
+                self._v,
+                self._tdb,
                 self.t_skin,
             ),
-            self._va,
+            self._v,
         )
         hr = threg.fixed_hr(
             threg.rad_coef(
@@ -1419,11 +1418,11 @@ class JOS3:
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
-                self._va,
-                self._ta,
+                self._v,
+                self._tdb,
                 self.t_skin,
             ),
-            self._va,
+            self._v,
         )
         return threg.wet_r(hc=hc, clo=self._clo, i_clo=self._iclo, lewis_rate=16.5)
 
@@ -1436,7 +1435,7 @@ class JOS3:
             err_cr=err_cr,
             err_sk=err_sk,
             t_skin=self.t_skin,
-            tdb=self._ta,
+            tdb=self._tdb,
             rh=self._rh,
             ret=self.r_et,
             height=self._height,
