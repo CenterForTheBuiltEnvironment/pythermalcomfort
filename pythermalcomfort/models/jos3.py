@@ -251,6 +251,7 @@ class JOS3:
 
     .. code-block:: python
 
+        >>> from pythermalcomfort.classes_return import get_attribute_values
         >>> import numpy as np
         >>> import pandas as pd
         >>> import matplotlib.pyplot as plt
@@ -295,7 +296,7 @@ class JOS3:
         >>>         0.1,  # right foot
         >>>     ]
         >>> )
-        >>> model.clo = local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"]
+        >>> model.clo = get_attribute_values(local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"])
         >>> # par should be input as int, float.
         >>> model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
         >>> # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
@@ -341,10 +342,18 @@ class JOS3:
         >>>     times=30,  # Number of loops of a simulation
         >>>     dtime=60,  # Time delta [sec]. The default is 60.
         >>> )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
-        >>> # Show the results
-        >>> df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
-        >>> df[["t_skin_mean", "t_skin_head", "t_skin_chest", "t_skin_left_hand"]].plot()  # Plot time series of local skin temperature.
-        >>> plt.legend(["Mean", "Head", "Chest", "Left hand"])  # Reset the legends
+        >>>
+        >>> # The easiest way to access the results is to use the `results` method
+        >>> results = model.results()
+        >>> # you can then use dot notation to access the results
+        >>> print(results.t_skin_mean)  # Print the mean skin temperature or you can use print(results['t_skin_mean'])
+        >>> # some attributes have results for each body part, you can access them by using the body part name
+        >>> print(results.t_skin.head)  # Print the skin temperature of the head
+        >>>
+        >>> # You can also save the results as a pandas dataframe and plot them
+        >>> df = pd.DataFrame([results.t_skin.head, results.t_skin.pelvis]).transpose()  # Make pandas.DataFrame
+        >>> df.plot()  # Plot time series of local skin temperature.
+        >>> plt.legend(["Head", "Pelvis"])  # Reset the legends
         >>> plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
         >>> plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
         >>> plt.show()  # Show the plot
@@ -1005,6 +1014,55 @@ class JOS3:
             q_res_latent=np.round(res_lh, 2),
         )
 
+    def results(self) -> JOS3Output:
+        """
+        This method consolidates the results into a single JOS3Output instance. This makes
+        it very easy to access the time series data for each parameter.
+
+        Returns
+        -------
+        JOS3Output
+            A single JOS3Output instance where each attribute is an array of values
+            representing the time series data for that attribute.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            >>> from pythermalcomfort.models import JOS3
+            >>>
+            >>> model = JOS3(height=1.75, weight=70, age=25, sex="female")
+            >>> model.simulate(times=3, dtime=60)
+            >>> output = model.results()
+            >>>
+            >>> print(output.t_skin_mean)
+            >>> print(output.t_skin.head)
+        """
+        merged_data = defaultdict(list)
+
+        for output in self._history:
+            for field in fields(JOS3Output):
+                value = getattr(output, field.name)
+                if isinstance(value, JOS3BodyParts):
+                    if field.name not in merged_data:
+                        merged_data[field.name] = defaultdict(list)
+                    for part in fields(JOS3BodyParts):
+                        merged_data[field.name][part.name].append(
+                            getattr(value, part.name)
+                        )
+                else:
+                    merged_data[field.name].append(value)
+
+        for key, value in merged_data.items():
+            if isinstance(value, defaultdict):
+                merged_data[key] = JOS3BodyParts(
+                    **{k: np.array(v) for k, v in value.items()}
+                )
+            else:
+                merged_data[key] = np.array(value)
+
+        return JOS3Output(**merged_data)
+
     def dict_results(self):
         """
         Get simulation results as a dictionary.
@@ -1099,45 +1157,6 @@ class JOS3:
             for k in data[0].keys():
                 out_dict[k].append(row[k])
         return out_dict
-
-    def results(self) -> JOS3Output:
-        """
-        Merge the history of JOS3Output instances into a single JOS3Output instance.
-
-        This method consolidates the list of JOS3Output instances stored in the model's history
-        into a single JOS3Output instance. Each attribute of the resulting JOS3Output instance
-        will be an array of values, representing the time series data for that attribute.
-
-        Returns
-        -------
-        JOS3Output
-            A single JOS3Output instance where each attribute is an array of values
-            representing the time series data for that attribute.
-        """
-        merged_data = defaultdict(list)
-
-        for output in self._history:
-            for field in fields(JOS3Output):
-                value = getattr(output, field.name)
-                if isinstance(value, JOS3BodyParts):
-                    if field.name not in merged_data:
-                        merged_data[field.name] = defaultdict(list)
-                    for part in fields(JOS3BodyParts):
-                        merged_data[field.name][part.name].append(
-                            getattr(value, part.name)
-                        )
-                else:
-                    merged_data[field.name].append(value)
-
-        for key, value in merged_data.items():
-            if isinstance(value, defaultdict):
-                merged_data[key] = JOS3BodyParts(
-                    **{k: np.array(v) for k, v in value.items()}
-                )
-            else:
-                merged_data[key] = np.array(value)
-
-        return JOS3Output(**merged_data)
 
     def to_csv(
         self,
