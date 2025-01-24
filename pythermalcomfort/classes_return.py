@@ -743,8 +743,6 @@ class JOS3Output:
         Heat loss by respiration [W].
     q_skin2env : np.ndarray
         Total heat loss from the skin to the environment [W].
-    name : str
-        Name of the model.
     height : float
         Body height [m].
     weight : float
@@ -841,66 +839,65 @@ class JOS3Output:
         Latent heat loss by respiration [W].
     """
 
-    simulation_time: dt.timedelta
-    dt: Union[int, float]
-    t_skin_mean: float
-    t_skin: JOS3BodyParts
-    t_core: JOS3BodyParts
-    w_mean: float
-    w: JOS3BodyParts
-    weight_loss_by_evap_and_res: float
-    cardiac_output: float
-    q_thermogenesis_total: float
-    q_res: float
-    q_skin2env: JOS3BodyParts
-    name: str
-    height: float
-    weight: float
-    bsa: JOS3BodyParts
-    fat: float
-    sex: str
-    age: int
-    t_core_set: JOS3BodyParts
-    t_skin_set: JOS3BodyParts
-    t_cb: float
-    t_artery: JOS3BodyParts
-    t_vein: JOS3BodyParts
-    t_superficial_vein: JOS3BodyParts
-    t_muscle: JOS3BodyParts
-    t_fat: JOS3BodyParts
-    to: JOS3BodyParts
-    r_t: JOS3BodyParts
-    r_et: JOS3BodyParts
-    tdb: JOS3BodyParts
-    tr: JOS3BodyParts
-    rh: JOS3BodyParts
-    v: JOS3BodyParts
-    par: float
-    clo: JOS3BodyParts
-    e_skin: JOS3BodyParts
-    e_max: JOS3BodyParts
-    e_sweat: JOS3BodyParts
-    bf_core: JOS3BodyParts
-    bf_muscle: JOS3BodyParts
-    bf_fat: JOS3BodyParts
-    bf_skin: JOS3BodyParts
-    bf_ava_hand: float
-    bf_ava_foot: float
-    q_bmr_core: JOS3BodyParts
-    q_bmr_muscle: JOS3BodyParts
-    q_bmr_fat: JOS3BodyParts
-    q_bmr_skin: JOS3BodyParts
-    q_work: JOS3BodyParts
-    q_shiv: JOS3BodyParts
-    q_nst: JOS3BodyParts
-    q_thermogenesis_core: JOS3BodyParts
-    q_thermogenesis_muscle: JOS3BodyParts
-    q_thermogenesis_fat: JOS3BodyParts
-    q_thermogenesis_skin: JOS3BodyParts
-    q_skin2env_sensible: JOS3BodyParts
-    q_skin2env_latent: JOS3BodyParts
-    q_res_sensible: float
-    q_res_latent: float
+    simulation_time: Optional[dt.timedelta] = None
+    dt: Optional[float] = None
+    t_skin_mean: Optional[float] = None
+    t_skin: Optional[JOS3BodyParts] = None
+    t_core: Optional[JOS3BodyParts] = None
+    w_mean: Optional[float] = None
+    w: Optional[JOS3BodyParts] = None
+    weight_loss_by_evap_and_res: Optional[float] = None
+    cardiac_output: Optional[float] = None
+    q_thermogenesis_total: Optional[float] = None
+    q_res: Optional[float] = None
+    q_skin2env: Optional[JOS3BodyParts] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    bsa: Optional[JOS3BodyParts] = None
+    fat: Optional[float] = None
+    sex: Optional[str] = None
+    age: Optional[int] = None
+    t_core_set: Optional[JOS3BodyParts] = None
+    t_skin_set: Optional[JOS3BodyParts] = None
+    t_cb: Optional[float] = None
+    t_artery: Optional[JOS3BodyParts] = None
+    t_vein: Optional[JOS3BodyParts] = None
+    t_superficial_vein: Optional[JOS3BodyParts] = None
+    t_muscle: Optional[JOS3BodyParts] = None
+    t_fat: Optional[JOS3BodyParts] = None
+    to: Optional[JOS3BodyParts] = None
+    r_t: Optional[JOS3BodyParts] = None
+    r_et: Optional[JOS3BodyParts] = None
+    tdb: Optional[JOS3BodyParts] = None
+    tr: Optional[JOS3BodyParts] = None
+    rh: Optional[JOS3BodyParts] = None
+    v: Optional[JOS3BodyParts] = None
+    par: Optional[float] = None
+    clo: Optional[JOS3BodyParts] = None
+    e_skin: Optional[JOS3BodyParts] = None
+    e_max: Optional[JOS3BodyParts] = None
+    e_sweat: Optional[JOS3BodyParts] = None
+    bf_core: Optional[JOS3BodyParts] = None
+    bf_muscle: Optional[JOS3BodyParts] = None
+    bf_fat: Optional[JOS3BodyParts] = None
+    bf_skin: Optional[JOS3BodyParts] = None
+    bf_ava_hand: Optional[float] = None
+    bf_ava_foot: Optional[float] = None
+    q_bmr_core: Optional[JOS3BodyParts] = None
+    q_bmr_muscle: Optional[JOS3BodyParts] = None
+    q_bmr_fat: Optional[JOS3BodyParts] = None
+    q_bmr_skin: Optional[JOS3BodyParts] = None
+    q_work: Optional[JOS3BodyParts] = None
+    q_shiv: Optional[JOS3BodyParts] = None
+    q_nst: Optional[JOS3BodyParts] = None
+    q_thermogenesis_core: Optional[JOS3BodyParts] = None
+    q_thermogenesis_muscle: Optional[JOS3BodyParts] = None
+    q_thermogenesis_fat: Optional[JOS3BodyParts] = None
+    q_thermogenesis_skin: Optional[JOS3BodyParts] = None
+    q_skin2env_sensible: Optional[JOS3BodyParts] = None
+    q_skin2env_latent: Optional[JOS3BodyParts] = None
+    q_res_sensible: Optional[float] = None
+    q_res_latent: Optional[float] = None
 
     def __getitem__(self, item):
         return getattr(self, item)

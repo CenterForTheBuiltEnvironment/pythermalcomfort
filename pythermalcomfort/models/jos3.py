@@ -127,8 +127,6 @@ class JOS3:
         cardiac output (the sum of the whole blood flow) [L/h]
     dt :
         time step [sec]
-    pythermalcomfort_version :
-        version of pythermalcomfort [-]
     q_res :
         heat loss by respiration [W]
     q_skin2env :
@@ -149,8 +147,6 @@ class JOS3:
         mean skin wettedness [-]
     weight_loss_by_evap_and_res :
         weight loss by the evaporation and respiration of the whole body [g/sec]
-    OPTIONAL PARAMETERS :
-        the paramters listed below are returned if ex_output = "all"
     age :
         age [years]
     bf_ava_foot :
@@ -179,8 +175,6 @@ class JOS3:
         body fat rate [%]
     height :
         body height [m]
-    name :
-        name of the model [-]
     par :
         physical activity ratio [-]
     q_bmr_core :
@@ -944,7 +938,6 @@ class JOS3:
             q_thermogenesis_total=round(q_thermogenesis_total, 2),
             q_res=round(res_sh + res_lh, 2),
             q_skin2env=pass_values_to_jos3_body_parts(shl_sk + e_sk),
-            name=self.model_name,
             height=self._height,
             weight=self._weight,
             bsa=pass_values_to_jos3_body_parts(self._bsa),
@@ -1142,7 +1135,7 @@ class JOS3:
         # Use the model name and current time as default output file name
         if path is None:
             now_time = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-            path = f"{self.model_name}_{now_time}.csv"
+            path = f"{now_time}.csv"
             if folder:
                 os.makedirs(folder, exist_ok=True)
                 path = folder + os.sep + path
