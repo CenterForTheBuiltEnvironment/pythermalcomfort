@@ -139,7 +139,7 @@ def antoine(x: float) -> float:
     float
         Saturated vapor pressure [kPa].
     """
-    return np.exp(16.6536 - 4030.183 / (x + 235))
+    return math.e ** (16.6536 - 4030.183 / (x + 235))
 
 
 def psy_ta_rh(
