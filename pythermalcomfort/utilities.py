@@ -4,7 +4,6 @@ from enum import Enum
 from typing import NamedTuple, Union
 
 import numpy as np
-from numba import jit
 
 from pythermalcomfort.classes_return import PsychrometricValues
 from pythermalcomfort.shared_functions import valid_range
@@ -125,21 +124,21 @@ def p_sat(tdb: Union[float, list[float]]):
     return pascals
 
 
-@jit(nopython=True, cache=True)
-def antoine(x: float) -> float:
+def antoine(tdb: Union[float, np.ndarray]) -> np.ndarray:
     """Calculate saturated vapor pressure using Antoine equation [kPa].
 
     Parameters
     ----------
-    x : float
+    tdb : float or list of floats
         Temperature [°C].
 
     Returns
     -------
-    float
+    float or list of floats
         Saturated vapor pressure [kPa].
     """
-    return math.e ** (16.6536 - 4030.183 / (x + 235))
+    tdb = np.array(tdb)
+    return math.e ** (16.6536 - 4030.183 / (tdb + 235))
 
 
 def psy_ta_rh(

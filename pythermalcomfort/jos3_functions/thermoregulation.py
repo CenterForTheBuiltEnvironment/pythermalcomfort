@@ -8,7 +8,7 @@ following order: "head", "neck", "chest", "back", "pelvis",
 "right_leg" and "right_hand".
 """
 
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np
 
@@ -209,10 +209,10 @@ def forced_convection(v: float) -> np.ndarray:
 
 
 def conv_coef(
-    posture: str = Default.posture,
-    v: Union[float, np.ndarray] = Default.air_speed,
-    tdb: Union[float, np.ndarray] = Default.dry_bulb_air_temperature,
-    t_skin: Union[float, np.ndarray] = Default.skin_temperature,
+    posture: str,
+    v: Union[float, np.ndarray],
+    tdb: Union[float, np.ndarray],
+    t_skin: Union[float, np.ndarray],
 ) -> np.ndarray:
     """
     Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
@@ -244,7 +244,7 @@ def conv_coef(
     return hc
 
 
-def rad_coef(posture: str = Default.posture) -> np.ndarray:
+def rad_coef(posture: str) -> np.ndarray:
     """
     Calculate radiative heat transfer coefficient (hr) [W/(m2*K)].
 
@@ -341,7 +341,7 @@ def rad_coef(posture: str = Default.posture) -> np.ndarray:
     return hr
 
 
-def fixed_hc(hc: np.ndarray, v: float) -> np.ndarray:
+def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
     """
     Fixes hc values to fit two-node-model's values.
 
@@ -462,8 +462,8 @@ def dry_r(hc, hr, clo):
 def wet_r(
     hc,
     clo,
-    i_clo=Default.clothing_vapor_permeation_efficiency,
-    lewis_rate=Default.lewis_rate,
+    i_clo,
+    lewis_rate,
 ):
     """Calculate total evaporative thermal resistance (between the skin and
     ambient air).
@@ -572,11 +572,11 @@ def evaporation(
     tdb,
     rh,
     ret,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-):
+    height,
+    weight,
+    bsa_equation,
+    age,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Calculate evaporative heat loss.
 
     Parameters
@@ -691,12 +691,12 @@ def evaporation(
 def skin_blood_flow(
     err_cr,
     err_sk,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    ci=Default.cardiac_index,
-):
+    height,
+    weight,
+    bsa_equation,
+    age,
+    ci,
+) -> np.ndarray:
     """Calculate skin blood flow rate (bf_skin) [L/h].
 
     Parameters
@@ -843,11 +843,11 @@ def skin_blood_flow(
 def ava_blood_flow(
     err_cr,
     err_sk,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    ci=Default.cardiac_index,
+    height,
+    weight,
+    bsa_equation,
+    age,
+    ci,
 ):
     """Calculate areteriovenous anastmoses (AVA) blood flow rate [L/h] based on
     Takemori's model, 1995.
@@ -904,11 +904,11 @@ def ava_blood_flow(
 
 
 def basal_met(
-    height=Default.height,
-    weight=Default.weight,
-    age=Default.age,
-    sex=Default.sex,
-    bmr_equation=Default.bmr_equation,
+    height,
+    weight,
+    age,
+    sex,
+    bmr_equation,
 ):
     """Calculate basal metabolic rate [W].
 
@@ -950,6 +950,7 @@ def basal_met(
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
         bmr *= 1000 / 4.186
     else:
+        # todo why we cannot use dubois?
         valid_equations = [
             "harris-benedict",
             "harris-benedict_origin",
@@ -975,7 +976,7 @@ def local_mbase(
     age: int = Default.age,
     sex: str = Default.sex,
     bmr_equation: str = Default.bmr_equation,
-):
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Calculate local basal metabolic rate [W].
 
     Parameters
@@ -1145,15 +1146,15 @@ PRE_SHIV = 0
 
 
 def shivering(
-    err_cr,
-    err_sk,
-    t_core,
-    t_skin,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    sex=Default.sex,
+    err_cr: np.ndarray,
+    err_sk: np.ndarray,
+    t_core: np.ndarray,
+    t_skin: np.ndarray,
+    height,
+    weight,
+    bsa_equation,
+    age,
+    sex,
     dtime=60,
     options=None,
 ):
@@ -1269,10 +1270,10 @@ def shivering(
 
 def nonshivering(
     err_sk,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
+    height,
+    weight,
+    bsa_equation,
+    age,
     cold_acclimation=False,
     batpositive=True,
 ):
@@ -1372,7 +1373,7 @@ def nonshivering(
     return q_nst
 
 
-def sum_m(mbase, q_work, q_shiv, q_nst):
+def sum_m(mbase: np.ndarray, q_work, q_shiv, q_nst):
     """Calculate total thermogenesis in each layer [W].
 
     Parameters
@@ -1415,11 +1416,11 @@ def sum_m(mbase, q_work, q_shiv, q_nst):
 def cr_ms_fat_blood_flow(
     q_work,
     q_shiv,
-    height=Default.height,
-    weight=Default.weight,
-    bsa_equation=Default.bsa_equation,
-    age=Default.age,
-    ci=Default.cardiac_index,
+    height,
+    weight,
+    bsa_equation,
+    age,
+    ci,
 ):
     """Calculate core, muscle and fat blood flow rate [L/h].
 

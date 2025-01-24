@@ -9,6 +9,7 @@ The values of a NumPy array containing 17 elements correspond to the following b
 """
 
 import logging
+from typing import Union
 
 import numpy as np
 
@@ -69,7 +70,7 @@ def validate_body_parameters(
         )
 
 
-def to_array_body_parts(inp):
+def to_array_body_parts(inp) -> np.ndarray:
     """Create a NumPy array of shape (17,) with the given input.
 
     Parameters
@@ -107,10 +108,10 @@ def to_array_body_parts(inp):
 
 
 def bsa_rate(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    bsa_equation: str = Default.bsa_equation,
-) -> float:
+    height: float,
+    weight: float,
+    bsa_equation: str,
+) -> Union[float, np.ndarray]:
     """
     Calculate the ratio of body surface area (BSA) to the standard body.
 
@@ -128,7 +129,7 @@ def bsa_rate(
 
     Returns
     -------
-    float
+    float, np.ndarray
         The ratio of the individual's BSA to the standard body BSA.
 
     Raises
@@ -156,9 +157,9 @@ def bsa_rate(
 
 
 def local_bsa(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    bsa_equation: str = Default.bsa_equation,
+    height: float,
+    weight: float,
+    bsa_equation: str,
 ) -> np.ndarray:
     """
     Calculate local body surface area (BSA) in square meters.
@@ -200,7 +201,7 @@ def local_bsa(
     return Default.local_bsa * bsa_ratio
 
 
-def weight_rate(weight: float = Default.weight) -> float:
+def weight_rate(weight: float) -> float:
     """
     Calculate the ratio of the body weight to the standard body.
 
@@ -217,12 +218,13 @@ def weight_rate(weight: float = Default.weight) -> float:
     return weight / Default.weight
 
 
+# todo remove all the defaults
 def bfb_rate(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    bsa_equation: str = Default.bsa_equation,
-    age: int = Default.age,
-    ci: float = Default.cardiac_index,
+    height: float,
+    weight: float,
+    bsa_equation: str,
+    age: int,
+    ci: float,
 ) -> float:
     """
     Calculate the ratio of basal blood flow (BFB) to the standard body.
@@ -280,17 +282,17 @@ def bfb_rate(
 
 
 def calculate_operative_temp_when_pmv_is_zero(
-    va: float = Default.air_speed,
-    rh: float = Default.relative_humidity,
-    met: float = Default.metabolic_rate,
-    clo: float = Default.clothing_insulation,
+    v: float,
+    rh: float,
+    met: float,
+    clo: float,
 ) -> float:
     """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
     logic.
 
     Parameters
     ----------
-    va : float, optional
+    v : float, optional
         Air velocity [m/s]. The default is 0.1.
     rh : float, optional
         Relative humidity [%]. The default is 50.
@@ -317,7 +319,7 @@ def calculate_operative_temp_when_pmv_is_zero(
     # Main loop for finding PMV=0
     for i in range(max_iterations):
         pmv_value = pmv_ppd_iso(
-            to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
+            to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
         ).pmv
 
         # Check for NaN and handle retries
@@ -329,7 +331,7 @@ def calculate_operative_temp_when_pmv_is_zero(
                 adjustment_factor = retry_adjustment_factor
                 to = initial_to  # Reset to initial temperature for retry
                 pmv_value = pmv_ppd_iso(
-                    to, to, va, rh, met, clo, model=Models.iso_7730_2005.value
+                    to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
                 ).pmv
                 logger.info(f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}")
 
@@ -357,10 +359,10 @@ def calculate_operative_temp_when_pmv_is_zero(
 
 
 def conductance(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    bsa_equation: str = Default.bsa_equation,
-    fat: float = Default.body_fat,
+    height: float,
+    weight: float,
+    bsa_equation: str,
+    fat: float,
 ):
     """Calculate thermal conductance between layers [W/K].
 
@@ -583,6 +585,7 @@ def conductance(
     wr = weight_rate(weight)
     bsar = bsa_rate(height, weight, bsa_equation)
     # head, neck (Sphere shape)
+    # todo we are multiplying zeros by a value
     cdt_cr_sk[:2] *= wr / bsar
     cdt_cr_ms[:2] *= wr / bsar
     cdt_ms_fat[:2] *= wr / bsar
@@ -630,11 +633,11 @@ def conductance(
 
 
 def capacity(
-    height: float = Default.height,
-    weight: float = Default.weight,
-    bsa_equation: str = Default.bsa_equation,
-    age: int = Default.age,
-    ci: float = Default.cardiac_index,
+    height: float,
+    weight: float,
+    bsa_equation: str,
+    age: int,
+    ci: float,
 ) -> np.ndarray:
     """Calculate the thermal capacity [J/K].
 

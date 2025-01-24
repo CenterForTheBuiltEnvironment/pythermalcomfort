@@ -3,6 +3,7 @@ import datetime as dt
 
 # Set up logging with a level of WARNING
 import os
+from typing import List
 
 import numpy as np
 
@@ -257,7 +258,7 @@ class JOS3:
         >>> import matplotlib.pyplot as plt
         >>> import os
         >>> from pythermalcomfort.models import JOS3
-        >>> from pythermalcomfort.jos3_functions.utilities import local_clo_typical_ensembles
+        >>> from pythermalcomfort.jos3_functions.parameters import local_clo_typical_ensembles
         >>>
         >>> model = JOS3(
         >>>     height=1.7,
@@ -372,26 +373,26 @@ class JOS3:
         Parameters
         ----------
         height : float, optional
-            Body height in meters. Default is 1.72.
+            Body height in meters.
         weight : float, optional
-            Body weight in kilograms. Default is 74.43.
+            Body weight in kilograms.
         fat : float, optional
-            Fat percentage. Default is 15.
+            Fat percentage.
         age : int, optional
-            Age in years. Default is 20.
+            Age in years.
         sex : str, optional
-            Sex ("male" or "female"). Default is "male".
+            Sex ("male" or "female").
         ci : float, optional
-            Cardiac index in liters per minute per square meter. Default is 2.6432.
+            Cardiac index in liters per minute per square meter.
         bmr_equation : str, optional
             The equation used to calculate basal metabolic rate (BMR). Options are "harris-benedict"
             for Caucasian data (DOI: doi.org/10.1073/pnas.4.12.370) or "japanese" for Ganpule's equation
-            (DOI: doi.org/10.1038/sj.ejcn.1602645). Default is "harris-benedict".
+            (DOI: doi.org/10.1038/sj.ejcn.1602645).
         bsa_equation : str, optional
-            The equation used to calculate body surface area (BSA). Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations. Default is "dubois".
+            The equation used to calculate body surface area (BSA). Choose one from pythermalcomfort.utilities.BodySurfaceAreaEquations.
         ex_output : None or "all", optional
             Additional output parameters. If None, no extra output is provided. If "all", all possible
-            outputs are included. Default is None.
+            outputs are included.
 
         Returns
         -------
@@ -453,7 +454,9 @@ class JOS3:
 
         # Initialize environmental conditions and other factors
         # (Default values of input conditions)
-        self._ta = np.ones(Default.num_body_parts) * Default.dry_bulb_air_temperature
+        self._ta: np.ndarray = (
+            np.ones(Default.num_body_parts) * Default.dry_bulb_air_temperature
+        )
         self._tr = np.ones(Default.num_body_parts) * Default.mean_radiant_temperature
         self._rh = np.ones(Default.num_body_parts) * Default.relative_humidity
         self._va = np.ones(Default.num_body_parts) * Default.air_speed
@@ -469,7 +472,7 @@ class JOS3:
         self.ex_q = np.zeros(NUM_NODES)  # External heat gain
         self._time = dt.timedelta(0)  # Elapsed time
         self.model_name = "JOS3"  # Model name
-        # todo expose them as single properties and not as a dict
+        # todo expose them as single properties and not as a dict and document them
         self.options = {
             "nonshivering_thermogenesis": True,
             "cold_acclimated": False,
@@ -477,6 +480,7 @@ class JOS3:
             "limit_dshiv/dt": False,
             "bat_positive": False,
             "ava_zero": False,
+            # todo shivering is not used in the model
             "shivering": False,
         }
 
@@ -490,11 +494,14 @@ class JOS3:
         self._time = dt.timedelta(0)  # Elapsed time
 
         # Reset set-point temperature and save the last model parameters
-        dict_results = self._reset_setpt(par=Default.physical_activity_ratio)
+        dict_results = self._reset_setpt()
+        # todo why the first element of the simulation is for a naked person?
         self._history.append(dict_results)
 
-    def _reset_setpt(self, par=Default.physical_activity_ratio):
-        """Reset set-point temperatures under steady state conditions.
+    # todo check the name of the function and the docstring
+    def _reset_setpt(self) -> JOS3Output:
+        """Reset set-point temperatures under steady state conditions. For a nude person in a reference environment,
+        of 50% RH, 0.1 m/s air velocity, and par=1.25.
 
         Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
         when at rest, similar to room set-point temperatures for air conditioning. This function is
@@ -508,20 +515,28 @@ class JOS3:
             Parameters of the JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
-        w_per_m2_to_met = 1 / met_to_w_m2  # unit converter W/m2 to met
-        met = self.bmr * par * w_per_m2_to_met  # [met]
-        self.to = calculate_operative_temp_when_pmv_is_zero(met=met)
-        self.rh = Default.relative_humidity
-        self.v = Default.air_speed
-        self.clo = Default.clothing_insulation
+        # todo shall these be the rerefence values for naked?
+        par: float = 1.25  # Physical activity ratio
+        met = self.bmr * par / met_to_w_m2  # [met]
+        rh = 50
+        v = 0.1
+        clo = 0
+        self.to = calculate_operative_temp_when_pmv_is_zero(
+            met=met, rh=rh, v=v, clo=clo
+        )
+        self.rh = rh
+        self.v = v
+        self.clo = clo
         self.par = par  # Physical activity ratio
 
         # Steady-calculation
         self.options["ava_zero"] = True
+        # todo how these values range, and dtime where selected?
         for _ in range(10):
             dict_out = self._run(dtime=60000, passive=True)
 
         # Set new set-point temperatures for core and skin
+        # todo why are not we simply just setting these values and not returning anything?
         self.cr_set_point = self.t_core
         self.sk_set_point = self.t_skin
         self.options["ava_zero"] = False
@@ -651,7 +666,7 @@ class JOS3:
         # Clothing heat resistance [m2.K/W]
         r_t = threg.dry_r(hc, hr, self._clo)
         # Clothing evaporative resistance [m2.kPa/W]
-        r_et = threg.wet_r(hc, self._clo, self._iclo)
+        r_et = threg.wet_r(hc, self._clo, self._iclo, lewis_rate=16.5)
 
         # ------------------------------------------------------------------
         # Thermoregulation
@@ -1212,6 +1227,7 @@ class JOS3:
         return to
 
     @to.setter
+    # todo to should not be a setter otherwise people can erroneously overrite it
     def to(self, inp):
         self._ta = to_array_body_parts(inp)
         self._tr = to_array_body_parts(inp)
@@ -1325,7 +1341,7 @@ class JOS3:
             ),
             self._va,
         )
-        return threg.wet_r(hc, self._clo, self._iclo)
+        return threg.wet_r(hc=hc, clo=self._clo, i_clo=self._iclo, lewis_rate=16.5)
 
     @property
     def w(self):
@@ -1333,14 +1349,17 @@ class JOS3:
         err_cr = self.t_core - self.cr_set_point
         err_sk = self.t_skin - self.sk_set_point
         wet, *_ = threg.evaporation(
-            err_cr,
-            err_sk,
-            self.t_skin,
-            self._ta,
-            self._rh,
-            self.r_et,
-            self._bsa_rate,
-            self._age,
+            err_cr=err_cr,
+            err_sk=err_sk,
+            t_skin=self.t_skin,
+            tdb=self._ta,
+            rh=self._rh,
+            ret=self.r_et,
+            height=self._height,
+            weight=self._weight,
+            # todo I change the following since before it was passing self._bsa_rate to height
+            bsa_equation=self._bsa_equation,
+            age=self._age,
         )
         return wet
 
@@ -1353,7 +1372,7 @@ class JOS3:
     @property
     def t_skin_mean(self) -> float:
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
-        return np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa)
+        return float(np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa))
 
     @property
     def t_skin(self) -> np.ndarray[float]:
@@ -1372,7 +1391,7 @@ class JOS3:
     @property
     def t_cb(self) -> float:
         """t_cb : float Temperature at central blood pool [°C]."""
-        return self._t_body[0].copy()
+        return float(self._t_body[0].copy())
 
     @property
     def t_artery(self) -> np.ndarray[float]:
