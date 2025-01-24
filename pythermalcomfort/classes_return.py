@@ -1,6 +1,6 @@
 import datetime as dt
 from dataclasses import dataclass, fields
-from typing import Union, Optional
+from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -639,11 +639,11 @@ class WCT:
 
 @dataclass(frozen=True)
 class JOS3BodyParts:
-    """Dataclass to represent the body parts in the JOS3 model.
-    It is very important to keep the order of the attributes as they are defined in the
-    dataclass ['head', 'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm',
-    'left_hand', 'right_shoulder', 'right_arm', 'right_hand', 'left_thigh', 'left_leg',
-    'left_foot', 'right_thigh', 'right_leg', 'right_foot']
+    """Dataclass to represent the body parts in the JOS3 model. It is very important to
+    keep the order of the attributes as they are defined in the dataclass ['head',
+    'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm', 'left_hand',
+    'right_shoulder', 'right_arm', 'right_hand', 'left_thigh', 'left_leg', 'left_foot',
+    'right_thigh', 'right_leg', 'right_foot']
 
     Attributes
     ----------

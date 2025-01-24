@@ -3,22 +3,21 @@ import datetime as dt
 
 # Set up logging with a level of WARNING
 import os
-from typing import List
 
 import numpy as np
 
 from pythermalcomfort.classes_return import (
-    JOS3Output,
     JOS3BodyParts,
+    JOS3Output,
 )
 from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
     calculate_operative_temp_when_pmv_is_zero,
+    pass_values_to_jos3_body_parts,
     to_array_body_parts,
     validate_body_parameters,
-    pass_values_to_jos3_body_parts,
 )
 from pythermalcomfort.jos3_functions.matrix import (
     INDEX,
@@ -491,7 +490,7 @@ class JOS3:
         threg.PRE_SHIV = 0
 
         # Initialize history to store model parameters
-        self._history: List[JOS3Output] = []
+        self._history: list[JOS3Output] = []
 
         # Set elapsed time to 0
         self._time = dt.timedelta(0)  # Elapsed time

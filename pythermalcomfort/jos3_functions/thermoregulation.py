@@ -4,7 +4,7 @@ thermoregulation.
 The values of a NumPy array containing 17 body parts
 """
 
-from typing import Union, Tuple
+from typing import Union
 
 import numpy as np
 
@@ -573,7 +573,7 @@ def evaporation(
     weight,
     bsa_equation,
     age,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Calculate evaporative heat loss.
 
     Parameters
@@ -973,7 +973,7 @@ def local_mbase(
     age: int = Default.age,
     sex: str = Default.sex,
     bmr_equation: str = Default.bmr_equation,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Calculate local basal metabolic rate [W].
 
     Parameters

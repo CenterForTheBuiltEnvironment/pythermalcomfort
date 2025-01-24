@@ -6,7 +6,6 @@ from pythermalcomfort.models.atcs import ATCS
 from pythermalcomfort.models.clo_tout import clo_tout
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.discomfort_index import discomfort_index
-from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.models.heat_index_lu import heat_index_lu
 from pythermalcomfort.models.heat_index_rothfusz import heat_index_rothfusz
 from pythermalcomfort.models.humidex import humidex
@@ -21,6 +20,7 @@ from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 from pythermalcomfort.models.set_tmp import set_tmp
 from pythermalcomfort.models.solar_gain import solar_gain
+from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.models.use_fans_heatwaves import use_fans_heatwaves
 from pythermalcomfort.models.utci import utci
 from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
