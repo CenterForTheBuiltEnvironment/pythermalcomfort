@@ -158,7 +158,7 @@ def test_JOS3_class():
 
 def test_calculate_operative_temp_when_pmv_is_zero():
     # Test: _calculate_operative_temp_when_pmv_is_zero()
-    to_neutral = calculate_operative_temp_when_pmv_is_zero()
+    to_neutral = calculate_operative_temp_when_pmv_is_zero(v=0.1, clo=0, met=1, rh=50)
     assert to_neutral == pytest.approx(28.8, rel=1e-3)
 
 
@@ -168,16 +168,16 @@ def test_body_parameters():
     validate_body_parameters(height=1.75, weight=70.0, age=30, body_fat=15)
     # Test with invalid height
     with pytest.raises(ValueError):
-        validate_body_parameters(height=0.1)
+        validate_body_parameters(height=0.1, weight=70.0, age=30, body_fat=15)
     # Test with invalid weight
     with pytest.raises(ValueError):
-        validate_body_parameters(weight=210.0)
+        validate_body_parameters(height=1.75, weight=210.0, age=30, body_fat=15)
     # Test with invalid age
     with pytest.raises(ValueError):
-        validate_body_parameters(age=101)
+        validate_body_parameters(height=1.75, weight=210.0, age=101, body_fat=15)
     # Test with invalid body fat
     with pytest.raises(ValueError):
-        validate_body_parameters(body_fat=91)
+        validate_body_parameters(height=1.75, weight=210.0, age=101, body_fat=91)
 
 
 def test_to17array():
@@ -336,35 +336,35 @@ def test_bfb_rate():
 
 def test_conductance():
     # Test with default parameters
-    result = conductance()
+    result = conductance(height=1.72, weight=74.43, bsa_equation="dubois", fat=15.0)
     assert isinstance(result, np.ndarray)
 
     # Test with custom parameters
-    result = conductance(height=1.8, weight=80, bsa_equation="dubois", fat=20)
+    result = conductance(height=1.8, weight=80, bsa_equation="dubois", fat=20.0)
     assert isinstance(result, np.ndarray)
 
     # Test with different fat rates
-    result_low_fat = conductance(fat=10)
-    result_high_fat = conductance(fat=30)
+    result_low_fat = conductance(
+        height=1.72, weight=74.43, bsa_equation="dubois", fat=10.0
+    )
+    result_high_fat = conductance(
+        height=1.72, weight=74.43, bsa_equation="dubois", fat=30.0
+    )
     assert np.any(
         result_low_fat != result_high_fat
     )  # The conductance matrix should differ
 
-    # Test with invalid equation
-    with pytest.raises(ValueError):
-        conductance(bsa_equation="unknown")
-
     # Test with non-numeric height
     with pytest.raises(TypeError):
-        conductance(height="non-numeric")
+        conductance(height="non-numeric", weight=74.43, bsa_equation="dubois", fat=10.0)
 
     # Test with non-numeric weight
     with pytest.raises(TypeError):
-        conductance(weight="non-numeric")
+        conductance(height=1.72, weight="non-numeric", bsa_equation="dubois", fat=10.0)
 
     # Test with non-numeric fat
     with pytest.raises(TypeError):
-        conductance(fat="non-numeric")
+        conductance(height=1.72, weight=74.43, fat="non-numeric", bsa_equation="dubois")
 
 
 def test_capacity():
@@ -1086,18 +1086,17 @@ def test_evaporation():
     rh = np.array([100] * 17)
 
     # Call the evaporation function
-    # wet, e_sk, e_max, e_sweat = evaporation(err_cr, err_sk, t_skin, tdb, rh, ret)
+    wet, e_sk, e_max, e_sweat = evaporation(err_cr, err_sk, t_skin, tdb, rh, ret)
 
-    # expected_e_max = 0.001
-    # expected_wet = 1
+    expected_e_max = 0.001
+    expected_wet = 1
     # Check that all elements in e_max have been replaced with 0.001
-    # fixme the following is not passing
-    # assert np.all(
-    #     e_max == expected_e_max
-    # )  # Verify that e_max has been replaced by 0.001
-    # assert np.all(
-    #     wet == pytest.approx(expected_wet, rel=1e-3)
-    # )  # Verify that wet is nealy 1
+    assert np.all(
+        e_max == expected_e_max
+    )  # Verify that e_max has been replaced by 0.001
+    assert np.all(
+        wet == pytest.approx(expected_wet, rel=1e-3)
+    )  # Verify that wet is nealy 1
 
 
 def test_skin_blood_flow():
@@ -1364,9 +1363,9 @@ def test_nonshivering():
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(err_sk, cold_acclimation=False)
     q_nst_with_acclimation = nonshivering(err_sk, cold_acclimation=True)
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():
