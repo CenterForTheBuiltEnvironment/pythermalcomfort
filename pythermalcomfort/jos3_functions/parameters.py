@@ -127,12 +127,6 @@ ALL_OUT_PARAMS = {
         "suffix": None,
         "unit": "L/h",
     },
-    "cycle_time": {
-        "ex_output": False,
-        "meaning": "the counts of executing one cycle calculation",
-        "suffix": None,
-        "unit": "-",
-    },
     "e_max": {
         "ex_output": True,
         "meaning": "maximum evaporative heat loss from the skin (each body part)",

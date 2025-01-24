@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from pythermalcomfort.jos3_functions.utilities import local_clo_typical_ensembles
+from pythermalcomfort.jos3_functions.parameters import local_clo_typical_ensembles
 from pythermalcomfort.models import JOS3
 
 # Make "jos3_example_example" directory in the current directory

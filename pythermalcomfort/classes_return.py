@@ -643,8 +643,6 @@ class JOS3Output:
 
     Attributes
     ----------
-    cycle_time : int
-        The current cycle time.
     simulation_time : datetime.timedelta
         The elapsed simulation time.
     dt : int or float
@@ -767,7 +765,6 @@ class JOS3Output:
         Latent heat loss by respiration [W].
     """
 
-    cycle_time: int
     simulation_time: dt.timedelta
     dt: Union[int, float]
     t_skin_mean: float

@@ -122,8 +122,6 @@ class JOS3:
     -------
     cardiac_output :
         cardiac output (the sum of the whole blood flow) [L/h]
-    cycle_time :
-        the counts of executing one cycle calculation [-]
     dt :
         time step [sec]
     pythermalcomfort_version :
@@ -470,7 +468,6 @@ class JOS3:
         self._hr = None  # Radiative heat transfer coefficient
         self.ex_q = np.zeros(NUM_NODES)  # External heat gain
         self._time = dt.timedelta(0)  # Elapsed time
-        self._cycle = 0  # Cycle time
         self.model_name = "JOS3"  # Model name
         # todo expose them as single properties and not as a dict
         self.options = {
@@ -489,9 +486,8 @@ class JOS3:
         # Initialize history to store model parameters
         self._history = []
 
-        # Set elapsed time and cycle time to 0
+        # Set elapsed time to 0
         self._time = dt.timedelta(0)  # Elapsed time
-        self._cycle = 0  # Cycle time
 
         # Reset set-point temperature and save the last model parameters
         dict_results = self._reset_setpt(par=Default.physical_activity_ratio)
@@ -577,9 +573,6 @@ class JOS3:
             # Increment the elapsed time by the time delta
             self._time += dt.timedelta(0, dtime)
 
-            # Increment the cycle counter
-            self._cycle += 1
-
             # Execute the simulation step
             dict_data = self._run(dtime=dtime, output=output)
 
@@ -610,7 +603,7 @@ class JOS3:
         -------
         dict
             A dictionary containing the simulation results, including parameters such as
-            cycle time, model time, mean skin temperature, skin temperature, core temperature,
+            model time, mean skin temperature, skin temperature, core temperature,
             mean skin wettedness, skin wettedness, weight loss by evaporation and respiration,
             cardiac output, total thermogenesis, respiratory heat loss, and total heat loss
             from the skin to the environment. If `ex_output` is set to "all" or a list of keys,
@@ -921,7 +914,6 @@ class JOS3:
         # Output parameters
         # ------------------------------------------------------------------
         return JOS3Output(
-            cycle_time=self._cycle,
             simulation_time=self._time,
             dt=dtime,
             t_skin_mean=np.round(self.t_skin_mean, 2),
