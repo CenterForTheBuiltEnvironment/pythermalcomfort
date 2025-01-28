@@ -2,9 +2,13 @@ import math
 import warnings
 from enum import Enum
 from typing import NamedTuple, Union
+from datetime import datetime
 
 import numpy as np
+import pandas as pd
 from numba import jit
+
+from epw import epw  # https://github.com/building-energy/epw
 
 from pythermalcomfort.classes_return import PsychrometricValues
 from pythermalcomfort.shared_functions import valid_range
@@ -1167,3 +1171,43 @@ class DefaultSkinTemperature(NamedTuple):
     right_thigh: float = 34.3
     right_leg: float = 32.8
     right_foot: float = 33.3
+
+
+def epw_to_dataframe(epw_file_path, year=datetime.now().year):
+    """
+    Imports an EPW weather file into a pandas DataFrame and processes it for plotting.
+
+    This function reads an EPW file, adjusts the hour definition, adds a fixed year
+    ('year'), creates a DateTime column, and includes a month name column for easy plotting.
+
+    Parameters
+    ----------
+    epw_file_path : str
+        Path to the EPW file.
+    year : int, optional
+        The year to use for the DateTime column. Default is the current year. EPW files usually
+        contain only month, day, and hour information, so a fixed year is required to create a
+        DateTime column.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A DataFrame containing the processed weather data.
+    """
+
+    weather_file = epw()
+    weather_file.read(epw_file_path)
+    weather_data = weather_file.dataframe
+
+    # Adjust the hour to compensate for EPW's 1-24 hour definition
+    weather_data["Hour"] -= 1  # Shift hour to 0-23
+
+    # Add a fixed year for consistent datetime processing (not used for plotting)
+    weather_data["Year"] = year
+
+    weather_data["DateTime"] = pd.to_datetime(
+        weather_data[["Year", "Month", "Day", "Hour"]]
+    )
+    weather_data["Month Name"] = weather_data["DateTime"].dt.strftime("%b")
+
+    return weather_data

@@ -7,19 +7,23 @@ from pythermalcomfort.charts.theme import (
     index_mapping_dictionary,
 )
 
+from pythermalcomfort.charts.classes import AdaptiveBase, Observations, AdaptiveSummary
 
-def adaptive_chart(df, show_summary=False, si_ip="si"):
-    """Generates a scatter plot with the Adaptive Comfort Model, ASHRAE 55.
+
+def adaptive_chart(df, units="si", show_summary=True):
+    """Generates a scatter plot with the Adaptive cmf Model, ASHRAE 55.
 
     Parameters
     ----------
     df : DataFrame
-        A DataFrame containing the input data. Must have the following columns:
-        't_out' (Outdoor temperature [°C]), 'top' (Operative temperature [°C]),
+        A DataFrame containing the input data. Must have the following columns with matching column names:
+        't_out' (Outdoor temperature [°C]),
+        'top' (Operative temperature [°C]),
         'adaptive_acceptability_80%' (Acceptability for 80% of the occupants),
         'adaptive_acceptability_90%' (Acceptability for 90% of the occupants).
 
     show_summary : bool, optional
+    A horizontal Plotly bar chart with the percentage of samples within the 80% and 90% acceptability range is shown.
         If True, a summary of the data is shown. Default is False.
 
     si_ip : str, optional
@@ -32,45 +36,44 @@ def adaptive_chart(df, show_summary=False, si_ip="si"):
 
     """
 
+    base = AdaptiveBase(show_summary=show_summary)
+
+    total_number_of_samples = len(df)  # int to calculate summary percentages
+
+    if base.show_summary:
+        fig = make_subplots(
+            rows=1, cols=2, column_widths=[1 - base.summary_width, base.summary_width]
+        )
+    else:
+        fig = go.Figure()
+
+    # turn into "AdaptiveComfortZone" trace
+
     var = "adaptive"
     var_metadata = index_mapping_dictionary[var]
-    var_name, var_unit, var_range = (
-        var_metadata["name"],
-        var_metadata[si_ip]["unit"],
-        var_metadata[si_ip]["range"],
-    )
-    cat_color, cat_order = (
-        var_metadata["colors_categories"],
-        var_metadata["order_categories"],
-    )
+    var_range = var_metadata[units]["range"]
 
-    total_number_of_samples = len(df)
+    t_outdoor_range = var_range  # this can be an attribute of the class instead
 
-    t_outdoor_range = var_range
+    t_outdoor = np.linspace(min(t_outdoor_range), max(t_outdoor_range), 100)
 
-    t_outdoor = np.linspace(t_outdoor_range[0], t_outdoor_range[1], 100)
-    t_comfort = 0.31 * t_outdoor + 17.8
-    t_80_upper, t_80_lower = t_comfort + 3.5, t_comfort - 3.5
-    t_90_upper, t_90_lower = t_comfort + 2.5, t_comfort - 2.5
+    t_cmf = 0.31 * t_outdoor + 17.8
+    t_80_upper, t_80_lower = t_cmf + 3.5, t_cmf - 3.5
+    t_90_upper, t_90_lower = t_cmf + 2.5, t_cmf - 2.5
 
     sum_80 = df["adaptive_acceptability_80%"].sum()
     sum_90 = df["adaptive_acceptability_90%"].sum()
 
-    if show_summary:
-        fig = make_subplots(rows=1, cols=2, column_widths=[0.8, 0.2])
-    else:
-        fig = go.Figure()
-
     fig.add_trace(
         go.Scatter(
             x=t_outdoor,
-            y=t_comfort,
+            y=t_cmf,
             mode="lines",
-            name="Comfort Temperature",
+            name="cmf Temperature",
             line=dict(color="black", width=1.5, dash="dash"),
         ),
-        row=1 if show_summary else None,
-        col=1 if show_summary else None,
+        row=1 if base.show_summary else None,
+        col=1 if base.show_summary else None,
     )
 
     fig.add_trace(
@@ -82,8 +85,8 @@ def adaptive_chart(df, show_summary=False, si_ip="si"):
             line=dict(color="rgba(255,255,255,0)"),
             name="90% Acceptability",
         ),
-        row=1 if show_summary else None,
-        col=1 if show_summary else None,
+        row=1 if base.show_summary else None,
+        col=1 if base.show_summary else None,
     )
 
     fig.add_trace(
@@ -95,70 +98,36 @@ def adaptive_chart(df, show_summary=False, si_ip="si"):
             line=dict(color="rgba(255,255,255,0)"),
             name="80% Acceptability",
         ),
-        row=1 if show_summary else None,
-        col=1 if show_summary else None,
+        row=1 if base.show_summary else None,
+        col=1 if base.show_summary else None,
     )
+
+    # ------------------------------------------------------------------------
+
+    # adding observations
+
+    samples = Observations()
 
     fig.add_trace(
-        go.Scatter(
-            x=df["t_out"],
-            y=df["top"],
-            mode="markers",
-            name="Observations",
-            marker=dict(color="#ea536e", size=5, symbol="circle"),
-            hovertemplate="t_out: %{x:.1f}<br>t_op: %{y:.1f}<br><extra></extra>",
-        ),
-        row=1 if show_summary else None,
-        col=1 if show_summary else None,
+        samples.generate_trace(df=df),
+        row=1 if base.show_summary else None,
+        col=1 if base.show_summary else None,
     )
 
-    if show_summary:
+    # generating summary if required
 
-        conditions = [
-            pd.isna(df["adaptive_acceptability_80%"]),
-            df["adaptive_acceptability_90%"] == True,
-            df["adaptive_acceptability_80%"] == True,
-            (df["adaptive_acceptability_80%"] == False)
-            & (df["adaptive_acceptability_90%"] == False),
-        ]
+    if base.show_summary:
 
-        df["categorical"] = np.select(conditions, cat_order, default="Out of Range")
-
-        category_counts = df["categorical"].value_counts()
-        category_percentages = df["categorical"].value_counts(normalize=True) * 100
-
-        categories = cat_order
-        percentages = [0] * len(cat_order)
-        sample_counts = [0] * len(cat_order)
-
-        for i, cat in enumerate(cat_order):
-            if cat in category_counts.index:
-                sample_counts[i] = category_counts[cat]
-                percentages[i] = category_percentages[cat]
+        summary = AdaptiveSummary()
 
         fig.add_trace(
-            go.Bar(
-                x=percentages,
-                y=categories,
-                orientation="h",
-                width=0.6,
-                marker=dict(color=cat_color),
-                text=[f"{percentage:.1f}%" for percentage in percentages],
-                textposition="outside",
-                cliponaxis=False,
-                customdata=sample_counts,
-                hovertemplate=(
-                    "<b>%{y}</b><br>"
-                    "Percentage: %{x:.1f}%<br>"
-                    "Samples: %{customdata} <extra></extra>"
-                ),
-                showlegend=False,
-            ),
+            summary.generate_trace(df=df),
             row=1,
             col=2,
         )
 
         fig.update_xaxes(showgrid=False, showticklabels=False, row=1, col=2)
+
         fig.update_yaxes(
             showgrid=False,
             side="left",
@@ -171,9 +140,9 @@ def adaptive_chart(df, show_summary=False, si_ip="si"):
         )
 
         fig.update_layout(
-            title="Adaptive Comfort Model, ASHRAE 55",
-            xaxis_title="Prevailing Mean Outdoor Temperature [°C]",
-            yaxis_title="Operative Temperature [°C]",
+            title=base.title,
+            xaxis_title=base.x_axis_label,
+            yaxis_title=base.y_axis_label,
             legend=dict(
                 font=dict(size=12),
                 orientation="h",
@@ -190,9 +159,9 @@ def adaptive_chart(df, show_summary=False, si_ip="si"):
 
     else:
         fig.update_layout(
-            title="Adaptive Comfort Model, ASHRAE 55",
-            xaxis_title="Prevailing Mean Outdoor Temperature [°C]",
-            yaxis_title="Operative Temperature [°C]",
+            title=base.title,
+            xaxis_title=base.x_axis_label,
+            yaxis_title=base.y_axis_label,
             legend=dict(font=dict(size=12)),
             xaxis=dict(range=[9, 34.5], dtick=2),
             yaxis=dict(range=[13, 37], dtick=2),

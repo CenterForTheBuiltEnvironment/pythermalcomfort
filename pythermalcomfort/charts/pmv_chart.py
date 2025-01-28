@@ -5,22 +5,22 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.optimize import brentq
 
-from pythermalcomfort.models import pmv
-from pythermalcomfort.utilities import v_relative, clo_dynamic, psy_ta_rh
+from pythermalcomfort.models import pmv_ppd_ashrae
+from pythermalcomfort.utilities import v_relative, clo_dynamic_iso, psy_ta_rh
 from pythermalcomfort.charts.theme import (
     tight_margins,
     index_mapping_dictionary,
 )
 
 
-def pmv_chart(df, pmv_constants, show_summary=False, si_ip="si"):
+def pmv_chart(df, pmv_constants, show_summary=True, si_ip="si"):
     """Generates a psychrometric chart with the Predicted Mean Vote (PMV) comfort zone, ASHRAE 55.
 
     Parameters
     ----------
     df : DataFrame
-        A DataFrame containing the input data. Must have the following columns:
-        'ta' (Dry bulb temperature [°C]), 'rh' (Relative humidity [%]).
+        A DataFrame containing the input data. Must have the following columns with matching column names:
+        'tdb' (Dry bulb temperature [°C]), 'rh' (Relative humidity [%]).
 
     pmv_constants : dict
         A dictionary containing the constants required for the PMV calculation. It must have the following keys
@@ -62,17 +62,17 @@ def pmv_chart(df, pmv_constants, show_summary=False, si_ip="si"):
     )
 
     vr = v_relative(v=v, met=met)
-    clo_d = clo_dynamic(clo=clo, met=met)
+    clo_d = clo_dynamic_iso(clo=clo, met=met, v=vr)
 
     observations = {
-        "t_dry": df["ta"].to_list(),
+        "t_dry": df["tdb"].to_list(),
         "rh": df["rh"].to_list(),
     }
 
     # helper functions start
 
     def pmv_eq(T, RH):
-        return pmv(
+        return pmv_ppd_ashrae(
             tdb=T, tr=tr, vr=vr, rh=RH, met=met, clo=clo_d, limit_inputs=False
         ).pmv
 
@@ -176,7 +176,7 @@ def pmv_chart(df, pmv_constants, show_summary=False, si_ip="si"):
 
     if show_summary:
 
-        df["pmv"] = df.apply(lambda x: pmv_eq(x["ta"], x["rh"]), axis=1)
+        df["pmv"] = df.apply(lambda x: pmv_eq(x["tdb"], x["rh"]), axis=1)
 
         df.loc[df["pmv"] > 0.5, "categorical"] = "Too Hot"
         df.loc[df["pmv"] < -0.6, "categorical"] = "Too Cold"

@@ -69,14 +69,26 @@ index_mapping_dictionary = {
     "HI": {
         "name": "Heat Index",
         "order_categories": [
-            "No Risk",
-            "Caution",
-            "Extreme<br>Caution",
-            "Danger",
-            "Extreme<br>Danger",
+            "no risk",
+            "caution",
+            "extreme caution",
+            "danger",
+            "extreme danger",
         ],
-        "colors": ["#FFFF65", "#FFD602", "#FF8C00", "#FF0000"],
-        "colors_categories": ["grey", "#FFFF65", "#FFD602", "#FF8C00", "#FF0000"],
+        "colors": [
+            [0.0, "rgba(255, 255, 255, 0.0)"],  # All values at or below 27°C are white
+            [0.0, "#FFFF65"],
+            [0.42, "#FFD602"],
+            [0.81, "#FF8C00"],
+            [1.0, "#FF0000"],
+        ],
+        "colors_categories": [
+            "rgba(211, 211, 211, 0.5)",
+            "#FFFF65",
+            "#FFD602",
+            "#FF8C00",
+            "#FF0000",
+        ],
         "si": {
             "unit": "°C",
             "range": [27, 60],
@@ -90,17 +102,17 @@ index_mapping_dictionary = {
     "UTCI": {
         "name": "UTCI",
         "order_categories": [
-            "Out of<br>Range",
-            "Extreme<br>Heat Stress",
-            "Very Strong<br>Heat Stress",
-            "Strong<br>Heat Stress",
-            "Moderate<br>Heat Stress",
-            "No Thermal<br>Stress",
-            "Slight<br>Cold Stress",
-            "Moderate<br>Cold Stress",
-            "Strong<br>Cold Stress",
-            "Very Strong<br>Cold Stress",
-            "Extreme<br>Cold Stress",
+            "unknown",
+            "extreme heat stress",
+            "very strong heat stress",
+            "strong heat stress",
+            "moderate heat stress",
+            "no thermal stress",
+            "slight cold stress",
+            "moderate cold stress",
+            "strong cold stress",
+            "very strong cold stress",
+            "extreme cold stress",
         ],
         "colors": [
             "#5555ff",
@@ -115,7 +127,7 @@ index_mapping_dictionary = {
             "#ff5555",
         ],
         "colors_categories": [
-            "grey",  # Out of Range
+            "grey",  # Unknown
             "#ff5555",  # Extreme Heat Stress
             "#ff8080",  # Very Strong Heat Stress
             "#e9afaf",  # Strong Heat Stress

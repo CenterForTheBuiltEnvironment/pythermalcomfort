@@ -446,12 +446,14 @@ class HIInputs(BaseInputs):
         self,
         tdb,
         rh,
-        round_output,
+        units=Units.SI.value,
+        round_output=True,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
+            units=units,
             round_output=round_output,
         )
 

@@ -9,7 +9,7 @@ from pythermalcomfort.charts.theme import (
 )
 
 
-def heatmap(df, var, global_local, si_ip, show_summary=False):
+def heatmap(df, var, global_local, si_ip, show_summary=True):
     """Generates a heatmap with the desired variable.
 
     Parameters
@@ -188,7 +188,7 @@ def heatmap(df, var, global_local, si_ip, show_summary=False):
         fig.add_trace(
             go.Bar(
                 x=percentages,
-                y=categories,
+                y=[category.title() for category in categories],
                 orientation="h",
                 marker=dict(color=cat_color),
                 text=[f"{percentage:.1f}%" for percentage in percentages],

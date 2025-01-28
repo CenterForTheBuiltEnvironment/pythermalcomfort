@@ -231,9 +231,12 @@ class HI:
     ----------
     hi : float or list of floats
         Heat Index, [°C] or [°F] depending on the units.
+    stress_category : str or list of strs
+        Heat Index categorized in terms of heat stress.
     """
 
     hi: Union[float, list[float]]
+    stress_category: Union[str, list[str]]
 
     def __getitem__(self, item):
         return getattr(self, item)

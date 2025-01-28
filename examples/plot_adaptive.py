@@ -5,7 +5,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 import pandas as pd
 
-
 from pythermalcomfort.utilities import operative_tmp
 from pythermalcomfort.models import adaptive_ashrae
 from pythermalcomfort.charts import adaptive_chart
@@ -17,18 +16,17 @@ ashrae_measurements = pd.read_csv(
 ).reset_index(drop=True)
 
 adaptive_subset = ashrae_measurements[["ta", "tr", "t_out", "vel"]].dropna()
+print(adaptive_subset.head(5))
 
 adaptive_subset["top"] = operative_tmp(
     tdb=adaptive_subset["ta"], tr=adaptive_subset["tr"], v=adaptive_subset["vel"]
 )
 
 adaptive_results = adaptive_ashrae(
-    tdb=adaptive_subset["ta"].to_numpy(),
-    tr=adaptive_subset["tr"].to_numpy(),
-    t_running_mean=adaptive_subset[
-        "t_out"
-    ].to_numpy(),  # ! simplified due to lack of data
-    v=adaptive_subset["vel"].to_numpy(),
+    tdb=adaptive_subset["ta"],
+    tr=adaptive_subset["tr"],
+    t_running_mean=adaptive_subset["t_out"],  # ! simplified due to lack of data
+    v=adaptive_subset["vel"],
     units="SI",
 )
 

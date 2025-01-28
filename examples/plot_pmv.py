@@ -12,7 +12,9 @@ ashrae_measurements = pd.read_csv(
     low_memory=False,
 ).reset_index(drop=True)
 
-pmv_subset = ashrae_measurements.loc[:, ["ta", "rh"]].dropna()
+ashrae_measurements = ashrae_measurements.rename(columns={"ta": "tdb"})
+
+pmv_subset = ashrae_measurements[["tdb", "rh"]].dropna()
 
 df = pmv_subset.sample(500, random_state=40)
 
