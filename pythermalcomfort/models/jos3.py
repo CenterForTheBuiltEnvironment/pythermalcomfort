@@ -1102,7 +1102,10 @@ class JOS3:
         key2keys = {}  # Column keys
         for key, value in self._history[0].__dict__.items():
             try:
-                length = len(value)
+                if isinstance(value, JOS3BodyParts):
+                    length = len(value.__dict__)
+                else:
+                    length = len(value)
                 if isinstance(value, str):
                     keys = [key]  # str is iter. Convert to list without suffix
                 elif check_word_contain(key, "sve", "sfv", "superficialvein"):
@@ -1141,7 +1144,7 @@ class JOS3:
                 if len(keys) == 1:
                     values = [value]  # make list if value is not iter
                 else:
-                    values = value
+                    values = value.__dict__
                 row.update(dict(zip(keys, values)))
             data.append(row)
 
