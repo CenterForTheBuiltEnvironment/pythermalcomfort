@@ -1,3 +1,7 @@
+.. image:: images/pythermalcomfort-3-short.png
+  :align: center
+  :alt: pythermalcomfort logo
+
 ================
 pythermalcomfort
 ================
