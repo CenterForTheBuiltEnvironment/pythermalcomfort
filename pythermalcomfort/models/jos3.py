@@ -16,8 +16,8 @@ from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
-    to_array_body_parts,
     pass_values_to_jos3_body_parts,
+    to_array_body_parts,
     validate_body_parameters,
 )
 from pythermalcomfort.jos3_functions.matrix import (
@@ -28,7 +28,7 @@ from pythermalcomfort.jos3_functions.matrix import (
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
-from pythermalcomfort.utilities import Postures, antoine, met_to_w_m2, Models
+from pythermalcomfort.utilities import Models, Postures, antoine, met_to_w_m2
 
 
 class JOS3:
@@ -537,14 +537,14 @@ class JOS3:
         to = initial_to
 
         # Main loop for finding PMV=0
-        for i in range(max_iterations):
+        for _i in range(max_iterations):
             pmv_value = pmv_ppd_iso(
                 to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
             ).pmv
 
             # Check for NaN and handle retries
             if np.isnan(pmv_value):
-                for retry in range(retry_attempts):
+                for _retry in range(retry_attempts):
                     adjustment_factor = retry_adjustment_factor
                     to = initial_to  # Reset to initial temperature for retry
                     pmv_value = pmv_ppd_iso(
