@@ -38,55 +38,55 @@ To set up `pythermalcomfort` for local development:
 1. Fork `pythermalcomfort <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort>`_ (look for the "Fork" button).
 2. Clone your fork locally. Fetch and pull all updates from the master branch before you do anything:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        git clone git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
+    git clone git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
 
 3. Create a branch for local development. The naming rules for new branches are as follows:
 
-    * For a new feature: `Feature/feature_name_here`
-    * For a bug fix: `Fix/bug_name_here`
-    * For documentation: `Documentation/doc_name_here`
+* For a new feature: `Feature/feature_name_here`
+* For a bug fix: `Fix/bug_name_here`
+* For documentation: `Documentation/doc_name_here`
 
-    You can create a branch locally using the following command. Make sure you only push updates to this new branch:
+You can create a branch locally using the following command. Make sure you only push updates to this new branch:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        git checkout -b name-of-your-bugfix-or-feature
+    git checkout -b name-of-your-bugfix-or-feature
 
-    Now you can make your changes locally.
+Now you can make your changes locally.
 
 4. When you're done making changes, run all the checks and docs builder with tox in one command:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        tox
-        tox -e docs
-        tox -e py312
+    tox
+    tox -e docs
+    tox -e py312
 
 5. Format the code and lint it:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
-        ruff check --fix
-        ruff format
-        docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
-        black .
+    autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
+    ruff check --fix
+    ruff format
+    docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
+    black .
 
 5. Commit your changes and push your branch to GitHub:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        git add .
-        git commit -m "Your detailed description of your changes."
-        git push origin name-of-your-bugfix-or-feature
+    git add .
+    git commit -m "Your detailed description of your changes."
+    git push origin name-of-your-bugfix-or-feature
 
 6. Submit a pull request after you have done all your modifications and tested your work. The pull request should include a detailed description of your work:
 
-    * What this pull request is about.
-    * How you tested your work.
-    * Whether this work affects other components in the project.
+* What this pull request is about.
+* How you tested your work.
+* Whether this work affects other components in the project.
 
 Pull Request Guidelines
 -----------------------
