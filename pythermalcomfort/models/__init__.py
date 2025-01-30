@@ -2,7 +2,6 @@ from pythermalcomfort.models.adaptive_ashrae import adaptive_ashrae
 from pythermalcomfort.models.adaptive_en import adaptive_en
 from pythermalcomfort.models.ankle_draft import ankle_draft
 from pythermalcomfort.models.at import at
-from pythermalcomfort.models.atcs import ATCS
 from pythermalcomfort.models.clo_tout import clo_tout
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.discomfort_index import discomfort_index
@@ -56,6 +55,5 @@ __all__ = [
     "net",
     "discomfort_index",
     "JOS3",
-    "ATCS",
     "zhang_sensation_comfort",
 ]
