@@ -1604,6 +1604,8 @@ def test_nonshivering():
         age_older = age_list[i + 1]
         assert sum_q_nst_by_age[age_younger] > sum_q_nst_by_age[age_older]
 
+
+def test_cold_acclimation_non_shivering():
     # Test cold acclimation that affects NST limit
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(
@@ -1624,9 +1626,7 @@ def test_nonshivering():
         age=20,
         bsa_equation="dubois",
     )
-    assert not np.array_equal(
-        q_nst_no_acclimation, q_nst_with_acclimation
-    ), "Cold acclimation did not change the result"
+    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation)
 
 
 def test_sum_bf():
