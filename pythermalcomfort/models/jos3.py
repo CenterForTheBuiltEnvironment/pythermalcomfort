@@ -16,9 +16,8 @@ from pythermalcomfort.jos3_functions import construction as cons
 from pythermalcomfort.jos3_functions import matrix
 from pythermalcomfort.jos3_functions import thermoregulation as threg
 from pythermalcomfort.jos3_functions.construction import (
-    calculate_operative_temp_when_pmv_is_zero,
-    pass_values_to_jos3_body_parts,
     to_array_body_parts,
+    pass_values_to_jos3_body_parts,
     validate_body_parameters,
 )
 from pythermalcomfort.jos3_functions.matrix import (
@@ -28,7 +27,8 @@ from pythermalcomfort.jos3_functions.matrix import (
     remove_body_name,
 )
 from pythermalcomfort.jos3_functions.parameters import ALL_OUT_PARAMS, Default
-from pythermalcomfort.utilities import Postures, antoine, met_to_w_m2
+from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+from pythermalcomfort.utilities import Postures, antoine, met_to_w_m2, Models
 
 
 class JOS3:
@@ -499,6 +499,76 @@ class JOS3:
         # todo why the first element of the simulation is for a naked person?
         self._history.append(dict_results)
 
+    def _calculate_operative_temp_when_pmv_is_zero(
+        self,
+        v: float,
+        rh: float,
+        met: float,
+        clo: float,
+    ) -> float:
+        """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
+        logic.
+
+        Parameters
+        ----------
+        v : float, optional
+            Air velocity [m/s]. The default is 0.1.
+        rh : float, optional
+            Relative humidity [%]. The default is 50.
+        met : float, optional
+            Metabolic rate [met]. The default is 1.
+        clo : float, optional
+            Clothing insulation [clo]. The default is 0.
+
+        Returns
+        -------
+        to : float
+            Operative temperature [°C].
+        """
+
+        # Default parameters
+        initial_to = 28
+        tolerance = 0.001
+        max_iterations = 100
+        adjustment_factor = 3
+        retry_adjustment_factor = adjustment_factor * 200
+        retry_attempts = 100
+
+        to = initial_to
+
+        # Main loop for finding PMV=0
+        for i in range(max_iterations):
+            pmv_value = pmv_ppd_iso(
+                to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
+            ).pmv
+
+            # Check for NaN and handle retries
+            if np.isnan(pmv_value):
+                for retry in range(retry_attempts):
+                    adjustment_factor = retry_adjustment_factor
+                    to = initial_to  # Reset to initial temperature for retry
+                    pmv_value = pmv_ppd_iso(
+                        to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
+                    ).pmv
+
+                    if abs(pmv_value) < tolerance:
+                        return to
+
+                    # Adjust the temperature during retry
+                    to = to - pmv_value / adjustment_factor
+
+                # If retries fail, log a warning and stop the loop
+                return to
+
+            # Check if the PMV is within tolerance
+            if abs(pmv_value) < tolerance:
+                return to
+
+            # Adjust the operative temperature using the adjustment factor
+            to = to - pmv_value / adjustment_factor
+
+        return to
+
     # todo check the name of the function and the docstring
     def _reset_setpt(self) -> JOS3Output:
         """Reset set-point temperatures under steady state conditions. For a nude person in a reference environment,
@@ -522,7 +592,7 @@ class JOS3:
         rh = 50
         v = 0.1
         clo = 0
-        self.to = calculate_operative_temp_when_pmv_is_zero(
+        self.to = self._calculate_operative_temp_when_pmv_is_zero(
             met=met, rh=rh, v=v, clo=clo
         )
         self.rh = rh

@@ -5,7 +5,6 @@ weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
 """
 
-import logging
 from typing import Union
 
 import numpy as np
@@ -13,11 +12,7 @@ import numpy as np
 from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.jos3_functions.matrix import IDICT, NUM_NODES
 from pythermalcomfort.jos3_functions.parameters import Default
-from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
-from pythermalcomfort.utilities import Models, body_surface_area
-
-logging.basicConfig(level=logging.WARN)
-logger = logging.getLogger(__name__)
+from pythermalcomfort.utilities import body_surface_area
 
 
 def validate_body_parameters(
@@ -277,83 +272,6 @@ def bfb_rate(
     bsa_ratio = bsa_rate(height, weight, bsa_equation)
     bfb_all = ci * bsa_ratio * Default.local_bsa.sum()  # Total BFB in L/h
     return bfb_all / Default.blood_flow_rate  # Ratio to the standard body (290 L/h)
-
-
-def calculate_operative_temp_when_pmv_is_zero(
-    v: float,
-    rh: float,
-    met: float,
-    clo: float,
-) -> float:
-    """Calculate operative temperature [°C] when PMV=0 with NaN handling and retry
-    logic.
-
-    Parameters
-    ----------
-    v : float, optional
-        Air velocity [m/s]. The default is 0.1.
-    rh : float, optional
-        Relative humidity [%]. The default is 50.
-    met : float, optional
-        Metabolic rate [met]. The default is 1.
-    clo : float, optional
-        Clothing insulation [clo]. The default is 0.
-
-    Returns
-    -------
-    to : float
-        Operative temperature [°C].
-    """
-    # Default parameters
-    initial_to = 28
-    tolerance = 0.001
-    max_iterations = 100
-    adjustment_factor = 3
-    retry_adjustment_factor = adjustment_factor * 200
-    retry_attempts = 100
-
-    to = initial_to
-
-    # Main loop for finding PMV=0
-    for i in range(max_iterations):
-        pmv_value = pmv_ppd_iso(
-            to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
-        ).pmv
-
-        # Check for NaN and handle retries
-        if np.isnan(pmv_value):
-            logger.warning(
-                f"NaN detected at iteration {i + 1}. Retrying with reduced adjustment step."
-            )
-            for retry in range(retry_attempts):
-                adjustment_factor = retry_adjustment_factor
-                to = initial_to  # Reset to initial temperature for retry
-                pmv_value = pmv_ppd_iso(
-                    to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
-                ).pmv
-                logger.info(f"Retry {retry + 1}, PMV: {pmv_value:.4f}, to: {to:.2f}")
-
-                if abs(pmv_value) < tolerance:
-                    logger.info(f"Converged to PMV=0 at to={to:.2f}°C during retry.")
-                    return to
-
-                # Adjust the temperature during retry
-                to = to - pmv_value / adjustment_factor
-
-            # If retries fail, log a warning and stop the loop
-            logger.error("Retries failed to achieve convergence after NaN detection.")
-            return to
-
-        # Check if the PMV is within tolerance
-        if abs(pmv_value) < tolerance:
-            logger.info(f"Converged to PMV=0 at to={to:.2f}°C in {i + 1} iterations.")
-            return to
-
-        # Adjust the operative temperature using the adjustment factor
-        to = to - pmv_value / adjustment_factor
-
-    logger.warning("Maximum iterations reached without achieving convergence.")
-    return to
 
 
 def conductance(

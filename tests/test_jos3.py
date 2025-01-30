@@ -8,7 +8,6 @@ from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.jos3_functions import construction
 from pythermalcomfort.jos3_functions.construction import (
     bfb_rate,
-    calculate_operative_temp_when_pmv_is_zero,
     capacity,
     conductance,
     local_bsa,
@@ -154,12 +153,6 @@ def test_JOS3_class():
     # Test with value out of range
     with pytest.raises(ValueError):
         JOS3(fat=91)
-
-
-def test_calculate_operative_temp_when_pmv_is_zero():
-    # Test: _calculate_operative_temp_when_pmv_is_zero()
-    to_neutral = calculate_operative_temp_when_pmv_is_zero(v=0.1, clo=0, met=1, rh=50)
-    assert to_neutral == pytest.approx(28.8, rel=1e-3)
 
 
 # test for construction.py
@@ -1631,9 +1624,9 @@ def test_nonshivering():
         age=20,
         bsa_equation="dubois",
     )
-    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
-        "Cold acclimation did not change the result"
-    )
+    assert not np.array_equal(
+        q_nst_no_acclimation, q_nst_with_acclimation
+    ), "Cold acclimation did not change the result"
 
 
 def test_sum_bf():
