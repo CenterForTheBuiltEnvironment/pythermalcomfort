@@ -1631,9 +1631,9 @@ def test_nonshivering():
         age=20,
         bsa_equation="dubois",
     )
-    assert not np.array_equal(
-        q_nst_no_acclimation, q_nst_with_acclimation
-    ), "Cold acclimation did not change the result"
+    assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation), (
+        "Cold acclimation did not change the result"
+    )
 
 
 def test_sum_bf():

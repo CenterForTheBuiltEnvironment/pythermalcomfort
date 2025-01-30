@@ -22,7 +22,6 @@ from typing import ClassVar
 import numpy as np
 
 # import pandas as pd
-
 from pythermalcomfort.classes_return import JOS3BodyParts
 from pythermalcomfort.utilities import BodySurfaceAreaEquations, Postures, Sex
 

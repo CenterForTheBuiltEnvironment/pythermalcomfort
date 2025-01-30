@@ -3,10 +3,10 @@ import datetime as dt
 
 # Set up logging with a level of WARNING
 import os
+from collections import defaultdict
 from dataclasses import fields
 
 import numpy as np
-from collections import defaultdict
 
 from pythermalcomfort.classes_return import (
     JOS3BodyParts,
