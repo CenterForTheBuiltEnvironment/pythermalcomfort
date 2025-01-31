@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from os.path import dirname, join
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def read(*names, **kwargs):
@@ -19,11 +19,16 @@ setup(
     version="2.11.4",
     license="MIT",
     description=(
-        "Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET,"
-        " adaptive) and convert physical variables. Please cite us if you use this"
-        " package: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python"
-        " package for thermal comfort research. SoftwareX 12, 100578."
-        " https://doi.org/10.1016/j.softx.2020.100578"
+        "The pythermalcomfort Python package is a comprehensive toolkit for calculating "
+        "thermal comfort indices, heat/cold stress metrics, and thermophysiological responses. "
+        "It supports multiple models, including PMV, PPD, adaptive comfort, and SET, "
+        "and calculates heat and cold stress indices such as UTCI, Heat Index, Wind Chill Index, and Humidex. "
+        "The package also includes thermophysiological models like the two-node (Gagge) and multinode (JOS-3) models "
+        "to estimate physiological responses such as core temperature, skin temperature, and skin wettedness. "
+        "Designed for researchers, engineers, and building science professionals, it ensures accuracy and compliance "
+        "with industry standards like ASHRAE 55, ISO 7730, and EN 16798. The package is easy to use, with an "
+        "intuitive API, extensive documentation, and active development, making it a valuable tool for thermal "
+        "comfort research and applications."
     ),
     long_description="{}\n{}".format(
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
@@ -31,17 +36,14 @@ setup(
         ),
         re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
     ),
+    long_description_content_type="text/x-rst",
     author="Federico Tartarini",
     author_email="cbecomforttool@gmail.com",
     url="https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort",
-    # packages=find_packages("pythermalcomfort"),
-    # package_dir={"pythermalcomfort": "pythermalcomfort"},
-    # py_modules=[splitext(basename(path))[0] for path in glob("pythermalcomfort/*.py")],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        # complete classifier list:
-        # http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
@@ -58,7 +60,9 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
+        "Topic :: Education",
         "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Atmospheric Science",
         "Topic :: Utilities",
     ],
     project_urls={
@@ -71,9 +75,14 @@ setup(
     keywords=[
         "thermal comfort",
         "pmv",
-        "ppd",
-        "building design",
-        "compliance",
+        "heat stress",
+        "cold stress",
+        "thermal sensation",
+        "thermal physiology",
+        "meteorology",
+        "climate analysis",
+        "discomfort",
+        "comfort",
         "thermal environment",
         "built environment",
     ],
@@ -83,11 +92,9 @@ setup(
         "numba",
         "numpy",
         "setuptools",
-    ],  # eg: 'aspectlib==1.1.1', 'six>=1.7',
+    ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
+        "dev": ["pytest", "sphinx"],
     },
     entry_points={
         "console_scripts": [

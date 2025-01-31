@@ -1,13 +1,13 @@
-.. image:: images/pythermalcomfort-3-short.png
-  :align: center
-  :alt: pythermalcomfort logo
-
 ================
 pythermalcomfort
 ================
 
 The ``pythermalcomfort`` Python package is a comprehensive toolkit for calculating **thermal comfort indices**, **heat/cold stress metrics**, and **thermophysiological responses** based on international standards and peer-reviewed research.
 Designed for researchers, engineers, and building science professionals, it simplifies complex calculations while ensuring accuracy and compliance with industry standards.
+
+.. image:: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/blob/5ee0ca3efdf4f2c7d2e0df7a83efe43f13a70451/docs/images/pythermalcomfort-3-short.png
+  :align: center
+  :alt: pythermalcomfort logo
 
 Key Features
 ============
@@ -59,7 +59,7 @@ Install ``pythermalcomfort`` via pip:
 
    pip install pythermalcomfort
 
-For advanced installation options, refer to the :doc:`installation guide <installation>`.
+For advanced installation options, refer to the installation Section in the documentation.
 
 Quick Start
 ===========
@@ -78,19 +78,19 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
    utci_value = utci(tdb=30, tr=30, v=0.5, rh=50)
    print(f"UTCI: {utci_value} °C")
 
-For more examples and detailed usage, check out models and indices in the :doc:`documentation <documentation/models>`.
+For more examples and detailed usage, check out models and indices in the models section of the documentation.
 
 Contribute
 ==========
 
 We welcome contributions!
 Whether you’re reporting a bug, suggesting a feature, or submitting a pull request, your input helps make ``pythermalcomfort`` better for everyone.
-Check out our :doc:`contribution guidelines <contributing>` to get started.
+Check out our contribution page in the documentation to get started.
 
 Documentation
 =============
 
-For detailed documentation, tutorials, and examples, visit our :doc:`documentation page <documentation/models>`.
+For detailed documentation, tutorials, and examples, visit our documentation.
 
 License
 =======

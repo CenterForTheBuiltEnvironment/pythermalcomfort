@@ -22,6 +22,8 @@ ruff = "*"
 docformatter = "*"
 autopep8 = "*"
 bump-my-version = "*"
+twine = "*"
+readme-renderer = "*"
 
 [requires]
 python_version = "3.12"
