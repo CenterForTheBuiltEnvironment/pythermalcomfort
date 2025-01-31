@@ -25,7 +25,6 @@ from pythermalcomfort.models.utci import utci
 from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
 from pythermalcomfort.models.wbgt import wbgt
 from pythermalcomfort.models.wci import wci
-from pythermalcomfort.models.zhang_comfort import zhang_sensation_comfort
 
 __all__ = [
     "heat_index_lu",
@@ -55,5 +54,4 @@ __all__ = [
     "net",
     "discomfort_index",
     "JOS3",
-    "zhang_sensation_comfort",
 ]
