@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
-from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.shared_functions import mapping, valid_range
 from pythermalcomfort.utilities import (
     Models,

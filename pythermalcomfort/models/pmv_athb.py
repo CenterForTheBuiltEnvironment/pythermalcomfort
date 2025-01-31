@@ -4,7 +4,7 @@ import numpy as np
 
 from pythermalcomfort.classes_input import ATHBInputs
 from pythermalcomfort.classes_return import ATHB
-from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.utilities import met_to_w_m2
 
 

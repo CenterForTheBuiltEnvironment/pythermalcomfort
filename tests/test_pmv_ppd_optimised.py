@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from pythermalcomfort.models.pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 
 
 class TestPmvPpdOptimized:
