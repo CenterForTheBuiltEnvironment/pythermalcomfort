@@ -19,16 +19,12 @@ setup(
     version="2.11.5",
     license="MIT",
     description=(
-        "The pythermalcomfort Python package is a comprehensive toolkit for calculating "
+        "pythermalcomfort is a comprehensive toolkit for calculating "
         "thermal comfort indices, heat/cold stress metrics, and thermophysiological responses. "
-        "It supports multiple models, including PMV, PPD, adaptive comfort, and SET, "
-        "and calculates heat and cold stress indices such as UTCI, Heat Index, Wind Chill Index, and Humidex. "
+        "It supports multiple models, including PMV, PPD, adaptive comfort, SET, "
+        "UTCI, Heat Index, Wind Chill Index, and Humidex. "
         "The package also includes thermophysiological models like the two-node (Gagge) and multinode (JOS-3) models "
         "to estimate physiological responses such as core temperature, skin temperature, and skin wettedness. "
-        "Designed for researchers, engineers, and building science professionals, it ensures accuracy and compliance "
-        "with industry standards like ASHRAE 55, ISO 7730, and EN 16798. The package is easy to use, with an "
-        "intuitive API, extensive documentation, and active development, making it a valuable tool for thermal "
-        "comfort research and applications."
     ),
     long_description="{}\n{}".format(
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
