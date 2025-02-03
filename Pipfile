@@ -1,0 +1,30 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+scipy = "*"
+numba = "*"
+numpy = "*"
+setuptools = "*"
+tox = "*"
+
+[dev-packages]
+pytest = "*"
+requests = "*"
+pandas = "*"
+pydantic = "*"
+tabulate = "*"
+matplotlib = "*"
+seaborn = "*"
+ruff = "*"
+docformatter = "*"
+autopep8 = "*"
+bump-my-version = "*"
+twine = "*"
+readme-renderer = "*"
+
+[requires]
+python_version = "3.12"
+python_full_version = "3.12.4"

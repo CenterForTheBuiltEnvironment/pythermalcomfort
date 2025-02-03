@@ -1,6 +1,55 @@
 Changelog
 =========
 
+3.0.0 (2024-03-18)
+-------------------
+
+.. warning::
+    pythermalcomfort version 3.0.0 introduces some breaking changes.
+
+    **How functions return results:**
+    as the functions now return dataclass instances with the calculation results.
+    This change enhances the structure and accessibility of the results.
+    For example:
+
+    .. code-block:: python
+
+        from pythermalcomfort.models import pmv_ppd_iso
+        result = pmv_ppd_iso(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model='7730-2005')
+        print(result.pmv)  # [-0.  0.41]
+
+    This update aims to make the package more user-friendly and to provide a more organized way to access all calculation results.
+
+    **Moved functions**
+    Moved all the functions that were in the `psychrometrics.py` file to the `utilities.py` file.
+
+    **Changed function names**
+    All the PMV functions have been renamed using the following format: `pmv_XXX` where XXX is the standard or the model name.
+
+    **PMV function**
+    The pmv_ppd function now has been split into two functions: pmv_ppd_iso and pmv_ppd_ashrae.
+
+.. note::
+    We have updated all functions to accept Numpy arrays as inputs, allowing you to pass multiple values at once for faster results.
+    Single values are still accepted, and the functions will return results as before.
+    Additionally, we have synchronized the tests with the R comf package to ensure consistent calculation results across both packages.
+
+    Other improvements include:
+
+    * Enhanced documentation with more examples.
+    * Better described the models.
+    * Added more tests to ensure calculation accuracy.
+    * Implemented input validation to ensure inputs are within model applicability limits.
+    * Harmonized input names across all functions.
+    * Added surveys to assess thermal comfort to the documentation.
+    * Added a detailed section about clothing insulation.
+
+2.10.0 (2024-03-18)
+-------------------
+
+* allow n-dimensional arrays for ``pet_steady`` and speedup ``p_sat`` calculation
+
+
 2.9.1 (2024-01-19)
 -------------------
 
@@ -260,7 +309,7 @@ Changelog
 1.2.2 (2020-08-21)
 ------------------
 
-* Changed default diameter in t_mrt
+* Changed default diameter in mean_radiant_tmp
 * Improved documentation
 
 
@@ -319,7 +368,7 @@ Changelog
 * Added functions to calculate vapour pressure, wet-bulb temperature, dew point temperature, and psychrometric data from dry bulb temperature and RH
 * Added authors
 * Added dictionaries with reference clo and met values
-* Added function to calculate enthalpy
+* Added function to calculate enthalpy_air
 
 0.5.2 (2020-03-11)
 ------------------

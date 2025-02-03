@@ -1,6 +1,21 @@
-def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
-    """Calculates the Wet Bulb Globe Temperature (WBGT) index calculated in
-    compliance with the ISO 7243 [11]_. The WBGT is a heat stress index that
+from typing import Union
+
+import numpy as np
+import numpy.typing as npt
+
+from pythermalcomfort.classes_input import WBGTInputs
+from pythermalcomfort.classes_return import WBGT
+
+
+def wbgt(
+    twb: Union[float, npt.ArrayLike],
+    tg: Union[float, npt.ArrayLike],
+    tdb: Union[float, npt.ArrayLike] = None,
+    with_solar_load: bool = False,
+    round_output: bool = True,
+) -> WBGT:
+    """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance
+    with the ISO 7243 Standard [ISO_7243_2017]_. The WBGT is a heat stress index that
     measures the thermal environment to which a person is exposed. In most
     situations, this index is simple to calculate. It should be used as a
     screening tool to determine whether heat stress is present. The PHS model
@@ -8,9 +23,9 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
     the function :py:meth:`pythermalcomfort.models.phs`.
 
     The WBGT determines the impact of heat on a person throughout the course of a working
-    day (up to 8 h). It does not apply to very brief heat exposures. It pertains to
-    the evaluation of male and female people who are fit for work in both indoor
-    and outdoor occupational environments, as well as other sorts of surroundings [11]_.
+    day (up to 8 hours). It does not apply to very brief heat exposures. It pertains to
+    the evaluation of male and female people who are fit for work in both indoor and
+    outdoor occupational environments, as well as other sorts of surroundings [ISO_7243_2017]_.
 
     The WBGT is defined as a function of only twb and tg if the person is not exposed to
     direct radiant heat from the sun. When a person is exposed to direct radiant heat,
@@ -18,42 +33,50 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
 
     Parameters
     ----------
-    twb : float,
-        natural (no forced air flow) wet bulb temperature, [°C]
-    tg : float
-        globe temperature, [°C]
-    tdb : float
-        dry bulb air temperature, [°C]. This value is needed as input if the person is
-        exposed to direct solar radiation
-    with_solar_load: bool
-        True if the globe sensor is exposed to direct solar radiation
-
-    Other Parameters
-    ----------------
-    round: boolean, default True
-        if True rounds output value, if False it does not round it
+    twb : float or list of floats
+        Natural (no forced air flow) wet bulb temperature, [°C].
+    tg : float or list of floats
+        Globe temperature, [°C].
+    tdb : float or list of floats, optional
+        Dry bulb air temperature, [°C]. This value is needed as input if the person is
+        exposed to direct solar radiation.
+    with_solar_load : bool, optional
+        True if the globe sensor is exposed to direct solar radiation. Defaults to False.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------
-    wbgt : float
-        Wet Bulb Globe Temperature Index, [°C]
+    WBGT
+        A dataclass containing the Wet Bulb Globe Temperature Index. See
+        :py:class:`~pythermalcomfort.classes_return.WBGT` for more details. To access the
+        `wbgt` value, use the `wbgt` attribute of the returned `wbgt` instance, e.g.,
+        `result.wbgt`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import wbgt
-        >>> wbgt(twb=25, tg=32)
-        27.1
+        from pythermalcomfort.models import wbgt
 
-        >>> # if the persion is exposed to direct solar radiation
-        >>> wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
-        25.9
+        result = wbgt(twb=25, tg=32)
+        print(result.wbgt)  # 27.1
+
+        result = wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
+        print(result.wbgt)  # 25.9
     """
-    default_kwargs = {
-        "round": True,
-    }
-    kwargs = {**default_kwargs, **kwargs}
+    # Validate inputs using the WBGTInputs class
+    WBGTInputs(
+        twb=twb,
+        tg=tg,
+        tdb=tdb,
+        with_solar_load=with_solar_load,
+        round_output=round_output,
+    )
+
+    twb = np.array(twb)
+    tg = np.array(tg)
+    tdb = np.array(tdb) if tdb is not None else None
 
     if with_solar_load and tdb is None:
         raise ValueError("Please enter the dry bulb air temperature")
@@ -63,7 +86,7 @@ def wbgt(twb, tg, tdb=None, with_solar_load=False, **kwargs):
     else:
         t_wbg = 0.7 * twb + 0.3 * tg
 
-    if kwargs["round"]:
-        return round(t_wbg, 1)
-    else:
-        return t_wbg
+    if round_output:
+        t_wbg = np.round(t_wbg, 1)
+
+    return WBGT(wbgt=t_wbg)

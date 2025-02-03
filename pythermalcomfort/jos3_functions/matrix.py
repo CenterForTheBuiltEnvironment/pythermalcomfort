@@ -1,29 +1,11 @@
-# -*- coding: utf-8 -*-
-
-"""This code defines a set of models and constants to model heat exchange
-and blood flow in different body parts and layers."""
+"""This code defines a set of models and constants to model heat exchange and
+blood flow in different body parts and layers."""
 
 import numpy as np
 
-BODY_NAMES = [
-    "head",
-    "neck",
-    "chest",
-    "back",
-    "pelvis",
-    "left_shoulder",
-    "left_arm",
-    "left_hand",
-    "right_shoulder",
-    "right_arm",
-    "right_hand",
-    "left_thigh",
-    "left_leg",
-    "left_foot",
-    "right_thigh",
-    "right_leg",
-    "right_foot",
-]
+from pythermalcomfort.classes_return import JOS3BodyParts
+from pythermalcomfort.jos3_functions.parameters import Default
+
 LAYER_NAMES = ["artery", "vein", "sfvein", "core", "muscle", "fat", "skin"]
 
 
@@ -33,7 +15,7 @@ def index_order():
     Returns
     -------
     index_dict : nested dictionary
-        keys are BODY_NAMES and LAYER_NAMES
+        keys are the body names and layer names
     """
     # Defines existing layers as 1 or None
     index_dict = {}
@@ -60,7 +42,7 @@ def index_order():
             "skin": 1,
         }
 
-    for key in BODY_NAMES[5:]:  # limb segments
+    for key in JOS3BodyParts.get_attribute_names()[5:]:  # limb segments
         index_dict[key] = {
             "artery": 1,
             "vein": 1,
@@ -74,7 +56,7 @@ def index_order():
     # Sets ordered indices in the matrix
     index_dict["CB"] = 0
     order_count = 1
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         for ln in LAYER_NAMES:
             if index_dict[bn][ln] is not None:
                 index_dict[bn][ln] = order_count
@@ -88,6 +70,7 @@ IDICT, NUM_NODES = index_order()
 
 def index_by_layer(layer):
     """Get indices of the matrix by the layer name.
+
     Parameters
     ----------
     layer : str
@@ -98,10 +81,9 @@ def index_by_layer(layer):
     -------
     indices of the matrix : list
     """
-
     # Gets indices by the layer name
     out_index = []
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         for ln in LAYER_NAMES:
             if (layer.lower() == ln) and IDICT[bn][ln]:
                 out_index.append(IDICT[bn][ln])
@@ -109,8 +91,8 @@ def index_by_layer(layer):
 
 
 def valid_index_by_layer(layer):
-    """
-    Get indices of the matrix by the layer name.
+    """Get indices of the matrix by the layer name.
+
     Parameters
     ----------
     layer : str
@@ -121,10 +103,9 @@ def valid_index_by_layer(layer):
     -------
     indices of the matrix : list
     """
-
     # Gets valid indices of the layer name
     out_index = []
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         if IDICT[bn][layer]:
             out_index.append(i)
     return out_index
@@ -146,7 +127,7 @@ def local_arr(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     1.067 [Wh/(L･K)] * Bloodflow [L/h] = [W/K]
     """
     bf_local = np.zeros((NUM_NODES, NUM_NODES))
-    for i, bn in enumerate(BODY_NAMES):
+    for i, bn in enumerate(JOS3BodyParts.get_attribute_names()):
         # Dictionary of indecies in each body segment
         # key = layer name, value = index of matrix
         index_of = IDICT[bn]
@@ -191,8 +172,8 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     """Get artery and vein blood flow rate [l/h]"""
     xbf = bf_core + bf_muscle + bf_fat + bf_skin
 
-    bf_art = np.zeros(17)
-    bf_vein = np.zeros(17)
+    bf_art = np.zeros(Default.num_body_parts)
+    bf_vein = np.zeros(Default.num_body_parts)
 
     # head
     bf_art[0] = xbf[0]
@@ -211,8 +192,8 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     bf_vein[3] = xbf[3]
 
     # pelvis (+Thighs, Legs, Feet, AVA_Feet)
-    bf_art[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
-    bf_vein[4] = xbf[4] + xbf[11:17].sum() + 2 * bf_ava_foot
+    bf_art[4] = xbf[4] + xbf[11 : Default.num_body_parts].sum() + 2 * bf_ava_foot
+    bf_vein[4] = xbf[4] + xbf[11 : Default.num_body_parts].sum() + 2 * bf_ava_foot
 
     # L.Shoulder (+Arm, Hand, (arteryのみAVA_Hand))
     bf_art[5] = xbf[5:8].sum() + bf_ava_hand
@@ -251,12 +232,12 @@ def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_f
     bf_vein[13] = xbf[13]
 
     # R.Thigh (+Leg, Foot, (arteryのみAVA_Foot))
-    bf_art[14] = xbf[14:17].sum() + bf_ava_foot
-    bf_vein[14] = xbf[14:17].sum()
+    bf_art[14] = xbf[14 : Default.num_body_parts].sum() + bf_ava_foot
+    bf_vein[14] = xbf[14 : Default.num_body_parts].sum()
 
     # R.Leg (+Foot)
-    bf_art[15] = xbf[15:17].sum() + bf_ava_foot
-    bf_vein[15] = xbf[15:17].sum()
+    bf_art[15] = xbf[15 : Default.num_body_parts].sum() + bf_ava_foot
+    bf_vein[15] = xbf[15 : Default.num_body_parts].sum()
 
     # R.Foot
     bf_art[16] = xbf[16] + bf_ava_foot
@@ -413,12 +394,11 @@ def remove_body_name(text):
     removed : str
         The removed body name
     """
-
     rtext = text
     removed = None
 
     # Remove the body part name from the parameter name
-    for bn in BODY_NAMES:
+    for bn in JOS3BodyParts.get_attribute_names():
         if bn in text:
             rtext = rtext.replace(
                 bn, ""

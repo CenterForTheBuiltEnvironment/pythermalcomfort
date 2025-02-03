@@ -16,6 +16,9 @@ matrix:
     - env:
         - TOXENV=py311,codecov
       python: '3.11'
+    - env:
+        - TOXENV=py312,codecov
+      python: '3.12'
 before_install:
   - python --version
   - uname -a

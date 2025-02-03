@@ -1,10 +1,16 @@
 from pythermalcomfort.models import net
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_net():
-    assert net(37, 100, 0.1) == 37
-    assert net(37, 100, 4.5) == 37
-    assert net(25, 100, 4.5) == 20
-    assert net(25, 100, 0.1) == 25.4
-    assert net(40, 48.77, 0.1) == 33.8
-    assert net(36, 50.196, 0.1) == 30.9
+def test_net(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.NET.name
+    )
+    tolerance = reference_table["tolerance"]
+
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = net(**inputs)
+
+        validate_result(result, outputs, tolerance)

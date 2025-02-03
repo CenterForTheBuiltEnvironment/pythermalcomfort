@@ -1,34 +1,35 @@
+from typing import Union
+
 import numpy as np
+import numpy.typing as npt
 from scipy import optimize
 
-from pythermalcomfort.psychrometrics import p_sat
-from pythermalcomfort.utilities import (
-    body_surface_area,
-)
+from pythermalcomfort.classes_input import PETSteadyInputs
+from pythermalcomfort.classes_return import PETSteady
+from pythermalcomfort.utilities import Postures, Sex, body_surface_area, p_sat
 
 
 def pet_steady(
-    tdb,
-    tr,
-    v,
-    rh,
-    met,
-    clo,
-    p_atm=1013.25,
-    position=1,
-    age=23,
-    sex=1,
-    weight=75,
-    height=1.8,
-    wme=0,
-):
-    """
-    The steady physiological equivalent temperature (PET) is calculated using the Munich
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    p_atm: Union[float, list[float]] = 1013.25,
+    position: Union[str, list[str]] = Postures.sitting.value,
+    age: Union[int, list[int]] = 23,
+    sex: Union[int, list[int]] = Sex.male.value,
+    weight: Union[float, list[float]] = 75,
+    height: Union[float, list[float]] = 1.8,
+    wme: Union[float, list[float]] = 0,
+) -> PETSteady:
+    """The steady physiological equivalent temperature (PET) is calculated using the Munich
     Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
     circumstances in a medically realistic manner. PET is defined as the air temperature
     at which, in a typical indoor setting the heat budget of the human body is balanced
     with the same core and skin temperature as under the complex outdoor conditions to be
-    assessed [20]_.
+    assessed [hoppe]_.
     The following assumptions are made for the indoor reference climate: tdb = tr, v = 0.1
     m/s, water vapour pressure = 12 hPa, clo = 0.9 clo, and met = 1.37 met + basic
     metabolism.
@@ -36,60 +37,124 @@ def pet_steady(
     outside with his or her own personal experience indoors in this way. This function
     solves the heat balances without accounting for heat storage in the human body.
 
-    The PET was originally proposed by Hoppe [20]_. In 2018, Walther and Goestchel [21]_
+    The PET was originally proposed by Hoppe [hoppe]_. In 2018, Walther and Goestchel [Walther]_
     proposed a correction of the original model, purging the errors in the
     PET calculation routine, and implementing a state-of-the-art vapour diffusion model.
     Walther and Goestchel (2018) model is therefore used to calculate the PET.
 
     Parameters
     ----------
-    tdb : float
-        dry bulb air temperature, [°C]
-    tr : float
-        mean radiant temperature, [°C]
-    v : float
-        air speed, [m/s]
-    rh : float
-        relative humidity, [%]
-    met : float
-        metabolic rate, [met]
-    clo : float
-        clothing insulation, [clo]
-    p_atm : float
-        atmospheric pressure, default value 1013.25 [hPa]
-    position : int
-        position of the individual (1=sitting, 2=standing, 3=standing, forced convection)
-    age : int, default 23
-        age in years
-    sex : int, default 1
-        male (1) or female (2).
-    weight : float, default 75
-        body mass, [kg]
-    height: float, default 1.8
-        height, [m]
-    wme : float, default 0
-        external work, [W/(m2)] default 0
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    tr : float or list of floats
+        Mean radiant temperature, [°C].
+    v : float or list of floats
+        Wind speed, [m/s].
+    rh : float or list of floats
+        Relative humidity, [%].
+    met : float or list of floats
+        Metabolic rate, [met].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+    p_atm : float or list of floats, optional
+        Atmospheric pressure, [hPa]. Defaults to 1013.25.
+    position : str or list of str, optional
+        Position of the person "sitting", "standing", "standing, forced convection". Defaults to "sitting".
+    age : int or list of ints, optional
+        Age of the person. Defaults to 23.
+    sex : str or list of str, optional
+        Sex of the person "male" or "female". Defaults to "male"
+    weight : float or list of floats, optional
+        Weight of the person, [kg]. Defaults to 75.
+    height : float or list of floats, optional
+        Height of the person, [m]. Defaults to 1.8.
+    wme : float or list of floats, optional
+        External work, [met]. Defaults to 0.
 
     Returns
     -------
-    PET
-        Steady-state PET under the given ambient conditions
+    PETSteady
+        A dataclass containing the Physiological Equivalent Temperature. See :py:class:`~pythermalcomfort.classes_return.PETSteady` for more details.
+        To access the `pet` value, use the `pet` attribute of the returned `PETSteady` instance, e.g., `result.pet`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import pet_steady
-        >>> pet_steady(tdb=20, tr=20, rh=50, v=0.15, met=1.37, clo=0.5)
-        18.85
-    """
+        from pythermalcomfort.models import pet_steady
 
+        result = pet_steady(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
+        print(result.pet)  # 24.67
+
+        result = pet_steady(
+            tdb=[25, 30],
+            tr=[25, 30],
+            v=[0.1, 0.2],
+            rh=[50, 60],
+            met=[1.2, 1.4],
+            clo=[0.5, 0.6],
+        )
+        print(result.pet)  # [24.67 31.46]
+
+    """
+    # Validate inputs using the PETSteadyInputs class
+    PETSteadyInputs(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        p_atm=p_atm,
+        position=position,
+        age=age,
+        sex=sex,
+        weight=weight,
+        height=height,
+        wme=wme,
+    )
+
+    return PETSteady(
+        pet=_pet_steady_vectorised(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            met=met,
+            clo=clo,
+            p_atm=p_atm,
+            position=position,
+            age=age,
+            sex=sex,
+            weight=weight,
+            height=height,
+            wme=wme,
+        )
+    )
+
+
+@np.vectorize
+def _pet_steady_vectorised(
+    tdb,
+    tr,
+    v,
+    rh,
+    met,
+    clo,
+    p_atm,
+    position,
+    age,
+    sex,
+    weight,
+    height,
+    wme,
+) -> npt.ArrayLike:
     met_factor = 58.2  # met conversion factor
     met = met * met_factor  # metabolic rate
 
     def vasomotricity(t_cr, t_sk):
-        """Defines the vasomotricity (blood flow) in function of the core
-        and skin temperatures.
+        """Defines the vasomotricity (blood flow) in function of the core and
+        skin temperatures.
 
         Parameters
         ----------
@@ -168,15 +233,14 @@ def pet_steady(
         _clo=0.9,
         actual_environment=False,
     ):
-        """
-        This function allows solving for the PET : either it solves the vectorial balance
+        """This function allows solving for the PET : either it solves the vectorial balance
         of the 3 unknown temperatures (T_core, T_sk, T_clo) or it solves for the
         environment operative temperature that would yield the same energy balance as the
         actual environment.
 
         Parameters
         ----------
-        t_arr : list or array-like
+        t_arr : list or list of floats
             [T_core, T_sk, T_clo], [°C]
         _tdb : float
             dry bulb air temperature, [°C]
@@ -197,8 +261,8 @@ def pet_steady(
         -------
         float or list
             PET or energy balance.
-        """
 
+        """
         e_skin = 0.99  # Skin emissivity
         e_clo = 0.95  # Clothing emissivity
         h_vap = 2.42 * 10**6  # Latent heat of evaporation [J/Kg]
@@ -233,7 +297,7 @@ def pet_steady(
             )
         )
         # Attribution of internal energy depending on the sex of the subject
-        met_correction = met_male if sex == 1 else met_female
+        met_correction = met_male if sex == Sex.male.value else met_female
 
         # Source term : metabolic activity
         he = (_met + met_correction) / a_dubois
@@ -247,12 +311,12 @@ def pet_steady(
         fcl = (
             1 + 0.31 * _clo
         )  # Increase heat exchange surface depending on clothing level
-        f_a_cl = (
-            173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0
-        ) / 100
+        f_a_cl = (173.51 * _clo - 2.36 - 100.76 * _clo * _clo + 19.28 * _clo**3.0) / 100
         a_clo = a_dubois * f_a_cl + a_dubois * (fcl - 1.0)  # clothed body surface area
 
-        f_eff = 0.696 if position == 2 else 0.725  # effective radiation factor
+        f_eff = (
+            0.696 if position == Postures.standing.value else 0.725
+        )  # effective radiation factor
 
         a_r_eff = (
             a_dubois * f_eff
@@ -265,9 +329,9 @@ def pet_steady(
 
         # Convection coefficient depending on wind velocity and subject position
         hc = 2.67 + 6.5 * _v**0.67  # sitting
-        if position == 2:  # standing
+        if position == Postures.standing.value:  # standing
             hc = 2.26 + 7.42 * _v**0.67
-        if position == 3:  # standing, forced convection
+        if position == "standing, forced convection":  # standing, forced convection
             hc = 8.6 * _v**0.513
         # h_cc corrected convective heat transfer coefficient
         h_cc = 3.0 * pow(p_atm / 1013.25, 0.53)
@@ -393,7 +457,7 @@ def pet_steady(
 
         Parameters
         ----------
-        _t_stable : list or array-like
+        _t_stable : list or list of floats
             3 temperatures obtained from the actual environment (T_core,T_skin,T_clo).
 
         Returns

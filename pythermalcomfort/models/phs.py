@@ -1,32 +1,37 @@
 import math
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 from numba import jit
 
-from pythermalcomfort.psychrometrics import p_sat
+from pythermalcomfort.classes_input import PHSInputs
+from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
-    check_standard_compliance_array,
+    Postures,
+    _check_standard_compliance_array,
+    met_to_w_m2,
+    p_sat,
 )
 
 
 def phs(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    tr: Union[float, int, np.ndarray, List[float], List[int]],
-    v: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-    met: Union[float, int, np.ndarray, List[float], List[int]],
-    clo: Union[float, int, np.ndarray, List[float], List[int]],
-    posture,
-    wme: Union[float, int, np.ndarray, List[float], List[int]] = 0,
-    **kwargs
-):
-    """Calculates the Predicted Heat Strain (PHS) index based in compliace with
-    the ISO 7933:2004 Standard [8]_. The ISO 7933 provides a method for the
-    analytical evaluation and interpretation of the thermal stress experienced
-    by a subject in a hot environment. It describes a method for predicting the
-    sweat rate and the internal core temperature that the human body will
-    develop in response to the working conditions.
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    posture: Union[str, list[str]],
+    wme: Union[float, int, np.ndarray, list[float], list[int]] = 0,
+    round_output: bool = True,
+    **kwargs,
+) -> PHS:
+    """Calculates the Predicted Heat Strain (PHS) index based in compliance
+    with the ISO 7933:2004 Standard [ISO_7933_2004]_. The ISO 7933 provides a method for
+    the analytical evaluation and interpretation of the thermal stress
+    experienced by a subject in a hot environment. It describes a method for
+    predicting the sweat rate and the internal core temperature that the human
+    body will develop in response to the working conditions.
 
     The PHS model can be used to predict the: heat by respiratory convection, heat flow
     by respiratory evaporation, steady state mean skin temperature, instantaneous value
@@ -36,97 +41,110 @@ def phs(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C]
-    tr : float, int, or array-like
-        mean radiant temperature, default in [°C]
-    v : float, int, or array-like
-        air speed, default in [m/s]
-    rh : float, int, or array-like
-        relative humidity, [%]
-    met : float, int, or array-like
-        metabolic rate, [W/(m2)]
-    clo : float, int, or array-like
-        clothing insulation, [clo]
-    posture: int
-        a numeric value presenting posture of person [sitting=1, standing=2, crouching=3]
-    wme : float, int, or array-like
-        external work, [W/(m2)] default 0
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    tr : float or list of floats
+        Mean radiant temperature, [°C].
+    v : float or list of floats
+        Air speed, [m/s].
+    rh : float or list of floats
+        Relative humidity, [%].
+    met : float or list of floats
+        Metabolic rate, [met].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+    posture: string or list of strings
+        a string value presenting posture of person "sitting", "standing", or "crouching"
+    wme : float or list of floats
+        external work, [met] default 0
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Other Parameters
     ----------------
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns values even if input values are
-        outside the applicability limits of the model.
+    limit_inputs : bool, optional
+        If True, limits the input parameters to the standard's applicability limits. Defaults to True.
 
-        The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
-        0 < vr [m/s] < 3, 100 < met [met] < 450, and 0.1 < clo [clo] < 1.
-    i_mst : float, default 0.38
-        static moisture permeability index, [dimensionless]
-    a_p : float, default 0.54
-        fraction of the body surface covered by the reflective clothing, [dimensionless]
-    drink : int, default 1
-        1 if workers can drink freely, 0 otherwise
-    weight : float, default 75
-        body weight, [kg]
-    height : float, default 1.8
-        height, [m]
-    walk_sp : float, default 0
-        walking speed, [m/s]
-    theta : float, default 0
-        angle between walking direction and wind direction [degrees]
-    acclimatized : int, default 100
-        100 if acclimatized subject, 0 otherwise
-    duration : int, default 480
-        duration of the work sequence, [minutes]
-    f_r : float, default 0.97
-        emissivity of the reflective clothing, [dimensionless]
-        Some reference values :py:meth:`pythermalcomfort.utilities.f_r_garments`.
-    t_sk : float, default 34.1
-        mean skin temperature when worker starts working, [°C]
-    t_cr : float, default 36.8
-        mean core temperature when worker starts working, [°C]
-    t_re : float, default False
-        mean rectal temperature when worker starts working, [°C]
-    t_cr_eq : float, default False
-        mean core temperature as a function of met when worker starts working, [°C]
-    sweat_rate : float, default 0
+        .. note::
+            By default, if the inputs are outside the standard applicability limits the
+            function returns nan. If False returns values even if input values are
+            outside the applicability limits of the model.
+
+            The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
+            0 < vr [m/s] < 3, 100 < met [met] < 450, and 0.1 < clo [clo] < 1.
+
+    i_mst : float, optional
+        Static moisture permeability index, [dimensionless]. Defaults to 0.38.
+    a_p : float, optional
+        Fraction of the body surface covered by the reflective clothing, [dimensionless]. Defaults to 0.54.
+    drink : int, optional
+        1 if workers can drink freely, 0 otherwise. Defaults to 1.
+    weight : float, optional
+        Body weight, [kg]. Defaults to 75.
+    height : float, optional
+        Height, [m]. Defaults to 1.8.
+    walk_sp : float, optional
+        Walking speed, [m/s]. Defaults to 0.
+    theta : float, optional
+        Angle between walking direction and wind direction, [degrees]. Defaults to 0.
+    acclimatized : int, optional
+        100 if acclimatized subject, 0 otherwise. Defaults to 100.
+    duration : int, optional
+        Duration of the work sequence, [minutes]. Defaults to 480.
+    f_r : float, optional
+        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97.
+    t_sk : float, optional
+        Mean skin temperature when worker starts working, [°C]. Defaults to 34.1.
+    t_cr : float, optional
+        Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
+    t_re : float, optional
+        Mean rectal temperature when worker starts working, [°C]. Defaults to False.
+    t_cr_eq : float, optional
+        Mean core temperature as a function of met when worker starts working, [°C]. Defaults to False.
+    sweat_rate : float, optional
+        Initial sweat rate, [g/h]. Defaults to 0.
 
     Returns
     -------
-    t_re : float
-        rectal temperature, [°C]
-    t_sk : float
-        skin temperature, [°C]
-    t_cr : float
-        core temperature, [°C]
-    t_cr_eq : float
-        core temperature as a function of the metabolic rate, [°C]
-    t_sk_t_cr_wg : float
-        fraction of the body mass at the skin temperature
-    d_lim_loss_50 : float
-        maximum allowable exposure time for water loss, mean subject, [minutes]
-    d_lim_loss_95 : float
-        maximum allowable exposure time for water loss, 95% of the working population,
-        [minutes]
-    d_lim_t_re : float
-        maximum allowable exposure time for heat storage, [minutes]
-    water_loss_watt : float
-        maximum water loss in watts, [W]
-    water_loss : float
-        maximum water loss, [g]
+    PHS
+        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.classes_return.PHS` for more details.
+        To access the individual attributes, use the corresponding attribute of the returned `PHS` instance, e.g., `result.t_re`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import phs
-        >>> results = phs(tdb=40, tr=40, rh=33.85, v=0.3, met=150, clo=0.5, posture=2, wme=0)
-        >>> print(results)
-        {'t_re': 37.5, 'd_lim_loss_50': 440, 'd_lim_loss_95': 298, 'd_lim_t_re': 480,
-        'water_loss': 6166.0}
+        from pythermalcomfort.models import phs
+
+        result = phs(
+            tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0
+        )
+        print(result.t_re)  # 37.5
+
+        result = phs(
+            tdb=[40, 45],
+            tr=[40, 45],
+            v=[0.3, 0.4],
+            rh=[33.85, 40],
+            met=[2.5, 2.6],
+            clo=[0.5, 0.6],
+            posture=["standing", "standing"],
+            wme=[0, 0],
+        )
+        print(result.t_re)  # [37.5 43.4]
     """
+    PHSInputs(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        round_output=round_output,
+        wme=wme,
+        posture=posture,
+    )
+
     default_kwargs = {
         "i_mst": 0.38,
         "a_p": 0.54,
@@ -153,9 +171,9 @@ def phs(
     tr = np.array(tr)
     v = np.array(v)
     rh = np.array(rh)
-    met = np.array(met)
+    met = np.array(met) * met_to_w_m2
     clo = np.array(clo)
-    wme = np.array(wme)
+    wme = np.array(wme) * met_to_w_m2
     posture = np.array(posture)
 
     i_mst = kwargs["i_mst"]
@@ -209,7 +227,7 @@ def phs(
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
-    ) = np.vectorize(_phs_optimized, cache=True)(
+    ) = _phs_optimized(
         tdb=tdb,
         tr=tr,
         v=v,
@@ -255,7 +273,7 @@ def phs(
             p_a_valid,
             met_valid,
             clo_valid,
-        ) = check_standard_compliance_array(
+        ) = _check_standard_compliance_array(
             "7933", tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
         )
         all_valid = ~(
@@ -269,14 +287,14 @@ def phs(
         for key in output.keys():
             output[key] = np.where(all_valid, output[key], np.nan)
 
-    if kwargs["round"]:
+    if round_output:
         for key in output.keys():
             if key != "t_sk_t_cr_wg":
                 output[key] = np.around(output[key], 1)
             else:
                 output[key] = np.around(output[key], 2)
 
-    return output
+    return PHS(**output)
 
 
 # Constants
@@ -285,7 +303,8 @@ const_t_sk = math.exp(-1 / 3)
 const_sw = math.exp(-1 / 10)
 
 
-@jit(nopython=True)
+@np.vectorize
+@jit(nopython=True, cache=True)
 def _phs_optimized(
     tdb,
     tr,
@@ -339,9 +358,9 @@ def _phs_optimized(
 
     # radiating area dubois
     a_r_du = 0.7
-    if posture == 2:
+    if posture == Postures.standing.value:
         a_r_du = 0.77
-    if posture == 3:
+    if posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate

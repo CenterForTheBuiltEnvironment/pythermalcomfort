@@ -1,87 +1,91 @@
+from typing import Union
+
 import numpy as np
-from numba import vectorize, float64
+from numba import float64, vectorize
 
-from pythermalcomfort.shared_functions import valid_range
-from pythermalcomfort.utilities import (
-    units_converter,
-    mapping,
-)
+from pythermalcomfort.classes_input import UTCIInputs
+from pythermalcomfort.classes_return import UTCI
+from pythermalcomfort.shared_functions import mapping, valid_range
+from pythermalcomfort.utilities import Units, units_converter
 
 
-def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=True):
-    """Determines the Universal Thermal Climate Index (UTCI). The UTCI is the
-    equivalent temperature for the environment derived from a reference
-    environment. It is defined as the air temperature of the reference
-    environment which produces the same strain index value in comparison with
-    the reference individual's response to the real environment. It is regarded
-    as one of the most comprehensive indices for calculating heat stress in
-    outdoor spaces. The parameters that are taken into account for calculating
-    UTCI involve dry bulb temperature, mean radiation temperature, the pressure
-    of water vapor or relative humidity, and wind speed (at the elevation of 10
-    m above the ground). [7]_
+def utci(
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    units: str = Units.SI.value,
+    limit_inputs: bool = True,
+    round_output: bool = True,
+) -> UTCI:
+    """
+    Determines the Universal Thermal Climate Index (UTCI). The UTCI is the equivalent
+    temperature for the environment derived from a reference environment. It is defined
+    as the air temperature of the reference environment which produces the same strain
+    index value in comparison with the reference individual's response to the real
+    environment. It is regarded as one of the most comprehensive indices for calculating
+    heat stress in outdoor spaces. The parameters that are taken into account for
+    calculating UTCI involve dry bulb temperature, mean radiation temperature, the
+    pressure of water vapor or relative humidity, and wind speed (at the elevation of 10
+    m above the ground). [Zare2018]_
 
     Parameters
     ----------
-    tdb : float, int, or array-like
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float, int, or array-like
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float, int, or array-like
-        wind speed 10m above ground level, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float, int, or array-like
-        relative humidity, [%]
-    units : {'SI', 'IP'}
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-    return_stress_category : boolean default False
-        if True returns the UTCI categorized in terms of thermal stress.
-    limit_inputs : boolean default True
-        By default, if the inputs are outsude the standard applicability limits the
-        function returns nan. If False returns UTCI values even if input values are
+    tdb : float or list of floats
+        Dry bulb air temperature. Default in [°C] in [°F] if `units` = 'IP'.
+    tr : float or list of floats
+        Mean radiant temperature. Default in [°C] in [°F] if `units` = 'IP'.
+    v : float or list of floats
+        Wind speed 10m above ground level. Default in [m/s] in [fps] if `units` = 'IP'.
+    rh : float or list of floats
+        Relative humidity, [%].
+    units : str, optional
+        Select the SI (International System of Units) or the IP (Imperial Units) system. Defaults to 'SI'.
+    limit_inputs : bool, optional
+        By default, if the inputs are outside the standard applicability limits the
+        function returns nan. If False, returns UTCI values even if input values are
         outside the applicability limits of the model. The valid input ranges are
-        -50 < tdb [°C] < 50, tdb - 70 < tr [°C] < tdb + 30, and for 0.5 < v [m/s] < 17.0.
+        -50 < tdb [°C] < 50, tdb - 70 < tr [°C] < tdb + 30, and for 0.5 < v [m/s] < 17.0. Defaults to True.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------
-    utci : float, int, or array-like
-         Universal Thermal Climate Index, [°C] or in [°F]
-    stress_category : str or array-like
-         UTCI categorized in terms of thermal stress [9]_.
-
-    Notes
-    -----
-    You can use this function to calculate the Universal Thermal Climate Index (`UTCI`)
-    The applicability wind speed value must be between 0.5 and 17 m/s.
-
-    .. _UTCI: https://www.utci.org/
+    UTCI
+        A dataclass containing the Universal Thermal Climate Index and stress category.
+        See :py:class:`~pythermalcomfort.classes_return.UTCI` for more details. To access the
+        `utci` and `stress_category` values, use the corresponding attributes of the
+        returned `Utci` instance, e.g., `result.utci`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import utci
-        >>> utci(tdb=25, tr=25, v=1.0, rh=50)
-        24.6
+        from pythermalcomfort.models import utci
 
-        >>> # for users who wants to use the IP system
-        >>> utci(tdb=77, tr=77, v=3.28, rh=50, units='ip')
-        76.4
+        result = utci(tdb=25, tr=25, v=1.0, rh=50)
+        print(result.utci)  # 24.6
+        print(result.stress_category)  # "no thermal stress"
 
-        >>> # for users who wants to get stress category
-        >>> utci(tdb=25, tr=25, v=1.0, rh=50, return_stress_category=True)
-        {"utci": 24.6, "stress_category": "no thermal stress"}
-
-    Raises
-    ------
-    ValueError
-        Raised if the input are outside the Standard's applicability limits
+        result = utci(tdb=[25, 40], tr=25, v=1.0, rh=50)
+        print(result.utci)  # [24.6, 40.6]
     """
+    # Validate inputs using the UtciInputs class
+    UTCIInputs(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        units=units,
+        limit_inputs=limit_inputs,
+    )
 
     tdb = np.array(tdb)
     tr = np.array(tr)
     v = np.array(v)
     rh = np.array(rh)
 
-    if units.lower() == "ip":
+    if units.upper() == Units.IP.value:
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)
 
     def exponential(t_db):
@@ -115,29 +119,31 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
         all_valid = ~(np.isnan(tdb_valid) | np.isnan(diff_valid) | np.isnan(v_valid))
         utci_approx = np.where(all_valid, utci_approx, np.nan)
 
-    if units.lower() == "ip":
-        utci_approx = units_converter(tmp=utci_approx, from_units="si")[0]
+    if units.upper() == Units.IP.value:
+        utci_approx = units_converter(
+            tmp=utci_approx, from_units=Units.SI.value.lower()
+        )[0]
 
-    if return_stress_category:
-        stress_categories = {
-            -40.0: "extreme cold stress",
-            -27.0: "very strong cold stress",
-            -13.0: "strong cold stress",
-            0.0: "moderate cold stress",
-            9.0: "slight cold stress",
-            26.0: "no thermal stress",
-            32.0: "moderate heat stress",
-            38.0: "strong heat stress",
-            46.0: "very strong heat stress",
-            1000.0: "extreme heat stress",
-        }
+    stress_categories = {
+        -40.0: "extreme cold stress",
+        -27.0: "very strong cold stress",
+        -13.0: "strong cold stress",
+        0.0: "moderate cold stress",
+        9.0: "slight cold stress",
+        26.0: "no thermal stress",
+        32.0: "moderate heat stress",
+        38.0: "strong heat stress",
+        46.0: "very strong heat stress",
+        1000.0: "extreme heat stress",
+    }
 
-        return {
-            "utci": np.round(utci_approx, 1),
-            "stress_category": mapping(utci_approx, stress_categories),
-        }
-    else:
-        return np.round(utci_approx, 1)
+    if round_output:
+        utci_approx = np.round(utci_approx, 1)
+
+    return UTCI(
+        utci=utci_approx,
+        stress_category=mapping(utci_approx, stress_categories),
+    )
 
 
 @vectorize(
@@ -149,6 +155,7 @@ def utci(tdb, tr, v, rh, units="SI", return_stress_category=False, limit_inputs=
             float64,
         )
     ],
+    cache=True,
 )
 def _utci_optimized(tdb, v, delta_t_tr, pa):
     return (

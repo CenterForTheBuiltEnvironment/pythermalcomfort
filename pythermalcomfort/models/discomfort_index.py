@@ -1,20 +1,20 @@
-from typing import Union, List
+from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import (
-    mapping,
-)
+from pythermalcomfort.classes_input import DIInputs
+from pythermalcomfort.classes_return import DI
+from pythermalcomfort.shared_functions import mapping
 
 
 def discomfort_index(
-    tdb: Union[float, int, np.ndarray, List[float], List[int]],
-    rh: Union[float, int, np.ndarray, List[float], List[int]],
-):
+    tdb: Union[float, list[float]],
+    rh: Union[float, list[float]],
+) -> DI:
     """Calculates the Discomfort Index (DI). The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
-    index is usuallly divided in 6 dicomfort categories and it only applies to
-    warm environments: [24]_
+    index is usually divided into 6 discomfort categories and it only applies to
+    warm environments: [polydoros2015]_
 
     * class 1 - DI < 21 °C - No discomfort
     * class 2 - 21 <= DI < 24 °C - Less than 50% feels discomfort
@@ -25,26 +25,39 @@ def discomfort_index(
 
     Parameters
     ----------
-    tdb : float, int, or array-like
-        dry bulb air temperature, [°C]
-    rh : float, int, or array-like
-        relative humidity, [%]
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    rh : float or list of floats
+        Relative humidity, [%].
 
     Returns
     -------
-    di : float, int, or array-like
-        Discomfort Index, [°C]
-    discomfort_condition : str or array-like
-        Classification of the thermal comfort conditions according to the discomfort index
+    DI
+        A dataclass containing the Discomfort Index and its classification. See :py:class:`~pythermalcomfort.classes_return.DI` for more details.
+        To access the `di` and `discomfort_condition` values, use the respective attributes of the returned `DI` instance, e.g., `result.di`.
 
     Examples
     --------
     .. code-block:: python
 
-        >>> from pythermalcomfort.models import discomfort_index
-        >>> discomfort_index(tdb=25, rh=50)
-        {'di': 22.1, 'discomfort_condition': 'Less than 50% feels discomfort'}
+        from pythermalcomfort.models import discomfort_index
+
+        result = discomfort_index(tdb=25, rh=50)
+        print(result.di)  # 22.1
+        print(result.discomfort_condition)  # Less than 50% feels discomfort
+
+        result = discomfort_index(tdb=[25, 30], rh=[50, 60])
+        print(result.di)  # [22.1, 27.3]
+        print(
+            result.discomfort_condition
+        )  # ['Less than 50% feels discomfort', 'Most of the population feels discomfort']
+
     """
+    # Validate inputs using the DiscomfortIndexInputs class
+    DIInputs(
+        tdb=tdb,
+        rh=rh,
+    )
 
     tdb = np.array(tdb)
     rh = np.array(rh)
@@ -60,7 +73,7 @@ def discomfort_index(
         99: "State of medical emergency",
     }
 
-    return {
-        "di": np.around(di, 1),
-        "discomfort_condition": mapping(di, di_categories, right=False),
-    }
+    return DI(
+        di=np.around(di, 1),
+        discomfort_condition=mapping(di, di_categories, right=False),
+    )

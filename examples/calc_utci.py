@@ -1,6 +1,8 @@
-from pythermalcomfort.models import utci
-import numpy as np
 import time
+
+import numpy as np
+
+from pythermalcomfort.models import utci
 
 utci_val = utci(tdb=29, tr=30, v=1, rh=60)
 print(utci_val)
@@ -19,14 +21,13 @@ utci_val = utci(
     v=[1, 2, 1],
     rh=[60, 60, 50],
 )
-print(utci_val)
+print(utci_val.utci)
 
 utci_val = utci(
     tdb=[29, 29, 25],
     tr=[30, 30, 25],
     v=[1, 2, 1],
     rh=[60, 60, 50],
-    return_stress_category=True,
 )
 print(utci_val)
 print(utci_val["utci"])

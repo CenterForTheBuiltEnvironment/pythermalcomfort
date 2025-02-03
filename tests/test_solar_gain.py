@@ -1,27 +1,35 @@
+import numpy as np
+
 from pythermalcomfort.models import solar_gain
-import json
-import requests
-
-# get file containing validation tables
-url = "https://raw.githubusercontent.com/FedericoTartarini/validation-data-comfort-models/main/validation_data.json"
-resp = requests.get(url)
-reference_tables = json.loads(resp.text)
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_solar_gain():
-    for table in reference_tables["reference_data"]["solar_gain"]:
-        for entry in table["data"]:
-            inputs = entry["inputs"]
-            outputs = entry["outputs"]
-            sg = solar_gain(
-                inputs["alt"],
-                inputs["sharp"],
-                inputs["I_dir"],
-                inputs["t_sol"],
-                inputs["f_svv"],
-                inputs["f_bes"],
-                inputs["asa"],
-                inputs["posture"],
-            )
-            assert sg["erf"] == outputs["erf"]
-            assert sg["delta_mrt"] == outputs["t_rsw"]
+def test_solar_gain(get_test_url, retrieve_data):
+    reference_table = retrieve_reference_table(
+        get_test_url, retrieve_data, Urls.SOLAR_GAIN.name
+    )
+    tolerance = reference_table["tolerance"]
+
+    for entry in reference_table["data"]:
+        inputs = entry["inputs"]
+        outputs = entry["outputs"]
+        result = solar_gain(**inputs)
+
+        validate_result(result, outputs, tolerance)
+
+
+def test_solar_gain_array():
+    np.allclose(
+        solar_gain(
+            sol_altitude=[0, 30],
+            sharp=[120, 60],
+            sol_radiation_dir=[800, 600],
+            sol_transmittance=[0.5, 0.6],
+            f_svv=[0.5, 0.4],
+            f_bes=[0.5, 0.6],
+            asw=0.7,
+            posture="sitting",
+        ).erf,
+        np.array([46.4, 52.8]),
+        atol=0.1,
+    )

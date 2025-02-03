@@ -1,28 +1,33 @@
+from dataclasses import asdict
+from typing import Union
+
 import numpy as np
 
-from pythermalcomfort.models import two_nodes
+from pythermalcomfort.classes_input import UseFansHeatwavesInputs
+from pythermalcomfort.classes_return import UseFansHeatwaves
+from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.utilities import (
-    units_converter,
-    check_standard_compliance_array,
-    body_surface_area,
+    Postures,
+    _check_standard_compliance_array,
 )
 
 
 def use_fans_heatwaves(
-    tdb,
-    tr,
-    v,
-    rh,
-    met,
-    clo,
-    wme=0,
-    body_surface_area=1.8258,
-    p_atm=101325,
-    body_position="standing",
-    units="SI",
-    max_skin_blood_flow=80,
-    **kwargs,
-):
+    tdb: Union[float, list[float]],
+    tr: Union[float, list[float]],
+    v: Union[float, list[float]],
+    rh: Union[float, list[float]],
+    met: Union[float, list[float]],
+    clo: Union[float, list[float]],
+    wme: Union[float, list[float]] = 0,
+    body_surface_area: Union[float, list[float]] = 1.8258,
+    p_atm: Union[float, list[float]] = 101325,
+    position: str = Postures.standing.value,
+    max_skin_blood_flow: float = 80,
+    limit_inputs: bool = True,
+    round_output: bool = True,
+    max_sweating: float = 500,
+) -> UseFansHeatwaves:
     """It helps you to estimate if the conditions you have selected would cause
     heat strain. This occurs when either the following variables reaches its
     maximum value:
@@ -33,90 +38,73 @@ def use_fans_heatwaves(
 
     Parameters
     ----------
-    tdb : float
-        dry bulb air temperature, default in [°C] in [°F] if `units` = 'IP'
-    tr : float
-        mean radiant temperature, default in [°C] in [°F] if `units` = 'IP'
-    v : float
-        air speed, default in [m/s] in [fps] if `units` = 'IP'
-    rh : float
-        relative humidity, [%]
-    met : float
-        metabolic rate, [met]
-    clo : float
-        clothing insulation, [clo]
-    wme : float
-        external work, [met] default 0
-    body_surface_area : float
-        body surface area, default value 1.8258 [m2] in [ft2] if `units` = 'IP'
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    tr : float or list of floats
+        Mean radiant temperature, [°C].
+    v : float or list of floats
+        Air speed, [m/s].
+    rh : float or list of floats
+        Relative humidity, [%].
+    met : float or list of floats
+        Metabolic rate, [met].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+    wme : float or list of floats, optional
+        External work, [met]. Defaults to 0.
+    body_surface_area : float or list of floats, optional
+        Body surface area, default value 1.8258 [m2]. Defaults to 1.8258.
 
-        The body surface area can be calculated using the function
-        :py:meth:`pythermalcomfort.utilities.body_surface_area`.
-    p_atm : float
-        atmospheric pressure, default value 101325 [Pa] in [atm] if `units` = 'IP'
-    body_position: str default="standing"
-        select either "sitting" or "standing"
-    units : {'SI', 'IP'}
-        select the SI (International System of Units) or the IP (Imperial Units) system.
-    max_skin_blood_flow : float, [kg/h/m2] default 80
-        maximum blood flow from the core to the skin
-
-    Other Parameters
-    ----------------
-    max_sweating: float, [mL/h/m2] default 500
-        max sweating
-    round: boolean, default True
-        if True rounds output value, if False it does not round it
-    limit_inputs : boolean default True
+        .. note::
+            The body surface area can be calculated using the function
+            :py:meth:`pythermalcomfort.utilities.body_surface_area`.
+    p_atm : float or list of floats, optional
+        Atmospheric pressure, default value 101325 [Pa]. Defaults to 101325.
+    position : str, optional
+        Select either "sitting" or "standing". Defaults to "standing".
+    max_skin_blood_flow : float
+        Maximum blood flow from the core to the skin. Defaults to 80.
+    limit_inputs : bool, optional
         By default, if the inputs are outside the standard applicability limits the
-        function returns nan. If False returns pmv and ppd values even if input values are
-        outside the applicability limits of the model.
-
-        The applicability limits are 20 < tdb [°C] < 50, 20 < tr [°C] < 50,
+        function returns nan. If False, returns values even if input values are
+        outside the applicability limits of the model. Defaults to True. The
+        applicability limits are 20 < tdb [°C] < 50, 20 < tr [°C] < 50,
         0.1 < v [m/s] < 4.5, 0.7 < met [met] < 2, and 0 < clo [clo] < 1.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------
-    e_skin : float
-        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff
-    e_rsw : float
-        Rate of evaporative heat loss from sweat evaporation, [W/m2]
-    e_diff : float
-        Rate of evaporative heat loss from moisture diffused through the skin, [W/m2]
-    e_max : float
-        Maximum rate of evaporative heat loss from skin, [W/m2]
-    q_sensible : float
-        Sensible heat loss from skin, [W/m2]
-    q_skin : float
-        Total rate of heat loss from skin, [W/m2]. Equal to q_sensible + e_skin
-    q_res : float
-        Total rate of heat loss through respiration, [W/m2]
-    t_core : float
-        Core temperature, [°C]
-    t_skin : float
-        Skin temperature, [°C]
-    m_bl : float
-        Skin blood flow, [kg/h/m2]
-    m_rsw : float
-        Rate at which regulatory sweat is generated, [mL/h/m2]
-    w : float
-        Skin wettedness, adimensional. Ranges from 0 and 1.
-    w_max : float
-        Skin wettedness (w) practical upper limit, adimensional. Ranges from 0 and 1.
-    heat_strain : bool
-        True if the model predict that the person may be experiencing heat strain
-    heat_strain_blood_flow : bool
-        True if heat strain is caused by skin blood flow (m_bl) reaching its maximum value
-    heat_strain_w : bool
-        True if heat strain is caused by skin wettedness (w) reaching its maximum value
-    heat_strain_sweating : bool
-        True if heat strain is caused by regulatory sweating (m_rsw) reaching its
-        maximum value
+    UseFansHeatwaves
+        A dataclass containing the results of using fans during heatwaves.
+        See :py:class:`~pythermalcomfort.classes_return.UseFansHeatwaves` for more details.
+        To access the results, use the corresponding attributes of the returned `UseFansHeatwaves` instance, e.g., `result.e_skin`.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        from pythermalcomfort.models import use_fans_heatwaves
+
+        result = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
+        print(result.e_skin)  # 63.0
+
     """
-    # If the SET function is used to calculate the cooling effect then the h_c is
-    # calculated in a slightly different way
-    default_kwargs = {"round": True, "max_sweating": 500, "limit_inputs": True}
-    kwargs = {**default_kwargs, **kwargs}
+    # Validate inputs using the UseFansHeatwavesInputs class
+    UseFansHeatwavesInputs(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atm=p_atm,
+        position=position,
+        max_skin_blood_flow=max_skin_blood_flow,
+        limit_inputs=limit_inputs,
+    )
 
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -126,16 +114,7 @@ def use_fans_heatwaves(
     clo = np.array(clo)
     wme = np.array(wme)
 
-    if units.lower() == "ip":
-        if body_surface_area == 1.8258:
-            body_surface_area = 19.65
-        if p_atm == 101325:
-            p_atm = 1
-        tdb, tr, v, body_surface_area, p_atm = units_converter(
-            tdb=tdb, tr=tr, v=v, area=body_surface_area, pressure=p_atm
-        )
-
-    output = two_nodes(
+    output = two_nodes_gagge(
         tdb,
         tr,
         v,
@@ -144,13 +123,14 @@ def use_fans_heatwaves(
         clo,
         wme=wme,
         body_surface_area=body_surface_area,
-        p_atmospheric=p_atm,
-        body_position=body_position,
+        p_atm=p_atm,
+        position=position,
         max_skin_blood_flow=max_skin_blood_flow,
-        round=False,
-        output="all",
-        max_sweating=kwargs["max_sweating"],
+        round_output=False,
+        max_sweating=max_sweating,
     )
+
+    output = asdict(output)
 
     output_vars = [
         "e_skin",
@@ -176,7 +156,7 @@ def use_fans_heatwaves(
     )
     output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
     output["heat_strain_sweating"] = np.where(
-        output["m_rsw"] == kwargs["max_sweating"], True, False
+        output["m_rsw"] == max_sweating, True, False
     )
 
     output["heat_strain"] = np.any(
@@ -190,7 +170,7 @@ def use_fans_heatwaves(
 
     output = {key: output[key] for key in output_vars}
 
-    if kwargs["limit_inputs"]:
+    if limit_inputs:
         (
             tdb_valid,
             tr_valid,
@@ -198,7 +178,7 @@ def use_fans_heatwaves(
             rh_valid,
             met_valid,
             clo_valid,
-        ) = check_standard_compliance_array(
+        ) = _check_standard_compliance_array(
             standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
         )
         all_valid = ~(
@@ -210,9 +190,7 @@ def use_fans_heatwaves(
         )
         output = {key: np.where(all_valid, output[key], np.nan) for key in output_vars}
 
-    for key in output.keys():
-        # round the results if needed
-        if (kwargs["round"]) and (type(output[key]) is not bool):
-            output[key] = np.around(output[key], 1)
+    if round_output:
+        output = {key: np.around(output[key], 1) for key in output_vars}
 
-    return output
+    return UseFansHeatwaves(**output)

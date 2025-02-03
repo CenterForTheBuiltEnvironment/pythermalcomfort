@@ -1,23 +1,33 @@
-========
-Contents
-========
+.. include:: ./readme.rst
+
+Getting Started
+===============
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
-   readme
    installation
-   usage
-   reference/index
+
+Usage
+=====
+
+.. toctree::
+   :maxdepth: 2
+
+   documentation/index
+
+Contributing
+============
+
+.. toctree::
+   :maxdepth: 2
+
    contributing
    authors
-   contact_us
-   changelog
+
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
-

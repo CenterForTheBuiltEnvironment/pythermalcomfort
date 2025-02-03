@@ -1,23 +1,14 @@
 #!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import print_function
 from __future__ import annotations
 
-import io
 import re
-from glob import glob
-from os.path import basename
-from os.path import dirname
-from os.path import join
-from os.path import splitext
+from os.path import dirname, join
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def read(*names, **kwargs):
-    with io.open(
+    with open(
         join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ) as fh:
         return fh.read()
@@ -25,32 +16,30 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.10.0",
+    version="3.0.0",
     license="MIT",
     description=(
-        "Package to calculate several thermal comfort indices (e.g. PMV, PPD, SET,"
-        " adaptive) and convert physical variables. Please cite us if you use this"
-        " package: Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python"
-        " package for thermal comfort research. SoftwareX 12, 100578."
-        " https://doi.org/10.1016/j.softx.2020.100578"
+        "pythermalcomfort is a comprehensive toolkit for calculating "
+        "thermal comfort indices, heat/cold stress metrics, and thermophysiological responses. "
+        "It supports multiple models, including PMV, PPD, adaptive comfort, SET, "
+        "UTCI, Heat Index, Wind Chill Index, and Humidex. "
+        "The package also includes thermophysiological models like the two-node (Gagge) and multinode (JOS-3) models "
+        "to estimate physiological responses such as core temperature, skin temperature, and skin wettedness. "
     ),
-    long_description="%s\n%s"
-    % (
+    long_description="{}\n{}".format(
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
             "", read("README.rst")
         ),
         re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
     ),
+    long_description_content_type="text/x-rst",
     author="Federico Tartarini",
     author_email="cbecomforttool@gmail.com",
     url="https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort",
-    # packages=find_packages("pythermalcomfort"),
-    # package_dir={"pythermalcomfort": "pythermalcomfort"},
-    # py_modules=[splitext(basename(path))[0] for path in glob("pythermalcomfort/*.py")],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
@@ -64,9 +53,12 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
+        "Topic :: Education",
         "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Atmospheric Science",
         "Topic :: Utilities",
     ],
     project_urls={
@@ -79,9 +71,14 @@ setup(
     keywords=[
         "thermal comfort",
         "pmv",
-        "ppd",
-        "building design",
-        "compliance",
+        "heat stress",
+        "cold stress",
+        "thermal sensation",
+        "thermal physiology",
+        "meteorology",
+        "climate analysis",
+        "discomfort",
+        "comfort",
         "thermal environment",
         "built environment",
     ],
@@ -91,11 +88,9 @@ setup(
         "numba",
         "numpy",
         "setuptools",
-    ],  # eg: 'aspectlib==1.1.1', 'six>=1.7',
+    ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
+        "dev": ["pytest", "sphinx"],
     },
     entry_points={
         "console_scripts": [
