@@ -4,8 +4,8 @@ import numpy as np
 
 from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
-from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
+from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.shared_functions import mapping
 from pythermalcomfort.utilities import (
     Models,
