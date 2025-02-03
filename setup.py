@@ -16,7 +16,7 @@ def read(*names, **kwargs):
 
 setup(
     name="pythermalcomfort",
-    version="2.11.6",
+    version="3.0.0",
     license="MIT",
     description=(
         "pythermalcomfort is a comprehensive toolkit for calculating "
