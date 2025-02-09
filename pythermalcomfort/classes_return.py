@@ -234,6 +234,7 @@ class HI:
     """
 
     hi: Union[float, list[float]]
+    stress_category: Union[str, list[str]]
 
     def __getitem__(self, item):
         return getattr(self, item)
