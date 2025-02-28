@@ -332,5 +332,8 @@ Work capacity
 
 .. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_hothaps
 
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_iso
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_niosh
 .. autoclass:: pythermalcomfort.classes_return.WorkCapacity
     :members:
