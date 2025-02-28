@@ -2,9 +2,11 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.classes_input import WorkCapacityInputs
+from pythermalcomfort.classes_input import (
+    WorkCapacityHothapsInputs,
+    WorkCapacityStandardsInputs,
+)
 from pythermalcomfort.classes_return import WorkCapacity
-
 
 
 def workcapacity_dunne(wbgt: Union[float, list[float]], intensity: str) -> WorkCapacity:
@@ -40,8 +42,8 @@ def workcapacity_dunne(wbgt: Union[float, list[float]], intensity: str) -> WorkC
         `result.capacity`.
 
     """
-    #Validate inputs
-    WorkCapacityInputs(wbgt=wbgt) 
+    # Validate inputs
+    WorkCapacityHothapsInputs(wbgt=wbgt, intensity=intensity)
 
     wbgt = np.array(wbgt)
     capacity = np.clip((100 - (25 * (np.maximum(0, wbgt - 25)) ** (2 / 3))), 0, 100)
@@ -57,7 +59,9 @@ def workcapacity_dunne(wbgt: Union[float, list[float]], intensity: str) -> WorkC
     return WorkCapacity(capacity=capacity)
 
 
-def workcapacity_hothaps(wbgt: Union[float, list[float]], intensity: str) -> WorkCapacity:
+def workcapacity_hothaps(
+    wbgt: Union[float, list[float]], intensity: str
+) -> WorkCapacity:
     """
     Estimate work capacity due to heat based on Kjellstrom et al.
 
@@ -81,7 +85,7 @@ def workcapacity_hothaps(wbgt: Union[float, list[float]], intensity: str) -> Wor
     The correction citation is: Bröde P, Fiala D, Lemke B, Kjellstrom T.
     Estimated work ability in warm outdoor environments depends on the chosen
     heat stress assessment metric. International Journal of Biometeorology.
-    2018 Mar;62(3):331–45. 
+    2018 Mar;62(3):331–45.
 
 
     The relevant definitions of the functions can be found most clearly in:
@@ -93,7 +97,7 @@ def workcapacity_hothaps(wbgt: Union[float, list[float]], intensity: str) -> Wor
     For a comparison of different functions see Fig 1 of Day E, Fankhauser S, Kingsmill
     N, Costa H, Mavrogianni A. Upholding labour productivity under climate
     change: an assessment of adaptation options. Climate Policy. 2019
-    Mar;19(3):367–85. 
+    Mar;19(3):367–85.
 
     Parameters
     ----------
@@ -113,8 +117,8 @@ def workcapacity_hothaps(wbgt: Union[float, list[float]], intensity: str) -> Wor
 
 
     """
-    #Validate inputs
-    WorkCapacityInputs(wbgt=wbgt) 
+    # Validate inputs
+    WorkCapacityHothapsInputs(wbgt=wbgt, intensity=intensity)
 
     wbgt = np.array(wbgt)
     if intensity == "heavy":
@@ -130,7 +134,10 @@ def workcapacity_hothaps(wbgt: Union[float, list[float]], intensity: str) -> Wor
 
     return WorkCapacity(capacity=capacity)
 
-def workcapacity_niosh(wbgt: Union[float, list[float]], M: Union[float,list[float]]) -> WorkCapacity:
+
+def workcapacity_niosh(
+    wbgt: Union[float, list[float]], M: Union[float, list[float]]
+) -> WorkCapacity:
     """
     Estimate work capacity due to heat based on NIOSH standards as described by Brode et al
 
@@ -141,12 +148,12 @@ def workcapacity_niosh(wbgt: Union[float, list[float]], M: Union[float,list[floa
     The function definitions / parameters can be found in: 1. Bröde P, Fiala D,
     Lemke B, Kjellstrom T. Estimated work ability in warm outdoor environments
     depends on the chosen heat stress assessment metric. International Journal
-    of Biometeorology. 2018 Mar;62(3):331–45. 
+    of Biometeorology. 2018 Mar;62(3):331–45.
 
     For a comparison of different functions see Fig 1 of Day E, Fankhauser S, Kingsmill
     N, Costa H, Mavrogianni A. Upholding labour productivity under climate
     change: an assessment of adaptation options. Climate Policy. 2019
-    Mar;19(3):367–85. 
+    Mar;19(3):367–85.
 
     Parameters
     ----------
@@ -165,23 +172,26 @@ def workcapacity_niosh(wbgt: Union[float, list[float]], M: Union[float,list[floa
 
 
     """
-    #Validate inputs
-    WorkCapacityInputs(wbgt=wbgt) 
+    # Validate inputs
+    WorkCapacityStandardsInputs(wbgt=wbgt, met=M)
 
     wbgt = np.array(wbgt)
     M = np.array(M)
-    if (M<0).any() or (M>2500).any():
+    if (M < 0).any() or (M > 2500).any():
         raise ValueError("Metabolic rate out of plausible range")
-    Mrest = 117 # assumed resting metabolic rate
+    Mrest = 117  # assumed resting metabolic rate
 
-    wbgt_lim = 56.7 - 11.5*np.log10(M)
-    wbgt_lim_rest = 56.7 - 11.5*np.log10(Mrest)
-    capacity = ((wbgt_lim_rest-wbgt)/(wbgt_lim_rest-wbgt_lim))*100
+    wbgt_lim = 56.7 - 11.5 * np.log10(M)
+    wbgt_lim_rest = 56.7 - 11.5 * np.log10(Mrest)
+    capacity = ((wbgt_lim_rest - wbgt) / (wbgt_lim_rest - wbgt_lim)) * 100
     capacity = np.clip(capacity, 0, 100)
 
     return WorkCapacity(capacity=capacity)
 
-def workcapacity_iso(wbgt: Union[float, list[float]], M: Union[float,list[float]]) -> WorkCapacity:
+
+def workcapacity_iso(
+    wbgt: Union[float, list[float]], M: Union[float, list[float]]
+) -> WorkCapacity:
     """
     Estimate work capacity due to heat based on ISO standards as described by Brode et al
 
@@ -192,12 +202,12 @@ def workcapacity_iso(wbgt: Union[float, list[float]], M: Union[float,list[float]
     The function definitions / parameters can be found in: 1. Bröde P, Fiala D,
     Lemke B, Kjellstrom T. Estimated work ability in warm outdoor environments
     depends on the chosen heat stress assessment metric. International Journal
-    of Biometeorology. 2018 Mar;62(3):331–45. 
+    of Biometeorology. 2018 Mar;62(3):331–45.
 
     For a comparison of different functions see Fig 1 of Day E, Fankhauser S, Kingsmill
     N, Costa H, Mavrogianni A. Upholding labour productivity under climate
     change: an assessment of adaptation options. Climate Policy. 2019
-    Mar;19(3):367–85. 
+    Mar;19(3):367–85.
 
     Parameters
     ----------
@@ -216,18 +226,18 @@ def workcapacity_iso(wbgt: Union[float, list[float]], M: Union[float,list[float]
 
 
     """
-    #Validate inputs
-    WorkCapacityInputs(wbgt=wbgt) 
+    # Validate inputs
+    WorkCapacityStandardsInputs(wbgt=wbgt, met=M)
 
     wbgt = np.array(wbgt)
     M = np.array(M)
-    if (M<0).any() or (M>2500).any():
+    if (M < 0).any() or (M > 2500).any():
         raise ValueError("Metabolic rate out of plausible range")
-    Mrest = 117 # assumed resting metabolic rate
+    Mrest = 117  # assumed resting metabolic rate
 
-    wbgt_lim = 34.9-M/46
-    wbgt_lim_rest = 34.9-Mrest/46
-    capacity = ((wbgt_lim_rest-wbgt)/(wbgt_lim_rest-wbgt_lim))*100
+    wbgt_lim = 34.9 - M / 46
+    wbgt_lim_rest = 34.9 - Mrest / 46
+    capacity = ((wbgt_lim_rest - wbgt) / (wbgt_lim_rest - wbgt_lim)) * 100
     capacity = np.clip(capacity, 0, 100)
 
     return WorkCapacity(capacity=capacity)
