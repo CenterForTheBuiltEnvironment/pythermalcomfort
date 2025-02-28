@@ -182,7 +182,7 @@ The Predicted Mean Vote (PMV) is an index that aims to predict the mean value of
 It was developed by Fanger [fanger1970]_.
 
 The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [ISO_7730_2005]_.
-It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [ASHRAE_55_2023]_.
+It calculates the heat balance of a typical occupant and relates their thermal gains or capacityes to their predicted mean thermal sensation [ASHRAE_55_2023]_.
 
 The PMV can be used to check if a thermal environment meets comfort criteria and to establish requirements for different levels of acceptability.
 The PMV model is applicable to healthy men and women exposed to indoor environments where thermal comfort is desirable, but moderate deviations from thermal comfort occur, in the design of new environments or the assessment of existing ones.
@@ -325,3 +325,12 @@ Wind chill temperature
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
 
+Work capacity
+---------
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_dunne
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_hothaps
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:

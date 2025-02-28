@@ -638,6 +638,22 @@ class WCT:
 
 
 @dataclass(frozen=True)
+class WorkCapacity:
+    """Dataclass to represent work loss.
+
+    Attributes
+    ----------
+    capacity : float or list of floats
+        Work capacity affected by heat.
+    """
+
+    capacity: Union[float, npt.ArrayLike]
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass(frozen=True)
 class JOS3BodyParts:
     """Dataclass to represent the body parts in the JOS3 model. It is very important to
     keep the order of the attributes as they are defined in the dataclass ['head',
