@@ -30,7 +30,7 @@ def pmv_ppd_iso(
     """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
     calculated in accordance with the ISO 7730.
 
-    The ISO uses the same formulation of the PMV as published by Fanger [fanger1970]_.
+    The ISO uses the same formulation of the PMV as published by Fanger [Fanger1970]_.
 
     Parameters
     ----------

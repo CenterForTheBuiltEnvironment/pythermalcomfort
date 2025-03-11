@@ -27,7 +27,7 @@ def phs(
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [ISO_7933_2004]_. The ISO 7933 provides a method for
+    with the ISO 7933:2004 Standard [7933ISO2004]_. The ISO 7933 provides a method for
     the analytical evaluation and interpretation of the thermal stress
     experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human

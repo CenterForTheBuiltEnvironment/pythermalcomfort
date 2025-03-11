@@ -18,7 +18,7 @@ def pmv_athb(
     clo: Union[bool, float, list[float]] = False,
 ) -> ATHB:
     """Return the PMV value calculated with the Adaptive Thermal Heat Balance
-    Framework [schweiker22]_. The adaptive thermal heat balance (ATHB) framework
+    Framework [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework
     introduced a method to account for the three adaptive principals, namely
     physiological, behavioral, and psychological adaptation, individually
     within existing heat balance models. The objective is a predictive model of

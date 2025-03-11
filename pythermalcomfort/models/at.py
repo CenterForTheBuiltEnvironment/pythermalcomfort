@@ -17,7 +17,7 @@ def at(
     """Calculates the Apparent Temperature (AT). The AT is defined as the
     temperature at the reference humidity level producing the same amount of
     discomfort as that experienced under the current ambient temperature,
-    humidity, and solar radiation [steadman1984]_. In other words, the AT is an
+    humidity, and solar radiation [Steadman1984]_. In other words, the AT is an
     adjustment to the dry bulb temperature based on the relative humidity
     value. Absolute humidity with a dew point of 14°C is chosen as a reference.
 
