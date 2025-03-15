@@ -328,3 +328,15 @@ Wind chill temperature
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
 
+Work capacity
+---------
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_dunne
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_hothaps
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_iso
+
+.. autofunction:: pythermalcomfort.models.work_capacity.workcapacity_niosh
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:
