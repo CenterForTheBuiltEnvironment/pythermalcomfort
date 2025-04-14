@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.0.1 (2025-04-14)
+-------------------
+
+* allow np.float and np.int as inputs to all functions
+* fixed documentation for phs - met units
+
 3.0.0 (2025-02-03)
 -------------------
 
