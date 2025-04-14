@@ -71,7 +71,7 @@ def phs(
             outside the applicability limits of the model.
 
             The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
-            0 < vr [m/s] < 3, 100 < met [met] < 450, and 0.1 < clo [clo] < 1.
+            0 < vr [m/s] < 3, 1.7 < met [met] < 7.5, and 0.1 < clo [clo] < 1.
 
     i_mst : float, optional
         Static moisture permeability index, [dimensionless]. Defaults to 0.38.
