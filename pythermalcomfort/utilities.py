@@ -374,6 +374,8 @@ def mean_radiant_tmp(
 
 def validate_type(value, name: str, allowed_types: tuple):
     """Validate the type of a value against allowed types."""
+    if isinstance(value, np.generic):
+        value = value.item()
     if not isinstance(value, allowed_types):
         raise TypeError(f"{name} must be one of the following types: {allowed_types}.")
 
