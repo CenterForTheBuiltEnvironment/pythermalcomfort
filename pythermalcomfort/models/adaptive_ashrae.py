@@ -70,7 +70,9 @@ def adaptive_ashrae(
         print(results)
         # AdaptiveASHRAE(tmp_cmf=np.float64(24.0), tmp_cmf_80_low=np.float64(20.5), tmp_cmf_80_up=np.float64(27.5), tmp_cmf_90_low=np.float64(21.5), tmp_cmf_90_up=np.float64(26.5), acceptability_80=array(True), acceptability_90=array(True))
 
-        print(results.acceptability_80)  # or use print(results["acceptability_80"])
+        print(
+            results.acceptability_80
+        )  # or use print(results["acceptability_80"])
         # True
         # The conditions you entered are considered to be comfortable for 80% of the occupants.
 
@@ -80,7 +82,9 @@ def adaptive_ashrae(
         # AdaptiveASHRAE(tmp_cmf=array([24., 24.]), tmp_cmf_80_low=array([20.5, 20.5]), tmp_cmf_80_up=array([27.5, 27.5]), tmp_cmf_90_low=array([21.5, 21.5]), tmp_cmf_90_up=array([26.5, 26.5]), acceptability_80=array([ True,  True]), acceptability_90=array([ True,  True]))
 
         # For users who want to use the IP system
-        results = adaptive_ashrae(tdb=77, tr=77, t_running_mean=68, v=0.3, units="IP")
+        results = adaptive_ashrae(
+            tdb=77, tr=77, t_running_mean=68, v=0.3, units="IP"
+        )
         print(results)
         # AdaptiveASHRAE(tmp_cmf=np.float64(75.2), tmp_cmf_80_low=np.float64(68.9), tmp_cmf_80_up=np.float64(81.5), tmp_cmf_90_low=np.float64(70.7), tmp_cmf_90_up=np.float64(79.7), acceptability_80=array(True), acceptability_90=array(True))
 
@@ -144,15 +148,19 @@ def adaptive_ashrae(
     acceptability_90 = (tmp_cmf_90_low <= to) & (to <= tmp_cmf_90_up)
 
     if units.upper() == Units.IP.value:
-        t_cmf, tmp_cmf_80_low, tmp_cmf_80_up, tmp_cmf_90_low, tmp_cmf_90_up = (
-            units_converter(
-                from_units=Units.SI.value,
-                tmp_cmf=t_cmf,
-                tmp_cmf_80_low=tmp_cmf_80_low,
-                tmp_cmf_80_up=tmp_cmf_80_up,
-                tmp_cmf_90_low=tmp_cmf_90_low,
-                tmp_cmf_90_up=tmp_cmf_90_up,
-            )
+        (
+            t_cmf,
+            tmp_cmf_80_low,
+            tmp_cmf_80_up,
+            tmp_cmf_90_low,
+            tmp_cmf_90_up,
+        ) = units_converter(
+            from_units=Units.SI.value,
+            tmp_cmf=t_cmf,
+            tmp_cmf_80_low=tmp_cmf_80_low,
+            tmp_cmf_80_up=tmp_cmf_80_up,
+            tmp_cmf_90_low=tmp_cmf_90_low,
+            tmp_cmf_90_up=tmp_cmf_90_up,
         )
 
     return AdaptiveASHRAE(

@@ -122,11 +122,21 @@ def pmv_ppd_ashrae(
         v_r = v_relative(v=v, met=met)
         # calculate dynamic clothing
         clo_d = clo_dynamic_ashrae(clo=clo, met=met)
-        results = pmv_ppd_ashrae(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, model="55-2023")
+        results = pmv_ppd_ashrae(
+            tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, model="55-2023"
+        )
         print(results.pmv)  # 0.0
         print(results.ppd)  # 5.0
 
-        result = pmv_ppd_ashrae(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model="55-2023)
+        result = pmv_ppd_ashrae(
+            tdb=[22, 25],
+            tr=25,
+            vr=0.1,
+            rh=50,
+            met=1.4,
+            clo=0.5,
+            model="55-2023",
+        )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
     """

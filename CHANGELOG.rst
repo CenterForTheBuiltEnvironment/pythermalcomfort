@@ -21,7 +21,10 @@ Changelog
     .. code-block:: python
 
         from pythermalcomfort.models import pmv_ppd_iso
-        result = pmv_ppd_iso(tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model='7730-2005')
+
+        result = pmv_ppd_iso(
+            tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model="7730-2005"
+        )
         print(result.pmv)  # [-0.  0.41]
 
     This update aims to make the package more user-friendly and to provide a more organized way to access all calculation results.

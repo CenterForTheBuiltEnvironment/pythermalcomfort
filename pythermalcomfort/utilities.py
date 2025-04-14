@@ -779,8 +779,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998
-    [7726ISO1998]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_
 
     Parameters
     ----------
