@@ -95,7 +95,7 @@ def pmv_athb(
     met_adapted = met - (0.234 * t_running_mean) / 58.2
 
     clo_adapted = clo
-    if not clo:
+    if clo is False:
         # Adapted clothing insulation level through behavioral adaptation
         clo_adapted = np.power(
             10,
