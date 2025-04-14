@@ -27,7 +27,7 @@ def phs(
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [ISO_7933_2004]_. The ISO 7933 provides a method for
+    with the ISO 7933:2004 Standard [7933ISO2004]_. The ISO 7933 provides a method for
     the analytical evaluation and interpretation of the thermal stress
     experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
@@ -71,7 +71,7 @@ def phs(
             outside the applicability limits of the model.
 
             The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
-            0 < vr [m/s] < 3, 100 < met [met] < 450, and 0.1 < clo [clo] < 1.
+            0 < vr [m/s] < 3, 1.7 < met [met] < 7.5, and 0.1 < clo [clo] < 1.
 
     i_mst : float, optional
         Static moisture permeability index, [dimensionless]. Defaults to 0.38.

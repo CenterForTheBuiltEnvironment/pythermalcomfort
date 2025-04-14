@@ -21,7 +21,7 @@ def solar_gain(
     round_output: bool = True,
 ) -> SolarGain:
     """Calculates the solar gain to the human body using the Effective Radiant
-    Field (ERF) [ASHRAE_55_2023]_. The ERF is a measure of the net energy flux to or from
+    Field (ERF) [55ASHRAE2023]_. The ERF is a measure of the net energy flux to or from
     the human body. ERF is expressed in W over human body surface area [W/m2].
     In addition, it calculates the delta mean radiant temperature. Which is the
     amount by which the mean radiant temperature of the space should be
@@ -40,7 +40,7 @@ def solar_gain(
         only. Orientation relative to compass or to room is not included in SHARP.
     sol_radiation_dir : float or list of floats
         Direct-beam solar radiation, [W/m2]. Ranges between 200 and 1000. See Table
-        C2-3 of ASHRAE 55 2020 [ASHRAE_55_2023]_.
+        C2-3 of ASHRAE 55 2020 [55ASHRAE2023]_.
     sol_transmittance : float or list of floats
         Total solar transmittance, ranges from 0 to 1. The total solar
         transmittance of window systems, including glazing unit, blinds, and other
@@ -57,7 +57,7 @@ def solar_gain(
         :py:meth:`pythermalcomfort.utilities.f_svv`.
     f_bes : float or list of floats
         Fraction of the possible body surface exposed to sun, ranges from 0 to 1.
-        See Table C2-2 and equation C-7 ASHRAE 55 2020 [ASHRAE_55_2023]_.
+        See Table C2-2 and equation C-7 ASHRAE 55 2020 [55ASHRAE2023]_.
     asw : float or list of floats, optional
         The average short-wave absorptivity of the occupant. It will range widely,
         depending on the color of the occupant’s skin as well as the color and

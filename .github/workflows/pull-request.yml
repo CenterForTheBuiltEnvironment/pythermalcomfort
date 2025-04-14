@@ -1,8 +1,10 @@
 name: Pull Request Workflow
 
 on:
-    pull_request:
-        types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+        - development
 
 jobs:
 
