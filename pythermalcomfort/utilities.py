@@ -1,7 +1,8 @@
 import math
 import warnings
 from enum import Enum
-from typing import NamedTuple, Union
+from typing import NamedTuple
+from typing import Union
 
 import numpy as np
 
@@ -25,6 +26,8 @@ class Models(Enum):
     ashrae_55_2023 = "55-2023"
     iso_7730_2005 = "7730-2005"
     iso_9920_2007 = "9920-2007"
+    iso_7933_2004 = "7933-2004"
+    iso_7933_2023 = "7933-2023"
 
 
 class Units(Enum):
@@ -450,9 +453,19 @@ def _check_standard_compliance_array(standard, **kwargs):
 
         return values_to_return.values()
 
-    if standard == "7933":  # based on ISO 7933:2004 Annex A
+    if standard == "7933_2004":  # based on ISO 7933:2004 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
         p_a_valid = valid_range(params["p_a"], (0, 4.5))
+        tr_valid = valid_range(params["tr"], (0.0, 60.0))
+        v_valid = valid_range(params["v"], (0.0, 3))
+        met_valid = valid_range(params["met"], (100, 450))
+        clo_valid = valid_range(params["clo"], (0.1, 1))
+
+        return tdb_valid, tr_valid, v_valid, p_a_valid, met_valid, clo_valid
+
+    if standard == "7933_2023":  # based on ISO 7933:2023 Annex A
+        tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
+        p_a_valid = valid_range(params["p_a"], (0.5, 4.5))
         tr_valid = valid_range(params["tr"], (0.0, 60.0))
         v_valid = valid_range(params["v"], (0.0, 3))
         met_valid = valid_range(params["met"], (100, 450))
