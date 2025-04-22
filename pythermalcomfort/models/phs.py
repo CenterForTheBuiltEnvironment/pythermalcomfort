@@ -27,8 +27,7 @@ def phs(
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [7933ISO2004]_. The ISO 7933 provides a method for
-    the analytical evaluation and interpretation of the thermal stress
+    with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933 provides a method for the analytical evaluation and interpretation of the thermal stress
     experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
     body will develop in response to the working conditions.
@@ -94,15 +93,15 @@ def phs(
     duration : int, optional
         Duration of the work sequence, [minutes]. Defaults to 480.
     f_r : float, optional
-        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97.
+        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97 in the 2004 standard and 0.42 in the 2023 standard.
     t_sk : float, optional
         Mean skin temperature when worker starts working, [°C]. Defaults to 34.1.
     t_cr : float, optional
         Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
     t_re : float, optional
-        Mean rectal temperature when worker starts working, [°C]. Defaults to False.
+        Mean rectal temperature when worker starts working, [°C]. Defaults to False in the 2004 standard and 36.8 in the 2023 standard.
     t_cr_eq : float, optional
-        Mean core temperature as a function of met when worker starts working, [°C]. Defaults to False.
+        Mean core temperature as a function of met when worker starts working, [°C]. Defaults to False in the 2004 standard and 36.8 in the 2023 standard.
     sweat_rate : float, optional
         Initial sweat rate, [g/h]. Defaults to 0.
 
