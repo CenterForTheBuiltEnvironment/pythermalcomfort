@@ -2,9 +2,7 @@ import pytest
 
 from pythermalcomfort.models import phs
 from pythermalcomfort.utilities import met_to_w_m2
-from tests.conftest import Urls
-from tests.conftest import retrieve_reference_table
-from tests.conftest import validate_result
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
 def test_phs(get_test_url, retrieve_data):

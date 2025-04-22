@@ -6,11 +6,13 @@ from numba import jit
 
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
-from pythermalcomfort.utilities import Models
-from pythermalcomfort.utilities import Postures
-from pythermalcomfort.utilities import _check_standard_compliance_array
-from pythermalcomfort.utilities import met_to_w_m2
-from pythermalcomfort.utilities import p_sat
+from pythermalcomfort.utilities import (
+    Models,
+    Postures,
+    _check_standard_compliance_array,
+    met_to_w_m2,
+    p_sat,
+)
 
 
 def phs(
@@ -285,7 +287,6 @@ def phs(
     }
 
     if limit_inputs:
-
         if model == Models.iso_7933_2004.value:
             standard = "7933_2004"
         elif model == Models.iso_7933_2023.value:
@@ -357,7 +358,6 @@ def _phs_optimized(
     sw_tot,
     model,
 ):
-
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight**0.425) * (height**0.725)
     # specific heat of the body [J/kg/C/min]
