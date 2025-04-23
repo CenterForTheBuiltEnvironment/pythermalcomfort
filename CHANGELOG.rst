@@ -1,11 +1,12 @@
 Changelog
 =========
 
-3.1.0 ()
+3.1.0 (2025-04-23)
 -------------------
 * Updated the PHS model in compliance with the ISO 7933:2023 standard
     - Added default‑kwarg overrides for 2023 mode (f_r, t_re, t_cr_eq)
     - removed unused variable `round` from `default_kwargs`
+* Included test cases according to the ISO 7933:2023 standard
 
 3.0.1 (2025-04-14)
 -------------------
