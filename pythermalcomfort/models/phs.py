@@ -25,12 +25,13 @@ def phs(
     posture: Union[str, list[str]],
     wme: Union[float, int, np.ndarray, list[float], list[int]] = 0,
     round_output: bool = True,
-    model: str = Models.iso_7933_2004.value,
+    model: str = Models.iso_7933_2023.value,
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933 provides a method for the analytical evaluation and interpretation of the thermal stress
-    experienced by a subject in a hot environment. It describes a method for
+    with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933
+    provides a method for the analytical evaluation and interpretation of the thermal
+    stress experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
     body will develop in response to the working conditions.
 
@@ -61,7 +62,8 @@ def phs(
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
     model : str, optional
-        Select the model you want to use to calculate the PHS. The default option is "7933-2004", and the other option is "7933-2023".
+        Select the model you want to use to calculate the PHS. The default option is
+        "7933-2023", and the other option is "7933-2004".
 
     Other Parameters
     ----------------
@@ -91,7 +93,7 @@ def phs(
     theta : float, optional
         Angle between walking direction and wind direction, [degrees]. Defaults to 0.
     acclimatized : int, optional
-        1 if acclimatized subject, 0 otherwise. Defaults to 1.
+        100 if acclimatized subject, 0 otherwise. Defaults to 100.
     duration : int, optional
         Duration of the work sequence, [minutes]. Defaults to 480.
     f_r : float, optional
@@ -101,9 +103,11 @@ def phs(
     t_cr : float, optional
         Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
     t_re : float, optional
-        Mean rectal temperature when worker starts working, [°C]. Defaults to False in the 2004 standard and 36.8 in the 2023 standard.
+        Mean rectal temperature when worker starts working, [°C]. If False in the 2004 standard, then t_re = t_cr, whereas in the 2023 standard t_re = 36.8 °C
     t_cr_eq : float, optional
-        Mean core temperature as a function of met when worker starts working, [°C]. Defaults to False in the 2004 standard and 36.8 in the 2023 standard.
+        Mean core temperature as a function of met when worker starts working, [°C]. If
+        False in the 2004 standard, then t_cr_eq = t_cr, whereas in the 2023 standard
+        t_cr_eq = 36.8 °C.
     sweat_rate : float, optional
         Initial sweat rate, [g/h]. Defaults to 0.
 
@@ -139,7 +143,7 @@ def phs(
 
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
         raise ValueError(
-            "Model should be '7933-2004' or '7933-2023'. Please check the documentation."
+            f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. Please check the documentation."
         )
 
     PHSInputs(
@@ -162,7 +166,7 @@ def phs(
         "height": 1.8,
         "walk_sp": 0,
         "theta": 0,
-        "acclimatized": 1,
+        "acclimatized": 100,
         "duration": 480,
         "f_r": 0.97,
         "t_sk": 34.1,
@@ -213,13 +217,13 @@ def phs(
     limit_inputs = kwargs["limit_inputs"]
 
     if model == Models.iso_7933_2023.value:
-        p_a = 0.6105 * math.exp(17.27 * tdb / (tdb + 237.3)) * rh / 100
+        p_a = 0.6105 * np.exp(17.27 * tdb / (tdb + 237.3)) * rh / 100
     elif model == Models.iso_7933_2004.value:
         p_a = p_sat(tdb) / 1000 * rh / 100
 
     acclimatized = int(acclimatized)
-    if acclimatized not in [0, 1]:
-        raise ValueError("Acclimatized should be 0 or 1")
+    if acclimatized not in [0, 100]:
+        raise ValueError("Acclimatized should be 0 or 100")
 
     if drink not in [0, 1]:
         raise ValueError("Drink should be 0 or 1")
@@ -287,11 +291,6 @@ def phs(
     }
 
     if limit_inputs:
-        if model == Models.iso_7933_2004.value:
-            standard = "7933_2004"
-        elif model == Models.iso_7933_2023.value:
-            standard = "7933_2023"
-
         (
             tdb_valid,
             tr_valid,
@@ -300,7 +299,7 @@ def phs(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard, tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
+            model, tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
         )
         all_valid = ~(
             np.isnan(tdb_valid)
@@ -405,7 +404,7 @@ def _phs_optimized(
             sw_max = 400
         if sw_max < 250:
             sw_max = 250
-        if acclimatized == 1:
+        if acclimatized == 100:
             sw_max = sw_max * 1.25
     elif model == Models.iso_7933_2023.value:
         sw_max = 400 if acclimatized == 0 else 500

@@ -452,7 +452,7 @@ def _check_standard_compliance_array(standard, **kwargs):
 
         return values_to_return.values()
 
-    if standard == "7933_2004":  # based on ISO 7933:2004 Annex A
+    if standard == Models.iso_7933_2004.value:  # based on ISO 7933:2004 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
         p_a_valid = valid_range(params["p_a"], (0, 4.5))
         tr_valid = valid_range(params["tr"], (0.0, 60.0))
@@ -462,7 +462,7 @@ def _check_standard_compliance_array(standard, **kwargs):
 
         return tdb_valid, tr_valid, v_valid, p_a_valid, met_valid, clo_valid
 
-    if standard == "7933_2023":  # based on ISO 7933:2023 Annex A
+    if standard == Models.iso_7933_2023.value:  # based on ISO 7933:2023 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
         p_a_valid = valid_range(params["p_a"], (0.5, 4.5))
         tr_valid = valid_range(params["tr"], (0.0, 60.0))

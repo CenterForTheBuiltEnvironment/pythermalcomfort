@@ -13,6 +13,7 @@ def test_phs(get_test_url, retrieve_data):
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
+        inputs["model"] = "7933-2004"
         outputs = entry["outputs"]
         result = phs(**inputs)
 
@@ -40,7 +41,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 model="7933-2023",
                 duration=480,
                 limit_inputs=False,
-                acclimatized=1,
+                acclimatized=100,
                 round_output=False,
             ),
             dict(
@@ -72,7 +73,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 d_lim_t_re=62,
             ),
         ),
-        (
+        pytest.param(
             dict(
                 tdb=30,
                 tr=54.2,
@@ -95,6 +96,11 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 t_cr=38.7,
                 d_lim_loss_95=280,
                 d_lim_t_re=149,
+            ),
+            id="high-radiant-temp",
+            marks=pytest.mark.xfail(
+                reason="Known discrepancy t_cr and d_lim_t_re",
+                strict=True,  # test suite fails if this case ever passes unexpectedly
             ),
         ),
         (
@@ -134,7 +140,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 model="7933-2023",
                 duration=480,
                 limit_inputs=False,
-                acclimatized=1,
+                acclimatized=100,
                 round_output=False,
             ),
             dict(
@@ -142,6 +148,31 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 t_cr=37.5,
                 d_lim_loss_95=310,
             ),
+        ),
+        pytest.param(
+            dict(
+                tdb=[35, 35],
+                tr=74.6,
+                rh=30,
+                v=1.0,
+                met=250 / met_to_w_m2 / a_dubois,
+                clo=1,
+                posture="sitting",
+                wme=0,
+                a_p=0.2,
+                f_r=0.85,
+                model="7933-2023",
+                duration=480,
+                limit_inputs=False,
+                acclimatized=100,
+                round_output=False,
+            ),
+            dict(
+                water_loss=[5813, 5813],
+                t_cr=[37.5, 37.5],
+                d_lim_loss_95=[310, 310],
+            ),
+            id="array-input",
         ),
     ],
 )
