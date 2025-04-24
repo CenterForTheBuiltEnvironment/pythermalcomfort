@@ -1,13 +1,33 @@
 import datetime as dt
-from dataclasses import dataclass, fields
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
 
 
+class AutoStrMixin:
+    def __str__(self) -> str:
+
+        if not is_dataclass(self):
+            return super().__str__()
+
+        # determine width by max variable name length
+        names = [f.name for f in fields(self)]
+        width = max((len(n) for n in names), default=0)
+        lines = [f"-------- {self.__class__.__name__} --------"]
+        for n in names:
+            v = getattr(self, n)
+            # align the variables
+            lines.append(f"{n.ljust(width)} : {v}")
+        return "\n".join(lines)
+
+
 @dataclass(frozen=True)
-class APMV:
+class APMV(AutoStrMixin):
     """A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV)
     model.
 
@@ -24,7 +44,7 @@ class APMV:
 
 
 @dataclass(frozen=True)
-class AdaptiveASHRAE:
+class AdaptiveASHRAE(AutoStrMixin):
     """A dataclass to store the results of the adaptive thermal comfort model based on
     ASHRAE 55.
 
@@ -59,7 +79,7 @@ class AdaptiveASHRAE:
 
 
 @dataclass
-class AdaptiveEN:
+class AdaptiveEN(AutoStrMixin):
     """Dataclass to store the results of the adaptive thermal comfort calculation based
     on EN 16798-1 2019.
 
@@ -103,7 +123,7 @@ class AdaptiveEN:
 
 
 @dataclass(frozen=True)
-class AnkleDraft:
+class AnkleDraft(AutoStrMixin):
     """Dataclass to store the results of the ankle draft calculation.
 
     Attributes
@@ -122,7 +142,7 @@ class AnkleDraft:
 
 
 @dataclass(frozen=True)
-class AT:
+class AT(AutoStrMixin):
     """Dataclass to store the results of the Apparent Temperature (AT) calculation.
 
     Attributes
@@ -138,7 +158,7 @@ class AT:
 
 
 @dataclass(frozen=True)
-class ATHB:
+class ATHB(AutoStrMixin):
     """Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB)
     calculation.
 
@@ -155,7 +175,7 @@ class ATHB:
 
 
 @dataclass(frozen=True)
-class CloTOut:
+class CloTOut(AutoStrMixin):
     """Dataclass to represent the clothing insulation Icl as a function of outdoor air
     temperature.
 
@@ -172,7 +192,7 @@ class CloTOut:
 
 
 @dataclass(frozen=True)
-class CE:
+class CE(AutoStrMixin):
     """Dataclass to represent the Cooling Effect (CE).
 
     Attributes
@@ -188,7 +208,7 @@ class CE:
 
 
 @dataclass(frozen=True)
-class DI:
+class DI(AutoStrMixin):
     """Dataclass to represent the Discomfort Index (DI) and its classification.
 
     Attributes
@@ -207,7 +227,7 @@ class DI:
 
 
 @dataclass(frozen=True)
-class EPMV:
+class EPMV(AutoStrMixin):
     """Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor
     (ePMV).
 
@@ -224,7 +244,7 @@ class EPMV:
 
 
 @dataclass(frozen=True)
-class HI:
+class HI(AutoStrMixin):
     """Dataclass to represent the Heat Index (HI).
 
     Attributes
@@ -240,7 +260,7 @@ class HI:
 
 
 @dataclass(frozen=True)
-class Humidex:
+class Humidex(AutoStrMixin):
     """Dataclass to represent the Humidex and its discomfort category.
 
     Attributes
@@ -259,7 +279,7 @@ class Humidex:
 
 
 @dataclass(frozen=True)
-class NET:
+class NET(AutoStrMixin):
     """Dataclass to represent the Normal Effective Temperature (NET).
 
     Attributes
@@ -275,7 +295,7 @@ class NET:
 
 
 @dataclass(frozen=True)
-class PETSteady:
+class PETSteady(AutoStrMixin):
     """Dataclass to represent the Physiological Equivalent Temperature (PET).
 
     Attributes
@@ -291,7 +311,7 @@ class PETSteady:
 
 
 @dataclass(frozen=True)
-class PHS:
+class PHS(AutoStrMixin):
     """Dataclass to represent the Predicted Heat Strain (PHS).
 
     Attributes
@@ -334,7 +354,7 @@ class PHS:
 
 
 @dataclass(frozen=True)
-class PMV:
+class PMV(AutoStrMixin):
     """Dataclass to represent the Predicted Mean Vote (PMV).
 
     Attributes
@@ -350,7 +370,7 @@ class PMV:
 
 
 @dataclass(frozen=True)
-class PMVPPD:
+class PMVPPD(AutoStrMixin):
     """Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of
     Dissatisfied (PPD).
 
@@ -373,7 +393,7 @@ class PMVPPD:
 
 
 @dataclass(frozen=True)
-class PsychrometricValues:
+class PsychrometricValues(AutoStrMixin):
     p_sat: Union[float, list[float]]
     p_vap: Union[float, list[float]]
     hr: Union[float, list[float]]
@@ -386,7 +406,7 @@ class PsychrometricValues:
 
 
 @dataclass(frozen=True)
-class SET:
+class SET(AutoStrMixin):
     """Dataclass to represent the Standard Effective Temperature (SET).
 
     Attributes
@@ -402,7 +422,7 @@ class SET:
 
 
 @dataclass(frozen=True)
-class SolarGain:
+class SolarGain(AutoStrMixin):
     """Dataclass to represent the solar gain to the human body.
 
     Attributes
@@ -422,7 +442,7 @@ class SolarGain:
 
 
 @dataclass(frozen=True)
-class GaggeTwoNodes:
+class GaggeTwoNodes(AutoStrMixin):
     """Dataclass to represent the results of the two-node model of human temperature
     regulation.
 
@@ -490,7 +510,7 @@ class GaggeTwoNodes:
 
 
 @dataclass(frozen=True)
-class UseFansHeatwaves:
+class UseFansHeatwaves(AutoStrMixin):
     """Dataclass to represent the results of using fans during heatwaves.
 
     Attributes
@@ -551,7 +571,7 @@ class UseFansHeatwaves:
 
 
 @dataclass(frozen=True)
-class UTCI:
+class UTCI(AutoStrMixin):
     """Dataclass to represent the Universal Thermal Climate Index (UTCI).
 
     Attributes
@@ -570,7 +590,7 @@ class UTCI:
 
 
 @dataclass(frozen=True)
-class VerticalTGradPPD:
+class VerticalTGradPPD(AutoStrMixin):
     """Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with
     vertical temperature gradient.
 
@@ -590,7 +610,7 @@ class VerticalTGradPPD:
 
 
 @dataclass(frozen=True)
-class WBGT:
+class WBGT(AutoStrMixin):
     """Dataclass to represent the Wet Bulb Globe Temperature (WBGT) index.
 
     Attributes
@@ -606,7 +626,7 @@ class WBGT:
 
 
 @dataclass(frozen=True)
-class WCI:
+class WCI(AutoStrMixin):
     """Dataclass to represent the Wind Chill Index (WCI).
 
     Attributes
@@ -622,7 +642,7 @@ class WCI:
 
 
 @dataclass(frozen=True)
-class WCT:
+class WCT(AutoStrMixin):
     """Dataclass to represent the Wind Chill Temperature (WCT).
 
     Attributes
@@ -638,7 +658,7 @@ class WCT:
 
 
 @dataclass(frozen=True)
-class JOS3BodyParts:
+class JOS3BodyParts(AutoStrMixin):
     """Dataclass to represent the body parts in the JOS3 model. It is very important to
     keep the order of the attributes as they are defined in the dataclass ['head',
     'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm', 'left_hand',
@@ -714,7 +734,7 @@ def get_attribute_values(cls):
 
 
 @dataclass(frozen=True)
-class JOS3Output:
+class JOS3Output(AutoStrMixin):
     """Dataclass to represent the output of the JOS3 model simulation.
 
     Attributes
