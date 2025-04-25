@@ -1,6 +1,16 @@
 Changelog
 =========
 
+3.1.0 (2025-04-23)
+-------------------
+* Updated the PHS model in compliance with the ISO 7933:2023 standard
+    - Added default‑kwarg overrides for 2023 mode (f_r, t_re, t_cr_eq)
+    - removed unused variable `round` from `default_kwargs`
+    - By default the ISO 7933:2023 standard will now be used. The 2004 standard can still be specified as an optional parameter
+* Included test cases according to the ISO 7933:2023 standard
+* WARNING: The third ISO 7933:2023 test case is currently failing and has been marked xfail while the discrepancy is investigated.
+* Added `AutoStrMixin` to provide a formatted `__str__` representation for result classes
+
 3.0.1 (2025-04-14)
 -------------------
 
