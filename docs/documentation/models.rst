@@ -327,4 +327,3 @@ Wind chill temperature
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
-
