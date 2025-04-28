@@ -230,6 +230,7 @@ class HI(AutoStrMixin):
     """
 
     hi: Union[float, list[float]]
+    stress_category: Union[str, list[str]]
 
 
 @dataclass(frozen=True, repr=False)
