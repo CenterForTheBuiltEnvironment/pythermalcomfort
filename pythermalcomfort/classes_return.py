@@ -18,15 +18,18 @@ class AutoStrMixin:
         for n in names:
             v = getattr(self, n)
             # Format multi-line values or very long values properly
-            v_str = str(v).replace("\n", "\n" + " " * (width + 3))
+            v_str = str(v).replace("\n", "\n" + " " * (width + 3 + 3))
             lines.append(f"{n.ljust(width)} : {v_str}")
         return "\n".join(lines)
 
     def __repr__(self) -> str:
         return self.__str__()
 
-    def __getitem__(self, item):
-        return getattr(self, item)
+    def __getitem__(self, item: str):
+        try:
+            return getattr(self, item)
+        except AttributeError as exc:
+            raise KeyError(f"{self.__class__.__name__} has no field '{item}'") from exc
 
 
 @dataclass(frozen=True, repr=False)

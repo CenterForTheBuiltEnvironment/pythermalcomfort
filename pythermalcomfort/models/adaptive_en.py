@@ -69,7 +69,7 @@ def adaptive_en(
         # True
         # The conditions you entered are considered to comply with Category I
 
-        # For users who want to use the IP system
+        # For users who want to use the IP system, units="IP" or "ip" are both valid
         results = adaptive_en(
             tdb=77, tr=77, t_running_mean=68, v=0.3, units="IP"
         )
