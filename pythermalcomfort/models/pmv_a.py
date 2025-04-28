@@ -90,7 +90,13 @@ def pmv_a(
         clo_d = clo_dynamic_iso(clo=clo, met=met, v=v)
 
         results = pmv_a(
-            tdb=28, tr=28, vr=v_r, rh=50, met=met, clo=clo_d, a_coefficient=0.293
+            tdb=28,
+            tr=28,
+            vr=v_r,
+            rh=50,
+            met=met,
+            clo=clo_d,
+            a_coefficient=0.293,
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.71

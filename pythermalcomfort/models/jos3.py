@@ -251,111 +251,125 @@ class JOS3:
 
     .. code-block:: python
 
-        >>> from pythermalcomfort.classes_return import get_attribute_values
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> import matplotlib.pyplot as plt
-        >>> import os
-        >>> from pythermalcomfort.models import JOS3
-        >>> from pythermalcomfort.jos3_functions.parameters import local_clo_typical_ensembles
-        >>>
-        >>> model = JOS3(
-        >>>     height=1.7,
-        >>>     weight=60,
-        >>>     fat=20,
-        >>>     age=30,
-        >>>     sex="male",
-        >>>     bmr_equation="japanese",
-        >>>     bsa_equation="fujimoto",
-        >>> )
-        >>> # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
-        >>> # Set the first condition
-        >>> # Environmental parameters can be input as int, float, list, dict, numpy array format.
-        >>> model.tdb = 28  # Air temperature [°C]
-        >>> model.tr = 30  # Mean radiant temperature [°C]
-        >>> model.rh = 40  # Relative humidity [%]
-        >>> model.v = np.array( # Air velocity [m/s]
-        >>>     [
-        >>>         0.2,  # head
-        >>>         0.4,  # neck
-        >>>         0.4,  # chest
-        >>>         0.1,  # back
-        >>>         0.1,  # pelvis
-        >>>         0.4,  # left shoulder
-        >>>         0.4,  # left arm
-        >>>         0.4,  # left hand
-        >>>         0.4,  # right shoulder
-        >>>         0.4,  # right arm
-        >>>         0.4,  # right hand
-        >>>         0.1,  # left thigh
-        >>>         0.1,  # left leg
-        >>>         0.1,  # left foot
-        >>>         0.1,  # right thigh
-        >>>         0.1,  # right leg
-        >>>         0.1,  # right foot
-        >>>     ]
-        >>> )
-        >>> model.clo = get_attribute_values(local_clo_typical_ensembles["briefs, socks, undershirt, work jacket, work pants, safety shoes"]["local_body_part"])
-        >>> # par should be input as int, float.
-        >>> model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
-        >>> # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
-        >>> # (0="standing", 1="sitting" or 2="lying")
-        >>> model.posture = "sitting"  # Posture [-], assuming a sitting position
-        >>>
-        >>> # Run JOS-3 model
-        >>> model.simulate(
-        >>>     times=30,  # Number of loops of a simulation
-        >>>     dtime=60,  # Time delta [sec]. The default is 60.
-        >>> )  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
-        >>> # Set the next condition (You only need to change the parameters that you want to change)
-        >>> model.to = 20  # Change operative temperature
-        >>> model.v = { # Air velocity [m/s], assuming to use a desk fan
-        >>>     'head' : 0.2,
-        >>>     'neck' : 0.4,
-        >>>     'chest' : 0.4,
-        >>>     'back': 0.1,
-        >>>     'pelvis' : 0.1,
-        >>>     'left_shoulder' : 0.4,
-        >>>     'left_arm' : 0.4,
-        >>>     'left_hand' : 0.4,
-        >>>     'right_shoulder' : 0.4,
-        >>>     'right_arm' : 0.4,
-        >>>     'right_hand' : 0.4,
-        >>>     'left_thigh' : 0.1,
-        >>>     'left_leg' : 0.1,
-        >>>     'left_foot' : 0.1,
-        >>>     'right_thigh' : 0.1,
-        >>>     'right_leg' : 0.1,
-        >>>     'right_foot' : 0.1
-        >>>     }
-        >>> # Run JOS-3 model
-        >>> model.simulate(
-        >>>     times=60,  # Number of loops of a simulation
-        >>>     dtime=60,  # Time delta [sec]. The default is 60.
-        >>> )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
-        >>> # Set the next condition (You only need to change the parameters that you want to change)
-        >>> model.tdb = 30  # Change air temperature [°C]
-        >>> model.tr = 35  # Change mean radiant temperature [°C]
-        >>> # Run JOS-3 model
-        >>> model.simulate(
-        >>>     times=30,  # Number of loops of a simulation
-        >>>     dtime=60,  # Time delta [sec]. The default is 60.
-        >>> )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
-        >>>
-        >>> # The easiest way to access the results is to use the `results` method
-        >>> results = model.results()
-        >>> # you can then use dot notation to access the results
-        >>> print(results.t_skin_mean)  # Print the mean skin temperature or you can use print(results['t_skin_mean'])
-        >>> # some attributes have results for each body part, you can access them by using the body part name
-        >>> print(results.t_skin.head)  # Print the skin temperature of the head
-        >>>
-        >>> # You can also save the results as a pandas dataframe and plot them
-        >>> df = pd.DataFrame([results.t_skin.head, results.t_skin.pelvis]).transpose()  # Make pandas.DataFrame
-        >>> df.plot()  # Plot time series of local skin temperature.
-        >>> plt.legend(["Head", "Pelvis"])  # Reset the legends
-        >>> plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
-        >>> plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
-        >>> plt.show()  # Show the plot
+        from pythermalcomfort.classes_return import get_attribute_values
+        import numpy as np
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        import os
+        from pythermalcomfort.models import JOS3
+        from pythermalcomfort.jos3_functions.parameters import (
+            local_clo_typical_ensembles,
+        )
+
+        model = JOS3(
+            height=1.7,
+            weight=60,
+            fat=20,
+            age=30,
+            sex="male",
+            bmr_equation="japanese",
+            bsa_equation="fujimoto",
+        )
+        # Set environmental conditions such as air temperature, mean radiant temperature using the setter methods.
+        # Set the first condition
+        # Environmental parameters can be input as int, float, list, dict, numpy array format.
+        model.tdb = 28  # Air temperature [°C]
+        model.tr = 30  # Mean radiant temperature [°C]
+        model.rh = 40  # Relative humidity [%]
+        model.v = np.array(  # Air velocity [m/s]
+            [
+                0.2,  # head
+                0.4,  # neck
+                0.4,  # chest
+                0.1,  # back
+                0.1,  # pelvis
+                0.4,  # left shoulder
+                0.4,  # left arm
+                0.4,  # left hand
+                0.4,  # right shoulder
+                0.4,  # right arm
+                0.4,  # right hand
+                0.1,  # left thigh
+                0.1,  # left leg
+                0.1,  # left foot
+                0.1,  # right thigh
+                0.1,  # right leg
+                0.1,  # right foot
+            ]
+        )
+        model.clo = get_attribute_values(
+            local_clo_typical_ensembles[
+                "briefs, socks, undershirt, work jacket, work pants, safety shoes"
+            ]["local_body_part"]
+        )
+        # par should be input as int, float.
+        model.par = (
+            1.2  # Physical activity ratio [-], assuming a sitting position
+        )
+        # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
+        # (0="standing", 1="sitting" or 2="lying")
+        model.posture = "sitting"  # Posture [-], assuming a sitting position
+
+        # Run JOS-3 model
+        model.simulate(
+            times=30,  # Number of loops of a simulation
+            dtime=60,  # Time delta [sec]. The default is 60.
+        )  # Exposure time = 30 [loops] * 60 [sec] = 30 [min]
+        # Set the next condition (You only need to change the parameters that you want to change)
+        model.to = 20  # Change operative temperature
+        model.v = {  # Air velocity [m/s], assuming to use a desk fan
+            "head": 0.2,
+            "neck": 0.4,
+            "chest": 0.4,
+            "back": 0.1,
+            "pelvis": 0.1,
+            "left_shoulder": 0.4,
+            "left_arm": 0.4,
+            "left_hand": 0.4,
+            "right_shoulder": 0.4,
+            "right_arm": 0.4,
+            "right_hand": 0.4,
+            "left_thigh": 0.1,
+            "left_leg": 0.1,
+            "left_foot": 0.1,
+            "right_thigh": 0.1,
+            "right_leg": 0.1,
+            "right_foot": 0.1,
+        }
+        # Run JOS-3 model
+        model.simulate(
+            times=60,  # Number of loops of a simulation
+            dtime=60,  # Time delta [sec]. The default is 60.
+        )  # Additional exposure time = 60 [loops] * 60 [sec] = 60 [min]
+        # Set the next condition (You only need to change the parameters that you want to change)
+        model.tdb = 30  # Change air temperature [°C]
+        model.tr = 35  # Change mean radiant temperature [°C]
+        # Run JOS-3 model
+        model.simulate(
+            times=30,  # Number of loops of a simulation
+            dtime=60,  # Time delta [sec]. The default is 60.
+        )  # Additional exposure time = 30 [loops] * 60 [sec] = 30 [min]
+
+        # The easiest way to access the results is to use the `results` method
+        results = model.results()
+        # you can then use dot notation to access the results
+        print(
+            results.t_skin_mean
+        )  # Print the mean skin temperature or you can use print(results['t_skin_mean'])
+        # some attributes have results for each body part, you can access them by using the body part name
+        print(results.t_skin.head)  # Print the skin temperature of the head
+
+        # You can also save the results as a pandas dataframe and plot them
+        df = pd.DataFrame(
+            [results.t_skin.head, results.t_skin.pelvis]
+        ).transpose()  # Make pandas.DataFrame
+        df.plot()  # Plot time series of local skin temperature.
+        plt.legend(["Head", "Pelvis"])  # Reset the legends
+        plt.ylabel(
+            "Skin temperature [°C]"
+        )  # Set y-label as 'Skin temperature [°C]'
+        plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
+        plt.show()  # Show the plot
     """
 
     def __init__(
@@ -407,6 +421,7 @@ class JOS3:
         .. code-block:: python
 
             jos3_model = JOS3(height=1.75, weight=70, age=25, sex="female")
+
         """
         # validate body parameters
         validate_body_parameters(height=height, weight=weight, age=age, body_fat=fat)
@@ -1092,14 +1107,13 @@ class JOS3:
         --------
         .. code-block:: python
 
-            >>> from pythermalcomfort.models import JOS3
-            >>>
-            >>> model = JOS3(height=1.75, weight=70, age=25, sex="female")
-            >>> model.simulate(times=3, dtime=60)
-            >>> output = model.results()
-            >>>
-            >>> print(output.t_skin_mean)
-            >>> print(output.t_skin.head)
+            from pythermalcomfort.models import JOS3
+
+            model = JOS3(height=1.75, weight=70, age=25, sex="female")
+            model.simulate(times=3, dtime=60)
+            output = model.results()
+            print(output.t_skin_mean)
+            print(output.t_skin.head)
         """
         merged_data = defaultdict(list)
 
@@ -1253,10 +1267,19 @@ class JOS3:
 
         Examples
         --------
-        >>> from pythermalcomfort.models import JOS3
-        >>> model = JOS3()
-        >>> model.simulate(60)
-        >>> model.to_csv()
+
+        .. code-block:: python
+
+            from pythermalcomfort.models import JOS3
+
+            # Create an instance of the JOS3 model
+            model = JOS3()
+
+            # Simulate for 60 steps
+            model.simulate(60)
+
+            # Export results to a CSV file
+            model.to_csv()
         """
         # Use the model name and current time as default output file name
         if path is None:

@@ -109,13 +109,25 @@ def pmv_ppd_iso(
         # calculate relative air speed
         v_r = v_relative(v=v, met=met)
         results = pmv_ppd_iso(
-            tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_dynamic, model="7730-2005"
+            tdb=tdb,
+            tr=tr,
+            vr=v_r,
+            rh=rh,
+            met=met,
+            clo=clo_dynamic,
+            model="7730-2005",
         )
         print(results.pmv)  # 0.17
         print(results.ppd)  # 5.6
 
         result = pmv_ppd_iso(
-            tdb=[22, 25], tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model="7730-2005"
+            tdb=[22, 25],
+            tr=25,
+            vr=0.1,
+            rh=50,
+            met=1.4,
+            clo=0.5,
+            model="7730-2005",
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]

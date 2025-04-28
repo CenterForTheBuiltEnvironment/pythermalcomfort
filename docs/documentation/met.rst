@@ -10,6 +10,7 @@ Met typical tasks, [met]
 
 .. code-block:: python
 
-    >>> from pythermalcomfort.utilities import met_typical_tasks
-    >>> print(met_typical_tasks['Filing, standing'])
-    1.4
+    from pythermalcomfort.utilities import met_typical_tasks
+
+    print(met_typical_tasks["Filing, standing"])
+    # 1.4

@@ -62,4 +62,3 @@ exclude = [
     "site-packages",
     "venv",
 ]
-
