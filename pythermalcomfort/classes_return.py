@@ -25,6 +25,9 @@ class AutoStrMixin:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 @dataclass(frozen=True, repr=False)
 class APMV(AutoStrMixin):
@@ -38,9 +41,6 @@ class APMV(AutoStrMixin):
     """
 
     a_pmv: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -73,9 +73,6 @@ class AdaptiveASHRAE(AutoStrMixin):
     tmp_cmf_90_up: Union[float, npt.ArrayLike]
     acceptability_80: Union[bool, npt.ArrayLike]
     acceptability_90: Union[bool, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass
@@ -118,9 +115,6 @@ class AdaptiveEN(AutoStrMixin):
     tmp_cmf_cat_ii_low: Union[float, npt.ArrayLike]
     tmp_cmf_cat_iii_low: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class AnkleDraft(AutoStrMixin):
@@ -137,9 +131,6 @@ class AnkleDraft(AutoStrMixin):
     ppd_ad: Union[float, npt.ArrayLike]
     acceptability: Union[bool, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class AT(AutoStrMixin):
@@ -152,9 +143,6 @@ class AT(AutoStrMixin):
     """
 
     at: float
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -170,9 +158,6 @@ class ATHB(AutoStrMixin):
 
     athb_pmv: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class CloTOut(AutoStrMixin):
@@ -187,9 +172,6 @@ class CloTOut(AutoStrMixin):
 
     clo_tout: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class CE(AutoStrMixin):
@@ -202,9 +184,6 @@ class CE(AutoStrMixin):
     """
 
     ce: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -222,9 +201,6 @@ class DI(AutoStrMixin):
     di: Union[float, list[float]]
     discomfort_condition: Union[str, list[str]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class EPMV(AutoStrMixin):
@@ -239,9 +215,6 @@ class EPMV(AutoStrMixin):
 
     e_pmv: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class HI(AutoStrMixin):
@@ -254,9 +227,6 @@ class HI(AutoStrMixin):
     """
 
     hi: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -274,9 +244,6 @@ class Humidex(AutoStrMixin):
     humidex: Union[float, list[float]]
     discomfort: Union[str, list[str]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class NET(AutoStrMixin):
@@ -290,9 +257,6 @@ class NET(AutoStrMixin):
 
     net: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class PETSteady(AutoStrMixin):
@@ -305,9 +269,6 @@ class PETSteady(AutoStrMixin):
     """
 
     pet: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -349,9 +310,6 @@ class PHS(AutoStrMixin):
     water_loss_watt: Union[float, list[float]]
     water_loss: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class PMV(AutoStrMixin):
@@ -364,9 +322,6 @@ class PMV(AutoStrMixin):
     """
 
     pmv: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -388,9 +343,6 @@ class PMVPPD(AutoStrMixin):
     ppd: Union[float, list[float]]
     tsv: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class PsychrometricValues(AutoStrMixin):
@@ -400,9 +352,6 @@ class PsychrometricValues(AutoStrMixin):
     wet_bulb_tmp: Union[float, list[float]]
     dew_point_tmp: Union[float, list[float]]
     h: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -416,9 +365,6 @@ class SET(AutoStrMixin):
     """
 
     set: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -436,9 +382,6 @@ class SolarGain(AutoStrMixin):
 
     erf: Union[float, list[float]]
     delta_mrt: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -505,9 +448,6 @@ class GaggeTwoNodes(AutoStrMixin):
     disc: Union[float, list[float]]
     t_sens: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class UseFansHeatwaves(AutoStrMixin):
@@ -566,9 +506,6 @@ class UseFansHeatwaves(AutoStrMixin):
     heat_strain_w: Union[bool, list[bool]]
     heat_strain_sweating: Union[bool, list[bool]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class UTCI(AutoStrMixin):
@@ -584,9 +521,6 @@ class UTCI(AutoStrMixin):
 
     utci: Union[float, list[float]]
     stress_category: Union[str, list[str]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -605,9 +539,6 @@ class VerticalTGradPPD(AutoStrMixin):
     ppd_vg: Union[float, list[float]]
     acceptability: Union[bool, list[bool]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class WBGT(AutoStrMixin):
@@ -620,9 +551,6 @@ class WBGT(AutoStrMixin):
     """
 
     wbgt: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -637,9 +565,6 @@ class WCI(AutoStrMixin):
 
     wci: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass(frozen=True, repr=False)
 class WCT(AutoStrMixin):
@@ -652,9 +577,6 @@ class WCT(AutoStrMixin):
     """
 
     wct: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
@@ -720,9 +642,6 @@ class JOS3BodyParts(AutoStrMixin):
     right_thigh: Optional[float] = None
     right_leg: Optional[float] = None
     right_foot: Optional[float] = None
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
     @classmethod
     def get_attribute_names(cls):
@@ -918,6 +837,3 @@ class JOS3Output(AutoStrMixin):
     q_skin2env_latent: Optional[JOS3BodyParts] = None
     q_res_sensible: Optional[float] = None
     q_res_latent: Optional[float] = None
-
-    def __getitem__(self, item):
-        return getattr(self, item)
