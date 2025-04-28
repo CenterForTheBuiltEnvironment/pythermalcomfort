@@ -71,7 +71,15 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
    from pythermalcomfort.models import pmv_ppd_iso, utci
 
    # Calculate PMV and PPD using ISO 7730 standard
-   result = pmv_ppd_iso(tdb=25, tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model="7730-2005")
+   result = pmv_ppd_iso(
+       tdb=25,  # Dry Bulb Temperature in °C
+       tr=25,  # Mean Radiant Temperature in °C
+       vr=0.1,  # Relative air speed in m/s
+       rh=50,  # Relative Humidity in %
+       met=1.4,  # Metabolic rate in met
+       clo=0.5,  # Clothing insulation in clo
+       model="7730-2005"  # Year of the ISO standard
+   )
    print(f"PMV: {result.pmv}, PPD: {result.ppd}")
 
    # Calculate UTCI for heat stress assessment
