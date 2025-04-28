@@ -97,17 +97,18 @@ def phs(
     duration : int, optional
         Duration of the work sequence, [minutes]. Defaults to 480.
     f_r : float, optional
-        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97 in the 2004 standard and 0.42 in the 2023 standard.
+        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97 in the 2004 standard and
+        0.42 in the 2023 standard.
     t_sk : float, optional
         Mean skin temperature when worker starts working, [°C]. Defaults to 34.1.
     t_cr : float, optional
         Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
     t_re : float, optional
-        Mean rectal temperature when worker starts working, [°C]. If False in the 2004 standard, then t_re = t_cr, whereas in the 2023 standard t_re = 36.8 °C
+        Mean rectal temperature when worker starts working, [°C]. If False in the 2004 standard,
+        then t_re = t_cr, whereas in the 2023 standard t_re = 36.8 °C
     t_cr_eq : float, optional
-        Mean core temperature as a function of met when worker starts working, [°C]. If
-        False in the 2004 standard, then t_cr_eq = t_cr, whereas in the 2023 standard
-        t_cr_eq = 36.8 °C.
+        Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
+        standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
     sweat_rate : float, optional
         Initial sweat rate, [g/h]. Defaults to 0.
 
@@ -143,7 +144,8 @@ def phs(
 
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
         raise ValueError(
-            f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. Please check the documentation."
+            f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. "
+            "Please check the documentation."
         )
 
     PHSInputs(
@@ -218,7 +220,7 @@ def phs(
 
     if model == Models.iso_7933_2023.value:
         p_a = 0.6105 * np.exp(17.27 * tdb / (tdb + 237.3)) * rh / 100
-    elif model == Models.iso_7933_2004.value:
+    else:  # model == Models.iso_7933_2004.value:
         p_a = p_sat(tdb) / 1000 * rh / 100
 
     acclimatized = int(acclimatized)
@@ -369,10 +371,10 @@ def _phs_optimized(
     d_lim_loss_95 = 0
 
     if model == Models.iso_7933_2023.value:
-        # 2023 standard only has one Dmax value
+        # 2023 standard only has one d_max value
         d_max_50 = (0.03 if drink == 0 else 0.05) * weight * 1000
         d_max_95 = (0.03 if drink == 0 else 0.05) * weight * 1000
-    elif model == Models.iso_7933_2004.value:
+    else:  # model == Models.iso_7933_2004.value:
         # maximum water loss to protect a mean subject [g]
         d_max_50 = 0.075 * weight * 1000
         # maximum water loss to protect 95 % of the working population [g]
@@ -394,7 +396,7 @@ def _phs_optimized(
         a_r_du = 0.77
     elif posture == Postures.sitting.value:
         a_r_du = 0.7
-    elif posture == Postures.crouching.value:
+    else:  # posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate
@@ -406,7 +408,7 @@ def _phs_optimized(
             sw_max = 250
         if acclimatized == 100:
             sw_max = sw_max * 1.25
-    elif model == Models.iso_7933_2023.value:
+    else:  # model == Models.iso_7933_2023.value:
         sw_max = 400 if acclimatized == 0 else 500
 
     # max skin wettedness
@@ -417,7 +419,7 @@ def _phs_optimized(
 
     if model == Models.iso_7933_2023.value:
         fcl = 1 + 0.28 * clo
-    elif model == Models.iso_7933_2004.value:
+    else:  # model == Models.iso_7933_2004.value:
         fcl = 1 + 0.3 * clo
 
     # Static boundary layer thermal insulation in quiet air
@@ -428,7 +430,7 @@ def _phs_optimized(
     if def_speed > 0:
         if def_dir == 1:  # Unidirectional walking
             v_r = abs(v - walk_sp * math.cos(3.14159 * theta / 180))
-        else:  # Omni-directional walking IF
+        else:  # Omnidirectional walking IF
             if v < walk_sp:
                 v_r = walk_sp
             else:
@@ -482,7 +484,7 @@ def _phs_optimized(
     # dynamic convective heat transfer coefficient
     if model == Models.iso_7933_2004.value:
         hc_dyn = 2.38 * abs(t_sk - tdb) ** 0.25
-    elif model == Models.iso_7933_2023.value:
+    else:  # model == Models.iso_7933_2023.value:
         t_cl = tr + 0.1  # clothing surface temperature
         hc_dyn = 2.38 * abs(t_cl - tdb) ** 0.25
 
@@ -493,7 +495,7 @@ def _phs_optimized(
 
     if model == Models.iso_7933_2023.value:
         f_cl_r = (1 - a_p) * 0.97 + a_p * (1 - f_r)
-    elif model == Models.iso_7933_2004.value:
+    else:  # model == Models.iso_7933_2004.value:
         f_cl_r = (1 - a_p) * 0.97 + a_p * f_r
 
     for time in range(1, duration + 1):
