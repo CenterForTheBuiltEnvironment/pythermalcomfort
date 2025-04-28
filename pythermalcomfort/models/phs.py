@@ -618,9 +618,11 @@ def _phs_optimized(
             d_lim_loss_50 = time
         if d_lim_loss_95 == 0 and sw_tot_g >= d_max_95:
             d_lim_loss_95 = time
-        if drink == 0:
-            d_lim_loss_95 = d_lim_loss_95 * 0.6
-            d_lim_loss_50 = d_lim_loss_95
+
+    # in the standard the if statement is within the while loop, causing it to decay exponentially
+    if drink == 0:
+        d_lim_loss_95 = d_lim_loss_95 * 0.6
+        d_lim_loss_50 = d_lim_loss_95
     if d_lim_loss_50 == 0:
         d_lim_loss_50 = duration
     if d_lim_loss_95 == 0:
