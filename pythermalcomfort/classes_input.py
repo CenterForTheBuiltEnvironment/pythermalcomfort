@@ -74,17 +74,40 @@ class BaseInputs:
                     "forced convection'"
                 )
         if self.posture is not None:
-            if self.posture.lower() not in [
+            valid_postures = [
                 Postures.sitting.value,
                 Postures.standing.value,
                 Postures.crouching.value,
-            ]:
-                raise ValueError(
-                    "posture must be either 'sitting', 'standing', or 'crouching'"
-                )
+            ]
+
+            # For a single string value
+            if isinstance(self.posture, str):
+                if self.posture.lower() not in valid_postures:
+                    raise ValueError(
+                        "posture must be either 'sitting', 'standing', or 'crouching'"
+                    )
+            # For list, numpy array or other iterables
+            elif isinstance(self.posture, (list, np.ndarray)):
+                for posture in self.posture:
+                    if (
+                        isinstance(posture, str)
+                        and posture.lower() not in valid_postures
+                    ):
+                        raise ValueError(
+                            "posture must be either 'sitting', 'standing', or 'crouching'"
+                        )
         if self.sex is not None:
-            if self.sex.lower() not in [Sex.male.value, Sex.female.value]:
-                raise ValueError("sex must be either 'male' or 'female'")
+            valid_sex_values = [Sex.male.value, Sex.female.value]
+
+            # For a single string value
+            if isinstance(self.sex, str):
+                if self.sex.lower() not in valid_sex_values:
+                    raise ValueError("sex must be either 'male' or 'female'")
+            # For list, numpy array or other iterables
+            elif isinstance(self.sex, (list, np.ndarray)):
+                for sex in self.sex:
+                    if isinstance(sex, str) and sex.lower() not in valid_sex_values:
+                        raise ValueError("sex must be either 'male' or 'female'")
         if self.tdb is not None:
             self.tdb = convert_series_to_list(self.tdb)
             validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
