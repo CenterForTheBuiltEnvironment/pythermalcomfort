@@ -48,7 +48,10 @@ If you use ``pythermalcomfort`` in your research, please cite it as follows:
 
 .. code-block:: text
 
-   Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578
+   Tartarini, F., Schiavon, S., 2020.
+   pythermalcomfort: A Python package for thermal comfort research.
+   SoftwareX 12, 100578.
+   https://doi.org/10.1016/j.softx.2020.100578
 
 Installation
 ============
@@ -59,7 +62,7 @@ Install ``pythermalcomfort`` via pip:
 
    pip install pythermalcomfort
 
-For advanced installation options, refer to the installation Section in the documentation.
+For advanced installation options, refer to the `Installation Instructions <https://pythermalcomfort.readthedocs.io/en/latest/installation.html>`_.
 
 Quick Start
 ===========
@@ -98,7 +101,7 @@ Check out our contribution page in the documentation to get started.
 Documentation
 =============
 
-For detailed documentation, tutorials, and examples, visit our documentation.
+For detailed documentation, tutorials, and examples, visit our `Documentation <https://pythermalcomfort.readthedocs.io/en/latest/documentation/index.html>`_.
 
 License
 =======
