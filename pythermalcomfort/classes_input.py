@@ -64,31 +64,37 @@ class BaseInputs:
         def convert_series_to_list(obj):
             return obj.tolist() if is_pandas_series(obj) else obj
 
+        def _validate_str_values(name: str, value, allowed):
+            values = np.atleast_1d(value)
+            for val in values.astype(str):
+                if val.lower() not in allowed:
+                    raise ValueError(f"{name} must be one of {allowed!r}")
+
         # Only validate attributes that are not None
         if self.units.upper() not in [Units.SI.value, Units.IP.value]:
             raise ValueError("Units must be either 'SI' or 'IP'")
         if self.position is not None:
-            if self.position.lower() not in [
-                Postures.sitting.value,
-                Postures.standing.value,
-                "standing, forced convection",
-            ]:
-                raise ValueError(
-                    "position must be either 'standing', 'sitting', or 'standing, "
-                    "forced convection'"
-                )
+            _validate_str_values(
+                "position",
+                self.position,
+                [
+                    Postures.sitting.value,
+                    Postures.standing.value,
+                    "standing, forced convection",
+                ],
+            )
         if self.posture is not None:
-            if self.posture.lower() not in [
-                Postures.sitting.value,
-                Postures.standing.value,
-                Postures.crouching.value,
-            ]:
-                raise ValueError(
-                    "posture must be either 'sitting', 'standing', or 'crouching'"
-                )
+            _validate_str_values(
+                "posture",
+                self.posture,
+                [
+                    Postures.sitting.value,
+                    Postures.standing.value,
+                    Postures.crouching.value,
+                ],
+            )
         if self.sex is not None:
-            if self.sex.lower() not in [Sex.male.value, Sex.female.value]:
-                raise ValueError("sex must be either 'male' or 'female'")
+            _validate_str_values("sex", self.sex, [Sex.male.value, Sex.female.value])
         if self.tdb is not None:
             self.tdb = convert_series_to_list(self.tdb)
             validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))

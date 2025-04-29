@@ -48,7 +48,10 @@ If you use ``pythermalcomfort`` in your research, please cite it as follows:
 
 .. code-block:: text
 
-   Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. https://doi.org/10.1016/j.softx.2020.100578
+   Tartarini, F., Schiavon, S., 2020.
+   pythermalcomfort: A Python package for thermal comfort research.
+   SoftwareX 12, 100578.
+   https://doi.org/10.1016/j.softx.2020.100578
 
 Installation
 ============
@@ -59,7 +62,7 @@ Install ``pythermalcomfort`` via pip:
 
    pip install pythermalcomfort
 
-For advanced installation options, refer to the installation Section in the documentation.
+For advanced installation options, refer to the `Installation Instructions <https://pythermalcomfort.readthedocs.io/en/latest/installation.html>`_.
 
 Quick Start
 ===========
@@ -71,7 +74,15 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
    from pythermalcomfort.models import pmv_ppd_iso, utci
 
    # Calculate PMV and PPD using ISO 7730 standard
-   result = pmv_ppd_iso(tdb=25, tr=25, vr=0.1, rh=50, met=1.4, clo=0.5, model='7730-2005')
+   result = pmv_ppd_iso(
+       tdb=25,  # Dry Bulb Temperature in °C
+       tr=25,  # Mean Radiant Temperature in °C
+       vr=0.1,  # Relative air speed in m/s
+       rh=50,  # Relative Humidity in %
+       met=1.4,  # Metabolic rate in met
+       clo=0.5,  # Clothing insulation in clo
+       model="7730-2005"  # Year of the ISO standard
+   )
    print(f"PMV: {result.pmv}, PPD: {result.ppd}")
 
    # Calculate UTCI for heat stress assessment
@@ -90,7 +101,7 @@ Check out our contribution page in the documentation to get started.
 Documentation
 =============
 
-For detailed documentation, tutorials, and examples, visit our documentation.
+For detailed documentation, tutorials, and examples, visit our `Documentation <https://pythermalcomfort.readthedocs.io/en/latest/documentation/index.html>`_.
 
 License
 =======

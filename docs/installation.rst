@@ -41,6 +41,7 @@ To verify that the package is installed correctly, you can run:
 .. code-block:: python
 
     import pythermalcomfort
+
     print(pythermalcomfort.__version__)
 
 This should print the version of the `pythermalcomfort` package installed on your system.

@@ -24,6 +24,8 @@ autopep8 = "*"
 bump-my-version = "*"
 twine = "*"
 readme-renderer = "*"
+pre-commit = "*"
+blacken-docs = "*"
 
 [requires]
 python_version = "3.12"

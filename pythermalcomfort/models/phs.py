@@ -7,6 +7,7 @@ from numba import jit
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
 from pythermalcomfort.utilities import (
+    Models,
     Postures,
     _check_standard_compliance_array,
     met_to_w_m2,
@@ -24,12 +25,13 @@ def phs(
     posture: Union[str, list[str]],
     wme: Union[float, int, np.ndarray, list[float], list[int]] = 0,
     round_output: bool = True,
+    model: str = Models.iso_7933_2023.value,
     **kwargs,
 ) -> PHS:
     """Calculates the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 Standard [7933ISO2004]_. The ISO 7933 provides a method for
-    the analytical evaluation and interpretation of the thermal stress
-    experienced by a subject in a hot environment. It describes a method for
+    with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933
+    provides a method for the analytical evaluation and interpretation of the thermal
+    stress experienced by a subject in a hot environment. It describes a method for
     predicting the sweat rate and the internal core temperature that the human
     body will develop in response to the working conditions.
 
@@ -59,6 +61,9 @@ def phs(
         external work, [met] default 0
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
+    model : str, optional
+        Select the model you want to use to calculate the PHS. The default option is
+        "7933-2023", and the other option is "7933-2004".
 
     Other Parameters
     ----------------
@@ -92,15 +97,18 @@ def phs(
     duration : int, optional
         Duration of the work sequence, [minutes]. Defaults to 480.
     f_r : float, optional
-        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97.
+        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97 in the 2004 standard and
+        0.42 in the 2023 standard.
     t_sk : float, optional
         Mean skin temperature when worker starts working, [°C]. Defaults to 34.1.
     t_cr : float, optional
         Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
     t_re : float, optional
-        Mean rectal temperature when worker starts working, [°C]. Defaults to False.
+        Mean rectal temperature when worker starts working, [°C]. If False in the 2004 standard,
+        then t_re = t_cr, whereas in the 2023 standard t_re = 36.8 °C
     t_cr_eq : float, optional
-        Mean core temperature as a function of met when worker starts working, [°C]. Defaults to False.
+        Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
+        standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
     sweat_rate : float, optional
         Initial sweat rate, [g/h]. Defaults to 0.
 
@@ -117,7 +125,14 @@ def phs(
         from pythermalcomfort.models import phs
 
         result = phs(
-            tdb=40, tr=40, rh=33.85, v=0.3, met=2.5, clo=0.5, posture="standing", wme=0
+            tdb=40,
+            tr=40,
+            rh=33.85,
+            v=0.3,
+            met=2.5,
+            clo=0.5,
+            posture="standing",
+            wme=0,
         )
         print(result.t_re)  # 37.5
 
@@ -133,6 +148,13 @@ def phs(
         )
         print(result.t_re)  # [37.5 43.4]
     """
+
+    if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
+        raise ValueError(
+            f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. "
+            "Please check the documentation."
+        )
+
     PHSInputs(
         tdb=tdb,
         tr=tr,
@@ -162,9 +184,18 @@ def phs(
         "t_cr_eq": False,
         "t_sk_t_cr_wg": 0.3,
         "sweat_rate": 0,
-        "round": True,
         "limit_inputs": True,
     }
+
+    if model == Models.iso_7933_2023.value:
+        # override changed default kwargs for 2023 standard
+        overrides_2023 = {
+            "f_r": 0.42,
+            "t_re": 36.8,
+            "t_cr_eq": 36.8,
+        }
+        default_kwargs.update(overrides_2023)
+
     kwargs = {**default_kwargs, **kwargs}
 
     tdb = np.array(tdb)
@@ -194,11 +225,14 @@ def phs(
     sweat_rate = kwargs["sweat_rate"]
     limit_inputs = kwargs["limit_inputs"]
 
-    p_a = p_sat(tdb) / 1000 * rh / 100
+    if model == Models.iso_7933_2023.value:
+        p_a = 0.6105 * np.exp(17.27 * tdb / (tdb + 237.3)) * rh / 100
+    else:  # model == Models.iso_7933_2004.value:
+        p_a = p_sat(tdb) / 1000 * rh / 100
 
     acclimatized = int(acclimatized)
-    if acclimatized < 0 or acclimatized > 100:
-        raise ValueError("Acclimatized should be between 0 and 100")
+    if acclimatized not in [0, 100]:
+        raise ValueError("Acclimatized should be 0 or 100")
 
     if drink not in [0, 1]:
         raise ValueError("Drink should be 0 or 1")
@@ -207,9 +241,6 @@ def phs(
         raise ValueError(
             "The weight of the person should be in kg and it cannot exceed 1000"
         )
-
-    # I needed to create this variable since vectorize accept no more than 34 inputs+outputs
-    combined_drink_acc_weight = drink * 1000000 + acclimatized * 1000 + weight
 
     if not t_re:
         t_re = t_cr
@@ -235,7 +266,9 @@ def phs(
         met=met,
         clo=clo,
         posture=posture,
-        combined_drink_acc_weight=combined_drink_acc_weight,
+        drink=drink,
+        acclimatized=acclimatized,
+        weight=weight,
         wme=wme,
         i_mst=i_mst,
         a_p=a_p,
@@ -250,6 +283,7 @@ def phs(
         t_cr_eq=t_cr_eq,
         t_sk_t_cr_wg=t_sk_t_cr_wg,
         sw_tot=sweat_rate,
+        model=model,
     )
 
     output = {
@@ -274,7 +308,7 @@ def phs(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            "7933", tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
+            model, tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
         )
         all_valid = ~(
             np.isnan(tdb_valid)
@@ -313,7 +347,9 @@ def _phs_optimized(
     met,
     clo,
     posture,
-    combined_drink_acc_weight,
+    drink,
+    acclimatized,
+    weight,
     wme,
     i_mst,
     a_p,
@@ -328,23 +364,29 @@ def _phs_optimized(
     t_cr_eq,
     t_sk_t_cr_wg,
     sw_tot,
+    model,
 ):
-    drink = int(combined_drink_acc_weight / 1000000)
-    acclimatized = int((combined_drink_acc_weight - drink * 1000000) / 1000)
-    weight = combined_drink_acc_weight - drink * 1000000 - acclimatized * 1000
-
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight**0.425) * (height**0.725)
-    sp_heat = 57.83 * weight / a_dubois  # specific heat of the body
+    # specific heat of the body [J/kg/C/min]
+    sp_heat = met_to_w_m2 * weight / a_dubois
+
     d_lim_t_re = 0  # maximum allowable exposure time for heat storage [min]
     # maximum allowable exposure time for water loss, mean subject [min]
     d_lim_loss_50 = 0
     # maximum allowable exposure time for water loss, 95 % of the working population [min]
     d_lim_loss_95 = 0
-    # maximum water loss to protect a mean subject [g]
-    d_max_50 = 0.075 * weight * 1000
-    # maximum water loss to protect 95 % of the working population [g]
-    d_max_95 = 0.05 * weight * 1000
+
+    if model == Models.iso_7933_2023.value:
+        # 2023 standard only has one d_max value
+        d_max_50 = (0.03 if drink == 0 else 0.05) * weight * 1000
+        d_max_95 = (0.03 if drink == 0 else 0.05) * weight * 1000
+    else:  # model == Models.iso_7933_2004.value:
+        # maximum water loss to protect a mean subject [g]
+        d_max_50 = 0.075 * weight * 1000
+        # maximum water loss to protect 95 % of the working population [g]
+        d_max_95 = 0.05 * weight * 1000
+
     sweat_rate = sw_tot
 
     def_dir = 0
@@ -357,30 +399,35 @@ def _phs_optimized(
         def_speed = 1
 
     # radiating area dubois
-    a_r_du = 0.7
     if posture == Postures.standing.value:
         a_r_du = 0.77
-    if posture == Postures.crouching.value:
+    elif posture == Postures.sitting.value:
+        a_r_du = 0.7
+    else:  # posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate
-    sw_max = (met - 32) * a_dubois
-    if sw_max > 400:
-        sw_max = 400
-    if sw_max < 250:
-        sw_max = 250
-    if acclimatized >= 50:
-        sw_max = sw_max * 1.25
+    if model == Models.iso_7933_2004.value:
+        sw_max = (met - 32) * a_dubois
+        if sw_max > 400:
+            sw_max = 400
+        if sw_max < 250:
+            sw_max = 250
+        if acclimatized == 100:
+            sw_max = sw_max * 1.25
+    else:  # model == Models.iso_7933_2023.value:
+        sw_max = 400 if acclimatized == 0 else 500
 
     # max skin wettedness
-    if acclimatized < 50:
-        w_max = 0.85
-    else:
-        w_max = 1
+    w_max = 0.85 if acclimatized == 0 else 1
 
     # static clothing insulation
     i_cl_st = clo * 0.155
-    fcl = 1 + 0.3 * clo
+
+    if model == Models.iso_7933_2023.value:
+        fcl = 1 + 0.28 * clo
+    else:  # model == Models.iso_7933_2004.value:
+        fcl = 1 + 0.3 * clo
 
     # Static boundary layer thermal insulation in quiet air
     i_a_st = 0.111
@@ -390,7 +437,7 @@ def _phs_optimized(
     if def_speed > 0:
         if def_dir == 1:  # Unidirectional walking
             v_r = abs(v - walk_sp * math.cos(3.14159 * theta / 180))
-        else:  # Omni-directional walking IF
+        else:  # Omnidirectional walking IF
             if v < walk_sp:
                 v_r = walk_sp
             else:
@@ -442,12 +489,21 @@ def _phs_optimized(
         z = 8.7 * v_r**0.6
 
     # dynamic convective heat transfer coefficient
-    hc_dyn = 2.38 * abs(t_sk - tdb) ** 0.25
+    if model == Models.iso_7933_2004.value:
+        hc_dyn = 2.38 * abs(t_sk - tdb) ** 0.25
+    else:  # model == Models.iso_7933_2023.value:
+        t_cl = tr + 0.1  # clothing surface temperature
+        hc_dyn = 2.38 * abs(t_cl - tdb) ** 0.25
+
     if z > hc_dyn:
         hc_dyn = z
 
     aux_r = 5.67e-08 * a_r_du
-    f_cl_r = (1 - a_p) * 0.97 + a_p * f_r
+
+    if model == Models.iso_7933_2023.value:
+        f_cl_r = (1 - a_p) * 0.97 + a_p * (1 - f_r)
+    else:  # model == Models.iso_7933_2004.value:
+        f_cl_r = (1 - a_p) * 0.97 + a_p * f_r
 
     for time in range(1, duration + 1):
         t_sk0 = t_sk
@@ -510,9 +566,13 @@ def _phs_optimized(
         elif w_req >= 1.7:
             sw_req = sw_max
         else:
-            e_v_eff = 1 - w_req**2 / 2
             if w_req > 1:
                 e_v_eff = (2 - w_req) ** 2 / 2
+            else:
+                e_v_eff = 1 - w_req**2 / 2
+
+            e_v_eff = max(0.05, e_v_eff)
+
             sw_req = e_req / e_v_eff
             if sw_req > sw_max:
                 sw_req = sw_max
@@ -558,9 +618,11 @@ def _phs_optimized(
             d_lim_loss_50 = time
         if d_lim_loss_95 == 0 and sw_tot_g >= d_max_95:
             d_lim_loss_95 = time
-        if drink == 0:
-            d_lim_loss_95 = d_lim_loss_95 * 0.6
-            d_lim_loss_50 = d_lim_loss_95
+
+    # in the standard the if statement is within the while loop, causing it to decay exponentially
+    if drink == 0:
+        d_lim_loss_95 = d_lim_loss_95 * 0.6
+        d_lim_loss_50 = d_lim_loss_95
     if d_lim_loss_50 == 0:
         d_lim_loss_50 = duration
     if d_lim_loss_95 == 0:

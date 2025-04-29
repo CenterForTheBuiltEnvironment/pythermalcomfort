@@ -167,9 +167,10 @@ Clothing insulation of typical ensembles, [clo]
 
 .. code-block:: python
 
-    >>> from pythermalcomfort.utilities import clo_typical_ensembles
-    >>> print(clo_typical_ensembles['Typical summer indoor clothing'])
-    0.5
+    from pythermalcomfort.utilities import clo_typical_ensembles
+
+    print(clo_typical_ensembles["Typical summer indoor clothing"])
+    # Output: 0.5
 
 Insulation of individual garments, [clo]
 ----------------------------------------
@@ -180,12 +181,17 @@ Insulation of individual garments, [clo]
 
 .. code-block:: python
 
-    >>> from pythermalcomfort.utilities import clo_individual_garments
-    >>> print(clo_individual_garments['T-shirt'])
-    0.08
+    from pythermalcomfort.utilities import clo_individual_garments
 
-    >>> # calculate total clothing insulation
-    >>> i_cl = clo_individual_garments['T-shirt'] + clo_individual_garments["Men's underwear"] +
-    >>>        clo_individual_garments['Thin trousers'] + clo_individual_garments['Shoes or sandals']
-    >>> print(i_cl)
-    0.29
+    print(clo_individual_garments["T-shirt"])
+    # 0.08
+
+    # calculate total clothing insulation
+    i_cl = (
+        clo_individual_garments["T-shirt"]
+        + clo_individual_garments["Men's underwear"]
+        + clo_individual_garments["Thin trousers"]
+        + clo_individual_garments["Shoes or sandals"]
+    )
+    print(i_cl)
+    # 0.29
