@@ -1,6 +1,8 @@
 import datetime as dt
-from dataclasses import dataclass, fields
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -486,6 +488,24 @@ class GaggeTwoNodes:
     t_sens: Union[float, list[float]]
 
     def __getitem__(self, item):
+        return getattr(self, item)
+
+
+@dataclass(frozen=True)
+class GaggeTwoNodesSleep:
+
+    set: Union[float, list[float]]
+    TSK: Union[float, list[float]]
+    TCR: Union[float, list[float]]
+    SKINWET: Union[float, list[float]]
+    TSENS: Union[float, list[float]]
+    DISC: Union[float, list[float]]
+    ESK: Union[float, list[float]]
+    MSHIV: Union[float, list[float]]
+    ALFA: Union[float, list[float]]
+    SKBF: Union[float, list[float]]
+
+    def __get_item(self, item):
         return getattr(self, item)
 
 

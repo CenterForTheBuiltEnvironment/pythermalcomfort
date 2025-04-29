@@ -1,10 +1,14 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
+from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Sex
+from pythermalcomfort.utilities import Units
+from pythermalcomfort.utilities import validate_type
 
 
 @dataclass
@@ -717,6 +721,85 @@ class GaggeTwoNodesInputs(BaseInputs):
             max_sweating=max_sweating,
             w_max=w_max,
         )
+
+
+@dataclass
+class GaggeTwoNodesSleepInputs(BaseInputs):
+    """Input validator for the two_nodes_gagge_sleep model."""
+
+    # Sleep‐model‐specific parameters
+    ltime: Union[float, int, np.ndarray, list] = field(default=1)
+    ht: Union[float, int, np.ndarray, list] = field(default=171)
+    wt: Union[float, int, np.ndarray, list] = field(default=70)
+    tu: Union[float, int, np.ndarray, list] = field(default=40)
+    obj: Union[str, np.ndarray, list] = field(default="set")
+    csw: Union[float, int, np.ndarray, list] = field(default=170)
+    cdil: Union[float, int, np.ndarray, list] = field(default=120)
+    cstr: Union[float, int, np.ndarray, list] = field(default=0.5)
+    varOut: Union[str, np.ndarray, list] = field(default="else")
+    tskn: Union[float, int, np.ndarray, list] = field(default=33.7)
+    tcrn: Union[float, int, np.ndarray, list] = field(default=36.8)
+    esk: Union[float, int, np.ndarray, list] = field(default=0.094)
+    alfa: Union[float, int, np.ndarray, list] = field(default=0.1)
+    skbf: Union[float, int, np.ndarray, list] = field(default=6.3)
+    mshiv: Union[float, int, np.ndarray, list] = field(default=0)
+    thickness: Union[float, int, np.ndarray, list] = field(default=1.76)
+
+    def __init__(
+        self,
+        ta,
+        tr,
+        vel,
+        rh,
+        clo=0.5,
+        met=1,
+        wme=0,
+        pb=760,
+        ltime=1,
+        ht=171,
+        wt=70,
+        tu=40,
+        obj="set",
+        csw=170,
+        cdil=120,
+        cstr=0.5,
+        varOut="else",
+        tskn=33.7,
+        tcrn=36.8,
+        esk=0.094,
+        alfa=0.1,
+        skbf=6.3,
+        mshiv=0,
+        thickness=1.76,
+    ):
+        # map your function’s args into the BaseInputs fields
+        super().__init__(
+            tdb=ta,
+            tr=tr,
+            v=vel,
+            rh=rh,
+            clo=clo,
+            met=met,
+            wme=wme,
+            p_atm=pb,
+        )
+        # store the extra sleep‐model parameters
+        self.ltime = ltime
+        self.ht = ht
+        self.wt = wt
+        self.tu = tu
+        self.obj = obj
+        self.csw = csw
+        self.cdil = cdil
+        self.cstr = cstr
+        self.varOut = varOut
+        self.tskn = tskn
+        self.tcrn = tcrn
+        self.esk = esk
+        self.alfa = alfa
+        self.skbf = skbf
+        self.mshiv = mshiv
+        self.thickness = thickness
 
 
 @dataclass
