@@ -1,6 +1,9 @@
 import datetime as dt
-from dataclasses import dataclass, fields, is_dataclass
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -217,6 +220,11 @@ class EPMV(AutoStrMixin):
     """
 
     e_pmv: Union[float, list[float]]
+
+
+@dataclass(frozen=True, repr=False)
+class ESI(AutoStrMixin):
+    esi: Union[float, list[float]]
 
 
 @dataclass(frozen=True, repr=False)
