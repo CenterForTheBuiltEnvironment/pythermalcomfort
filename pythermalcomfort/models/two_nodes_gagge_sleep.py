@@ -1,0 +1,399 @@
+import math
+
+import numpy as np
+import pandas as pd
+from numba import jit
+from numba import vectorize
+
+from pythermalcomfort.classes_input import GaggeTwoNodesSleepInputs
+from pythermalcomfort.classes_return import GaggeTwoNodesSleep
+
+
+def two_nodes_gagge_sleep(
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    clo: float | list[float] = 0.5,
+    met: float | list[float] = 1,
+    wme: float | list[float] = 0,
+    pb: float | list[float] = 760,
+    ltime: float | list[float] = 1,
+    height: float | list[float] = 171,
+    weight: float | list[float] = 70,
+    tu: float | list[float] = 40,
+    c_sw: float | list[float] = 170,
+    c_dil: float | list[float] = 120,
+    c_str: float | list[float] = 0.5,
+    temp_skin_neutral: float | list[float] = 33.7,
+    temp_core_neutral: float | list[float] = 36.8,
+    e_skin: float | list[float] = 0.094,
+    alfa: float | list[float] = 0.1,
+    skbf: float | list[float] = 6.3,
+    met_shivering: float | list[float] = 0,
+    thickness: float | list[float] = 1.76,
+    duration: int = 481,
+) -> GaggeTwoNodesSleep:
+
+    # validate input
+    GaggeTwoNodesSleepInputs(
+        tdb,
+        tr,
+        v,
+        rh,
+        clo=clo,
+        met=met,
+        wme=wme,
+        pb=pb,
+        ltime=ltime,
+        height=height,
+        weight=weight,
+        tu=tu,
+        c_sw=c_sw,
+        c_dil=c_dil,
+        c_str=c_str,
+        temp_skin_neutral=temp_skin_neutral,
+        temp_core_neutral=temp_core_neutral,
+        e_skin=e_skin,
+        alfa=alfa,
+        skbf=skbf,
+        met_shivering=met_shivering,
+        thickness=thickness,
+    )
+
+    tdb = np.array(tdb)
+    tr = np.array(tr)
+    v = np.array(v)
+    rh = np.array(rh)
+    clo = np.array(clo)
+    met = np.array(met)
+    wme = np.array(wme)
+    pb = np.array(pb)
+    ltime = np.array(ltime)
+    height = np.array(height)
+    weigheight = np.array(weight)
+    tu = np.array(tu)
+    c_sw = np.array(c_sw)
+    c_dil = np.array(c_dil)
+    c_str = np.array(c_str)
+    temp_skin_neutral = np.array(temp_skin_neutral)
+    temp_core_neutral = np.array(temp_core_neutral)
+    e_skin = np.array(e_skin)
+    alfa = np.array(alfa)
+    skbf = np.array(skbf)
+    met_shivering = np.array(met_shivering)
+    thickness = np.array(thickness)
+
+    prev_params = {
+        "t_core": temp_core_neutral,
+        "t_skin": temp_skin_neutral,
+        "e_skin": e_skin,
+        "met_shivering": met_shivering,
+        "alfa": alfa,
+        "skbf": skbf,
+    }
+
+    results = []
+    # 5) simulate minute by minute
+    for i in range(duration):
+
+        if i == 0:
+            met_value = 1.1
+            tcrn_value = 36.8
+        else:
+            met_value = (
+                -0.000000000000575 * ((i - 1) / 60) ** 5
+                + 0.000000000785521 * ((i - 1) / 60) ** 4
+                - 0.00000039173563 * ((i - 1) / 60) ** 3
+                + 0.000087620232151 * ((i - 1) / 60) ** 2
+                - 0.008801558913211 * ((i - 1) / 60)
+                + 1.09952538864493
+            )
+
+            tcrn_value = (
+                0.022234 * ((i - 1) / 60) ** 2 - 0.27677 * ((i - 1) / 60) + 37.02
+            )
+
+        result_array = _sleep_set_optimized(
+            tdb,
+            tr,
+            v,
+            rh,
+            clo,
+            met=met_value,
+            wme=wme,
+            pb=pb,
+            ltime=ltime,
+            height=height,
+            weight=weight,
+            c_sw=c_sw,
+            c_dil=c_dil,
+            c_str=c_str,
+            temp_skin_neutral=prev_params["t_skin"],
+            temp_core_neutral=tcrn_value,
+            e_skin=prev_params["e_skin"],
+            alfa=prev_params["alfa"],
+            skbf=prev_params["skbf"],
+            met_shivering=prev_params["met_shivering"],
+            thickness=thickness,
+        )
+
+        results.append(result_array)
+
+        prev_params["t_core"] = result_array[1]
+        prev_params["t_skin"] = result_array[2]
+        prev_params["e_skin"] = result_array[6]
+        prev_params["met_shivering"] = result_array[7]
+        prev_params["alfa"] = result_array[8]
+        prev_params["skbf"] = result_array[9]
+
+    df = pd.DataFrame(
+        results,
+        columns=[
+            "set_temp",
+            "t_core",
+            "t_skin",
+            "wet",
+            "t_sens",
+            "disc",
+            "e_skin",
+            "met_shivering",
+            "alfa",
+            "skbf",
+        ],
+    )
+
+    output = {
+        "set_temp": df["set_temp"],
+        "t_core": df["t_core"],
+        "t_skin": df["t_skin"],
+        "wet": df["wet"],
+        "t_sens": df["t_sens"],
+        "disc": df["disc"],
+        "e_skin": df["e_skin"],
+        "met_shivering": df["met_shivering"],
+        "alfa": df["alfa"],
+        "skbf": df["skbf"],
+    }
+
+    return GaggeTwoNodesSleep(**output)
+
+
+def _sleep_set_optimized(
+    tdb,
+    tr,
+    v,
+    rh,
+    clo,
+    met,
+    wme,
+    pb,
+    ltime,
+    height,
+    weight,
+    c_sw,
+    c_dil,
+    c_str,
+    temp_skin_neutral,
+    temp_core_neutral,
+    e_skin,
+    alfa,
+    skbf,
+    met_shivering,
+    thickness,
+):
+
+    m = met * 58.2
+    w = wme * 58.2
+    k_clo = 0.25
+    temp_body_neutral = 36.49
+    skin_blood_flow_neutral = 6.3
+    sbc = 5.6697 * 10**-8
+    sa = ((height * weight) / 3600) ** 0.5
+
+    v = max(v, 0.1)
+    t_skin = temp_skin_neutral
+    t_core = temp_core_neutral
+    rmm = m
+
+    pressure_in_atmospheres = pb / 760
+    r_clo = 0.155 * clo
+    f_a_cl = 0.0308 * thickness + 0.7695
+    lr = 2.2 / pressure_in_atmospheres
+    pa = rh * math.exp(18.6686 - (4030.183 / (tdb + 235))) / 100
+    if clo <= 0:
+        w_max = 0.38 * v**-0.29
+        i_cl = 1
+    else:
+        w_max = 0.59 * v**-0.08
+        i_cl = 0.45
+
+    chc = 0.881 * (t_skin - tdb) ** 0.368
+    chr = 3.235
+    ctc = chr + chc
+    r_a = 1 / (f_a_cl * ctc)
+    t_op = (chr * tr + chc * tdb) / ctc
+    t_cl = t_op + (t_skin - t_op) / (ctc * (r_a + r_clo))
+    t_cl_old = t_cl
+    flag = False
+
+    for tim in range(ltime):
+        if flag:
+            t_cl = (r_a * t_skin + r_clo * t_op) / (r_a + r_clo)
+            if abs(t_cl - t_cl_old) > 0.01:
+                flag = False
+                t_cl_old = t_cl
+            else:
+                flag = True
+
+        while not flag:
+            chr = 4 * sbc * ((t_cl + tr) / 2 + 273.15) ** 3 * 0.72
+            ctc = chr + chc
+            r_a = 1 / (f_a_cl * ctc)
+            t_op = (chr * tr + chc * tdb) / ctc
+            t_cl = (r_a * t_skin + r_clo * t_op) / (r_a + r_clo)
+            if abs(t_cl - t_cl_old) > 0.01:
+                flag = False
+                t_cl_old = t_cl
+            else:
+                flag = True
+
+        dry = (t_skin - t_op) / (r_a + r_clo)
+        hf_cs = (t_core - t_skin) * (5.28 + 1.163 * skbf)
+        q_res = 0.0023 * m * (44 - pa)
+        c_res = 0.0014 * m * (34 - tdb)
+        s_core = m - hf_cs - q_res - c_res - w
+        s_skin = hf_cs - dry - e_skin
+        tc_sk = 0.97 * alfa * weight
+        tc_cr = 0.97 * (1 - alfa) * weight
+        d_t_sk = (s_skin * sa) / tc_sk / 60
+        d_t_cr = (s_core * sa) / tc_cr / 60
+        t_skin += d_t_sk
+        t_core += d_t_cr
+        t_body = alfa * t_skin + (1 - alfa) * t_core
+
+        warm_sk = max(t_skin - 33.7, 0)
+        cold_s = max(33.7 - t_skin, 0)
+        warm_c = max(t_core - temp_core_neutral, 0)
+        cold_c = max(temp_core_neutral - t_core, 0)
+        warm_b = max(t_body - temp_body_neutral, 0)
+
+        skbf = (skin_blood_flow_neutral + c_dil * warm_c) / (1 + c_str * cold_s)
+        skbf = min(max(skbf, 0.5), 90)
+        reg_sw = c_sw * warm_b * math.exp(warm_sk / 10.7)
+        reg_sw = min(reg_sw, 500)
+        e_rsw = 0.68 * reg_sw
+        r_ea = 1 / (lr * f_a_cl * chc)
+        r_ecl = r_clo / (lr * i_cl)
+        e_max = (_fnsvp(t_skin) - pa) / (r_ea + r_ecl)
+        p_rsw = e_rsw / e_max
+        p_wet = 0.06 + 0.94 * p_rsw
+        e_diff = p_wet * e_max - e_rsw
+        e_skin = e_rsw + e_diff
+        if p_wet > w_max:
+            p_wet = w_max
+            p_rsw = w_max / 0.94
+            e_rsw = p_rsw * e_max
+            e_diff = 0.06 * (1 - p_rsw) * e_max
+            e_skin = e_rsw + e_diff
+        if e_max < 0:
+            e_skin = e_max
+        e_skin = e_rsw + e_diff
+        met_shivering = 19.4 * cold_s * cold_c
+        m = rmm + met_shivering
+        alfa = 0.0417737 + 0.7451833 / (skbf + 0.585417)
+
+    q_skin = dry + e_skin
+    rn = m - w
+    e_comfort = 0.42 * (rn - 58.2)
+    e_comfort = max(e_comfort, 0)
+    e_max *= w_max
+    h_d = 1 / (r_a + r_clo)
+    h_e = 1 / (r_ea + r_ecl)
+    wet = p_wet
+    p_s_sk = _fnsvp(t_skin)
+    chrs = chr
+    chcs = max(3, 5.66 * ((met - 0.85) ** 0.39) if met >= 0.85 else 0)
+    ctcs = chcs + chrs
+    r_clo_s = 1.52 / ((met - wme) + 0.6944) - 0.1835
+    r_cl_s = 0.155 * r_clo_s
+    f_a_cl_s = 1 + k_clo * r_clo_s
+    f_cl_s = 1 / (1 + 0.155 * f_a_cl_s * ctcs * r_clo_s)
+    i_m_s = 0.45
+    i_cl_s = i_m_s * chcs / ctcs * (1 - f_cl_s) / (chcs / ctcs - f_cl_s * i_m_s)
+    r_a_s = 1 / (f_a_cl_s * ctcs)
+    r_ea_s = 1 / (lr * f_a_cl_s * chcs)
+    r_ecl_s = r_cl_s / (lr * i_cl_s)
+    h_d_s = 1 / (r_a_s + r_cl_s)
+    h_e_s = 1 / (r_ea_s + r_ecl_s)
+    delta = 1e-04
+    xold = t_skin - q_skin / h_d
+
+    flag1 = False
+    while not flag1:
+        err1 = _fnerre(xold, q_skin, h_d, t_skin, wet, h_e, p_s_sk)
+        err2 = _fnerre(xold + delta, q_skin, h_d, t_skin, wet, h_e, p_s_sk)
+        x = xold - delta * err1 / (err2 - err1)
+        if abs(x - xold) > 0.01:
+            xold = x
+            flag1 = False
+        else:
+            flag1 = True
+
+    xold = t_skin - q_skin / h_d_s
+
+    flag2 = False
+    while not flag2:
+        err1 = _fnerrs(xold, q_skin, h_d_s, t_skin, wet, h_e_s, p_s_sk)
+        err2 = _fnerrs(xold + delta, q_skin, h_d_s, t_skin, wet, h_e_s, p_s_sk)
+        x = xold - delta * err1 / (err2 - err1)
+        if abs(x - xold) > 0.01:
+            xold = x
+            flag2 = False
+        else:
+            flag2 = True
+
+    set_temp = x
+    tbm_l = (0.194 / 58.15) * rn + 36.301
+    tbm_h = (0.347 / 58.15) * rn + 36.669
+    if t_body < tbm_l:
+        t_sens = 0.4685 * (t_body - tbm_l)
+    elif t_body >= tbm_l and t_body < tbm_h:
+        t_sens = w_max * 4.7 * (t_body - tbm_l) / (tbm_h - tbm_l)
+    else:
+        t_sens = w_max * 4.7 + 0.4685 * (t_body - tbm_h)
+
+    disc = 4.7 * (e_rsw - e_comfort) / (e_max - e_comfort - e_diff)
+    if disc < 0:
+        disc = t_sens
+
+    return (
+        set_temp,
+        t_core,
+        t_skin,
+        wet,
+        t_sens,
+        disc,
+        e_skin,
+        met_shivering,
+        alfa,
+        skbf,
+    )
+
+
+def _fnsvp(T):
+    return math.exp(18.6686 - 4030.183 / (T + 235))
+
+
+def _fnerre(x, hsk, hd, tsk, w, he, pssk):
+    return hsk - hd * (tsk - x) - w * he * (pssk - 0.5 * _fnsvp(x))
+
+
+def _fnerrs(x, hsk, hd_s, tsk, w, he_s, pssk):
+    return hsk - hd_s * (tsk - x) - w * he_s * (pssk - 0.5 * _fnsvp(x))
+
+
+if __name__ == "__main__":
+    test = two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, met=1.1, thickness=1.76)
+
+    print(test)

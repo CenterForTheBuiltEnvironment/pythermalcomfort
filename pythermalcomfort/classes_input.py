@@ -731,80 +731,70 @@ class GaggeTwoNodesInputs(BaseInputs):
 
 @dataclass
 class GaggeTwoNodesSleepInputs(BaseInputs):
-    """Input validator for the two_nodes_gagge_sleep model."""
-
-    # Sleep‐model‐specific parameters
+    # Model-specific parameters not in BaseInputs
     ltime: Union[float, int, np.ndarray, list] = field(default=1)
-    ht: Union[float, int, np.ndarray, list] = field(default=171)
-    wt: Union[float, int, np.ndarray, list] = field(default=70)
     tu: Union[float, int, np.ndarray, list] = field(default=40)
-    obj: Union[str, np.ndarray, list] = field(default="set")
-    csw: Union[float, int, np.ndarray, list] = field(default=170)
-    cdil: Union[float, int, np.ndarray, list] = field(default=120)
-    cstr: Union[float, int, np.ndarray, list] = field(default=0.5)
-    varOut: Union[str, np.ndarray, list] = field(default="else")
-    tskn: Union[float, int, np.ndarray, list] = field(default=33.7)
-    tcrn: Union[float, int, np.ndarray, list] = field(default=36.8)
-    esk: Union[float, int, np.ndarray, list] = field(default=0.094)
+    c_sw: Union[float, int, np.ndarray, list] = field(default=170)
+    c_dil: Union[float, int, np.ndarray, list] = field(default=120)
+    c_str: Union[float, int, np.ndarray, list] = field(default=0.5)
+    temp_skin_neutral: Union[float, int, np.ndarray, list] = field(default=33.7)
+    temp_core_neutral: Union[float, int, np.ndarray, list] = field(default=36.8)
+    e_skin: Union[float, int, np.ndarray, list] = field(default=0.094)
     alfa: Union[float, int, np.ndarray, list] = field(default=0.1)
     skbf: Union[float, int, np.ndarray, list] = field(default=6.3)
-    mshiv: Union[float, int, np.ndarray, list] = field(default=0)
+    met_shivering: Union[float, int, np.ndarray, list] = field(default=0)
     thickness: Union[float, int, np.ndarray, list] = field(default=1.76)
 
     def __init__(
         self,
-        ta,
+        tdb,
         tr,
-        vel,
+        v,
         rh,
         clo=0.5,
         met=1,
         wme=0,
         pb=760,
+        height=171,
+        weight=70,
         ltime=1,
-        ht=171,
-        wt=70,
         tu=40,
-        obj="set",
-        csw=170,
-        cdil=120,
-        cstr=0.5,
-        varOut="else",
-        tskn=33.7,
-        tcrn=36.8,
-        esk=0.094,
+        c_sw=170,
+        c_dil=120,
+        c_str=0.5,
+        temp_skin_neutral=33.7,
+        temp_core_neutral=36.8,
+        e_skin=0.094,
         alfa=0.1,
         skbf=6.3,
-        mshiv=0,
+        met_shivering=0,
         thickness=1.76,
     ):
-        # map your function’s args into the BaseInputs fields
+        # Initialise BaseInputs-supported fields
         super().__init__(
-            tdb=ta,
+            tdb=tdb,
             tr=tr,
-            v=vel,
+            v=v,
             rh=rh,
             clo=clo,
             met=met,
             wme=wme,
             p_atm=pb,
+            height=height,
+            weight=weight,
         )
-        # store the extra sleep‐model parameters
+        # Assign model-specific parameters
         self.ltime = ltime
-        self.ht = ht
-        self.wt = wt
         self.tu = tu
-        self.obj = obj
-        self.csw = csw
-        self.cdil = cdil
-        self.cstr = cstr
-        self.varOut = varOut
-        self.tskn = tskn
-        self.tcrn = tcrn
-        self.esk = esk
+        self.c_sw = c_sw
+        self.c_dil = c_dil
+        self.c_str = c_str
+        self.temp_skin_neutral = temp_skin_neutral
+        self.temp_core_neutral = temp_core_neutral
+        self.e_skin = e_skin
         self.alfa = alfa
         self.skbf = skbf
-        self.mshiv = mshiv
+        self.met_shivering = met_shivering
         self.thickness = thickness
 
 

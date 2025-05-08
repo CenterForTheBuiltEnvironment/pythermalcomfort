@@ -1,7 +1,9 @@
 import datetime as dt
 from dataclasses import dataclass
 from dataclasses import fields
+from dataclasses import is_dataclass
 from typing import Optional
+from typing import Sequence
 from typing import Union
 
 import numpy as np
@@ -453,26 +455,19 @@ class GaggeTwoNodes(AutoStrMixin):
     disc: Union[float, list[float]]
     t_sens: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class GaggeTwoNodesSleep:
-
-    set: Union[float, list[float]]
-    TSK: Union[float, list[float]]
-    TCR: Union[float, list[float]]
-    SKINWET: Union[float, list[float]]
-    TSENS: Union[float, list[float]]
-    DISC: Union[float, list[float]]
-    ESK: Union[float, list[float]]
-    MSHIV: Union[float, list[float]]
-    ALFA: Union[float, list[float]]
-    SKBF: Union[float, list[float]]
-
-    def __get_item(self, item):
-        return getattr(self, item)
+@dataclass(frozen=True, repr=False)
+class GaggeTwoNodesSleep(AutoStrMixin):
+    set_temp: Union[float, list[float]]
+    t_core: Union[float, list[float]]
+    t_skin: Union[float, list[float]]
+    wet: Union[float, list[float]]
+    t_sens: Union[float, list[float]]
+    disc: Union[float, list[float]]
+    e_skin: Union[float, list[float]]
+    met_shivering: Union[float, list[float]]
+    alfa: Union[float, list[float]]
+    skbf: Union[float, list[float]]
 
 
 @dataclass(frozen=True)
