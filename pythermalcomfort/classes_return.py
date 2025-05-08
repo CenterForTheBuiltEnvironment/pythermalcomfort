@@ -224,6 +224,14 @@ class EPMV(AutoStrMixin):
 
 @dataclass(frozen=True, repr=False)
 class ESI(AutoStrMixin):
+    """Dataclass to represent the Environmental Stress Index (ESI).
+
+    Attributes
+    ----------
+    esi : float or list of floats
+        Environmental Stress Index.
+    """
+
     esi: Union[float, list[float]]
 
 
