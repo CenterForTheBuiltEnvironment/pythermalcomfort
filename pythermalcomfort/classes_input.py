@@ -44,6 +44,7 @@ class BaseInputs:
     sol_altitude: Union[float, int, np.ndarray, list] = field(default=None)
     sharp: Union[float, int, np.ndarray, list] = field(default=None)
     sol_radiation_dir: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_radiation_global: Union[float, int, np.ndarray, list] = field(default=None)
     sol_transmittance: Union[float, int, np.ndarray, list] = field(default=None)
     f_svv: Union[float, int, np.ndarray, list] = field(default=None)
     f_bes: Union[float, int, np.ndarray, list] = field(default=None)
@@ -178,6 +179,15 @@ class BaseInputs:
             validate_type(
                 self.sol_radiation_dir,
                 "sol_radiation_dir",
+                (float, int, np.ndarray, list),
+            )
+        if self.sol_radiation_global is not None:
+            self.sol_radiation_global = convert_series_to_list(
+                self.sol_radiation_global
+            )
+            validate_type(
+                self.sol_radiation_global,
+                "sol_radiation_global",
                 (float, int, np.ndarray, list),
             )
         if self.sol_transmittance is not None:
@@ -448,12 +458,12 @@ class EPMVInputs(BaseInputs):
 @dataclass
 class ESIInputs(BaseInputs):
 
-    def __init__(self, tdb, rh, sol_radiation_dir, round_output=True):
+    def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
-            sol_radiation_dir=sol_radiation_dir,
+            sol_radiation_global=sol_radiation_global,
             round_output=round_output,
         )
 

@@ -3,7 +3,7 @@ from tests.conftest import is_equal
 
 
 def test_esi():
-    result = esi(tdb=30.2, rh=42.2, sol_radiation_dir=766)
+    result = esi(tdb=30.2, rh=42.2, sol_radiation_global=766)
     is_equal(result.esi, 26.2, 0.1)
 
 
