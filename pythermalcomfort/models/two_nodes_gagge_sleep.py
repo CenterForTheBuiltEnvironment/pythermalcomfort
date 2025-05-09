@@ -1,9 +1,6 @@
 import math
 
 import numpy as np
-import pandas as pd
-from numba import jit
-from numba import vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesSleepInputs
 from pythermalcomfort.classes_return import GaggeTwoNodesSleep
@@ -14,8 +11,7 @@ def two_nodes_gagge_sleep(
     tr: float | list[float],
     v: float | list[float],
     rh: float | list[float],
-    clo: float | list[float] = 0.5,
-    met: float | list[float] = 1,
+    clo: float | list[float],
     wme: float | list[float] = 0,
     pb: float | list[float] = 760,
     ltime: float | list[float] = 1,
@@ -32,17 +28,18 @@ def two_nodes_gagge_sleep(
     skbf: float | list[float] = 6.3,
     met_shivering: float | list[float] = 0,
     thickness: float | list[float] = 1.76,
-    duration: int = 481,
 ) -> GaggeTwoNodesSleep:
 
     # validate input
+    duration = len(tdb)
+    # TODO: check if all inputs are the same length
+
     GaggeTwoNodesSleepInputs(
         tdb,
         tr,
         v,
         rh,
         clo=clo,
-        met=met,
         wme=wme,
         pb=pb,
         ltime=ltime,
@@ -66,12 +63,11 @@ def two_nodes_gagge_sleep(
     v = np.array(v)
     rh = np.array(rh)
     clo = np.array(clo)
-    met = np.array(met)
     wme = np.array(wme)
     pb = np.array(pb)
     ltime = np.array(ltime)
     height = np.array(height)
-    weigheight = np.array(weight)
+    weight = np.array(weight)
     tu = np.array(tu)
     c_sw = np.array(c_sw)
     c_dil = np.array(c_dil)
@@ -84,7 +80,8 @@ def two_nodes_gagge_sleep(
     met_shivering = np.array(met_shivering)
     thickness = np.array(thickness)
 
-    prev_params = {
+    # this should be the same dataclass as the return of _optimised
+    result = {
         "t_core": temp_core_neutral,
         "t_skin": temp_skin_neutral,
         "e_skin": e_skin,
@@ -97,30 +94,24 @@ def two_nodes_gagge_sleep(
     # 5) simulate minute by minute
     for i in range(duration):
 
-        if i == 0:
-            met_value = 1.1
-            tcrn_value = 36.8
-        else:
-            met_value = (
-                -0.000000000000575 * ((i - 1) / 60) ** 5
-                + 0.000000000785521 * ((i - 1) / 60) ** 4
-                - 0.00000039173563 * ((i - 1) / 60) ** 3
-                + 0.000087620232151 * ((i - 1) / 60) ** 2
-                - 0.008801558913211 * ((i - 1) / 60)
-                + 1.09952538864493
-            )
+        met = (
+            -0.000000000000575 * ((i - 1) / 60) ** 5
+            + 0.000000000785521 * ((i - 1) / 60) ** 4
+            - 0.00000039173563 * ((i - 1) / 60) ** 3
+            + 0.000087620232151 * ((i - 1) / 60) ** 2
+            - 0.008801558913211 * ((i - 1) / 60)
+            + 1.09952538864493
+        )
 
-            tcrn_value = (
-                0.022234 * ((i - 1) / 60) ** 2 - 0.27677 * ((i - 1) / 60) + 37.02
-            )
+        tcrn_value = 0.022234 * ((i - 1) / 60) ** 2 - 0.27677 * ((i - 1) / 60) + 37.02
 
-        result_array = _sleep_set_optimized(
+        result = _sleep_set_optimized(
             tdb,
             tr,
             v,
             rh,
             clo,
-            met=met_value,
+            met=met,
             wme=wme,
             pb=pb,
             ltime=ltime,
@@ -129,40 +120,19 @@ def two_nodes_gagge_sleep(
             c_sw=c_sw,
             c_dil=c_dil,
             c_str=c_str,
-            temp_skin_neutral=prev_params["t_skin"],
+            temp_skin_neutral=result["t_skin"],
             temp_core_neutral=tcrn_value,
-            e_skin=prev_params["e_skin"],
-            alfa=prev_params["alfa"],
-            skbf=prev_params["skbf"],
-            met_shivering=prev_params["met_shivering"],
+            e_skin=result["e_skin"],
+            alfa=result["alfa"],
+            skbf=result["skbf"],
+            met_shivering=result["met_shivering"],
             thickness=thickness,
         )
 
-        results.append(result_array)
+        # results shouldb e a list of the local dataclass
+        results.append(result)
 
-        prev_params["t_core"] = result_array[1]
-        prev_params["t_skin"] = result_array[2]
-        prev_params["e_skin"] = result_array[6]
-        prev_params["met_shivering"] = result_array[7]
-        prev_params["alfa"] = result_array[8]
-        prev_params["skbf"] = result_array[9]
-
-    df = pd.DataFrame(
-        results,
-        columns=[
-            "set_temp",
-            "t_core",
-            "t_skin",
-            "wet",
-            "t_sens",
-            "disc",
-            "e_skin",
-            "met_shivering",
-            "alfa",
-            "skbf",
-        ],
-    )
-
+    # TODO: make return values arrays instead of df
     output = {
         "set_temp": df["set_temp"],
         "t_core": df["t_core"],
@@ -175,6 +145,8 @@ def two_nodes_gagge_sleep(
         "alfa": df["alfa"],
         "skbf": df["skbf"],
     }
+
+    # convert the list of dictionaries to a dictionary of lists
 
     return GaggeTwoNodesSleep(**output)
 
@@ -367,18 +339,18 @@ def _sleep_set_optimized(
     if disc < 0:
         disc = t_sens
 
-    return (
-        set_temp,
-        t_core,
-        t_skin,
-        wet,
-        t_sens,
-        disc,
-        e_skin,
-        met_shivering,
-        alfa,
-        skbf,
-    )
+    return {
+        "set_temp": set_temp,
+        "t_core": t_core,
+        "t_skin": t_skin,
+        "wet": wet,
+        "t_sens": t_sens,
+        "disc": disc,
+        "e_skin": e_skin,
+        "met_shivering": met_shivering,
+        "alfa": alfa,
+        "skbf": skbf,
+    }
 
 
 def _fnsvp(T):
@@ -394,6 +366,8 @@ def _fnerrs(x, hsk, hd_s, tsk, w, he_s, pssk):
 
 
 if __name__ == "__main__":
-    test = two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, met=1.1, thickness=1.76)
+    test = two_nodes_gagge_sleep(
+        18, 18, 0.05, 50, 1.4, met=1.1, thickness=1.76, duration=1
+    )
 
     print(test)
