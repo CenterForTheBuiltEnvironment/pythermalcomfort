@@ -1,14 +1,10 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures
-from pythermalcomfort.utilities import Sex
-from pythermalcomfort.utilities import Units
-from pythermalcomfort.utilities import validate_type
+from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
 
 
 @dataclass
@@ -457,7 +453,6 @@ class EPMVInputs(BaseInputs):
 
 @dataclass
 class ESIInputs(BaseInputs):
-
     def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
         # Initialize with only required fields, setting others to None
         super().__init__(
