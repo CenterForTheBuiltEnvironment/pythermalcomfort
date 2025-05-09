@@ -5,6 +5,7 @@ from pythermalcomfort.models.at import at
 from pythermalcomfort.models.clo_tout import clo_tout
 from pythermalcomfort.models.cooling_effect import cooling_effect
 from pythermalcomfort.models.discomfort_index import discomfort_index
+from pythermalcomfort.models.esi import esi
 from pythermalcomfort.models.heat_index_lu import heat_index_lu
 from pythermalcomfort.models.heat_index_rothfusz import heat_index_rothfusz
 from pythermalcomfort.models.humidex import humidex
@@ -54,4 +55,5 @@ __all__ = [
     "net",
     "discomfort_index",
     "JOS3",
+    "esi",
 ]

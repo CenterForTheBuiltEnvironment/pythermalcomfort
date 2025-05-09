@@ -40,6 +40,7 @@ class BaseInputs:
     sol_altitude: Union[float, int, np.ndarray, list] = field(default=None)
     sharp: Union[float, int, np.ndarray, list] = field(default=None)
     sol_radiation_dir: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_radiation_global: Union[float, int, np.ndarray, list] = field(default=None)
     sol_transmittance: Union[float, int, np.ndarray, list] = field(default=None)
     f_svv: Union[float, int, np.ndarray, list] = field(default=None)
     f_bes: Union[float, int, np.ndarray, list] = field(default=None)
@@ -174,6 +175,15 @@ class BaseInputs:
             validate_type(
                 self.sol_radiation_dir,
                 "sol_radiation_dir",
+                (float, int, np.ndarray, list),
+            )
+        if self.sol_radiation_global is not None:
+            self.sol_radiation_global = convert_series_to_list(
+                self.sol_radiation_global
+            )
+            validate_type(
+                self.sol_radiation_global,
+                "sol_radiation_global",
                 (float, int, np.ndarray, list),
             )
         if self.sol_transmittance is not None:
@@ -439,6 +449,29 @@ class EPMVInputs(BaseInputs):
             wme=wme,
             units=units,
         )
+
+
+@dataclass
+class ESIInputs(BaseInputs):
+    def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            sol_radiation_global=sol_radiation_global,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
+
+        sol_radiation_global = np.asarray(self.sol_radiation_global, dtype=float)
+        if np.any(sol_radiation_global < 0):
+            raise ValueError("Solar radiation must be greater than 0 W/m2")
 
 
 class HIModels(Enum):
