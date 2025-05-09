@@ -467,6 +467,17 @@ class ESIInputs(BaseInputs):
             round_output=round_output,
         )
 
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
+
+        sol_radiation_global = np.asarray(self.sol_radiation_global, dtype=float)
+        if np.any(sol_radiation_global < 0):
+            raise ValueError("Solar radiation must be greater than 0 W/m2")
+
 
 class HIModels(Enum):
     rothfusz = "rothfusz"

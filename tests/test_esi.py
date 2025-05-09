@@ -1,3 +1,5 @@
+import pytest
+
 from pythermalcomfort.models import esi
 from tests.conftest import is_equal
 
@@ -10,3 +12,25 @@ def test_esi():
 def test_esi_list_input():
     result = esi([30.2, 27.0], [42.2, 68.8], [766, 289])
     is_equal(result.esi, [26.2, 25.6], 0.1)
+
+
+@pytest.mark.parametrize(
+    "tdb,rh,sol",
+    [
+        (30, -5, 500),  # negative relative humidity
+        (30, 120, 500),  # RH above 100 %
+        (30, 50, -10),  # negative solar radiation
+    ],
+)
+def test_esi_invalid_numeric_ranges(tdb, rh, sol):
+    with pytest.raises(ValueError):
+        esi(tdb=tdb, rh=rh, sol_radiation_global=sol)
+
+
+@pytest.mark.parametrize(
+    "tdb,rh,sol",
+    [("30.0", 45, 500), (30, "45", 500), (30, 45, "500.0")],
+)
+def test_esi_invalid_type(tdb, rh, sol):
+    with pytest.raises(TypeError):
+        esi(tdb=tdb, rh=rh, sol_radiation_global=sol)
