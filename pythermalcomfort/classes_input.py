@@ -1,10 +1,14 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
+from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Sex
+from pythermalcomfort.utilities import Units
+from pythermalcomfort.utilities import validate_type
 
 
 @dataclass
@@ -722,6 +726,26 @@ class GaggeTwoNodesInputs(BaseInputs):
             round_output=round_output,
             max_sweating=max_sweating,
             w_max=w_max,
+        )
+
+
+@dataclass
+class THIInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        rh,
+        twb,
+        tdp,
+        round_output=True,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            twb=twb,
+            tdp=tdp,
+            round_output=round_output,
         )
 
 

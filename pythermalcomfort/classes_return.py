@@ -1,6 +1,9 @@
 import datetime as dt
-from dataclasses import dataclass, fields, is_dataclass
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -450,6 +453,19 @@ class GaggeTwoNodes(AutoStrMixin):
     pmv_set: Union[float, list[float]]
     disc: Union[float, list[float]]
     t_sens: Union[float, list[float]]
+
+
+@dataclass(frozen=True, repr=False)
+class THI(AutoStrMixin):
+    """Dataclass to represent the Temperature-Humidity Index (THI).
+
+    Attributes
+    ----------
+    thi : float or list of floats
+        Temperature-Humidity Index
+    """
+
+    thi: Union[float, list[float]]
 
 
 @dataclass(frozen=True, repr=False)

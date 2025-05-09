@@ -1,7 +1,8 @@
 import math
 import warnings
 from enum import Enum
-from typing import NamedTuple, Union
+from typing import NamedTuple
+from typing import Union
 
 import numpy as np
 
@@ -27,6 +28,10 @@ class Models(Enum):
     iso_9920_2007 = "9920-2007"
     iso_7933_2004 = "7933-2004"
     iso_7933_2023 = "7933-2023"
+
+
+class THIModels(Enum):
+    yousef_1985 = "yousef_1985"
 
 
 class Units(Enum):
