@@ -731,19 +731,6 @@ class GaggeTwoNodesInputs(BaseInputs):
 
 @dataclass
 class GaggeTwoNodesSleepInputs(BaseInputs):
-    # Model-specific parameters not in BaseInputs
-    ltime: Union[float, int, np.ndarray, list] = field(default=1)
-    tu: Union[float, int, np.ndarray, list] = field(default=40)
-    c_sw: Union[float, int, np.ndarray, list] = field(default=170)
-    c_dil: Union[float, int, np.ndarray, list] = field(default=120)
-    c_str: Union[float, int, np.ndarray, list] = field(default=0.5)
-    temp_skin_neutral: Union[float, int, np.ndarray, list] = field(default=33.7)
-    temp_core_neutral: Union[float, int, np.ndarray, list] = field(default=36.8)
-    e_skin: Union[float, int, np.ndarray, list] = field(default=0.094)
-    alfa: Union[float, int, np.ndarray, list] = field(default=0.1)
-    skbf: Union[float, int, np.ndarray, list] = field(default=6.3)
-    met_shivering: Union[float, int, np.ndarray, list] = field(default=0)
-    thickness: Union[float, int, np.ndarray, list] = field(default=1.76)
 
     def __init__(
         self,
@@ -751,24 +738,10 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
         tr,
         v,
         rh,
-        clo=0.5,
-        met=1,
+        clo,
+        thickness,
         wme=0,
-        pb=760,
-        height=171,
-        weight=70,
-        ltime=1,
-        tu=40,
-        c_sw=170,
-        c_dil=120,
-        c_str=0.5,
-        temp_skin_neutral=33.7,
-        temp_core_neutral=36.8,
-        e_skin=0.094,
-        alfa=0.1,
-        skbf=6.3,
-        met_shivering=0,
-        thickness=1.76,
+        p_atm=101325,
     ):
         # Initialise BaseInputs-supported fields
         super().__init__(
@@ -777,25 +750,9 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
             v=v,
             rh=rh,
             clo=clo,
-            met=met,
             wme=wme,
-            p_atm=pb,
-            height=height,
-            weight=weight,
+            p_atm=p_atm,
         )
-        # Assign model-specific parameters
-        self.ltime = ltime
-        self.tu = tu
-        self.c_sw = c_sw
-        self.c_dil = c_dil
-        self.c_str = c_str
-        self.temp_skin_neutral = temp_skin_neutral
-        self.temp_core_neutral = temp_core_neutral
-        self.e_skin = e_skin
-        self.alfa = alfa
-        self.skbf = skbf
-        self.met_shivering = met_shivering
-        self.thickness = thickness
 
 
 @dataclass

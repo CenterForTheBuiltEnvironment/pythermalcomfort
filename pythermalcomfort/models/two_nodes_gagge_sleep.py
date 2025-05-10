@@ -12,73 +12,54 @@ def two_nodes_gagge_sleep(
     v: float | list[float],
     rh: float | list[float],
     clo: float | list[float],
-    wme: float | list[float] = 0,
-    pb: float | list[float] = 760,
-    ltime: float | list[float] = 1,
-    height: float | list[float] = 171,
-    weight: float | list[float] = 70,
-    tu: float | list[float] = 40,
-    c_sw: float | list[float] = 170,
-    c_dil: float | list[float] = 120,
-    c_str: float | list[float] = 0.5,
-    temp_skin_neutral: float | list[float] = 33.7,
-    temp_core_neutral: float | list[float] = 36.8,
-    e_skin: float | list[float] = 0.094,
-    alfa: float | list[float] = 0.1,
-    skbf: float | list[float] = 6.3,
-    met_shivering: float | list[float] = 0,
-    thickness: float | list[float] = 1.76,
+    thickness: float | list[float],
+    wme: float = 0,
+    p_atm: float = 101325,
+    **kwargs,
 ) -> GaggeTwoNodesSleep:
 
-    # validate input
-    duration = len(tdb)
-    # TODO: check if all inputs are the same length
+    ltime = kwargs.pop("ltime", 1)
+    height = kwargs.pop("height", 171)
+    weight = kwargs.pop("weight", 70)
+    tu = kwargs.pop("tu", 40)
+    c_sw = kwargs.pop("c_sw", 170)
+    c_dil = kwargs.pop("c_dil", 120)
+    c_str = kwargs.pop("c_str", 0.5)
+    temp_skin_neutral = kwargs.pop("temp_skin_neutral", 33.7)
+    temp_core_neutral = kwargs.pop("temp_core_neutral", 36.8)
+    e_skin = kwargs.pop("e_skin", 0.094)
+    alfa = kwargs.pop("alfa", 0.1)
+    skbf = kwargs.pop("skbf", 6.3)
+    met_shivering = kwargs.pop("met_shivering", 0)
+
+    if kwargs:
+        raise TypeError(f"Unexpected arguments: {', '.join(kwargs)}")
 
     GaggeTwoNodesSleepInputs(
-        tdb,
-        tr,
-        v,
-        rh,
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
         clo=clo,
-        wme=wme,
-        pb=pb,
-        ltime=ltime,
-        height=height,
-        weight=weight,
-        tu=tu,
-        c_sw=c_sw,
-        c_dil=c_dil,
-        c_str=c_str,
-        temp_skin_neutral=temp_skin_neutral,
-        temp_core_neutral=temp_core_neutral,
-        e_skin=e_skin,
-        alfa=alfa,
-        skbf=skbf,
-        met_shivering=met_shivering,
         thickness=thickness,
+        wme=wme,
+        p_atm=p_atm,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    clo = np.array(clo)
-    wme = np.array(wme)
-    pb = np.array(pb)
-    ltime = np.array(ltime)
-    height = np.array(height)
-    weight = np.array(weight)
-    tu = np.array(tu)
-    c_sw = np.array(c_sw)
-    c_dil = np.array(c_dil)
-    c_str = np.array(c_str)
-    temp_skin_neutral = np.array(temp_skin_neutral)
-    temp_core_neutral = np.array(temp_core_neutral)
-    e_skin = np.array(e_skin)
-    alfa = np.array(alfa)
-    skbf = np.array(skbf)
-    met_shivering = np.array(met_shivering)
-    thickness = np.array(thickness)
+    tdb = np.atleast_1d(tdb)
+    tr = np.atleast_1d(tr)
+    v = np.atleast_1d(v)
+    rh = np.atleast_1d(rh)
+    clo = np.atleast_1d(clo)
+    thickness = np.atleast_1d(thickness)
+
+    # These variables should have the same length, which will be the duration
+    lengths = [len(x) for x in (tdb, tr, v, rh, clo, thickness)]
+    if len(set(lengths)) != 1:
+        raise ValueError(
+            f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}"
+        )
+    duration = lengths[0]
 
     # this should be the same dataclass as the return of _optimised
     result = {
@@ -91,7 +72,7 @@ def two_nodes_gagge_sleep(
     }
 
     results = []
-    # 5) simulate minute by minute
+
     for i in range(duration):
 
         met = (
@@ -106,14 +87,15 @@ def two_nodes_gagge_sleep(
         tcrn_value = 0.022234 * ((i - 1) / 60) ** 2 - 0.27677 * ((i - 1) / 60) + 37.02
 
         result = _sleep_set_optimized(
-            tdb,
-            tr,
-            v,
-            rh,
-            clo,
+            tdb[i],
+            tr[i],
+            v[i],
+            rh[i],
+            clo[i],
+            thickness=thickness[i],
             met=met,
             wme=wme,
-            pb=pb,
+            p_atm=p_atm,
             ltime=ltime,
             height=height,
             weight=weight,
@@ -126,27 +108,19 @@ def two_nodes_gagge_sleep(
             alfa=result["alfa"],
             skbf=result["skbf"],
             met_shivering=result["met_shivering"],
-            thickness=thickness,
         )
 
         # results shouldb e a list of the local dataclass
         results.append(result)
 
-    # TODO: make return values arrays instead of df
-    output = {
-        "set_temp": df["set_temp"],
-        "t_core": df["t_core"],
-        "t_skin": df["t_skin"],
-        "wet": df["wet"],
-        "t_sens": df["t_sens"],
-        "disc": df["disc"],
-        "e_skin": df["e_skin"],
-        "met_shivering": df["met_shivering"],
-        "alfa": df["alfa"],
-        "skbf": df["skbf"],
-    }
-
-    # convert the list of dictionaries to a dictionary of lists
+    if not results:
+        output = {}
+    else:
+        output = {}
+        for key in results[0].keys():
+            vals = [d[key] for d in results]
+            # only wrap in an array if there’s more than one element
+            output[key] = np.array(vals) if len(vals) > 1 else vals[0]
 
     return GaggeTwoNodesSleep(**output)
 
@@ -157,9 +131,10 @@ def _sleep_set_optimized(
     v,
     rh,
     clo,
+    thickness,
     met,
     wme,
-    pb,
+    p_atm,
     ltime,
     height,
     weight,
@@ -172,7 +147,6 @@ def _sleep_set_optimized(
     alfa,
     skbf,
     met_shivering,
-    thickness,
 ):
 
     m = met * 58.2
@@ -188,7 +162,7 @@ def _sleep_set_optimized(
     t_core = temp_core_neutral
     rmm = m
 
-    pressure_in_atmospheres = pb / 760
+    pressure_in_atmospheres = p_atm / 101325
     r_clo = 0.155 * clo
     f_a_cl = 0.0308 * thickness + 0.7695
     lr = 2.2 / pressure_in_atmospheres
@@ -363,11 +337,3 @@ def _fnerre(x, hsk, hd, tsk, w, he, pssk):
 
 def _fnerrs(x, hsk, hd_s, tsk, w, he_s, pssk):
     return hsk - hd_s * (tsk - x) - w * he_s * (pssk - 0.5 * _fnsvp(x))
-
-
-if __name__ == "__main__":
-    test = two_nodes_gagge_sleep(
-        18, 18, 0.05, 50, 1.4, met=1.1, thickness=1.76, duration=1
-    )
-
-    print(test)
