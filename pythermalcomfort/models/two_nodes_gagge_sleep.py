@@ -17,11 +17,67 @@ def two_nodes_gagge_sleep(
     p_atm: float = 101325,
     **kwargs,
 ) -> GaggeTwoNodesSleep:
+    """Adaption of the Gagge two-node model for sleep thermal environment.
+
+    Parameters
+    ----------
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C].
+    tr : float or list of floats
+        Mean radiant temperature, [°C].
+    v : float or list of floats
+        Air speed, [m/s].
+    rh : float or list of floats
+        Relative humidity, [%].
+    clo : float or list of floats
+        Clothing insulation, [clo].
+    thickness : float or list of floats
+        Thickness of the quilt. [cm].
+    wme : float or list of floats, optional
+        External work, [met]. Defaults to 0.
+    p_atm : float or list of floats, optional
+        Atmospheric pressure, default value 101325 [Pa]. Defaults to 101325.
+
+    Other Parameters
+    ----------------
+    ltime : int, optional
+        Number of time steps for each iteration. Defaults to 1.
+    height : float, optional
+        Height of the person, [cm]. Defaults to 171.
+    weight : float, optional
+        Weight of the person, [kg]. Defaults to 70.
+    c_sw : float, optional
+        Driving coefficient for regulatory sweating. Defaults to 170.
+    c_dil : float, optional
+        Driving coefficient for vasodilation. Defaults to 120.
+    c_str : float, optional
+        Driving coefficient for vasoconstriction. Defaults to 0.5.
+    temp_skin_neutral : float, optional
+        Skin temperature at neutral conditions, [°C]. Defaults to 33.7.
+    temp_core_neutral : float, optional
+        Core temperature at neutral conditions, [°C]. Defaults to 36.8.
+    e_skin : float, optional
+        Total evaporative heat loss, [W]. Defaults to 0.094.
+    alfa : float, optional
+        Dynamic fraction of total body mass assigned to the skin node (dimensionless). Defaults to 0.1.
+    skbf : float, optional
+        Skin-blood-flow rate per unit surface area, [kg/h/m2]. Defaults to 6.3.
+    met_shivering : float, optional
+        Metabolic rate due to shivering, [met]. Defaults to 0.
+
+        .. note::
+            tdb, tr, v, rh, clo and thickness must have the same length. This length will be the duration of the simulation.
+
+    Returns
+    -------
+    GaggeTwoNodesSleep
+        A dataclass containing the results of the Gagge two-node model for sleep thermal environment. See
+        `pythermalcomfort.classes_return.GaggeTwoNodesSleep` for more details. To access the results, use the corresponding attributes of the returned instance, e.g. `result.e_skin`.
+    """
 
     ltime = kwargs.pop("ltime", 1)
     height = kwargs.pop("height", 171)
     weight = kwargs.pop("weight", 70)
-    tu = kwargs.pop("tu", 40)
     c_sw = kwargs.pop("c_sw", 170)
     c_dil = kwargs.pop("c_dil", 120)
     c_str = kwargs.pop("c_str", 0.5)

@@ -458,6 +458,32 @@ class GaggeTwoNodes(AutoStrMixin):
 
 @dataclass(frozen=True, repr=False)
 class GaggeTwoNodesSleep(AutoStrMixin):
+    """Dataclass to represent the results of the two-node sleep model.
+
+    Attributes
+    ----------
+    set : float or list of floats
+        Standard Effective Temperature (SET).
+    t_core : float or list of floats
+        Core temperature, [°C].
+    t_skin : float or list of floats
+        Skin temperature, [°C].
+    wet : float or list of floats
+        Skin wettedness, adimensional. Ranges from 0 to 1.
+    t_sens : float or list of floats
+        Predicted Thermal Sensation.
+    disc : float or list of floats
+        Thermal discomfort.
+    e_skin : float or list of floats
+        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff.
+    met_shivering : float or list of floats
+        Metabolic rate due to shivering, [W/m2].
+    alfa : float or list of floats
+        Dynamic fraction of total body mass assigned to the skin node (dimensionless).
+    skbf: float or list of floats
+        Skin-blood-flow rate per unit surface area, [kg/h/m2].
+    """
+
     set_temp: Union[float, list[float]]
     t_core: Union[float, list[float]]
     t_skin: Union[float, list[float]]
