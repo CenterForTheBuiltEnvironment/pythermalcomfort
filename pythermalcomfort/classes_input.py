@@ -726,6 +726,31 @@ class GaggeTwoNodesInputs(BaseInputs):
 
 
 @dataclass
+class GaggeTwoNodesSleepInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        rh,
+        clo,
+        thickness,
+        wme=0,
+        p_atm=101325,
+    ):
+        # Initialise BaseInputs-supported fields
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            clo=clo,
+            wme=wme,
+            p_atm=p_atm,
+        )
+
+
+@dataclass
 class UseFansHeatwavesInputs(BaseInputs):
     def __init__(
         self,
