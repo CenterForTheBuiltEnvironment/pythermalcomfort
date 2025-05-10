@@ -30,7 +30,6 @@ def test_two_nodes_gagge_sleep_single_input():
 
 
 def test_two_nodes_gagge_sleep_long_duration():
-
     duration = 481
     ta = np.repeat(18, duration)
     tr = np.repeat(18, duration)
@@ -107,7 +106,6 @@ def test_two_nodes_gagge_sleep_long_duration():
 
 
 def test_length_mismatch_raises_value_error():
-
     with pytest.raises(ValueError) as exc:
         two_nodes_gagge_sleep(
             [18, 18],

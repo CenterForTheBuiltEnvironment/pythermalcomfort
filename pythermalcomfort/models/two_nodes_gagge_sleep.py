@@ -130,7 +130,6 @@ def two_nodes_gagge_sleep(
     results = []
 
     for i in range(duration):
-
         met = (
             -0.000000000000575 * ((i - 1) / 60) ** 5
             + 0.000000000785521 * ((i - 1) / 60) ** 4
@@ -204,7 +203,6 @@ def _sleep_set_optimized(
     skbf,
     met_shivering,
 ):
-
     m = met * 58.2
     w = wme * 58.2
     k_clo = 0.25
