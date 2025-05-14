@@ -302,8 +302,6 @@ class ENInputs(BaseInputs):
 
 @dataclass
 class AnkleDraftInputs(BaseInputs):
-    """Child class that only requires specific attributes."""
-
     def __init__(
         self,
         tdb,
@@ -453,6 +451,12 @@ class EPMVInputs(BaseInputs):
 
 @dataclass
 class ESIInputs(BaseInputs):
+    """Input class for the Environmental Stress Index (ESI) calculation.
+
+    This class validates and processes inputs required for calculating the ESI,
+    which evaluates heat stress based on temperature, humidity, and solar radiation.
+    """
+
     def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
         # Initialize with only required fields, setting others to None
         super().__init__(
@@ -471,7 +475,7 @@ class ESIInputs(BaseInputs):
 
         sol_radiation_global = np.asarray(self.sol_radiation_global, dtype=float)
         if np.any(sol_radiation_global < 0):
-            raise ValueError("Solar radiation must be greater than 0 W/m2")
+            raise ValueError("Solar radiation must be greater than or equal to 0 W/m2")
 
 
 class HIModels(Enum):

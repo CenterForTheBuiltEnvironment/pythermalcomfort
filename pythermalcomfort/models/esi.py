@@ -40,7 +40,9 @@ def esi(
         result = esi(tdb=30.2, rh=42.2, sol_radiation_global=766)
         print(result.esi)  # 26.2
 
-        result = esi(tdb=[30.2, 27.0], rh=[42.2, 68.8], sol_radiation_global=[766, 289])
+        result = esi(
+            tdb=[30.2, 27.0], rh=[42.2, 68.8], sol_radiation_global=[766, 289]
+        )
         print(result.esi)  # [26.2, 25.6]
     """
 
@@ -55,7 +57,7 @@ def esi(
     rh = np.array(rh)
     sol_radiation_global = np.array(sol_radiation_global)
 
-    esi = (
+    _esi = (
         0.63 * tdb
         - 0.03 * rh
         + 0.002 * sol_radiation_global
@@ -64,6 +66,6 @@ def esi(
     )
 
     if round_output:
-        esi = np.round(esi, 1)
+        _esi = np.round(_esi, 1)
 
-    return ESI(esi=esi)
+    return ESI(esi=_esi)
