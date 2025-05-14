@@ -1,6 +1,9 @@
 import datetime as dt
-from dataclasses import dataclass, fields, is_dataclass
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -493,7 +496,7 @@ class GaggeTwoNodesSleep(AutoStrMixin):
 
 
 @dataclass(frozen=True)
-class UseFansHeatwaves:
+class UseFansHeatwaves(AutoStrMixin):
     """Dataclass to represent the results of using fans during heatwaves.
 
     Attributes
