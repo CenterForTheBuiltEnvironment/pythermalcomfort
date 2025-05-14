@@ -105,6 +105,14 @@ Gagge two-node model
 .. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodes
     :members:
 
+Two-node model sleep
+--------------------
+
+.. autofunction:: pythermalcomfort.models.two_nodes_gagge_sleep.two_nodes_gagge_sleep
+
+.. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodesSleep
+    :members:
+
 Heat Index (HI)
 ---------------
 

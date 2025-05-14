@@ -7,7 +7,7 @@ from pythermalcomfort.models import two_nodes_gagge_sleep
 
 def test_two_nodes_gagge_sleep_single_input():
     # run with scalar inputs
-    result = two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, thickness=1.76)
+    result = two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, thickness_quilt=1.76)
 
     # expected outputs
     expected = {
@@ -20,7 +20,7 @@ def test_two_nodes_gagge_sleep_single_input():
         "e_skin": np.array([27.10243546]),
         "met_shivering": np.array([0.0]),
         "alfa": np.array([0.13731683]),
-        "skbf": np.array([7.21402727]),
+        "skin_blood_flow": np.array([7.21402727]),
     }
 
     # compare each field with a reasonable tolerance
@@ -81,7 +81,7 @@ def test_two_nodes_gagge_sleep_long_duration():
         "e_skin",
         "met_shivering",
         "alfa",
-        "skbf",
+        "skin_blood_flow",
     ]
 
     # check first row

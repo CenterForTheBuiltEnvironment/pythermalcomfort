@@ -476,7 +476,7 @@ class GaggeTwoNodesSleep(AutoStrMixin):
         Metabolic rate due to shivering, [W/m2].
     alfa : float or list of floats
         Dynamic fraction of total body mass assigned to the skin node (dimensionless).
-    skbf: float or list of floats
+    skin_blood_flow: float or list of floats
         Skin-blood-flow rate per unit surface area, [kg/h/m2].
     """
 
@@ -489,7 +489,7 @@ class GaggeTwoNodesSleep(AutoStrMixin):
     e_skin: Union[float, list[float]]
     met_shivering: Union[float, list[float]]
     alfa: Union[float, list[float]]
-    skbf: Union[float, list[float]]
+    skin_blood_flow: Union[float, list[float]]
 
 
 @dataclass(frozen=True)
