@@ -32,3 +32,4 @@ References
 .. [ISO9920] ISO, EN (2009). ISO 9920 - Ergonomics of the thermal environment. Estimation of thermal insulation and water vapour resistance of a clothing ensemble
 .. [Fanger1970] Fanger, P. O. (1970). Thermal comfort: analysis and applications in environmental engineering. McGraw-Hill, New York.
 .. [Tartarini2025PMV] Tartarini, F. and Schiavon, S., 2025. Comparative analysis of PMV Models accuracy implemented in the ISO 7730: 2005 and ASHRAE 55: 2023. Building and Environment, p.112766. doi: doi.org/10.1016/j.buildenv.2025.112766
+.. [Yan2022] Yan, S., Xiong, J., Kim, J. & de Dear, R. (2022). Adapting the two-node model to evaluate sleeping thermal environments. Building and Environment. 222, 109417. DOI: doi.org/10.1016/j.buildenv.2022.109417

@@ -19,7 +19,7 @@ def two_nodes_gagge_sleep(
     p_atm: float = 101325,
     **kwargs,
 ) -> GaggeTwoNodesSleep:
-    """Adaption of the Gagge two-node model for sleep thermal environment.
+    """Adaption of the Gagge two-node model for sleep thermal environment, developed by Yan, S., Xiong, J., Kim, J. and de Dear, R. [Yan2022]_.
 
     Parameters
     ----------
