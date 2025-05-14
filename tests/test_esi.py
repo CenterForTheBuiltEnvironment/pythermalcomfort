@@ -18,13 +18,26 @@ def test_esi_list_input():
     "tdb,rh,sol",
     [
         (30, -5, 500),  # negative relative humidity
-        (30, 120, 500),  # RH above 100 %
+        (30, 120, 500),  # RH above 100%
         (30, 50, -10),  # negative solar radiation
     ],
 )
 def test_esi_invalid_numeric_ranges(tdb, rh, sol):
     with pytest.raises(ValueError):
         esi(tdb=tdb, rh=rh, sol_radiation_global=sol)
+
+
+@pytest.mark.parametrize(
+    "tdb,rh,sol,expected",
+    [
+        (30, 0, 500, 16.5),  # minimum RH
+        (30, 100, 500, 19.5),  # maximum RH
+        (30, 50, 0, 18.0),  # minimum solar radiation
+    ],
+)
+def test_esi_boundary_conditions(tdb, rh, sol, expected):
+    result = esi(tdb=tdb, rh=rh, sol_radiation_global=sol)
+    is_equal(result.esi, expected, 0.1)  # Replace expected values with actual results
 
 
 @pytest.mark.parametrize(
