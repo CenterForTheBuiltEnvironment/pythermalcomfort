@@ -97,6 +97,13 @@ Discomfort Index (DI)
 .. autoclass:: pythermalcomfort.classes_return.DI
     :members:
 
+Environmental Stress Index (ESI)
+--------------------------------
+.. autofunction:: pythermalcomfort.models.esi.esi
+
+.. autoclass:: pythermalcomfort.classes_return.ESI
+    :members:
+
 Gagge two-node model
 --------------------
 
