@@ -1,10 +1,22 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
+from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Sex
+from pythermalcomfort.utilities import Units
+from pythermalcomfort.utilities import validate_type
+
+
+class WorkIntensity(str, Enum):
+    """Enumeration for work intensity levels."""
+
+    HEAVY = "heavy"
+    MEDIUM = "medium"
+    LIGHT = "light"
 
 
 @dataclass
@@ -54,7 +66,7 @@ class BaseInputs:
     max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
     wbgt: Union[float, int, np.ndarray, list] = field(default=None)
-    intensity: Union[str, np.ndarray, list] = field(default=None)
+    intensity: Union[str, WorkIntensity] = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -237,6 +249,13 @@ class BaseInputs:
         if self.wbgt is not None:
             self.wbgt = convert_series_to_list(self.wbgt)
             validate_type(self.wbgt, "wbgt", (float, int, np.ndarray, list))
+        if self.intensity is not None:
+            self.intensity = convert_series_to_list(self.intensity)
+            _validate_str_values(
+                "intensity",
+                self.intensity,
+                [i.value for i in WorkIntensity],
+            )
 
 
 @dataclass
@@ -908,11 +927,7 @@ class WorkCapacityHothapsInputs(BaseInputs):
         wbgt,
         intensity,
     ):
-        # Initialize with only required fields, setting others to None
-        super().__init__(
-            wbgt=wbgt,
-            intensity=intensity,
-        )
+        super().__init__(wbgt=wbgt, intensity=intensity)
 
 
 @dataclass
@@ -927,3 +942,9 @@ class WorkCapacityStandardsInputs(BaseInputs):
             wbgt=wbgt,
             met=met,
         )
+
+    def __post_init__(self):
+        super().__post_init__()
+        met = np.asarray(self.met, dtype=float)
+        if np.any(met < 0) or np.any(met > 2500):
+            raise ValueError("Metabolic rate out of plausible range")

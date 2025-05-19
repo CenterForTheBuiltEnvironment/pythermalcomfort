@@ -599,7 +599,7 @@ class WCT(AutoStrMixin):
 
 
 @dataclass(frozen=True)
-class WorkCapacity:
+class WorkCapacity(AutoStrMixin):
     """Dataclass to represent work loss.
 
     Attributes
@@ -609,9 +609,6 @@ class WorkCapacity:
     """
 
     capacity: Union[float, npt.ArrayLike]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True, repr=False)
