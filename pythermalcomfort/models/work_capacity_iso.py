@@ -3,7 +3,6 @@ from typing import Union
 import numpy as np
 
 from pythermalcomfort.classes_input import WorkCapacityStandardsInputs
-from pythermalcomfort.classes_input import WorkIntensity
 from pythermalcomfort.classes_return import WorkCapacity
 
 

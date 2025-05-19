@@ -2,8 +2,7 @@ from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.classes_input import WorkCapacityHothapsInputs
-from pythermalcomfort.classes_input import WorkIntensity
+from pythermalcomfort.classes_input import WorkCapacityHothapsInputs, WorkIntensity
 from pythermalcomfort.classes_return import WorkCapacity
 
 
