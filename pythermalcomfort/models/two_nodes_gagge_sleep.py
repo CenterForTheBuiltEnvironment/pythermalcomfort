@@ -40,9 +40,9 @@ def two_nodes_gagge_sleep(
         Clothing insulation, [clo].
     thickness_quilt : float or list of floats
         Thickness of the quilt. [cm].
-    wme : float or list of floats, optional
+    wme : float, optional
         External work, [met]. Defaults to 0.
-    p_atm : float or list of floats, optional
+    p_atm : float, optional
         Atmospheric pressure, default value 101325 [Pa]. Defaults to 101325.
     **kwargs : dict
         Keyword arguments:
@@ -244,7 +244,8 @@ def _sleep_set(
         w_max = 0.59 * v**-0.08
         i_cl = 0.45
 
-    chc = 0.881 * (t_skin - tdb) ** 0.368
+    temp_diff = abs(t_skin - tdb)
+    chc = 0.881 * temp_diff**0.368
     h_r = 3.235
     ctc = h_r + chc
     r_a = 1 / (f_a_cl * ctc)
@@ -262,7 +263,9 @@ def _sleep_set(
             else:
                 flag = True
 
-        while not flag:
+        max_iter = 100
+        iter_cnt = 0
+        while not flag and iter_cnt < max_iter:
             h_r = 4 * sbc * ((t_cl + tr) / 2 + 273.15) ** 3 * 0.72
             ctc = h_r + chc
             r_a = 1 / (f_a_cl * ctc)
@@ -273,6 +276,7 @@ def _sleep_set(
                 t_cl_old = t_cl
             else:
                 flag = True
+            iter_cnt += 1
 
         dry = (t_skin - t_op) / (r_a + r_clo)
         hf_cs = (t_core - t_skin) * (5.28 + 1.163 * skin_blood_flow)
