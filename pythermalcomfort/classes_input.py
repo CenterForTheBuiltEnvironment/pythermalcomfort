@@ -53,6 +53,7 @@ class BaseInputs:
     max_skin_blood_flow: Union[float, int, np.ndarray, list] = field(default=80)
     max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
+    thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -232,6 +233,11 @@ class BaseInputs:
         if self.w_max is not None:
             self.w_max = convert_series_to_list(self.w_max)
             validate_type(self.w_max, "w_max", (float, int, np.ndarray, list))
+        if self.thickness_quilt is not None:
+            self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
+            validate_type(
+                self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
+            )
 
 
 @dataclass
@@ -759,6 +765,32 @@ class GaggeTwoNodesInputs(BaseInputs):
             round_output=round_output,
             max_sweating=max_sweating,
             w_max=w_max,
+        )
+
+
+@dataclass
+class GaggeTwoNodesSleepInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        rh,
+        clo,
+        thickness_quilt,
+        wme=0,
+        p_atm=101325,
+    ):
+        # Initialise BaseInputs-supported fields
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            clo=clo,
+            wme=wme,
+            p_atm=p_atm,
+            thickness_quilt=thickness_quilt,
         )
 
 

@@ -466,6 +466,46 @@ class GaggeTwoNodes(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
+class GaggeTwoNodesSleep(AutoStrMixin):
+    """Dataclass to represent the results of the two-node sleep model.
+
+    Attributes
+    ----------
+    set : float or list of floats
+        Standard Effective Temperature (SET).
+    t_core : float or list of floats
+        Core temperature, [°C].
+    t_skin : float or list of floats
+        Skin temperature, [°C].
+    wet : float or list of floats
+        Skin wettedness, adimensional. Ranges from 0 to 1.
+    t_sens : float or list of floats
+        Predicted Thermal Sensation.
+    disc : float or list of floats
+        Thermal discomfort.
+    e_skin : float or list of floats
+        Total rate of evaporative heat loss from skin, [W/m2]. Equal to e_rsw + e_diff.
+    met_shivering : float or list of floats
+        Metabolic rate due to shivering, [W/m2].
+    alfa : float or list of floats
+        Dynamic fraction of total body mass assigned to the skin node (dimensionless).
+    skin_blood_flow: float or list of floats
+        Skin-blood-flow rate per unit surface area, [kg/h/m2].
+    """
+
+    set_temp: Union[float, list[float]]
+    t_core: Union[float, list[float]]
+    t_skin: Union[float, list[float]]
+    wet: Union[float, list[float]]
+    t_sens: Union[float, list[float]]
+    disc: Union[float, list[float]]
+    e_skin: Union[float, list[float]]
+    met_shivering: Union[float, list[float]]
+    alfa: Union[float, list[float]]
+    skin_blood_flow: Union[float, list[float]]
+
+
+@dataclass(frozen=True)
 class UseFansHeatwaves(AutoStrMixin):
     """Dataclass to represent the results of using fans during heatwaves.
 
