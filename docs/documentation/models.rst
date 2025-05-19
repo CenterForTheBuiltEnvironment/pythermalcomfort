@@ -14,7 +14,7 @@ The adaptive thermal comfort model is a method that relates indoor design temper
 It's specifically intended for **occupant-controlled naturally conditioned spaces**, where the thermal conditions are primarily regulated by occupants through the use of openings in the building envelope, such as windows.
 The adaptive model is based on the idea that people in naturally ventilated spaces adjust to their environment through a variety of behavioural and physiological adaptations.
 
-Below are some key characteristics and criteria of the adaptive model, according to the ASHRAE 55-2023 standard [ASHRAE_55_2023]_:
+Below are some key characteristics and criteria of the adaptive model, according to the ASHRAE 55-2023 standard [55ASHRAE2023]_:
 
 **Applicability**: The adaptive model can only be applied in spaces that meet specific criteria:
   *   There is no mechanical cooling or heating system in operation.
@@ -97,6 +97,13 @@ Discomfort Index (DI)
 .. autoclass:: pythermalcomfort.classes_return.DI
     :members:
 
+Environmental Stress Index (ESI)
+--------------------------------
+.. autofunction:: pythermalcomfort.models.esi.esi
+
+.. autoclass:: pythermalcomfort.classes_return.ESI
+    :members:
+
 Gagge two-node model
 --------------------
 
@@ -115,7 +122,7 @@ For instance, at 80% relative humidity, the heat index is only valid within a te
 To address this issue, Lu and Romps (2022) [lu]_ developed a new model that extends the range of validity of the heat index.
 
 pythermalcomfort therefore includes two equations to calculate the Heat Index. One in accordance with the new Lu and Romps (2022) model which is an extension of the first version of Steadman’s (1979) apparent temperature :py:class:`~pythermalcomfort.models.heat_index_lu.heat_index_lu`.
-The other is developed by Rothfusz (1990) and it is a simplified model derived by multiple regression analysis in temperature and relative humidity from the first version of Steadman’s (1979) apparent temperature (AT) [Rothfusz]_ :py:class:`~pythermalcomfort.models.heat_index_rothfusz.heat_index_rothfusz`.
+The other is developed by Rothfusz (1990) and it is a simplified model derived by multiple regression analysis in temperature and relative humidity from the first version of Steadman’s (1979) apparent temperature (AT) [Rothfusz1990]_ :py:class:`~pythermalcomfort.models.heat_index_rothfusz.heat_index_rothfusz`.
 
 Heat Index (HI) Lu and Romps (2022)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,10 +186,10 @@ Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
 ------------------------------------------------------------------------
 
 The Predicted Mean Vote (PMV) is an index that aims to predict the mean value of thermal sensation votes from a large group of people, based on a seven-point scale ranging from "cold" (-3) to "hot" (+3).
-It was developed by Fanger [fanger1970]_.
+It was developed by Fanger [Fanger1970]_.
 
-The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [ISO_7730_2005]_.
-It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [ASHRAE_55_2023]_.
+The PMV is designed to predict the average thermal sensation of a large group of people exposed to the same environment [7730ISO2005]_.
+It calculates the heat balance of a typical occupant and relates their thermal gains or losses to their predicted mean thermal sensation [55ASHRAE2023]_.
 
 The PMV can be used to check if a thermal environment meets comfort criteria and to establish requirements for different levels of acceptability.
 The PMV model is applicable to healthy men and women exposed to indoor environments where thermal comfort is desirable, but moderate deviations from thermal comfort occur, in the design of new environments or the assessment of existing ones.
@@ -197,11 +204,14 @@ The PMV calculation considers several factors:
   *   **Clothing insulation** (`I` :sub:`cl,r`), dynamic intrinsic insulation, this is the thermal insulation from the skin surface to the outer clothing surface, including enclosed air layers, under the environmental conditions.
 
 The PMV model is applicable when the six main parameters are within specific intervals.
-These values are specified by the ASHRAE 55 [ASHRAE_55_2023]_ and ISO 7730 standards [ISO_7730_2005]_.
-The ISO also states that the PMV model is only applicable for PMV between -2 and +2 [ISO_7730_2005]_.
+These values are specified by the ASHRAE 55 [55ASHRAE2023]_ and ISO 7730 standards [7730ISO2005]_.
+The ISO also states that the PMV model is only applicable for PMV between -2 and +2 [7730ISO2005]_.
 
-The PMV model has been shown to have low accuracy in predicting thermal sensation votes, especially outside thermal neutrality, with a prediction accuracy of approximately 34% [cheung]_.
-For this reason, it is recommended that the use of the PMV be restricted to values between -0.5 and +0.5, where an environment may be deemed thermally neutral by a large group of occupants.
+There are several formulations of the PMV model that have been developed over the years.
+The two most commonly used are the original PMV model [Fanger1970]_ and the ASHRAE 55 PMV model [55ASHRAE2023]_.
+Tartarini and Schiavon (2025) [Tartarini2025PMV]_ compared the accuracy of the PMV models implemented in the ISO 7730:2005 and ASHRAE 55:2023 standards and found that the ISO 7730:2005 model has a higher accuracy than the ASHRAE 55:2023 model.
+However, it should be noted that both PMV models have low accuracy in predicting thermal sensation votes, especially outside thermal neutrality [Tartarini2025PMV]_.
+For this reason, it is recommended that the use of the PMV be restricted to values between -0.5 and +0.5 [Tartarini2025PMV]_, where an environment may be deemed thermally neutral by a large group of occupants.
 
 The Predicted Percentage Dissatisfied (PPD) is an index that provides a **quantitative prediction of the percentage of people likely to feel too warm or too cool in a given environment**.
 The PPD is derived from the PMV.
@@ -213,10 +223,10 @@ PMV formulations
 After Fanger developed the original PMV model which it is still included in the ISO 7330 in its original form, several other PMV formulations have been proposed.
 These include but are not limited to:
 
-  *  the aPMV model [yao2009]_ :py:meth:`pythermalcomfort.models.pmv_a.pmv_a`,
-  *  the ASHRAE 55 PMV model [ASHRAE_55_2023]_ :py:meth:`pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae`,
-  *  the ATHB model [schweiker22]_ :py:meth:`pythermalcomfort.models.pmv_athb.pmv_athb`,
-  *  the ePMV model [fanger2002]_ :py:meth:`pythermalcomfort.models.pmv_e.pmv_e`.
+  *  the aPMV model [Yao2009]_ :py:meth:`pythermalcomfort.models.pmv_a.pmv_a`,
+  *  the ASHRAE 55 PMV model [55ASHRAE2023]_ :py:meth:`pythermalcomfort.models.pmv_ppd_ashrae.pmv_ppd_ashrae`,
+  *  the ATHB model [Schweiker2022]_ :py:meth:`pythermalcomfort.models.pmv_athb.pmv_athb`,
+  *  the ePMV model [Fanger2002]_ :py:meth:`pythermalcomfort.models.pmv_e.pmv_e`.
 
 
 ISO 7730 - PMV and PPD
@@ -324,7 +334,6 @@ Wind chill temperature
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
-
 Work capacity
 ---------
 

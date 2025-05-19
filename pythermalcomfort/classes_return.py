@@ -1,13 +1,42 @@
 import datetime as dt
-from dataclasses import dataclass, fields
-from typing import Optional, Union
+from dataclasses import dataclass
+from dataclasses import fields
+from dataclasses import is_dataclass
+from typing import Optional
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
 
 
-@dataclass(frozen=True)
-class APMV:
+class AutoStrMixin:
+    def __str__(self) -> str:
+        if not is_dataclass(self):
+            return super().__str__()
+
+        # determine width by max variable name length
+        names = [f.name for f in fields(self)]
+        width = max((len(n) for n in names), default=0)
+        lines = [f"-------- {self.__class__.__name__} --------"]
+        for n in names:
+            v = getattr(self, n)
+            # Format multi-line values or very long values properly
+            v_str = str(v).replace("\n", "\n" + " " * (width + 3 + 3))
+            lines.append(f"{n.ljust(width)} : {v_str}")
+        return "\n".join(lines)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __getitem__(self, item: str):
+        try:
+            return getattr(self, item)
+        except AttributeError as exc:
+            raise KeyError(f"{self.__class__.__name__} has no field '{item}'") from exc
+
+
+@dataclass(frozen=True, repr=False)
+class APMV(AutoStrMixin):
     """A dataclass to store the results of the adaptive Predicted Mean Vote (aPMV)
     model.
 
@@ -19,12 +48,9 @@ class APMV:
 
     a_pmv: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class AdaptiveASHRAE:
+@dataclass(frozen=True, repr=False)
+class AdaptiveASHRAE(AutoStrMixin):
     """A dataclass to store the results of the adaptive thermal comfort model based on
     ASHRAE 55.
 
@@ -54,12 +80,9 @@ class AdaptiveASHRAE:
     acceptability_80: Union[bool, npt.ArrayLike]
     acceptability_90: Union[bool, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 @dataclass
-class AdaptiveEN:
+class AdaptiveEN(AutoStrMixin):
     """Dataclass to store the results of the adaptive thermal comfort calculation based
     on EN 16798-1 2019.
 
@@ -98,12 +121,9 @@ class AdaptiveEN:
     tmp_cmf_cat_ii_low: Union[float, npt.ArrayLike]
     tmp_cmf_cat_iii_low: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class AnkleDraft:
+@dataclass(frozen=True, repr=False)
+class AnkleDraft(AutoStrMixin):
     """Dataclass to store the results of the ankle draft calculation.
 
     Attributes
@@ -117,12 +137,9 @@ class AnkleDraft:
     ppd_ad: Union[float, npt.ArrayLike]
     acceptability: Union[bool, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class AT:
+@dataclass(frozen=True, repr=False)
+class AT(AutoStrMixin):
     """Dataclass to store the results of the Apparent Temperature (AT) calculation.
 
     Attributes
@@ -133,12 +150,9 @@ class AT:
 
     at: float
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class ATHB:
+@dataclass(frozen=True, repr=False)
+class ATHB(AutoStrMixin):
     """Dataclass to store the results of the Adaptive Thermal Heat Balance (ATHB)
     calculation.
 
@@ -150,12 +164,9 @@ class ATHB:
 
     athb_pmv: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class CloTOut:
+@dataclass(frozen=True, repr=False)
+class CloTOut(AutoStrMixin):
     """Dataclass to represent the clothing insulation Icl as a function of outdoor air
     temperature.
 
@@ -167,12 +178,9 @@ class CloTOut:
 
     clo_tout: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class CE:
+@dataclass(frozen=True, repr=False)
+class CE(AutoStrMixin):
     """Dataclass to represent the Cooling Effect (CE).
 
     Attributes
@@ -183,12 +191,9 @@ class CE:
 
     ce: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class DI:
+@dataclass(frozen=True, repr=False)
+class DI(AutoStrMixin):
     """Dataclass to represent the Discomfort Index (DI) and its classification.
 
     Attributes
@@ -202,12 +207,9 @@ class DI:
     di: Union[float, list[float]]
     discomfort_condition: Union[str, list[str]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class EPMV:
+@dataclass(frozen=True, repr=False)
+class EPMV(AutoStrMixin):
     """Dataclass to represent the Adjusted Predicted Mean Votes with Expectancy Factor
     (ePMV).
 
@@ -219,12 +221,22 @@ class EPMV:
 
     e_pmv: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
+
+@dataclass(frozen=True, repr=False)
+class ESI(AutoStrMixin):
+    """Dataclass to represent the Environmental Stress Index (ESI).
+
+    Attributes
+    ----------
+    esi : float or list of floats
+        Environmental Stress Index.
+    """
+
+    esi: Union[float, list[float]]
 
 
-@dataclass(frozen=True)
-class HI:
+@dataclass(frozen=True, repr=False)
+class HI(AutoStrMixin):
     """Dataclass to represent the Heat Index (HI).
 
     Attributes
@@ -235,12 +247,9 @@ class HI:
 
     hi: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class Humidex:
+@dataclass(frozen=True, repr=False)
+class Humidex(AutoStrMixin):
     """Dataclass to represent the Humidex and its discomfort category.
 
     Attributes
@@ -254,12 +263,9 @@ class Humidex:
     humidex: Union[float, list[float]]
     discomfort: Union[str, list[str]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class NET:
+@dataclass(frozen=True, repr=False)
+class NET(AutoStrMixin):
     """Dataclass to represent the Normal Effective Temperature (NET).
 
     Attributes
@@ -270,12 +276,9 @@ class NET:
 
     net: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class PETSteady:
+@dataclass(frozen=True, repr=False)
+class PETSteady(AutoStrMixin):
     """Dataclass to represent the Physiological Equivalent Temperature (PET).
 
     Attributes
@@ -286,12 +289,9 @@ class PETSteady:
 
     pet: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class PHS:
+@dataclass(frozen=True, repr=False)
+class PHS(AutoStrMixin):
     """Dataclass to represent the Predicted Heat Strain (PHS).
 
     Attributes
@@ -329,12 +329,9 @@ class PHS:
     water_loss_watt: Union[float, list[float]]
     water_loss: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class PMV:
+@dataclass(frozen=True, repr=False)
+class PMV(AutoStrMixin):
     """Dataclass to represent the Predicted Mean Vote (PMV).
 
     Attributes
@@ -345,12 +342,9 @@ class PMV:
 
     pmv: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class PMVPPD:
+@dataclass(frozen=True, repr=False)
+class PMVPPD(AutoStrMixin):
     """Dataclass to represent the Predicted Mean Vote (PMV) and Predicted Percentage of
     Dissatisfied (PPD).
 
@@ -368,12 +362,9 @@ class PMVPPD:
     ppd: Union[float, list[float]]
     tsv: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class PsychrometricValues:
+@dataclass(frozen=True, repr=False)
+class PsychrometricValues(AutoStrMixin):
     p_sat: Union[float, list[float]]
     p_vap: Union[float, list[float]]
     hr: Union[float, list[float]]
@@ -381,12 +372,9 @@ class PsychrometricValues:
     dew_point_tmp: Union[float, list[float]]
     h: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class SET:
+@dataclass(frozen=True, repr=False)
+class SET(AutoStrMixin):
     """Dataclass to represent the Standard Effective Temperature (SET).
 
     Attributes
@@ -397,12 +385,9 @@ class SET:
 
     set: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class SolarGain:
+@dataclass(frozen=True, repr=False)
+class SolarGain(AutoStrMixin):
     """Dataclass to represent the solar gain to the human body.
 
     Attributes
@@ -417,12 +402,9 @@ class SolarGain:
     erf: Union[float, list[float]]
     delta_mrt: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class GaggeTwoNodes:
+@dataclass(frozen=True, repr=False)
+class GaggeTwoNodes(AutoStrMixin):
     """Dataclass to represent the results of the two-node model of human temperature
     regulation.
 
@@ -485,12 +467,9 @@ class GaggeTwoNodes:
     disc: Union[float, list[float]]
     t_sens: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class UseFansHeatwaves:
+@dataclass(frozen=True, repr=False)
+class UseFansHeatwaves(AutoStrMixin):
     """Dataclass to represent the results of using fans during heatwaves.
 
     Attributes
@@ -546,12 +525,9 @@ class UseFansHeatwaves:
     heat_strain_w: Union[bool, list[bool]]
     heat_strain_sweating: Union[bool, list[bool]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class UTCI:
+@dataclass(frozen=True, repr=False)
+class UTCI(AutoStrMixin):
     """Dataclass to represent the Universal Thermal Climate Index (UTCI).
 
     Attributes
@@ -565,12 +541,9 @@ class UTCI:
     utci: Union[float, list[float]]
     stress_category: Union[str, list[str]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class VerticalTGradPPD:
+@dataclass(frozen=True, repr=False)
+class VerticalTGradPPD(AutoStrMixin):
     """Dataclass to represent the Predicted Percentage of Dissatisfied (PPD) with
     vertical temperature gradient.
 
@@ -585,12 +558,9 @@ class VerticalTGradPPD:
     ppd_vg: Union[float, list[float]]
     acceptability: Union[bool, list[bool]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class WBGT:
+@dataclass(frozen=True, repr=False)
+class WBGT(AutoStrMixin):
     """Dataclass to represent the Wet Bulb Globe Temperature (WBGT) index.
 
     Attributes
@@ -601,12 +571,9 @@ class WBGT:
 
     wbgt: Union[float, npt.ArrayLike]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class WCI:
+@dataclass(frozen=True, repr=False)
+class WCI(AutoStrMixin):
     """Dataclass to represent the Wind Chill Index (WCI).
 
     Attributes
@@ -617,12 +584,9 @@ class WCI:
 
     wci: Union[float, list[float]]
 
-    def __getitem__(self, item):
-        return getattr(self, item)
 
-
-@dataclass(frozen=True)
-class WCT:
+@dataclass(frozen=True, repr=False)
+class WCT(AutoStrMixin):
     """Dataclass to represent the Wind Chill Temperature (WCT).
 
     Attributes
@@ -632,9 +596,6 @@ class WCT:
     """
 
     wct: Union[float, list[float]]
-
-    def __getitem__(self, item):
-        return getattr(self, item)
 
 
 @dataclass(frozen=True)
@@ -653,8 +614,8 @@ class WorkCapacity:
         return getattr(self, item)
 
 
-@dataclass(frozen=True)
-class JOS3BodyParts:
+@dataclass(frozen=True, repr=False)
+class JOS3BodyParts(AutoStrMixin):
     """Dataclass to represent the body parts in the JOS3 model. It is very important to
     keep the order of the attributes as they are defined in the dataclass ['head',
     'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm', 'left_hand',
@@ -717,9 +678,6 @@ class JOS3BodyParts:
     right_leg: Optional[float] = None
     right_foot: Optional[float] = None
 
-    def __getitem__(self, item):
-        return getattr(self, item)
-
     @classmethod
     def get_attribute_names(cls):
         return [field.name for field in fields(cls)]
@@ -729,8 +687,8 @@ def get_attribute_values(cls):
     return np.array([getattr(cls, field.name) for field in fields(cls)])
 
 
-@dataclass(frozen=True)
-class JOS3Output:
+@dataclass(frozen=True, repr=False)
+class JOS3Output(AutoStrMixin):
     """Dataclass to represent the output of the JOS3 model simulation.
 
     Attributes
@@ -914,6 +872,3 @@ class JOS3Output:
     q_skin2env_latent: Optional[JOS3BodyParts] = None
     q_res_sensible: Optional[float] = None
     q_res_latent: Optional[float] = None
-
-    def __getitem__(self, item):
-        return getattr(self, item)

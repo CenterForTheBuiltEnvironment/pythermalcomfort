@@ -29,7 +29,7 @@ def pet_steady(
     circumstances in a medically realistic manner. PET is defined as the air temperature
     at which, in a typical indoor setting the heat budget of the human body is balanced
     with the same core and skin temperature as under the complex outdoor conditions to be
-    assessed [hoppe]_.
+    assessed [Hoppe1999]_.
     The following assumptions are made for the indoor reference climate: tdb = tr, v = 0.1
     m/s, water vapour pressure = 12 hPa, clo = 0.9 clo, and met = 1.37 met + basic
     metabolism.
@@ -37,7 +37,7 @@ def pet_steady(
     outside with his or her own personal experience indoors in this way. This function
     solves the heat balances without accounting for heat storage in the human body.
 
-    The PET was originally proposed by Hoppe [hoppe]_. In 2018, Walther and Goestchel [Walther]_
+    The PET was originally proposed by Hoppe [Hoppe1999]_. In 2018, Walther and Goestchel [Walther2018]_
     proposed a correction of the original model, purging the errors in the
     PET calculation routine, and implementing a state-of-the-art vapour diffusion model.
     Walther and Goestchel (2018) model is therefore used to calculate the PET.

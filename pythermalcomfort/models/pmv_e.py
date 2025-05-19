@@ -27,7 +27,7 @@ def pmv_e(
     expectations, but a metabolic rate that is estimated too high can also
     contribute to explaining the difference. An extension of the PMV model that
     includes an expectancy factor is introduced for use in non-air-conditioned
-    buildings in warm climates [fanger2002]_.
+    buildings in warm climates [Fanger2002]_.
 
     Parameters
     ----------

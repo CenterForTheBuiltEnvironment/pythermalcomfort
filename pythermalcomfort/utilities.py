@@ -25,6 +25,8 @@ class Models(Enum):
     ashrae_55_2023 = "55-2023"
     iso_7730_2005 = "7730-2005"
     iso_9920_2007 = "9920-2007"
+    iso_7933_2004 = "7933-2004"
+    iso_7933_2023 = "7933-2023"
 
 
 class Units(Enum):
@@ -263,7 +265,7 @@ def mean_radiant_tmp(
 ):
     """Converts globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
-    7726:1998 Standard [ISO_7726_1998]_.
+    7726:1998 Standard [7726ISO1998]_.
 
     Parameters
     ----------
@@ -284,7 +286,7 @@ def mean_radiant_tmp(
         to better determine the free and forced convection coefficient used in the
         calculation of the mean radiant temperature. They also showed that mean radiant
         temperature measured with ping-pong ball-sized globe thermometers is not reliable
-        due to a stochastic convective bias [Teitelbaum]_. The Mixed Convection model has only
+        due to a stochastic convective bias [Teitelbaum2022]_. The Mixed Convection model has only
         been validated for globe sensors with a diameter between 0.04 and 0.15 m.
 
     Returns
@@ -374,6 +376,8 @@ def mean_radiant_tmp(
 
 def validate_type(value, name: str, allowed_types: tuple):
     """Validate the type of a value against allowed types."""
+    if isinstance(value, np.generic):
+        value = value.item()
     if not isinstance(value, allowed_types):
         raise TypeError(f"{name} must be one of the following types: {allowed_types}.")
 
@@ -448,9 +452,19 @@ def _check_standard_compliance_array(standard, **kwargs):
 
         return values_to_return.values()
 
-    if standard == "7933":  # based on ISO 7933:2004 Annex A
+    if standard == Models.iso_7933_2004.value:  # based on ISO 7933:2004 Annex A
         tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
         p_a_valid = valid_range(params["p_a"], (0, 4.5))
+        tr_valid = valid_range(params["tr"], (0.0, 60.0))
+        v_valid = valid_range(params["v"], (0.0, 3))
+        met_valid = valid_range(params["met"], (100, 450))
+        clo_valid = valid_range(params["clo"], (0.1, 1))
+
+        return tdb_valid, tr_valid, v_valid, p_a_valid, met_valid, clo_valid
+
+    if standard == Models.iso_7933_2023.value:  # based on ISO 7933:2023 Annex A
+        tdb_valid = valid_range(params["tdb"], (15.0, 50.0))
+        p_a_valid = valid_range(params["p_a"], (0.5, 4.5))
         tr_valid = valid_range(params["tr"], (0.0, 60.0))
         v_valid = valid_range(params["v"], (0.0, 3))
         met_valid = valid_range(params["met"], (100, 450))
@@ -642,9 +656,9 @@ def clo_dynamic_iso(
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
     as well as the air speed modify the insulation characteristics of the clothing.
     Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
-    [ISO_7730_2005]_. However, the ISO 7730:2005 contains insufficient information to
+    [7730ISO2005]_. However, the ISO 7730:2005 contains insufficient information to
     calculate (I :sub:`cl,r`). Therefore, we implemented the equations provided in the
-    ISO 9920:2007 standard [iso9920]_.
+    ISO 9920:2007 standard [ISO9920]_.
 
     Parameters
     ----------
@@ -701,9 +715,9 @@ def running_mean_outdoor_temperature(
         newest/yesterday to oldest) :math:`[t_{day-1}, t_{day-2}, ... ,
         t_{day-n}]`.
         Where :math:`t_{day-1}` is yesterday's daily mean temperature. The EN
-        16798-1 2019 [EN_16798_2019]_ states that n should be equal to 7
+        16798-1 2019 [16798EN2019]_ states that n should be equal to 7
     alpha : float
-        constant between 0 and 1. The EN 16798-1 2019 [EN_16798_2019]_ recommends a value of 0.8,
+        constant between 0 and 1. The EN 16798-1 2019 [16798EN2019]_ recommends a value of 0.8,
         while the ASHRAE 55 2020 recommends to choose values between 0.9 and 0.6,
         corresponding to a slow- and fast- response running mean, respectively.
         Adaptive comfort theory suggests that a slow-response running mean (alpha =
@@ -777,8 +791,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998
-    [ISO_7726_1998]_
+    """Calculates operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_
 
     Parameters
     ----------
@@ -807,7 +820,7 @@ def operative_tmp(
 
 def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
     """Calculates the intrinsic insulation of a clothing ensemble based on individual
-    garments. This equation is in accordance with the ISO 9920:2009 standard [iso9920]_
+    garments. This equation is in accordance with the ISO 9920:2009 standard [ISO9920]_
     Section 4.3. It should be noted that this equation is only valid for clothing
     ensembles with rather uniform insulation values across the body.
 
@@ -828,7 +841,7 @@ def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
 def clo_area_factor(i_cl: Union[float, list[float]]):
     """Calculates the clothing area factor (f_cl) of the clothing ensemble as a function
     of the intrinsic insulation of the clothing ensemble. This equation is in accordance
-    with the ISO 9920:2009 standard [iso9920]_ Section 5. The standard warns that the
+    with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
     correlation between f_cl and i_cl is low especially for non-western clothing
     ensembles. The application of this equation is limited to clothing ensembles with
     clo values between 0.2 and 1.7 clo.
@@ -859,7 +872,7 @@ def clo_insulation_air_layer(
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
     the boundary air layer insulation is calculated based on the walking speed (v_walk)
     and the relative air speed (vr). This equation is extracted from the ISO 9920:2009
-    standard [iso9920]_ Section 6.
+    standard [ISO9920]_ Section 6.
 
     Parameters
     ----------
@@ -901,7 +914,7 @@ def clo_total_insulation(
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
-    ISO 7790 standard [iso9920]_ provides different equations to calculate it as a
+    ISO 7790 standard [ISO9920]_ provides different equations to calculate it as a
     function of the total thermal insulation of clothing (`I`:sub:`T`), the insulation
     of the boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
     relative air speed (`v`:sub:`r`). These different equations are used if the person
@@ -910,7 +923,7 @@ def clo_total_insulation(
     in very light clothing (`I`:sub:`cl` < 0.6 clo). Here we have not implemented the
     equation for high clothing (`I`:sub:`T` > 2.0 clo). Hence the applicability of this
     function is limited to 0 clo < (`I`:sub:`T`) < 2.0 clo). You can find all the inputs
-    required in this function in the ISO 9920:2009 standard [iso9920]_ Annex A.
+    required in this function in the ISO 9920:2009 standard [ISO9920]_ Annex A.
 
     Parameters
     ----------

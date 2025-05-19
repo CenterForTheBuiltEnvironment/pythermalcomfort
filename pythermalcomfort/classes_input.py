@@ -40,6 +40,7 @@ class BaseInputs:
     sol_altitude: Union[float, int, np.ndarray, list] = field(default=None)
     sharp: Union[float, int, np.ndarray, list] = field(default=None)
     sol_radiation_dir: Union[float, int, np.ndarray, list] = field(default=None)
+    sol_radiation_global: Union[float, int, np.ndarray, list] = field(default=None)
     sol_transmittance: Union[float, int, np.ndarray, list] = field(default=None)
     f_svv: Union[float, int, np.ndarray, list] = field(default=None)
     f_bes: Union[float, int, np.ndarray, list] = field(default=None)
@@ -62,31 +63,37 @@ class BaseInputs:
         def convert_series_to_list(obj):
             return obj.tolist() if is_pandas_series(obj) else obj
 
+        def _validate_str_values(name: str, value, allowed):
+            values = np.atleast_1d(value)
+            for val in values.astype(str):
+                if val.lower() not in allowed:
+                    raise ValueError(f"{name} must be one of {allowed!r}")
+
         # Only validate attributes that are not None
         if self.units.upper() not in [Units.SI.value, Units.IP.value]:
             raise ValueError("Units must be either 'SI' or 'IP'")
         if self.position is not None:
-            if self.position.lower() not in [
-                Postures.sitting.value,
-                Postures.standing.value,
-                "standing, forced convection",
-            ]:
-                raise ValueError(
-                    "position must be either 'standing', 'sitting', or 'standing, "
-                    "forced convection'"
-                )
+            _validate_str_values(
+                "position",
+                self.position,
+                [
+                    Postures.sitting.value,
+                    Postures.standing.value,
+                    "standing, forced convection",
+                ],
+            )
         if self.posture is not None:
-            if self.posture.lower() not in [
-                Postures.sitting.value,
-                Postures.standing.value,
-                Postures.crouching.value,
-            ]:
-                raise ValueError(
-                    "posture must be either 'sitting', 'standing', or 'crouching'"
-                )
+            _validate_str_values(
+                "posture",
+                self.posture,
+                [
+                    Postures.sitting.value,
+                    Postures.standing.value,
+                    Postures.crouching.value,
+                ],
+            )
         if self.sex is not None:
-            if self.sex.lower() not in [Sex.male.value, Sex.female.value]:
-                raise ValueError("sex must be either 'male' or 'female'")
+            _validate_str_values("sex", self.sex, [Sex.male.value, Sex.female.value])
         if self.tdb is not None:
             self.tdb = convert_series_to_list(self.tdb)
             validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
@@ -170,6 +177,15 @@ class BaseInputs:
             validate_type(
                 self.sol_radiation_dir,
                 "sol_radiation_dir",
+                (float, int, np.ndarray, list),
+            )
+        if self.sol_radiation_global is not None:
+            self.sol_radiation_global = convert_series_to_list(
+                self.sol_radiation_global
+            )
+            validate_type(
+                self.sol_radiation_global,
+                "sol_radiation_global",
                 (float, int, np.ndarray, list),
             )
         if self.sol_transmittance is not None:
@@ -291,8 +307,6 @@ class ENInputs(BaseInputs):
 
 @dataclass
 class AnkleDraftInputs(BaseInputs):
-    """Child class that only requires specific attributes."""
-
     def __init__(
         self,
         tdb,
@@ -438,6 +452,35 @@ class EPMVInputs(BaseInputs):
             wme=wme,
             units=units,
         )
+
+
+@dataclass
+class ESIInputs(BaseInputs):
+    """Input class for the Environmental Stress Index (ESI) calculation.
+
+    This class validates and processes inputs required for calculating the ESI,
+    which evaluates heat stress based on temperature, humidity, and solar radiation.
+    """
+
+    def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            sol_radiation_global=sol_radiation_global,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
+
+        sol_radiation_global = np.asarray(self.sol_radiation_global, dtype=float)
+        if np.any(sol_radiation_global < 0):
+            raise ValueError("Solar radiation must be greater than or equal to 0 W/m2")
 
 
 class HIModels(Enum):

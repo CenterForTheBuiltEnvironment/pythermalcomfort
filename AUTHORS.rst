@@ -44,4 +44,3 @@ Bug reports
 -----------
 
 You can report bugs or request new features using `GitHub issues <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_.
-

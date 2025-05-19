@@ -16,6 +16,7 @@ from pythermalcomfort.utilities import (
     transpose_sharp_altitude,
     units_converter,
     v_relative,
+    validate_type,
 )
 
 
@@ -332,3 +333,43 @@ def test_v_relative():
     met = 1.5
     expected_result = -1.5 + 0.3 * 0.5
     assert np.allclose(v_relative(v, met), expected_result, atol=1e-6)
+
+
+def test_validate_type():
+    allowed = (float, int, list, np.ndarray)
+
+    # valid cases
+    # native Python types
+    validate_type(1, "int_value", allowed)
+    validate_type(3.1415, "float_value", allowed)
+    validate_type([1, 2, 3], "list_value", allowed)
+    validate_type(np.array([1, 2, 3]), "array_value", allowed)
+
+    # np scalars should be converted to native types via .item()
+    validate_type(np.float32(40.0), "np_float32", allowed)
+    validate_type(np.int32(100), "np_int32", allowed)
+    validate_type(np.int64(200), "np_int64", allowed)
+
+    # np array of floats and ints should be allowed
+    arr_numeric = np.array([np.float32(1.0), np.int32(2), 3, 3.52])
+    validate_type(arr_numeric, "arr_numeric", allowed)
+
+    # empty NumPy array should also pass
+    validate_type(np.array([]), "empty_array", allowed)
+
+    # empty list should pass
+    validate_type([], "empty_list", allowed)
+
+    # --- Invalid cases ---
+
+    with pytest.raises(TypeError) as exc_info:
+        validate_type({"a": 1}, "dict_type", allowed)
+    assert "dict_type must be one of the following types:" in str(exc_info.value)
+
+    with pytest.raises(TypeError) as exc_info:
+        validate_type("hello", "str_value", allowed)
+    assert "str_value must be one of the following types:" in str(exc_info.value)
+
+    with pytest.raises(TypeError) as exc_info:
+        validate_type(np.str_("hello"), "np_str", allowed)
+    assert "np_str must be one of the following types:" in str(exc_info.value)
