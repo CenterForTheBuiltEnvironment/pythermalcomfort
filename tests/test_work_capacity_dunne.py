@@ -21,10 +21,10 @@ def test_heavy_array_and_clipping():
     assert np.allclose(wc.capacity, expected_base)
 
 
-def test_medium_and_light_intensity():
+def test_moderate_and_light_intensity():
     wbgt = 30
     base = np.clip(100 - 25 * (5) ** (2 / 3), 0, 100)
-    wc_med = work_capacity_dunne(wbgt, "medium")
+    wc_med = work_capacity_dunne(wbgt, "moderate")
     wc_light = work_capacity_dunne(wbgt, "light")
     assert wc_med.capacity == pytest.approx(np.clip(base * 2, 0, 100))
     assert wc_light.capacity == pytest.approx(np.clip(base * 4, 0, 100))

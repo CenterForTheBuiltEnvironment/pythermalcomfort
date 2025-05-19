@@ -21,8 +21,8 @@ def test_scalar_heavy():
     assert pytest.approx(exp, rel=1e-3) == result.capacity
 
 
-def test_scalar_medium():
-    result = work_capacity_hothaps(30.0, intensity=WorkIntensity.MEDIUM.value)
+def test_scalar_moderate():
+    result = work_capacity_hothaps(30.0, intensity=WorkIntensity.MODERATE.value)
     assert isinstance(result.capacity, float)
     exp = _expected_capacity(30.0, divisor=32.93, exponent=17.81)
     assert pytest.approx(exp, rel=1e-3) == result.capacity
@@ -51,7 +51,7 @@ def test_low_wbgt_clamped_to_100():
 
 
 def test_high_wbgt_approaches_10_percent():
-    result = work_capacity_hothaps(100.0, intensity="medium")
+    result = work_capacity_hothaps(100.0, intensity="moderate")
     assert result.capacity == pytest.approx(10.0, rel=1e-3)
 
 

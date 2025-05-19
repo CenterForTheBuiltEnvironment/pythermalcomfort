@@ -15,7 +15,7 @@ class WorkIntensity(str, Enum):
     """Enumeration for work intensity levels."""
 
     HEAVY = "heavy"
-    MEDIUM = "medium"
+    MODERATE = "moderate"
     LIGHT = "light"
 
 

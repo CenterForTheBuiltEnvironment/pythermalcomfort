@@ -12,7 +12,7 @@ def work_capacity_hothaps(
     intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
     """
-    Estimate work capacity due to heat based on Kjellstrom et al.
+    Estimate work capacity due to heat based on Kjellstrom et al. [Kjellstrom2018]_
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -28,7 +28,7 @@ def work_capacity_hothaps(
     The shape of the function is just an assumption, and the fit of the
     sigmoid to the data it is analysing is not especially good.
 
-    Heavy intensity work is sometimes labelled as 400 W, medium 300 W, light 200
+    Heavy intensity work is sometimes labelled as 400 W, moderate 300 W, light 200
     W, but this is only nominal.
 
     The correction citation is: Bröde P, Fiala D, Lemke B, Kjellstrom T.
@@ -54,7 +54,7 @@ def work_capacity_hothaps(
         Wet bulb globe temperature, [°C].
     intensity : str
         Which work intensity to use for the calculation, choice of "heavy",
-        "medium" or "light".
+        "moderate" or "light".
 
     Returns
     -------
@@ -75,7 +75,7 @@ def work_capacity_hothaps(
 
     params = {
         WorkIntensity.HEAVY: {"divisor": 30.94, "exponent": 16.64},
-        WorkIntensity.MEDIUM: {"divisor": 32.93, "exponent": 17.81},
+        WorkIntensity.MODERATE: {"divisor": 32.93, "exponent": 17.81},
         WorkIntensity.LIGHT: {"divisor": 34.64, "exponent": 22.72},
     }
     divisor = params[intensity]["divisor"]

@@ -33,3 +33,7 @@ References
 .. [Fanger1970] Fanger, P. O. (1970). Thermal comfort: analysis and applications in environmental engineering. McGraw-Hill, New York.
 .. [Tartarini2025PMV] Tartarini, F. and Schiavon, S., 2025. Comparative analysis of PMV Models accuracy implemented in the ISO 7730: 2005 and ASHRAE 55: 2023. Building and Environment, p.112766. doi: doi.org/10.1016/j.buildenv.2025.112766
 .. [Moran2001] Moran, D.S., Pandolf, K.B., Shapiro, Y., Heled, Y., Shani, Y., Mathew, W.T., Gonzalez, R.R., 2001. An environmental stress index (ESI) as a substitute for the wet bulb globe temperature (WBGT). Journal of Thermal Biology 26, 427-431. DOI: doi.org/10.1016/S0306-4565(01)00055-9
+.. [Dunne2013] Dunne JP, Stouffer RJ, John JG. Reductions in labour capacity from heat stress under climate warming. Nature Climate Change. 2013 Jun;3(6):563-566.
+.. [Kjellstrom2018] Kjellstrom T, Freyberg C, Lemke B, Otto M, Briggs D. Estimating population heat exposure and impacts on working people in conjunction with climate change. International Journal of Biometeorology. 2018 Mar;62(3):291-306.
+
+

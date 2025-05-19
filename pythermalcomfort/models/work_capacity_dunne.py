@@ -12,7 +12,7 @@ def work_capacity_dunne(
     intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
     """
-    Estimate work capacity due to heat based ISO standards as described by Dunne et al
+    Estimate work capacity due to heat based ISO standards as described by Dunne et al [Dunne2013]_
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -23,8 +23,8 @@ def work_capacity_dunne(
     stress under climate warming. Nature Climate Change. 2013 Jun;3(6):563–6.
 
     Heavy intensity work is sometimes labelled as 400 W, but this is only
-    nominal. Medium work is assumed to be half as much as heavy intensity, and
-    light half as much as medium.
+    nominal. Moderate work is assumed to be half as much as heavy intensity, and
+    light half as much as moderate.
 
     Parameters
     ----------
@@ -32,7 +32,11 @@ def work_capacity_dunne(
         Wet bulb globe temperature, [°C].
     intensity : str
         Which work intensity to use for the calculation, choice of "heavy",
-        "medium" or "light".
+        "moderate" or "light". Default is "heavy".
+
+        .. note::
+            Dunne et al [Dunne2013]_ suggests that heavy intensity work is 350-500 kcal/h, moderate
+            is 200-350 kcal/h, and light is less than 100-200 kcal/h.
 
     Returns
     -------
@@ -55,7 +59,7 @@ def work_capacity_dunne(
 
     factor_map = {
         WorkIntensity.HEAVY: 1,
-        WorkIntensity.MEDIUM: 2,
+        WorkIntensity.MODERATE: 2,
         WorkIntensity.LIGHT: 4,
     }
 
