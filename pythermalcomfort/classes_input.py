@@ -7,6 +7,14 @@ import numpy as np
 from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
 
 
+class WorkIntensity(str, Enum):
+    """Enumeration for work intensity levels."""
+
+    HEAVY = "heavy"
+    MODERATE = "moderate"
+    LIGHT = "light"
+
+
 @dataclass
 class BaseInputs:
     """Base class containing all possible input parameters."""
@@ -53,6 +61,8 @@ class BaseInputs:
     max_skin_blood_flow: Union[float, int, np.ndarray, list] = field(default=80)
     max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
+    wbgt: Union[float, int, np.ndarray, list] = field(default=None)
+    intensity: Union[str, WorkIntensity] = field(default=None)
     thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
@@ -233,6 +243,16 @@ class BaseInputs:
         if self.w_max is not None:
             self.w_max = convert_series_to_list(self.w_max)
             validate_type(self.w_max, "w_max", (float, int, np.ndarray, list))
+        if self.wbgt is not None:
+            self.wbgt = convert_series_to_list(self.wbgt)
+            validate_type(self.wbgt, "wbgt", (float, int, np.ndarray, list))
+        if self.intensity is not None:
+            self.intensity = convert_series_to_list(self.intensity)
+            _validate_str_values(
+                "intensity",
+                self.intensity,
+                [i.value for i in WorkIntensity],
+            )
         if self.thickness_quilt is not None:
             self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
             validate_type(
@@ -459,8 +479,8 @@ class EPMVInputs(BaseInputs):
 class ESIInputs(BaseInputs):
     """Input class for the Environmental Stress Index (ESI) calculation.
 
-    This class validates and processes inputs required for calculating the ESI,
-    which evaluates heat stress based on temperature, humidity, and solar radiation.
+    This class validates and processes inputs required for calculating the ESI, which
+    evaluates heat stress based on temperature, humidity, and solar radiation.
     """
 
     def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
@@ -932,3 +952,33 @@ class WCTInputs(BaseInputs):
             v=v,
             round_output=round_output,
         )
+
+
+@dataclass
+class WorkCapacityHothapsInputs(BaseInputs):
+    def __init__(
+        self,
+        wbgt,
+        intensity,
+    ):
+        super().__init__(wbgt=wbgt, intensity=intensity)
+
+
+@dataclass
+class WorkCapacityStandardsInputs(BaseInputs):
+    def __init__(
+        self,
+        wbgt,
+        met,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            wbgt=wbgt,
+            met=met,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+        met = np.asarray(self.met, dtype=float)
+        if np.any(met < 0) or np.any(met > 2500):
+            raise ValueError("Metabolic rate out of plausible range")
