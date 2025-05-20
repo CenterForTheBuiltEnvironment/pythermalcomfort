@@ -793,6 +793,12 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
             thickness_quilt=thickness_quilt,
         )
 
+    def __post_init__(self):
+        super().__post_init__()
+
+        if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
+            raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
+
 
 @dataclass
 class UseFansHeatwavesInputs(BaseInputs):

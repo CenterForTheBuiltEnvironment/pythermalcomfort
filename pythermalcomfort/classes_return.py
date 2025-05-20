@@ -493,7 +493,7 @@ class GaggeTwoNodesSleep(AutoStrMixin):
         Skin-blood-flow rate per unit surface area, [kg/h/m2].
     """
 
-    set_temp: Union[float, list[float]]
+    set: Union[float, list[float]]
     t_core: Union[float, list[float]]
     t_skin: Union[float, list[float]]
     wet: Union[float, list[float]]

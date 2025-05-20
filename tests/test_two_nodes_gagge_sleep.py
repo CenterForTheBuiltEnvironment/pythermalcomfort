@@ -11,7 +11,7 @@ def test_two_nodes_gagge_sleep_single_input():
 
     # expected outputs
     expected = {
-        "set_temp": np.array([28.62412397]),
+        "set": np.array([28.62412397]),
         "t_core": np.array([37.0322359]),
         "t_skin": np.array([33.71180903]),
         "wet": np.array([0.38381668]),
@@ -42,7 +42,7 @@ def test_two_nodes_gagge_sleep_long_duration():
 
     # Assert return type and shape
     assert isinstance(result, GaggeTwoNodesSleep)
-    assert result.set_temp.shape == (duration,)
+    assert result.set.shape == (duration,)
     assert result.t_core.shape == (duration,)
     assert result.t_skin.shape == (duration,)
 
@@ -72,7 +72,7 @@ def test_two_nodes_gagge_sleep_long_duration():
     ]
 
     fields = [
-        "set_temp",
+        "set",
         "t_core",
         "t_skin",
         "wet",
@@ -131,3 +131,9 @@ def test_invalid_kwarg_type_raises_type_error():
         two_nodes_gagge_sleep("string", 18, 0.05, 50, 1.4, 1.76)
     msg = str(exc.value)
     assert "tdb" in msg
+
+
+def test_tickness_quilt_negative():
+    # Test with a specific thickness_quilt value
+    with pytest.raises(ValueError):
+        two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, thickness_quilt=-1.76)

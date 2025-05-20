@@ -386,7 +386,7 @@ def _sleep_set(
         disc = t_sens
 
     return {
-        "set_temp": set_temp,
+        "set": set_temp,
         "t_core": t_core,
         "t_skin": t_skin,
         "wet": wet,
