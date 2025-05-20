@@ -35,6 +35,11 @@ def test_lower_bound_clipping():
     assert wc.capacity == pytest.approx(0)
 
 
+def test_upper_bound_clipping():
+    wc = work_capacity_dunne(20, "light")
+    assert wc.capacity == pytest.approx(100)
+
+
 def test_invalid_intensity_raises():
     with pytest.raises(ValueError):
         work_capacity_dunne(25, "invalid")

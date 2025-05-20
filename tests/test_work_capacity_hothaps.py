@@ -24,6 +24,7 @@ def test_scalar_heavy():
 def test_scalar_moderate():
     result = work_capacity_hothaps(30.0, intensity=WorkIntensity.MODERATE.value)
     assert isinstance(result.capacity, float)
+    assert isinstance(result, WorkCapacity)
     exp = _expected_capacity(30.0, divisor=32.93, exponent=17.81)
     assert pytest.approx(exp, rel=1e-3) == result.capacity
 
@@ -31,6 +32,7 @@ def test_scalar_moderate():
 def test_scalar_light():
     result = work_capacity_hothaps(30.0, intensity=WorkIntensity.LIGHT.value)
     assert isinstance(result.capacity, float)
+    assert isinstance(result, WorkCapacity)
     exp = _expected_capacity(30.0, divisor=34.64, exponent=22.72)
     assert pytest.approx(exp, rel=1e-3) == result.capacity
 
