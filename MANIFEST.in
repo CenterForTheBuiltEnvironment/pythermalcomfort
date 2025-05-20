@@ -14,7 +14,7 @@ include CONTRIBUTING.rst
 include LICENSE
 include README.rst
 
-include tox.ini .travis.yml .appveyor.yml
+include tox.ini
 
 include *.yml
 recursive-include examples *.py
