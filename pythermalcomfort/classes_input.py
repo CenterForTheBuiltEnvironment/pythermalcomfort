@@ -1,14 +1,10 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures
-from pythermalcomfort.utilities import Sex
-from pythermalcomfort.utilities import Units
-from pythermalcomfort.utilities import validate_type
+from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
 
 
 class WorkIntensity(str, Enum):
