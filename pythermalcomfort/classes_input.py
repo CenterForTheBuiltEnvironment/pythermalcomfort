@@ -1,10 +1,14 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from typing import Union
 
 import numpy as np
 
-from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
+from pythermalcomfort.utilities import Postures
+from pythermalcomfort.utilities import Sex
+from pythermalcomfort.utilities import Units
+from pythermalcomfort.utilities import validate_type
 
 
 class WorkIntensity(str, Enum):
@@ -63,6 +67,7 @@ class BaseInputs:
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
     wbgt: Union[float, int, np.ndarray, list] = field(default=None)
     intensity: Union[str, WorkIntensity] = field(default=None)
+    thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -251,6 +256,11 @@ class BaseInputs:
                 "intensity",
                 self.intensity,
                 [i.value for i in WorkIntensity],
+            )
+        if self.thickness_quilt is not None:
+            self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
+            validate_type(
+                self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
             )
 
 
@@ -780,6 +790,38 @@ class GaggeTwoNodesInputs(BaseInputs):
             max_sweating=max_sweating,
             w_max=w_max,
         )
+
+
+@dataclass
+class GaggeTwoNodesSleepInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        rh,
+        clo,
+        thickness_quilt,
+        wme=0,
+        p_atm=101325,
+    ):
+        # Initialise BaseInputs-supported fields
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            clo=clo,
+            wme=wme,
+            p_atm=p_atm,
+            thickness_quilt=thickness_quilt,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
+            raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
 
 
 @dataclass

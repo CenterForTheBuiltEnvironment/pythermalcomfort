@@ -125,8 +125,7 @@ Stats
     * - Downloads
       - |downloads|
     * - Tests
-      - | |appveyor|
-        | |codecov|
+      - | |codecov|
         | |tests|
     * - Package
       - | |version| |wheel|
@@ -151,10 +150,6 @@ Stats
 
 .. |downloads| image:: https://img.shields.io/pypi/dm/pythermalcomfort?color=brightgreen
     :alt: PyPI - Downloads
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/CenterForTheBuiltEnvironment/pythermalcomfort?branch=master&svg=true
-    :alt: AppVeyor Build Status
-    :target: https://ci.appveyor.com/project/CenterForTheBuiltEnvironment/pythermalcomfort
 
 .. |codecov| image:: https://codecov.io/github/CenterForTheBuiltEnvironment/pythermalcomfort/coverage.svg?branch=master
     :alt: Coverage Status
