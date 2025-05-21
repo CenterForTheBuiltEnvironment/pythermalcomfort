@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.2.0 (2025-05-20)
+------------------
+
+* Added the `two_nodes_gagge_sleep` function to calculate the two-node model for sleeping individuals
+* Added the `ESI` function to calculate the Environmental Stress Index.
+
 3.1.0 (2025-04-28)
 -------------------
 * Updated the PHS model in compliance with the ISO 7933:2023 standard
