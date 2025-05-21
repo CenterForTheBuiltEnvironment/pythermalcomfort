@@ -1,8 +1,7 @@
 import math
 import warnings
 from enum import Enum
-from typing import NamedTuple
-from typing import Union
+from typing import NamedTuple, Union
 
 import numpy as np
 
