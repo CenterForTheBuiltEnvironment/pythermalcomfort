@@ -479,19 +479,6 @@ class THI(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
-class THI(AutoStrMixin):
-    """Dataclass to represent the Temperature-Humidity Index (THI).
-
-    Attributes
-    ----------
-    thi : float or list of floats
-        Temperature-Humidity Index (THI).
-    """
-
-    thi: Union[float, list[float]]
-
-
-@dataclass(frozen=True, repr=False)
 class GaggeTwoNodesSleep(AutoStrMixin):
     """Dataclass to represent the results of the two-node sleep model.
 
