@@ -30,10 +30,6 @@ class Models(Enum):
     iso_7933_2023 = "7933-2023"
 
 
-class THIModels(Enum):
-    yousef_1985 = "yousef_1985"
-
-
 class Units(Enum):
     SI = "SI"
     IP = "IP"

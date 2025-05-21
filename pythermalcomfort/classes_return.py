@@ -475,7 +475,7 @@ class THI(AutoStrMixin):
     Attributes
     ----------
     thi : float or list of floats
-        Temperature-Humidity Index
+        Temperature-Humidity Index (THI).
     """
 
     thi: Union[float, list[float]]

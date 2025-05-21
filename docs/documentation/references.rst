@@ -33,3 +33,6 @@ References
 .. [Fanger1970] Fanger, P. O. (1970). Thermal comfort: analysis and applications in environmental engineering. McGraw-Hill, New York.
 .. [Tartarini2025PMV] Tartarini, F. and Schiavon, S., 2025. Comparative analysis of PMV Models accuracy implemented in the ISO 7730: 2005 and ASHRAE 55: 2023. Building and Environment, p.112766. doi: doi.org/10.1016/j.buildenv.2025.112766
 .. [Moran2001] Moran, D.S., Pandolf, K.B., Shapiro, Y., Heled, Y., Shani, Y., Mathew, W.T., Gonzalez, R.R., 2001. An environmental stress index (ESI) as a substitute for the wet bulb globe temperature (WBGT). Journal of Thermal Biology 26, 427-431. DOI: doi.org/10.1016/S0306-4565(01)00055-9
+.. [Yan2025] Yan J, Tong Z, Wang Y, Feng S, Su Y, Song Y, Wen Q, Yin C. From measurements to regulations: An actionable approach for sustainable urban cooling via heat-resilient urban planning. Sustainable Cities and Society. 2025;125:106361.
+.. [Schlatter1987] Schlatter TW. Temperature-humidity index. In: Climatology. Encyclopedia of Earth Science. Springer; 1987. DOI: 10.1007/0-387-30749-4_176
+

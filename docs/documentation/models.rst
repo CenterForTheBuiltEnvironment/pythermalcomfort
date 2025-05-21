@@ -334,3 +334,11 @@ Wind chill temperature
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
+
+Temperature Humidity Index (THI)
+-----------------------------
+
+.. autofunction:: pythermalcomfort.models.thi.thi
+    
+.. autoclass:: pythermalcomfort.classes_return.THI
+    :members:
