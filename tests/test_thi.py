@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 
-from pythermalcomfort.classes_input import THIInputs
 from pythermalcomfort.classes_return import THI
 from pythermalcomfort.models import thi
 from tests.conftest import is_equal
@@ -39,13 +38,13 @@ def test_list_input():
 
 
 @pytest.mark.parametrize(
-    "tdb, rh",
+    "tdb, rh, expected_error",
     [
-        (25.0, -5.0),
-        (25.0, 150.0),  # humidity should be between 0 and 100
-        ("hot", "humid"),  # invalid input types
+        (25.0, -5.0, ValueError),
+        (25.0, 150.0, ValueError),  # humidity should be between 0 and 100
+        ("hot", "humid", TypeError),  # invalid types
     ],
 )
-def test_invalid_inputs_raise(tdb, rh):
-    with pytest.raises(Exception):
+def test_invalid_inputs_raise_specific(tdb, rh, expected_error):
+    with pytest.raises(expected_error):
         thi(tdb, rh)
