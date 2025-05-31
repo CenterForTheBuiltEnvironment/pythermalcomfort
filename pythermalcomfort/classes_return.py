@@ -466,6 +466,22 @@ class GaggeTwoNodes(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
+class GaggeTwoNodesJi(AutoStrMixin):
+    """Dataclass to represent the results of the Gagge-Ji model of human temperature.
+
+    Attributes
+    ----------
+    t_core : float or list of floats
+        Core temperature, [°C].
+    t_skin : float or list of floats
+        Skin temperature, [°C].
+    """
+
+    t_core: Union[float, list[float]]
+    t_skin: Union[float, list[float]]
+
+
+@dataclass(frozen=True, repr=False)
 class GaggeTwoNodesSleep(AutoStrMixin):
     """Dataclass to represent the results of the two-node sleep model.
 
