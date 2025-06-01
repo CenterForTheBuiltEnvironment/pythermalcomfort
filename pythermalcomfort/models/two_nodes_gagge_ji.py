@@ -417,8 +417,8 @@ def _two_nodes_ji_optimized(
 
         # calculate first the sweat efficiency using the skin WETNESS (assuming all sweat is converted to evaporative heat).
         # Note skin wetness is different than skin WETTEDNESS which assumes the correct evaporation efficiency
-        he_n = (
-            1 / (r_total)
+        he_n = 1 / (
+            r_total
         )  # coefficient of the evaporative heat transfer (inverse of the total evaporative heat resistance; W/(K*m2*Pa))
         wettedness_dif = 1 / (2 + 2.46 * he_n)
         wp = (
