@@ -251,14 +251,7 @@ def _two_nodes_ji_optimized(
 
     # initialize some variables
     e_skin = 0.1 * met  # total evaporative heat loss, W
-    q_sensible = 0  # total sensible heat loss, W
     w = 0.06  # skin wettedness
-    e_rsw = 0  # heat lost by vaporization sweat
-    e_diff = 0  # vapor diffusion through skin
-    e_max = 0  # maximum evaporative capacity
-    m_rsw = 0  # regulatory sweating
-    q_res = 0  # heat loss due to respiration
-    c_res = 0  # convective heat loss respiration
 
     pressure_in_atmospheres = p_atm / 101325
     n_simulation = 0
@@ -331,15 +324,15 @@ def _two_nodes_ji_optimized(
                 raise StopIteration("Max iterations exceeded")
 
         # Convective heat transfer coefficient based on clothing
-        dTcl_air = t_cl - tdb  # difference between clothing and air temperature
+        d_tcl_air = t_cl - tdb  # difference between clothing and air temperature
         if air_speed < 0.2:
             # Free convection. Gao et al 2019: Formulation of human body heat transfer coefficient...
-            if dTcl_air > 0:
+            if d_tcl_air > 0:
                 # Upward flow
-                h_cc = 2.5 * dTcl_air**0.16
+                h_cc = 2.5 * d_tcl_air**0.16
             else:
                 # Downward flow
-                h_cc = 2.5 * math.fabs(dTcl_air) ** 0.41
+                h_cc = 2.5 * math.fabs(d_tcl_air) ** 0.41
         else:
             # Forced convection
             # Original formula from SET code
@@ -417,8 +410,8 @@ def _two_nodes_ji_optimized(
 
         # calculate first the sweat efficiency using the skin WETNESS (assuming all sweat is converted to evaporative heat).
         # Note skin wetness is different than skin WETTEDNESS which assumes the correct evaporation efficiency
-        he_n = 1 / (
-            r_total
+        he_n = (
+            1 / r_total
         )  # coefficient of the evaporative heat transfer (inverse of the total evaporative heat resistance; W/(K*m2*Pa))
         wettedness_dif = 1 / (2 + 2.46 * he_n)
         wp = (

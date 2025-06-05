@@ -601,7 +601,7 @@ class JOS3:
             Parameters of the JOS-3 model.
         """
         # Set operative temperature under PMV=0 environment
-        # todo shall these be the rerefence values for naked?
+        # todo shall these be the reference values for naked?
         par: float = 1.25  # Physical activity ratio
         met = self.bmr * par / met_to_w_m2  # [met]
         rh = 50
@@ -1529,7 +1529,6 @@ class JOS3:
             ret=self.r_et,
             height=self._height,
             weight=self._weight,
-            # todo I change the following since before it was passing self._bsa_rate to height
             bsa_equation=self._bsa_equation,
             age=self._age,
         )
