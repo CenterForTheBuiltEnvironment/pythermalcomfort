@@ -16,8 +16,7 @@ from pythermalcomfort.utilities import Postures, Sex, antoine
 
 
 def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
-    """
-    Calculate the natural convection heat transfer coefficient based on posture.
+    """Calculate the natural convection heat transfer coefficient based on posture.
 
     Parameters
     ----------
@@ -37,6 +36,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
     ------
     ValueError
         If the posture is not one of the valid options.
+
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -59,7 +59,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
                 2.80,
                 2.04,
                 2.04,
-            ]
+            ],
         )
     elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -82,7 +82,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
                 2.98,
                 2.98,
                 2.62,
-            ]
+            ],
         )
     elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
@@ -106,7 +106,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
                 0.945,
                 0.385,
                 0.200,
-            ]
+            ],
         )
         hc_b = np.array(
             [
@@ -127,7 +127,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
                 0.447,
                 0.580,
                 0.966,
-            ]
+            ],
         )
         hc_natural = hc_a * (abs(tdb - t_skin) ** hc_b)
     else:
@@ -139,14 +139,13 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
             Postures.supine.value,
         ]
         raise ValueError(
-            f"Invalid posture: '{posture}'. Must be one of {valid_postures}"
+            f"Invalid posture: '{posture}'. Must be one of {valid_postures}",
         )
     return hc_natural
 
 
 def forced_convection(v: float) -> np.ndarray:
-    """
-    Calculate the forced convection heat transfer coefficient.
+    """Calculate the forced convection heat transfer coefficient.
     Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
 
     Parameters
@@ -158,6 +157,7 @@ def forced_convection(v: float) -> np.ndarray:
     -------
     np.ndarray
         Forced convection heat transfer coefficient body segments.
+
     """
     hc_a = np.array(
         [
@@ -178,7 +178,7 @@ def forced_convection(v: float) -> np.ndarray:
             14.0,
             15.8,
             15.1,
-        ]
+        ],
     )
     hc_b = np.array(
         [
@@ -199,7 +199,7 @@ def forced_convection(v: float) -> np.ndarray:
             0.61,
             0.74,
             0.62,
-        ]
+        ],
     )
     hc_forced = hc_a * (v**hc_b)
     return hc_forced
@@ -211,8 +211,7 @@ def conv_coef(
     tdb: Union[float, np.ndarray],
     t_skin: Union[float, np.ndarray],
 ) -> np.ndarray:
-    """
-    Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
+    """Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
     Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
     Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
 
@@ -234,6 +233,7 @@ def conv_coef(
     -------
     np.ndarray
         Convective heat transfer coefficient (hc) [W/(m2*K)].
+
     """
     hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
     hc_forced = forced_convection(v=v)
@@ -242,8 +242,7 @@ def conv_coef(
 
 
 def rad_coef(posture: str) -> np.ndarray:
-    """
-    Calculate radiative heat transfer coefficient (hr) [W/(m2*K)].
+    """Calculate radiative heat transfer coefficient (hr) [W/(m2*K)].
 
     Parameters
     ----------
@@ -254,6 +253,7 @@ def rad_coef(posture: str) -> np.ndarray:
     -------
     np.ndarray
         Radiative heat transfer coefficient (hr) [W/(m2*K)].
+
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -276,7 +276,7 @@ def rad_coef(posture: str) -> np.ndarray:
                 4.77,
                 5.34,
                 6.14,
-            ]
+            ],
         )
     elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -299,7 +299,7 @@ def rad_coef(posture: str) -> np.ndarray:
                 4.10,
                 4.74,
                 6.36,
-            ]
+            ],
         )
     elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
@@ -322,7 +322,7 @@ def rad_coef(posture: str) -> np.ndarray:
                 4.440,
                 5.547,
                 6.085,
-            ]
+            ],
         )
     else:
         valid_postures = [
@@ -333,14 +333,13 @@ def rad_coef(posture: str) -> np.ndarray:
             Postures.supine.value,
         ]
         raise ValueError(
-            f"Invalid posture '{posture}'. Must be one of {valid_postures}"
+            f"Invalid posture '{posture}'. Must be one of {valid_postures}",
         )
     return hr
 
 
 def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
-    """
-    Fixes hc values to fit two-node-model's values.
+    """Fixes hc values to fit two-node-model's values.
 
     Parameters
     ----------
@@ -353,6 +352,7 @@ def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
     -------
     np.ndarray
         Fixed convective heat transfer coefficient (hc) [W/(m2*K)].
+
     """
     mean_hc = np.average(hc, weights=cons.Default.local_bsa)
     mean_va = np.average(v, weights=cons.Default.local_bsa)
@@ -362,8 +362,7 @@ def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
 
 
 def fixed_hr(hr: np.ndarray) -> np.ndarray:
-    """
-    Fixes hr values to fit two-node-model's values.
+    """Fixes hr values to fit two-node-model's values.
 
     Parameters
     ----------
@@ -374,13 +373,14 @@ def fixed_hr(hr: np.ndarray) -> np.ndarray:
     -------
     np.ndarray
         Fixed radiative heat transfer coefficient (hr) [W/(m2*K)].
+
     """
     mean_hr = np.average(hr, weights=cons.Default.local_bsa)
     _fixed_hr = hr * 4.7 / mean_hr
     return _fixed_hr
 
 
-# todo this function is a duplicate in utils
+# TODO this function is a duplicate in utils
 def operative_temp(tdb, tr, hc, hr):
     """Calculate operative temperature [°C]
 
@@ -399,12 +399,13 @@ def operative_temp(tdb, tr, hc, hr):
     -------
     to : float or array
         Operative temperature [°C]
+
     """
     to = (hc * tdb + hr * tr) / (hc + hr)
     return to
 
 
-# todo this function is a duplicate in utils and they are different
+# TODO this function is a duplicate in utils and they are different
 def clo_area_factor(clo):
     """Calculate clothing area factor [-]
 
@@ -417,12 +418,13 @@ def clo_area_factor(clo):
     -------
     fcl : float or array
         clothing area factor [-]
+
     """
     fcl = np.where(clo < 0.5, clo * 0.2 + 1, clo * 0.1 + 1.05)
     return fcl
 
 
-# todo this function is different from ISO 9920
+# TODO this function is different from ISO 9920
 def dry_r(hc, hr, clo):
     """Calculate total sensible thermal resistance (between the skin and
     ambient air).
@@ -445,6 +447,7 @@ def dry_r(hc, hr, clo):
     ------
     ValueError
         If any of the input parameters are negative.
+
     """
     if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
         raise ValueError("Input parameters hc and hr must be non-negative.")
@@ -485,6 +488,7 @@ def wet_r(
     ------
     ValueError
         If any of the input parameters are negative.
+
     """
     if (np.array(hc) < 0).any():
         raise ValueError("Input parameters hc must be non-negative.")
@@ -509,6 +513,7 @@ def error_signals(err_sk=0.0):
     -------
     tuple
         Warm signal (WRMS) [°C] and Cold signal (CLDS) [°C].
+
     """
     err_sk = np.array(err_sk, dtype=float)
 
@@ -532,7 +537,7 @@ def error_signals(err_sk=0.0):
             0.0501,
             0.0251,
             0.0167,
-        ]
+        ],
     )
 
     # wrms signal
@@ -546,8 +551,7 @@ def error_signals(err_sk=0.0):
 
 
 def tetens(x: float) -> float:
-    """
-    Calculate saturated vapor pressure using Tetens equation [kPa].
+    """Calculate saturated vapor pressure using Tetens equation [kPa].
 
     Parameters
     ----------
@@ -558,6 +562,7 @@ def tetens(x: float) -> float:
     -------
     float
         Saturated vapor pressure [kPa].
+
     """
     return 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 
@@ -607,6 +612,7 @@ def evaporation(
         Maximum evaporative heat loss at the skin [W].
     e_sweat : TYPE
         Evaporative heat loss at the skin by only sweating [W].
+
     """
     wrms, clds = error_signals(
         err_sk,
@@ -645,7 +651,7 @@ def evaporation(
             0.073,
             0.036,
             0.0175,
-        ]
+        ],
     )
 
     sig_sweat = (371.2 * err_cr[0]) + (33.64 * (wrms - clds))
@@ -675,7 +681,7 @@ def evaporation(
                 0.40,
                 0.40,
                 0.40,
-            ]
+            ],
         )
     e_sweat = skin_sweat * sig_sweat * sd_sweat * 2 ** (err_sk / 10)
     wet = 0.06 + 0.94 * (e_sweat / e_max)
@@ -715,6 +721,7 @@ def skin_blood_flow(
     -------
     bf_skin : array
         Skin blood flow rate [L/h].
+
     """
     wrms, clds = error_signals(err_sk)
 
@@ -738,7 +745,7 @@ def skin_blood_flow(
             1.456,
             0.651,
             0.934,
-        ]
+        ],
     )
     # SKIND
     skin_dilat = np.array(
@@ -760,7 +767,7 @@ def skin_blood_flow(
             0.0736,
             0.0411,
             0.0623,
-        ]
+        ],
     )
     # SKINC
     skin_stric = np.array(
@@ -782,7 +789,7 @@ def skin_blood_flow(
             0.0213,
             0.0213,
             0.1489,
-        ]
+        ],
     )
 
     sig_dilat = (100.5 * err_cr[0]) + (6.4 * (wrms - clds))
@@ -814,7 +821,7 @@ def skin_blood_flow(
                 0.31,
                 0.31,
                 0.31,
-            ]
+            ],
         )
         sd_stric = np.ones(Default.num_body_parts)
 
@@ -868,6 +875,7 @@ def ava_blood_flow(
     -------
     bf_ava_hand, bf_ava_foot : array
         AVA blood flow rate at hand and foot [L/h].
+
     """
     # Cal. mean error body core temp.
     cap_bcr = [10.2975, 9.3935, 4.488]  # Thermal capacity at chest, back and pelvis
@@ -926,6 +934,7 @@ def basal_met(
     -------
      bmr: float
         Basal metabolic rate [W].
+
     """
     if bmr_equation == "harris-benedict":
         if sex == Sex.male.value:
@@ -947,7 +956,7 @@ def basal_met(
             bmr = 0.0481 * weight + 2.34 * height - 0.0138 * age - 0.9708
         bmr *= 1000 / 4.186
     else:
-        # todo why we cannot use dubois?
+        # TODO why we cannot use dubois?
         valid_equations = [
             "harris-benedict",
             "harris-benedict_origin",
@@ -955,7 +964,7 @@ def basal_met(
             "ganpule",
         ]
         raise ValueError(
-            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}"
+            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}",
         )
 
     bmr *= 0.048  # [kcal/day] to [W]
@@ -993,6 +1002,7 @@ def local_mbase(
     -------
     mbase : array
         Local basal metabolic rate (Mbase) [W].
+
     """
     mbase_all = basal_met(height, weight, age, sex, bmr_equation)
     # Distribution coefficient of basal metabolic rate
@@ -1015,7 +1025,7 @@ def local_mbase(
             0.01557,
             0.00422,
             0.00250,
-        ]
+        ],
     )
     mbf_ms = np.array(
         [
@@ -1036,7 +1046,7 @@ def local_mbase(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
     mbf_fat = np.array(
         [
@@ -1057,7 +1067,7 @@ def local_mbase(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
     mbf_sk = np.array(
         [
@@ -1078,7 +1088,7 @@ def local_mbase(
             0.00144,
             0.00027,
             0.00118,
-        ]
+        ],
     )
 
     mbase_cr = mbf_cr * mbase_all
@@ -1107,6 +1117,7 @@ def local_q_work(bmr, par):
     ------
     ValueError
         If par is less than 1.
+
     """
     if par < 1:
         raise ValueError("par must be 1 or more")
@@ -1133,7 +1144,7 @@ def local_q_work(bmr, par):
             0.2010,
             0.0990,
             0.005,
-        ]
+        ],
     )
     q_work = q_work_all * workf
     return q_work
@@ -1180,6 +1191,7 @@ def shivering(
     -------
     q_shiv : array
         Local thermogenesis by shivering [W].
+
     """
     # Integrated error signal in the warm and cold receptors
     wrms, clds = error_signals(err_sk)
@@ -1204,7 +1216,7 @@ def shivering(
             0.0039,
             0.00175,
             0.00035,
-        ]
+        ],
     )
     # integrated error signal of shivering
     sig_shiv = 24.36 * clds * (-err_cr[0])
@@ -1217,16 +1229,15 @@ def shivering(
             tskm = np.average(t_skin, weights=cons.Default.local_bsa)  # Mean skin temp.
             if tskm < 31:
                 thres = 36.6
-            else:
-                if sex == Sex.male.value:
-                    thres = -0.2436 * tskm + 44.10
-                else:  # sex == "female":
-                    thres = -0.2250 * tskm + 43.05
+            elif sex == Sex.male.value:
+                thres = -0.2436 * tskm + 44.10
+            else:  # sex == "female":
+                thres = -0.2250 * tskm + 43.05
             # Second threshold of starting shivering
             if thres < t_core[0]:
                 sig_shiv = 0
 
-    # todo I do not think this is well written code
+    # TODO I do not think this is well written code
     global PRE_SHIV  # Previous shivering thermogenesis [W]
     if options:
         if options["limit_dshiv/dt"]:
@@ -1299,6 +1310,7 @@ def nonshivering(
     -------
     q_nst : array
         Local metabolic rate by non-shivering [W].
+
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
     wrms, clds = error_signals(err_sk)
@@ -1359,7 +1371,7 @@ def nonshivering(
             0.000,
             0.000,
             0.000,
-        ]
+        ],
     )
 
     # Ratio of body surface area to the standard body [-]
@@ -1388,6 +1400,7 @@ def sum_m(mbase: np.ndarray, q_work, q_shiv, q_nst):
     -------
     q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin : array
         Total thermogenesis in core, muscle, fat, skin layers [W].
+
     """
     q_thermogenesis_core = mbase[0].copy()
     q_thermogenesis_muscle = mbase[1].copy()
@@ -1442,6 +1455,7 @@ def cr_ms_fat_blood_flow(
     -------
     bf_core, bf_muscle, bf_fat : array
         Core, muscle and fat blood flow rate [L/h].
+
     """
     # Basal blood flow rate [L/h]
     # core, CBFB
@@ -1464,7 +1478,7 @@ def cr_ms_fat_blood_flow(
             1.406,
             0.164,
             0.080,
-        ]
+        ],
     )
     # muscle, MSBFB
     bfb_muscle = np.array(
@@ -1486,7 +1500,7 @@ def cr_ms_fat_blood_flow(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
     # fat, FTBFB
     bfb_fat = np.array(
@@ -1508,7 +1522,7 @@ def cr_ms_fat_blood_flow(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
 
     bfb_rate = cons.bfb_rate(height, weight, bsa_equation, age, ci)
@@ -1548,6 +1562,7 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     -------
     co : float
         Cardiac output (the sum of the whole blood flow rate) [L/h].
+
     """
     # Cardiac output (CO)
     co = 0
@@ -1578,6 +1593,7 @@ def resp_heat_loss(tdb: float, p_a: float, q_thermogenesis_total: float):
         Sensible heat loss by respiration [W].
     res_lh : float
         Latent heat loss by respiration [W].
+
     """
     res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # Sensible heat loss
     res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # Latent heat loss

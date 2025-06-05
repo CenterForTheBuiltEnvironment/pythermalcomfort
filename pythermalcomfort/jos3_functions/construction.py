@@ -1,5 +1,4 @@
-"""
-This module provides models for calculating various body parameters including surface area,
+"""This module provides models for calculating various body parameters including surface area,
 weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 
 The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
@@ -21,8 +20,7 @@ def validate_body_parameters(
     age: int,
     body_fat: float,
 ):
-    """
-    Validate the body parameters: height, weight, age, and body fat percentage.
+    """Validate the body parameters: height, weight, age, and body fat percentage.
 
     Parameters
     ----------
@@ -47,6 +45,7 @@ def validate_body_parameters(
     .. code-block:: python
 
         validate_body_parameters(height=1.80, weight=75, age=30, body_fat=20)
+
     """
     if not (0.5 <= height <= 3.0):
         raise ValueError("Height must be in the range [0.5, 3.0] meters.")
@@ -59,7 +58,7 @@ def validate_body_parameters(
 
     if not (1 <= body_fat <= 90):
         raise ValueError(
-            "Body fat percentage must be in the range [1, 90] (1% to 90%)."
+            "Body fat percentage must be in the range [1, 90] (1% to 90%).",
         )
 
 
@@ -81,23 +80,22 @@ def to_array_body_parts(inp) -> np.ndarray:
     ------
     ValueError
         If the input type is not supported or if the input list or ndarray is not of length 17.
+
     """
     if isinstance(inp, (int, float)):
         return np.full(Default.num_body_parts, inp)
-    elif isinstance(inp, dict):
+    if isinstance(inp, dict):
         return np.array([inp[key] for key in JOS3BodyParts.get_attribute_names()])
-    elif isinstance(inp, (list, np.ndarray)):
+    if isinstance(inp, (list, np.ndarray)):
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
             return inp.copy()
-        else:
-            raise ValueError(
-                f"The input list or ndarray is not of length {Default.num_body_parts}"
-            )
-    else:
         raise ValueError(
-            "Unsupported input type. Supported types: int, float, list, dict, ndarray"
+            f"The input list or ndarray is not of length {Default.num_body_parts}",
         )
+    raise ValueError(
+        "Unsupported input type. Supported types: int, float, list, dict, ndarray",
+    )
 
 
 def bsa_rate(
@@ -105,8 +103,7 @@ def bsa_rate(
     weight: float,
     bsa_equation: str,
 ) -> Union[float, np.ndarray]:
-    """
-    Calculate the ratio of body surface area (BSA) to the standard body.
+    """Calculate the ratio of body surface area (BSA) to the standard body.
 
     This function computes the ratio of an individual's body surface area to that of a standard body,
     based on the given height, weight, and BSA calculation equation.
@@ -138,6 +135,7 @@ def bsa_rate(
 
         bsa_ratio = bsa_rate(height=1.80, weight=75, bsa_equation="dubois")
         print(bsa_ratio)
+
     """
     bsa_all = body_surface_area(
         height=height,
@@ -154,8 +152,7 @@ def local_bsa(
     weight: float,
     bsa_equation: str,
 ) -> np.ndarray:
-    """
-    Calculate local body surface area (BSA) in square meters.
+    """Calculate local body surface area (BSA) in square meters.
 
     The local body surface area has been derived from 65MN.
     The head has been divided into head and neck based on Smith's model.
@@ -189,14 +186,14 @@ def local_bsa(
 
         local_bsa_values = local_bsa(height=1.80, weight=75, bsa_equation="dubois")
         print(local_bsa_values)
+
     """
     bsa_ratio = bsa_rate(height=height, weight=weight, bsa_equation=bsa_equation)
     return Default.local_bsa * bsa_ratio
 
 
 def weight_rate(weight: float) -> float:
-    """
-    Calculate the ratio of the body weight to the standard body.
+    """Calculate the ratio of the body weight to the standard body.
 
     Parameters
     ----------
@@ -207,6 +204,7 @@ def weight_rate(weight: float) -> float:
     -------
     float
         The ratio of the body weight to the standard body.
+
     """
     return weight / Default.weight
 
@@ -218,8 +216,7 @@ def bfb_rate(
     age: int,
     ci: float,
 ) -> float:
-    """
-    Calculate the ratio of basal blood flow (BFB) to the standard body.
+    """Calculate the ratio of basal blood flow (BFB) to the standard body.
 
     This function computes the basal blood flow rate based on the given height, weight,
     BSA calculation equation, age, and cardiac index.
@@ -255,6 +252,7 @@ def bfb_rate(
 
         bfb_ratio = bfb_rate(height=1.80, weight=75, age=30, ci=2.59)
         print(bfb_ratio)
+
     """
     ci *= 60  # Convert unit from L/min/m² to L/h/m²
 
@@ -297,6 +295,7 @@ def conductance(
     conductance : numpy.ndarray
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
+
     """
     if fat < 12.5:
         cdt_cr_sk = np.array(
@@ -318,7 +317,7 @@ def conductance(
                 2.565,
                 1.378,
                 3.404,
-            ]
+            ],
         )
     elif fat < 17.5:
         cdt_cr_sk = np.array(
@@ -340,7 +339,7 @@ def conductance(
                 2.468,
                 1.326,
                 3.370,
-            ]
+            ],
         )
     elif fat < 22.5:
         cdt_cr_sk = np.array(
@@ -362,7 +361,7 @@ def conductance(
                 2.375,
                 1.276,
                 3.337,
-            ]
+            ],
         )
     elif fat < 27.5:
         cdt_cr_sk = np.array(
@@ -384,7 +383,7 @@ def conductance(
                 2.285,
                 1.227,
                 3.304,
-            ]
+            ],
         )
     else:  # fat >= 27.5
         cdt_cr_sk = np.array(
@@ -406,7 +405,7 @@ def conductance(
                 2.198,
                 1.181,
                 3.271,
-            ]
+            ],
         )
 
     cdt_cr_ms = np.zeros(Default.num_body_parts)  # core to muscle [W/K]
@@ -446,7 +445,7 @@ def conductance(
             0.810,
             0.435,
             1.816,
-        ]
+        ],
     )
     # superficial vein to skin
     cdt_sfv_sk = np.array(
@@ -468,7 +467,7 @@ def conductance(
             102.012,
             54.784,
             24.277,
-        ]
+        ],
     )
 
     # art to vein (counter-flow) [W/K]
@@ -493,14 +492,14 @@ def conductance(
             0.826,
             0.444,
             0.992,
-        ]
+        ],
     )
 
     # Changes values by body size based on the standard body.
     wr = weight_rate(weight)
     bsar = bsa_rate(height, weight, bsa_equation)
     # head, neck (Sphere shape)
-    # todo we are multiplying zeros by a value
+    # TODO we are multiplying zeros by a value
     cdt_cr_sk[:2] *= wr / bsar
     cdt_cr_ms[:2] *= wr / bsar
     cdt_ms_fat[:2] *= wr / bsar
@@ -578,6 +577,7 @@ def capacity(
     np.ndarray
         Thermal capacity [J/K].
         The shape is (NUM_NODES).
+
     """
     # Define capacities [Wh/K]
 
@@ -601,7 +601,7 @@ def capacity(
             0.0813,
             0.04,
             0.0103,
-        ]
+        ],
     )
 
     # vein [Wh/K]
@@ -624,7 +624,7 @@ def capacity(
             0.207,
             0.1,
             0.024,
-        ]
+        ],
     )
 
     # superficial vein [Wh/K]
@@ -647,7 +647,7 @@ def capacity(
             0.074,
             0.05,
             0.021,
-        ]
+        ],
     )
 
     # central blood [Wh/K]
@@ -673,7 +673,7 @@ def capacity(
             5.3117,
             2.867,
             0.2097,
-        ]
+        ],
     )
 
     # muscle [Wh/K]
@@ -696,7 +696,7 @@ def capacity(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
 
     # fat [Wh/K]
@@ -719,7 +719,7 @@ def capacity(
             0.0,
             0.0,
             0.0,
-        ]
+        ],
     )
 
     # skin [Wh/K]
@@ -742,7 +742,7 @@ def capacity(
             0.334,
             0.169,
             0.107,
-        ]
+        ],
     )
 
     # Adjust capacities based on body parameters
@@ -791,5 +791,5 @@ def pass_values_to_jos3_body_parts(values, round_digits=2, body_parts=None):
         **{
             name: value
             for name, value in zip(body_parts, np.round(values, round_digits))
-        }
+        },
     )

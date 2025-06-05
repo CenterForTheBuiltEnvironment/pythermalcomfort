@@ -67,18 +67,19 @@ from pythermalcomfort.utilities import body_surface_area, p_sat_torr
     ],
 )
 def test_two_nodes_gagge_ji_examples(
-    tdb,
-    tr,
-    v,
-    met,
-    clo,
-    rh,
-    weight,
-    height,
-    expected_t_core,
-    expected_t_skin,
-    duration,
-):
+    tdb: float,
+    tr: float,
+    v: float,
+    met: float,
+    clo: float,
+    rh: float,
+    weight: float,
+    height: float,
+    expected_t_core: float,
+    expected_t_skin: float,
+    duration: int,
+) -> None:
+    """Test the two_nodes_gagge_ji function with predefined scenarios."""
     # compute vapor pressure from relative humidity and saturation vapor pressure
     vapor_pressure = rh * p_sat_torr(tdb=tdb) / 100
 
@@ -108,7 +109,8 @@ def test_two_nodes_gagge_ji_examples(
     assert t_skin_last == pytest.approx(expected_t_skin, rel=1e-3)
 
 
-def test_two_nodes_gagge_ji_list_tdb():
+def test_two_nodes_gagge_ji_list_tdb() -> None:
+    """Test that the function can handle a list of tdb values."""
     tdb_list = [36.5, 36.5]
     tr = 36.5
     v = 0.25
@@ -142,19 +144,22 @@ def test_two_nodes_gagge_ji_list_tdb():
     t_core_list = result.t_core
     t_skin_list = result.t_skin
 
-    assert isinstance(t_core_list, list) and len(t_core_list) == 2
-    assert isinstance(t_skin_list, list) and len(t_skin_list) == 2
+    assert isinstance(t_core_list, list)
+    assert len(t_core_list) == 2
+    assert isinstance(t_skin_list, list)
+    assert len(t_skin_list) == 2
 
     # both simulations should yield the same final values as scenario 1
-    expected_t_core = 37.446339126254756
-    expected_t_skin = 34.596469729370725
+    expected_t_core = 37.446
+    expected_t_skin = 34.596
 
     for core_arr, skin_arr in zip(t_core_list, t_skin_list):
         assert core_arr[-1] == pytest.approx(expected_t_core, rel=1e-3)
         assert skin_arr[-1] == pytest.approx(expected_t_skin, rel=1e-3)
 
 
-def test_invalid_position_raises_value_error():
+def test_invalid_position_raises_value_error() -> None:
+    """Test that an invalid position raises a ValueError."""
     with pytest.raises(ValueError):
         two_nodes_gagge_ji(
             tdb=36.5,
@@ -173,7 +178,8 @@ def test_invalid_position_raises_value_error():
         )
 
 
-def test_unexpected_kwarg_raises_type_error():
+def test_unexpected_kwarg_raises_type_error() -> None:
+    """Test that an unexpected keyword argument raises a TypeError."""
     with pytest.raises(TypeError) as excinfo:
         two_nodes_gagge_ji(
             tdb=36.5,
@@ -194,7 +200,8 @@ def test_unexpected_kwarg_raises_type_error():
     assert "Unexpected arguments: foo" in str(excinfo.value)
 
 
-def test_non_numeric_tdb_raises_type_error():
+def test_non_numeric_tdb_raises_type_error() -> None:
+    """Test that a non-numeric tdb raises a TypeError."""
     with pytest.raises(TypeError):
         two_nodes_gagge_ji(
             tdb="hot",  # invalid type

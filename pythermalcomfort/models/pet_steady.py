@@ -129,7 +129,7 @@ def pet_steady(
             weight=weight,
             height=height,
             wme=wme,
-        )
+        ),
     )
 
 
@@ -169,6 +169,7 @@ def _pet_steady_vectorised(
             "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
             mass
             between core and skin [].
+
         """
         # skin and core temperatures set values
         tc_set = 36.6  # 36.8
@@ -205,6 +206,7 @@ def _pet_steady_vectorised(
         -------
         m_rsw : float
             The sweating flow rate, [g/m2/h].
+
         """
         tc_set = 36.6  # 36.8
         tsk_set = 34  # 33.7
@@ -218,8 +220,7 @@ def _pet_steady_vectorised(
         # from Gagge's model
         m_rsw = 304.94 * sig_body
         # 500 g/m^2/h is the upper sweat rate limit
-        if m_rsw > 500:
-            m_rsw = 500
+        m_rsw = min(m_rsw, 500)
 
         return m_rsw
 
@@ -354,8 +355,7 @@ def _pet_steady_vectorised(
         # Clothed fraction of the body approximation
         r_cl = _clo / 6.45  # Conversion in [m2.K/W]
         y = 0
-        if f_a_cl > 1.0:
-            f_a_cl = 1.0
+        f_a_cl = min(f_a_cl, 1.0)
         if _clo >= 2.0:
             y = 1.0
         if 0.6 < _clo < 2.0:
@@ -393,8 +393,7 @@ def _pet_steady_vectorised(
             delta = esw - e_max
             if delta < 0:
                 esw = e_max
-        if esw < 0:
-            esw = 0
+        esw = max(esw, 0)
         # i_m= Woodcock's ratio (see above)
         r_ecl = (1 / (fcl * hc) + r_cl) / (
             lr * i_m
@@ -448,9 +447,8 @@ def _pet_steady_vectorised(
         if actual_environment:
             # if we solve for the system we need to return 3 temperatures
             return list(e_bal_vec)
-        else:
-            # solving for the PET requires the scalar balance only
-            return e_bal_scal
+        # solving for the PET requires the scalar balance only
+        return e_bal_scal
 
     def pet_fc(_t_stable):
         """Function to find the solution.
@@ -464,6 +462,7 @@ def _pet_steady_vectorised(
         -------
         float
             The PET comfort index.
+
         """
 
         # Definition of a function with the input variables of the PET reference situation

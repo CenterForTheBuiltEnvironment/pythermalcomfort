@@ -136,7 +136,9 @@ class BaseInputs:
         if self.t_running_mean is not None:
             self.t_running_mean = convert_series_to_list(self.t_running_mean)
             validate_type(
-                self.t_running_mean, "t_running_mean", (float, int, np.ndarray, list)
+                self.t_running_mean,
+                "t_running_mean",
+                (float, int, np.ndarray, list),
             )
         if self.q is not None:
             self.q = convert_series_to_list(self.q)
@@ -167,7 +169,9 @@ class BaseInputs:
         if self.sol_altitude is not None:
             self.sol_altitude = convert_series_to_list(self.sol_altitude)
             validate_type(
-                self.sol_altitude, "sol_altitude", (float, int, np.ndarray, list)
+                self.sol_altitude,
+                "sol_altitude",
+                (float, int, np.ndarray, list),
             )
         if self.sharp is not None:
             self.sharp = convert_series_to_list(self.sharp)
@@ -181,7 +185,7 @@ class BaseInputs:
             )
         if self.sol_radiation_global is not None:
             self.sol_radiation_global = convert_series_to_list(
-                self.sol_radiation_global
+                self.sol_radiation_global,
             )
             validate_type(
                 self.sol_radiation_global,
@@ -237,12 +241,16 @@ class BaseInputs:
         if self.thickness_quilt is not None:
             self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
             validate_type(
-                self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
+                self.thickness_quilt,
+                "thickness_quilt",
+                (float, int, np.ndarray, list),
             )
         if self.vapor_pressure is not None:
             self.vapor_pressure = convert_series_to_list(self.vapor_pressure)
             validate_type(
-                self.vapor_pressure, "vapor_pressure", (float, int, np.ndarray, list)
+                self.vapor_pressure,
+                "vapor_pressure",
+                (float, int, np.ndarray, list),
             )
 
 
@@ -502,12 +510,14 @@ class HIInputs(BaseInputs):
         tdb,
         rh,
         round_output,
+        limit_inputs,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
             round_output=round_output,
+            limit_inputs=limit_inputs,
         )
 
 

@@ -99,6 +99,7 @@ def solar_gain(
         )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
+
     """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(
@@ -161,7 +162,7 @@ def _solar_gain_vectorised(
     floor_reflectance,
 ):
     def find_span(arr, x):
-        for i in range(0, len(arr)):
+        for i in range(len(arr)):
             if arr[i + 1] >= x >= arr[i]:
                 return i
         return -1

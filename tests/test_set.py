@@ -16,7 +16,9 @@ set_exp = []
 
 def test_set_url(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.SET.name
+        get_test_url,
+        retrieve_data,
+        Urls.SET.name,
     )
     tolerance = reference_table["tolerance"]
     for entry in reference_table["data"]:

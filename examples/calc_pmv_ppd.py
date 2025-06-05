@@ -22,7 +22,7 @@ garments = ["Sweatpants", "T-shirt", "Shoes or sandals"]
 
 met = met_typical_tasks[activity]  # activity met, [met]
 icl = sum(
-    [clo_individual_garments[item] for item in garments]
+    [clo_individual_garments[item] for item in garments],
 )  # calculate total clothing insulation
 
 # calculate the relative air velocity

@@ -139,6 +139,7 @@ def pmv_ppd_ashrae(
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
+
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -168,7 +169,7 @@ def pmv_ppd_ashrae(
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
         raise ValueError(
-            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}",
         )
 
     (
@@ -201,7 +202,7 @@ def pmv_ppd_ashrae(
     pmv_array = _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
 
     ppd_array = 100.0 - 95.0 * np.exp(
-        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0
+        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0,
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan

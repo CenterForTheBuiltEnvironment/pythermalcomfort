@@ -15,7 +15,7 @@ def pmv_a(
     rh: Union[float, list[float]],
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
-    a_coefficient: Union[float, int],
+    a_coefficient: float,
     wme: Union[float, list[float]] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
@@ -100,6 +100,7 @@ def pmv_a(
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.71
+
     """
     # Validate inputs using the APMVInputs class
     APMVInputs(

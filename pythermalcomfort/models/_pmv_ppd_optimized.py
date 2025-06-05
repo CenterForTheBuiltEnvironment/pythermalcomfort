@@ -14,7 +14,7 @@ from pythermalcomfort.utilities import met_to_w_m2
             float64,
             float64,
             float64,
-        )
+        ),
     ],
     cache=True,
 )

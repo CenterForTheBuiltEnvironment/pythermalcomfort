@@ -88,6 +88,7 @@ def set_tmp(
 
         result = set_tmp(tdb=[25, 25], tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
         print(result.set)  # [24.3, 24.3]
+
     """
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -135,7 +136,12 @@ def set_tmp(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
+            standard="ashrae",
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            met=met,
+            clo=clo,
         )
         all_valid = ~(
             np.isnan(tdb_valid)

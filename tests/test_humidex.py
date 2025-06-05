@@ -6,7 +6,9 @@ from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 def test_humidex(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.HUMIDEX.name
+        get_test_url,
+        retrieve_data,
+        Urls.HUMIDEX.name,
     )
     tolerance = reference_table["tolerance"]
 
@@ -31,7 +33,7 @@ def test_humidex(get_test_url, retrieve_data):
 
 
 def test_humidex_masterson():
-    # todo move this to shared test
+    # TODO move this to shared test
     # I got these values from
     # https://publications.gc.ca/collections/collection_2018/eccc/En57-23-1-79-eng.pdf
     result = humidex(tdb=21, rh=100, model="masterson")

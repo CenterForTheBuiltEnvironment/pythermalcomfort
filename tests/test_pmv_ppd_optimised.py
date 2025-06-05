@@ -6,11 +6,16 @@ from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 
 
 class TestPmvPpdOptimized:
+    """Test cases for the PMV and PPD optimized model."""
+
     #  Returns NaN for invalid input values
 
-    def test_pmv_ppd_optimized(self):
+    def test_pmv_ppd_optimized(self) -> None:
+        """Test the optimized PMV and PPD function with various inputs."""
         assert math.isclose(
-            _pmv_ppd_optimized(25, 25, 0.3, 50, 1.5, 0.7, 0), 0.55, abs_tol=0.01
+            _pmv_ppd_optimized(25, 25, 0.3, 50, 1.5, 0.7, 0),
+            0.55,
+            abs_tol=0.01,
         )
 
         np.testing.assert_equal(
@@ -19,7 +24,8 @@ class TestPmvPpdOptimized:
         )
 
     #  The function returns the correct PMV value for typical input values.
-    def test_pmv_typical_input(self):
+    def test_pmv_typical_input(self) -> None:
+        """Test the optimized PMV and PPD function with typical input values."""
         # Typical input values
         tdb = 25
         tr = 23
@@ -38,7 +44,8 @@ class TestPmvPpdOptimized:
         )
 
     #  The function returns the correct PMV value for extreme input values.
-    def test_pmv_extreme_input(self):
+    def test_pmv_extreme_input(self) -> None:
+        """Test the optimized PMV and PPD function with extreme input values."""
         # Extreme input values
         tdb = 35
         tr = 45
@@ -57,8 +64,8 @@ class TestPmvPpdOptimized:
         )
 
     #  The function returns NaN if any of the input values are NaN.
-    def test_nan_input_values(self):
-        # Input values with NaN
+    def test_nan_input_values(self) -> None:
+        """Test the optimized PMV and PPD function with NaN input values."""
         tdb = float("nan")
         tr = 23
         vr = 0.1
@@ -70,7 +77,8 @@ class TestPmvPpdOptimized:
         assert math.isnan(_pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme))
 
     #  The function returns NaN if any of the input values are infinite.
-    def test_infinite_input_values(self):
+    def test_infinite_input_values(self) -> None:
+        """Test the optimized PMV and PPD function with infinite input values."""
         # Input values with infinity
         tdb = float("inf")
         tr = 23

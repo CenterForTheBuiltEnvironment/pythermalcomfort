@@ -1,5 +1,4 @@
-"""
-Test suite for Temperature-Humidity Index (THI) model.
+"""Test suite for Temperature-Humidity Index (THI) model.
 
 Tests cover scalar and list inputs, rounding behaviour, and input validation.
 """

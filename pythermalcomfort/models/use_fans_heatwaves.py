@@ -152,11 +152,15 @@ def use_fans_heatwaves(
     ]
 
     output["heat_strain_blood_flow"] = np.where(
-        output["m_bl"] == max_skin_blood_flow, True, False
+        output["m_bl"] == max_skin_blood_flow,
+        True,
+        False,
     )
     output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
     output["heat_strain_sweating"] = np.where(
-        output["m_rsw"] == max_sweating, True, False
+        output["m_rsw"] == max_sweating,
+        True,
+        False,
     )
 
     output["heat_strain"] = np.any(
@@ -179,7 +183,13 @@ def use_fans_heatwaves(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+            standard="fan_heatwaves",
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            met=met,
+            clo=clo,
         )
         all_valid = ~(
             np.isnan(tdb_valid)

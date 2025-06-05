@@ -77,6 +77,7 @@ def adaptive_en(
         # AdaptiveEN(tmp_cmf=np.float64(nan), acceptability_cat_i=np.False_, ...)
         # The adaptive thermal comfort model can only be used
         # if the running mean temperature is between 10 °C and 30 °C.
+
     """
     # Validate inputs using the ENInputs class
     ENInputs(tdb=tdb, tr=tr, t_running_mean=t_running_mean, v=v, units=units)
@@ -89,7 +90,10 @@ def adaptive_en(
 
     if units.upper() == Units.IP.value:
         tdb, tr, t_running_mean, v = units_converter(
-            tdb=tdb, tr=tr, tmp_running_mean=t_running_mean, v=v
+            tdb=tdb,
+            tr=tr,
+            tmp_running_mean=t_running_mean,
+            v=v,
         )
 
     trm_valid = valid_range(t_running_mean, (10.0, 33.5))

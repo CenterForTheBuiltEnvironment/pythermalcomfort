@@ -4,7 +4,9 @@ from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 def test_use_fans_heatwaves(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.USE_FANS_HEATWAVES.name
+        get_test_url,
+        retrieve_data,
+        Urls.USE_FANS_HEATWAVES.name,
     )
     tolerance = reference_table["tolerance"]
 

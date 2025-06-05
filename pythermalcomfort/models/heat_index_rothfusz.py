@@ -11,6 +11,7 @@ def heat_index_rothfusz(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
     round_output: bool = True,
+    limit_inputs: bool = True,
 ) -> HI:
     """The Heat Index (HI) calculated in accordance with the Rothfusz (1990) model [Rothfusz1990]_.
 
@@ -38,12 +39,14 @@ def heat_index_rothfusz(
         result = heat_index_rothfusz(tdb=29, rh=50)
         print(result.hi)  # 29.7
         print(result.stress_category)  # "caution"
+
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(
         tdb=tdb,
         rh=rh,
         round_output=round_output,
+        limit_inputs=limit_inputs,
     )
 
     tdb = np.array(tdb)
@@ -55,9 +58,12 @@ def heat_index_rothfusz(
     hi += -3.582 * 10**-6 * tdb**2 * rh**2
 
     # heat index should only be calculated for temperatures above 27 °C
-    tdb_valid = np.where((tdb >= 27.0), tdb, np.nan)
-    all_valid = ~(np.isnan(tdb_valid))
-    hi_valid = np.where(all_valid, hi, np.nan)
+    if limit_inputs:
+        tdb_valid = np.where((tdb >= 27.0), tdb, np.nan)
+        all_valid = ~(np.isnan(tdb_valid))
+        hi_valid = np.where(all_valid, hi, np.nan)
+    else:
+        hi_valid = hi
 
     heat_index_categories = {
         27.0: "no risk",

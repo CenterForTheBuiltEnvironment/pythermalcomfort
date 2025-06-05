@@ -106,7 +106,6 @@ def two_nodes_gagge_ji(
         )
 
     """
-
     body_weight = kwargs.pop("body_weight", 70)
     length_time_simulation = kwargs.pop("length_time_simulation", 120)
     initial_skin_temp = kwargs.pop("initial_skin_temp", 36.8)
@@ -150,7 +149,9 @@ def two_nodes_gagge_ji(
     }
 
     results_array_of_dicts = np.vectorize(
-        _two_nodes_ji_optimized, excluded=excluded_params, otypes=[object]
+        _two_nodes_ji_optimized,
+        excluded=excluded_params,
+        otypes=[object],
     )(
         tdb=tdb,
         tr=tr,
@@ -392,8 +393,7 @@ def _two_nodes_ji_optimized(
             * math.exp(t_sk_sw / 10.7)
         )
         # Apply max sweating rate
-        if m_rsw > m_rsw_max:
-            m_rsw = m_rsw_max
+        m_rsw = min(m_rsw, m_rsw_max)
         # Energy lost via evaporation
         e_rsw = 0.68 * m_rsw  # heat lost by vaporization sweat
 

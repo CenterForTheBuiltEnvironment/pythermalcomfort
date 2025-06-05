@@ -7,7 +7,9 @@ from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 def test_phs(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.PHS.name
+        get_test_url,
+        retrieve_data,
+        Urls.PHS.name,
     )
     tolerance = reference_table["tolerance"]
 

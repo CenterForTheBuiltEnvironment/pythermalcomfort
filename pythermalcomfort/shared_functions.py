@@ -21,6 +21,7 @@ def mapping(value, map_dictionary, right=True):
     Returns
     -------
     Stress category for each input temperature.
+
     """
     bins = np.array(list(map_dictionary.keys()))
     words = np.append(np.array(list(map_dictionary.values())), "unknown")

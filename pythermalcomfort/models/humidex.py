@@ -57,6 +57,7 @@ def humidex(
         print(result.humidex)  # [28.2, 39.1]
         print(result.discomfort)
         # ['Little or no discomfort', 'Evident discomfort']
+
     """
     # Validate inputs using the HumidexInputs class
     HumidexInputs(
@@ -73,7 +74,7 @@ def humidex(
 
     if model not in [model.value for model in HumidexModels]:
         raise ValueError(
-            "Invalid model. The model must be either 'rana' or 'masterson'"
+            "Invalid model. The model must be either 'rana' or 'masterson'",
         )
 
     hi = tdb + 5 / 9 * ((6.112 * 10 ** (7.5 * tdb / (237.7 + tdb)) * rh / 100) - 10)
@@ -81,7 +82,7 @@ def humidex(
         hi = tdb + 5 / 9 * (
             6.11
             * np.exp(
-                5417.753 * (1 / 273.15 - 1 / (dew_point_tmp(tdb=tdb, rh=rh) + 273.15))
+                5417.753 * (1 / 273.15 - 1 / (dew_point_tmp(tdb=tdb, rh=rh) + 273.15)),
             )
             - 10
         )
