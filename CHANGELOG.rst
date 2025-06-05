@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.3.0 (2025-06-05)
+------------------
+
+* Added the `two_nodes_gagge_ji` function to calculate the two-node model for older individuals
+* Added the `Temperature-Humidity Index (THI)`.
+
 3.2.0 (2025-05-20)
 ------------------
 
