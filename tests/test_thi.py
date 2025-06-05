@@ -1,3 +1,8 @@
+"""
+Test suite for Temperature-Humidity Index (THI) model.
+
+Tests cover scalar and list inputs, rounding behaviour, and input validation.
+"""
 import numpy as np
 import pytest
 
