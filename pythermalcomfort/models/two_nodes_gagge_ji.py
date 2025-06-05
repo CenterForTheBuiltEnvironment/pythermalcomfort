@@ -422,9 +422,8 @@ def _two_nodes_ji_optimized(
         w = (math.sqrt(2 * wp**2 + 1) - 1) / wp
 
         # Limit w
-        if w > w_max:
-            # print("Skin wetness exceeds max value ${:.2f}".format(w_max))
-            w = w_max
+        # print("Skin wetness exceeds max value ${:.2f}".format(w_max))
+        w = min(w, w_max)
 
         # Recalculate evaporative sweat heat
         p_rsw = (w - wettedness_dif) / (1.0 - wettedness_dif)
