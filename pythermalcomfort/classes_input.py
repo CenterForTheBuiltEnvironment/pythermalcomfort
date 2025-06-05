@@ -459,8 +459,8 @@ class EPMVInputs(BaseInputs):
 class ESIInputs(BaseInputs):
     """Input class for the Environmental Stress Index (ESI) calculation.
 
-    This class validates and processes inputs required for calculating the ESI,
-    which evaluates heat stress based on temperature, humidity, and solar radiation.
+    This class validates and processes inputs required for calculating the ESI, which
+    evaluates heat stress based on temperature, humidity, and solar radiation.
     """
 
     def __init__(self, tdb, rh, sol_radiation_global, round_output=True):
@@ -798,6 +798,29 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
         if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
             raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
+
+
+@dataclass
+class THIInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        rh,
+        round_output=True,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
 
 
 @dataclass
