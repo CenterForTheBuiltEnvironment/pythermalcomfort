@@ -14,7 +14,8 @@ clo = []
 set_exp = []
 
 
-def test_set_url(get_test_url, retrieve_data):
+def test_set_url(get_test_url, retrieve_data) -> None:
+    """Test the SET model with various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,
@@ -31,7 +32,8 @@ def test_set_url(get_test_url, retrieve_data):
         validate_result(result, outputs, tolerance)
 
 
-def test_set_npnan():
+def test_set_npnan() -> None:
+    """Test that the function returns np.nan when inputs are np.nan."""
     np.testing.assert_equal(
         set_tmp(
             [41, 20, 20, 20, 20, 39],

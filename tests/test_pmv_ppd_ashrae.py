@@ -7,7 +7,8 @@ from pythermalcomfort.utilities import Models
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_pmv_ppd(get_test_url, retrieve_data):
+def test_pmv_ppd(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the PMV and PPD values correctly for various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,
@@ -19,7 +20,7 @@ def test_pmv_ppd(get_test_url, retrieve_data):
         inputs = entry["inputs"]
         outputs = entry["outputs"]
         # TODO change the validation table code and removed the following
-        if "standard" not in inputs.keys():
+        if "standard" not in inputs:
             inputs["standard"] = "iso"
         if inputs["standard"] == "ashrae":
             inputs["model"] = Models.ashrae_55_2023.value
@@ -30,7 +31,10 @@ def test_pmv_ppd(get_test_url, retrieve_data):
 
 
 class TestPmvPpd:
-    def test_thermal_sensation(self):
+    """Test cases for the PMV and PPD model."""
+
+    def test_thermal_sensation(self) -> None:
+        """Test that the function returns the correct thermal sensation values."""
         np.testing.assert_equal(
             pmv_ppd_ashrae(
                 [16, 21, 24, 26, 29, 32, 34, 33.47, 33.46],
@@ -55,7 +59,8 @@ class TestPmvPpd:
         )
 
     #  Returns NaN for invalid input values
-    def test_returns_nan_for_invalid_input_values(self):
+    def test_returns_nan_for_invalid_input_values(self) -> None:
+        """Test that the function returns NaN for invalid input values."""
         # test airspeed limits
         np.testing.assert_equal(
             pmv_ppd_ashrae(
@@ -98,6 +103,7 @@ class TestPmvPpd:
             PMVPPD(pmv=np.float64(4.48), ppd=np.float64(100.0), tsv=np.str_("Hot")),
         )
 
-    def test_wrong_standard(self):
+    def test_wrong_standard(self) -> None:
+        """Test that the function raises a ValueError for an unsupported model."""
         with pytest.raises(ValueError):
             pmv_ppd_ashrae(25, 25, 0.1, 50, 1.1, 0.5, model="random")

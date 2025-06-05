@@ -12,7 +12,7 @@ from tests.conftest import is_equal
 
 
 @pytest.mark.parametrize(
-    "tdb, rh, expected",
+    ("tdb", "rh", "expected"),
     [
         (30.0, 70.0, 81.4),
         (20.0, 50.0, 65.2),
@@ -46,7 +46,7 @@ def test_list_input() -> None:
 
 
 @pytest.mark.parametrize(
-    "tdb, rh, expected_error",
+    ("tdb", "rh", "expected_error"),
     [
         (25.0, -5.0, ValueError),
         (25.0, 150.0, ValueError),  # humidity should be between 0 and 100
@@ -54,7 +54,9 @@ def test_list_input() -> None:
     ],
 )
 def test_invalid_inputs_raise_specific(
-    tdb: float, rh: float, expected_error: Exception
+    tdb: float,
+    rh: float,
+    expected_error: Exception,
 ) -> None:
     """Test that the function raises specific errors for invalid inputs."""
     with pytest.raises(expected_error):

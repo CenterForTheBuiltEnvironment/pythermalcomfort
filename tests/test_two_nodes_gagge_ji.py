@@ -6,7 +6,19 @@ from pythermalcomfort.utilities import body_surface_area, p_sat_torr
 
 # Scenarios based on Table 4 from the paper by Ji et al. (2022)
 @pytest.mark.parametrize(
-    "tdb, tr, v, met, clo, rh, weight, height, expected_t_core, expected_t_skin, duration",
+    (
+        "tdb",
+        "tr",
+        "v",
+        "met",
+        "clo",
+        "rh",
+        "weight",
+        "height",
+        "expected_t_core",
+        "expected_t_skin",
+        "duration",
+    ),
     [
         # Scenario 1
         (
