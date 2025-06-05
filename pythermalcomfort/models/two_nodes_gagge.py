@@ -92,9 +92,7 @@ def two_nodes_gagge(
         result = two_nodes_gagge(tdb=25, tr=25, v=0.1, rh=50, clo=0.5, met=1.2)
         print(result.w)  # 100.0
 
-        result = two_nodes_gagge(
-            tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5
-        )
+        result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
     """
     # Validate inputs using the TwoNodesInputs class

@@ -303,9 +303,7 @@ class JOS3:
             ]["local_body_part"]
         )
         # par should be input as int, float.
-        model.par = (
-            1.2  # Physical activity ratio [-], assuming a sitting position
-        )
+        model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
         # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
         # (0="standing", 1="sitting" or 2="lying")
         model.posture = "sitting"  # Posture [-], assuming a sitting position
@@ -365,9 +363,7 @@ class JOS3:
         ).transpose()  # Make pandas.DataFrame
         df.plot()  # Plot time series of local skin temperature.
         plt.legend(["Head", "Pelvis"])  # Reset the legends
-        plt.ylabel(
-            "Skin temperature [°C]"
-        )  # Set y-label as 'Skin temperature [°C]'
+        plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
         plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
         plt.show()  # Show the plot
     """

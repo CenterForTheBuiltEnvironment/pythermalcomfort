@@ -55,9 +55,7 @@ def net(
         result = net(tdb=37, rh=100, v=0.1)
         print(result.net)  # 37.0
 
-        result = net(
-            tdb=[37, 30], rh=[100, 60], v=[0.1, 0.5], round_output=False
-        )
+        result = net(tdb=[37, 30], rh=[100, 60], v=[0.1, 0.5], round_output=False)
         print(result.net)  # [37.0, 26.38977535]
 
     """

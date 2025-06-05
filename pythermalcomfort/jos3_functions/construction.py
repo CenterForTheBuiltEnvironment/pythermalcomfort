@@ -187,9 +187,7 @@ def local_bsa(
 
     .. code-block:: python
 
-        local_bsa_values = local_bsa(
-            height=1.80, weight=75, bsa_equation="dubois"
-        )
+        local_bsa_values = local_bsa(height=1.80, weight=75, bsa_equation="dubois")
         print(local_bsa_values)
     """
     bsa_ratio = bsa_rate(height=height, weight=weight, bsa_equation=bsa_equation)
