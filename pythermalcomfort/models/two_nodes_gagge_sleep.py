@@ -355,7 +355,8 @@ def _sleep_set(
         err2 = _fnerre(xold + delta, q_skin, h_d, t_skin, wet, h_e, p_s_sk)
         err_diff = err2 - err1
         if abs(err_diff) < 1e-10:  # Avoid division by very small values
-            pass
+            # Use a fallback approach or break iteration
+            break
         else:
             x = xold - delta * err1 / err_diff
         if abs(x - xold) > 0.01:
