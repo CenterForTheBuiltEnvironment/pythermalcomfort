@@ -27,8 +27,10 @@ def thi(
     Returns
     -------
     THI
-        A dataclass containing the Temperature-Humidity Index. See :py:class:`~pythermalcomfort.classes_return.THI` for more details.
-        To access the `thi` value, use the `thi` attribute of the returned `THI` instance, e.g., `result.thi`.
+        A dataclass containing the Temperature-Humidity Index.
+        See :py:class:`~pythermalcomfort.classes_return.THI` for more details.
+        To access the `thi` value, use the `thi` attribute of the returned `THI`
+        instance, e.g., `result.thi`.
     """
 
     # Validate inputs using the THIInputs class
