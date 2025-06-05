@@ -64,6 +64,7 @@ class BaseInputs:
     wbgt: Union[float, int, np.ndarray, list] = field(default=None)
     intensity: Union[str, WorkIntensity] = field(default=None)
     thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
+    vapor_pressure: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -257,6 +258,11 @@ class BaseInputs:
             self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
             validate_type(
                 self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
+            )
+        if self.vapor_pressure is not None:
+            self.vapor_pressure = convert_series_to_list(self.vapor_pressure)
+            validate_type(
+                self.vapor_pressure, "vapor_pressure", (float, int, np.ndarray, list)
             )
 
 
@@ -789,6 +795,36 @@ class GaggeTwoNodesInputs(BaseInputs):
 
 
 @dataclass
+class GaggeTwoNodesJiInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        met,
+        clo,
+        vapor_pressure,
+        wme,
+        body_surface_area,
+        p_atm,
+        position,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            met=met,
+            clo=clo,
+            vapor_pressure=vapor_pressure,
+            wme=wme,
+            body_surface_area=body_surface_area,
+            p_atm=p_atm,
+            position=position,
+        )
+
+
+@dataclass
 class GaggeTwoNodesSleepInputs(BaseInputs):
     def __init__(
         self,
@@ -818,6 +854,29 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
         if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
             raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
+
+
+@dataclass
+class THIInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        rh,
+        round_output=True,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
 
 
 @dataclass
