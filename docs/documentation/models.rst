@@ -120,6 +120,14 @@ Two-node model sleep
 .. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodesSleep
     :members:
 
+Gagge-Ji two-node model
+----------------------
+
+.. autofunction:: pythermalcomfort.models.two_nodes_gagge_ji.two_nodes_gagge_ji
+    
+.. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodesJi
+    :members:
+
 Heat Index (HI)
 ---------------
 
@@ -341,4 +349,12 @@ Wind chill temperature
 .. autofunction:: pythermalcomfort.models.wind_chill_temperature.wct
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
+    :members:
+
+Temperature Humidity Index (THI)
+-----------------------------
+
+.. autofunction:: pythermalcomfort.models.thi.thi
+    
+.. autoclass:: pythermalcomfort.classes_return.THI
     :members:
