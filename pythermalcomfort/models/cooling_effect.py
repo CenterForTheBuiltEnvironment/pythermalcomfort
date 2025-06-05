@@ -20,7 +20,7 @@ def cooling_effect(
     wme: Union[float, list[float]] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
-    """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
+    """Return the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [55ASHRAE2023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under

@@ -7,7 +7,7 @@ def valid_range(x, valid):
 
 
 def mapping(value, map_dictionary, right=True):
-    """Maps a temperature array to stress categories.
+    """Map a temperature array to stress categories.
 
     Parameters
     ----------

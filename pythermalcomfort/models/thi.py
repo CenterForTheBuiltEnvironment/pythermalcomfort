@@ -11,7 +11,7 @@ def thi(
     rh: Union[float, list[float]],
     round_output: bool = True,
 ) -> THI:
-    """Calculates the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent to
+    """Calculate the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent to
     the definition in [Schlatter1987]_, but uses Celsius instead of Fahrenheit.
 
     Parameters

@@ -29,7 +29,7 @@ def pmv_ppd_ashrae(
     airspeed_control: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
-    """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+    """Return Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
     calculated in accordance with the ASHRAE 55 Standard.
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the

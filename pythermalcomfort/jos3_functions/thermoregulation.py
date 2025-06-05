@@ -339,7 +339,7 @@ def rad_coef(posture: str) -> np.ndarray:
 
 
 def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
-    """Fixes hc values to fit two-node-model's values.
+    """Fix hc values to fit two-node-model's values.
 
     Parameters
     ----------
@@ -362,7 +362,7 @@ def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
 
 
 def fixed_hr(hr: np.ndarray) -> np.ndarray:
-    """Fixes hr values to fit two-node-model's values.
+    """Fix hr values to fit two-node-model's values.
 
     Parameters
     ----------

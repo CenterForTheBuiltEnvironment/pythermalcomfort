@@ -14,7 +14,7 @@ def wbgt(
     with_solar_load: bool = False,
     round_output: bool = True,
 ) -> WBGT:
-    """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance
+    """Calculate the Wet Bulb Globe Temperature (WBGT) index in compliance
     with the ISO 7243 Standard [7243ISO2017]_. The WBGT is a heat stress index that
     measures the thermal environment to which a person is exposed. In most
     situations, this index is simple to calculate. It should be used as a

@@ -20,7 +20,7 @@ def pmv_e(
     units: str = Units.SI.value,
     limit_inputs: bool = True,
 ) -> EPMV:
-    """Returns Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
+    """Return Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
     This index was developed by Fanger, P. O. et al. (2002). In non-air-
     conditioned buildings in warm climates, occupants may sense the warmth as
     being less severe than the PMV predicts. The main reason is low

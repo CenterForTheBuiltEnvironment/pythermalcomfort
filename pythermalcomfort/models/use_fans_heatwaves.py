@@ -28,7 +28,7 @@ def use_fans_heatwaves(
     round_output: bool = True,
     max_sweating: float = 500,
 ) -> UseFansHeatwaves:
-    """It helps you to estimate if the conditions you have selected would cause
+    """Estimate if the conditions you have selected would cause
     heat strain. This occurs when either the following variables reaches its
     maximum value:
 

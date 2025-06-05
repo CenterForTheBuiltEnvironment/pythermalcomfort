@@ -248,7 +248,8 @@ def test_bsa_rate():
         construction.bsa_rate(weight="non-numeric", height=1.72, bsa_equation="dubois")
 
 
-def test_local_bsa():
+def test_local_bsa() -> None:
+    """Test the local_bsa function from construction.py."""
     # Test with default parameters
     result = local_bsa(height=1.72, weight=74.43, bsa_equation="dubois")
     assert isinstance(result, np.ndarray)
@@ -272,7 +273,8 @@ def test_local_bsa():
         local_bsa(weight="non-numeric", height=1.72, bsa_equation="dubois")
 
 
-def test_weight_rate():
+def test_weight_rate() -> None:
+    """Test the weight_rate function from construction.py."""
     # Test with default parameters
     result = weight_rate(weight=74.43)
     expected_result = (
@@ -296,7 +298,8 @@ def test_weight_rate():
         weight_rate(weight="non-numeric")
 
 
-def test_bfb_rate():
+def test_bfb_rate() -> None:
+    """Test the bfb_rate function from construction.py."""
     # Test with default parameters
     result = bfb_rate(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59)
     assert isinstance(result, float)
@@ -1438,7 +1441,8 @@ def test_ava_blood_flow():
     assert bf_ava_foot == pytest.approx(expected_result_foot, rel=1e-3)
 
 
-def test_basal_met():
+def test_basal_met() -> None:
+    """Test the basal_met function for calculating basal metabolic rate (BMR)."""
     # Test with default values
     bmr = basal_met(
         height=1.72,
@@ -1514,7 +1518,8 @@ def test_local_mbase():
     assert all(mbase_cr > mbase_sk)
 
 
-def test_local_q_work():
+def test_local_q_work() -> None:
+    """Test the local_q_work function for calculating local work rate."""
     # Test with par = 1.5
     q_work = local_q_work(bmr=100, par=1.5)
     assert all(q_work >= 0)
@@ -1526,7 +1531,8 @@ def test_local_q_work():
         local_q_work(bmr=100, par=0.8)
 
 
-def test_shivering():
+def test_shivering() -> None:
+    """Test the shivering function for calculating shivering thermogenesis."""
     # Test with zero error signals
     err_cr = np.zeros(17)
     err_sk = np.zeros(17)
@@ -1619,7 +1625,8 @@ def test_shivering():
         assert all(q_shiv_by_age[age_younger] > q_shiv_by_age[age_older])
 
 
-def test_nonshivering():
+def test_nonshivering() -> None:
+    """Test the nonshivering function for calculating non-shivering thermogenesis."""
     # Test with zero error signals
     err_sk = np.zeros(17)
     q_nst = nonshivering(

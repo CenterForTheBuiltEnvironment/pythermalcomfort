@@ -2,6 +2,9 @@
 line-length = 88
 indent-width = 4
 
+# Support Python 3.9+.
+target-version = "py39"
+
 [lint]
 select = [
     "A",  # prevent using keywords that clobber python builtins
@@ -13,10 +16,17 @@ select = [
     "E9",
     "UP",  # alert you when better syntax is available in your python version
     "I",  # import order
+    "D401",   # pydocstyle
+#    "ALL",  # all rules
 ]
 ignore = [
     "E712",  # Allow using if x == False, as it's not always equivalent to if x.
     "E501",  # Supress line-too-long warnings: trust black's judgement on this one.
+    "FIX",
+    "S101",
+    "PLR2004",
+    "TD",
+    "D100"
 ]
 
 [format]

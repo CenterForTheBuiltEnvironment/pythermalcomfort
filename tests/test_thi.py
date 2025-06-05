@@ -18,21 +18,24 @@ from tests.conftest import is_equal
         (20.0, 50.0, 65.2),
     ],
 )
-def test_scalar_rounding_default(tdb, rh, expected):
+def test_scalar_rounding_default(tdb: float, rh: float, expected: float) -> None:
+    """Test that the function calculates THI correctly with default rounding."""
     result = thi(tdb, rh)
     assert isinstance(result, THI)
     assert isinstance(result.thi, float)
     assert is_equal(result.thi, expected)
 
 
-def test_scalar_no_rounding():
+def test_scalar_no_rounding() -> None:
+    """Test that the function calculates THI correctly without rounding."""
     tdb, rh = 30.0, 70.0
     expected = 1.8 * tdb + 32 - 0.55 * (1 - 0.01 * rh) * (1.8 * tdb - 26)
     result = thi(tdb, rh, round_output=False)
     assert is_equal(result.thi, expected)
 
 
-def test_list_input():
+def test_list_input() -> None:
+    """Test that the function calculates THI correctly for lists of tdb and rh values."""
     tdb_list = [30, 20]
     rh_list = [70, 50]
     result = thi(tdb_list, rh_list)
@@ -50,6 +53,9 @@ def test_list_input():
         ("hot", "humid", TypeError),  # invalid types
     ],
 )
-def test_invalid_inputs_raise_specific(tdb, rh, expected_error):
+def test_invalid_inputs_raise_specific(
+    tdb: float, rh: float, expected_error: Exception
+) -> None:
+    """Test that the function raises specific errors for invalid inputs."""
     with pytest.raises(expected_error):
         thi(tdb, rh)

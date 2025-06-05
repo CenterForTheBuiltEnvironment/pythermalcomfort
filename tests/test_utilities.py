@@ -192,6 +192,7 @@ def test_clo_correction_factor_environment() -> None:
 
 
 def test_transpose_sharp_altitude() -> None:
+    """Test the transpose_sharp_altitude function."""
     assert transpose_sharp_altitude(sharp=0, altitude=0) == (0, 90)
     assert transpose_sharp_altitude(sharp=0, altitude=20) == (0, 70)
     assert transpose_sharp_altitude(sharp=0, altitude=45) == (0, 45)
@@ -205,22 +206,24 @@ def test_transpose_sharp_altitude() -> None:
 
 
 def test_f_svv() -> None:
-    assert round(f_svv(30, 10, 3.3), 2) == 0.27
-    assert round(f_svv(150, 10, 3.3), 2) == 0.31
-    assert round(f_svv(30, 6, 3.3), 2) == 0.20
-    assert round(f_svv(150, 6, 3.3), 2) == 0.23
-    assert round(f_svv(30, 10, 6), 2) == 0.17
-    assert round(f_svv(150, 10, 6), 2) == 0.21
-    assert round(f_svv(30, 6, 6), 2) == 0.11
-    assert round(f_svv(150, 6, 6), 2) == 0.14
-    assert round(f_svv(6, 9, 3.3), 2) == 0.14
-    assert round(f_svv(6, 6, 3.3), 2) == 0.11
-    assert round(f_svv(6, 6, 6), 2) == 0.04
-    assert round(f_svv(4, 4, 3.3), 2) == 0.06
-    assert round(f_svv(4, 4, 6), 2) == 0.02
+    """Test the f_svv function for calculating the clothing insulation factor."""
+    assert np.isclose(round(f_svv(30, 10, 3.3), 2), 0.27, atol=1e-09)
+    assert np.isclose(round(f_svv(150, 10, 3.3), 2), 0.31, atol=1e-09)
+    assert np.isclose(round(f_svv(30, 6, 3.3), 2), 0.20, atol=1e-09)
+    assert np.isclose(round(f_svv(150, 6, 3.3), 2), 0.23, atol=1e-09)
+    assert np.isclose(round(f_svv(30, 10, 6), 2), 0.17, atol=1e-09)
+    assert np.isclose(round(f_svv(150, 10, 6), 2), 0.21, atol=1e-09)
+    assert np.isclose(round(f_svv(30, 6, 6), 2), 0.11, atol=1e-09)
+    assert np.isclose(round(f_svv(150, 6, 6), 2), 0.14, atol=1e-09)
+    assert np.isclose(round(f_svv(6, 9, 3.3), 2), 0.14, atol=1e-09)
+    assert np.isclose(round(f_svv(6, 6, 3.3), 2), 0.11, atol=1e-09)
+    assert np.isclose(round(f_svv(6, 6, 6), 2), 0.04, atol=1e-09)
+    assert np.isclose(round(f_svv(4, 4, 3.3), 2), 0.06, atol=1e-09)
+    assert np.isclose(round(f_svv(4, 4, 6), 2), 0.02, atol=1e-09)
 
 
 def test_running_mean_outdoor_temperature() -> None:
+    """Test the running mean outdoor temperature function."""
     assert (running_mean_outdoor_temperature([20, 20], alpha=0.7)) == 20
     assert (running_mean_outdoor_temperature([20, 20], alpha=0.9)) == 20
     assert (running_mean_outdoor_temperature([20, 20, 20, 20], alpha=0.7)) == 20
@@ -242,6 +245,7 @@ def test_running_mean_outdoor_temperature() -> None:
 
 
 def test_ip_units_converter() -> None:
+    """Test the units converter for IP and SI units."""
     assert (units_converter(tdb=77, tr=77, v=3.2, from_units=Units.IP.value)) == [
         25.0,
         25.0,
@@ -285,6 +289,7 @@ def test_ip_units_converter() -> None:
 
 
 def test_clo_dynamic_ashrae() -> None:
+    """Test the dynamic clothing insulation function for ASHRAE standards."""
     assert clo_dynamic_ashrae(clo=1, met=1) == 1
     assert clo_dynamic_ashrae(clo=1, met=0.5) == 1
     assert clo_dynamic_ashrae(clo=2, met=0.5) == 2
@@ -357,7 +362,8 @@ def test_v_relative() -> None:
     assert np.allclose(v_relative(v, met), expected_result, atol=1e-6)
 
 
-def test_validate_type():
+def test_validate_type() -> None:
+    """Test the validate_type function for type validation."""
     allowed = (float, int, list, np.ndarray)
 
     # valid cases

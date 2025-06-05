@@ -14,7 +14,7 @@ def at(
     q: Union[float, list[float]] = None,
     round_output: bool = True,
 ) -> AT:
-    """Calculates the Apparent Temperature (AT). The AT is defined as the
+    """Calculate the Apparent Temperature (AT). The AT is defined as the
     temperature at the reference humidity level producing the same amount of
     discomfort as that experienced under the current ambient temperature,
     humidity, and solar radiation [Steadman1984]_. In other words, the AT is an

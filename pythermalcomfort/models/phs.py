@@ -28,7 +28,7 @@ def phs(
     model: str = Models.iso_7933_2023.value,
     **kwargs,
 ) -> PHS:
-    """Calculates the Predicted Heat Strain (PHS) index based in compliance
+    """Calculate the Predicted Heat Strain (PHS) index based in compliance
     with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933
     provides a method for the analytical evaluation and interpretation of the thermal
     stress experienced by a subject in a hot environment. It describes a method for

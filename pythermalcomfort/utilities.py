@@ -60,7 +60,7 @@ def enthalpy_air(
     tdb: Union[float, list[float]],
     hr: Union[float, list[float]],
 ):
-    """Calculates air enthalpy_air.
+    """Calculate air enthalpy_air.
 
     Parameters
     ----------
@@ -97,7 +97,7 @@ c13 = 6.5459673
 
 
 def p_sat(tdb: Union[float, list[float]]):
-    """Calculates vapour pressure of water at different temperatures.
+    """Calculate vapour pressure of water at different temperatures.
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ def psy_ta_rh(
     rh: Union[float, list[float]],
     p_atm=101325,
 ) -> PsychrometricValues:
-    """Calculates psychrometric values of air based on dry bulb air temperature and
+    """Calculate psychrometric values of air based on dry bulb air temperature and
     relative humidity. For more accurate results we recommend the use of the Python
     package `psychrolib`_.
 
@@ -205,7 +205,7 @@ def wet_bulb_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the wet-bulb temperature using the Stull equation [Stull2011]_
+    """Calculate the wet-bulb temperature using the Stull equation [Stull2011]_
 
     Parameters
     ----------
@@ -235,7 +235,7 @@ def dew_point_tmp(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
 ):
-    """Calculates the dew point temperature.
+    """Calculate the dew point temperature.
 
     Parameters
     ----------
@@ -270,7 +270,7 @@ def mean_radiant_tmp(
     emissivity: Union[float, list[float]] = 0.95,
     standard="Mixed Convection",
 ):
-    """Converts globe temperature reading into mean radiant temperature in accordance
+    """Convert the globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
     7726:1998 Standard [7726ISO1998]_.
 
@@ -570,7 +570,7 @@ def body_surface_area(
 
 
 def f_svv(w, h, d):
-    """Calculates the sky-vault view fraction.
+    """Calculate the sky-vault view fraction.
 
     Parameters
     ----------
@@ -727,7 +727,7 @@ def running_mean_outdoor_temperature(
     alpha: float = 0.8,
     units: str = Units.SI.value,
 ):
-    """Estimates the running mean temperature also known as prevailing mean outdoor
+    """Estimate the running mean temperature also known as prevailing mean outdoor
     temperature.
 
     Parameters
@@ -769,7 +769,7 @@ def running_mean_outdoor_temperature(
 
 
 def units_converter(from_units=Units.IP.value, **kwargs):
-    """Converts IP values to SI units.
+    """Convert IP values to SI units.
 
     Parameters
     ----------
@@ -815,7 +815,7 @@ def operative_tmp(
     v: Union[float, list[float]],
     standard: str = "ISO",
 ):
-    """Calculates operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_
+    """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
 
     Parameters
     ----------
@@ -844,7 +844,7 @@ def operative_tmp(
 
 
 def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
-    """Calculates the intrinsic insulation of a clothing ensemble based on individual
+    """Calculate the intrinsic insulation of a clothing ensemble based on individual
     garments. This equation is in accordance with the ISO 9920:2009 standard [ISO9920]_
     Section 4.3. It should be noted that this equation is only valid for clothing
     ensembles with rather uniform insulation values across the body.
@@ -865,7 +865,7 @@ def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
 
 
 def clo_area_factor(i_cl: Union[float, list[float]]):
-    """Calculates the clothing area factor (f_cl) of the clothing ensemble as a function
+    """Calculate the clothing area factor (f_cl) of the clothing ensemble as a function
     of the intrinsic insulation of the clothing ensemble. This equation is in accordance
     with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
     correlation between f_cl and i_cl is low especially for non-western clothing
@@ -893,7 +893,7 @@ def clo_insulation_air_layer(
     v_walk: Union[float, list[float]],
     i_a_static: Union[float, list[float]],
 ):
-    """Calculates the insulation of the boundary air layer (`I`:sub:`a,r`). The static
+    """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`). The static
     boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
     0.15 m/s. Thus, for static conditions, the standard recommends using the value of
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
@@ -938,7 +938,7 @@ def clo_total_insulation(
     i_a_static: Union[float, list[float]],
     i_cl: Union[float, list[float]],
 ):
-    """Calculates the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
+    """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
     conditions and activities. It accounts for the effects of movements and wind. The
@@ -1005,7 +1005,7 @@ def clo_correction_factor_environment(
     v_walk: Union[float, list[float]],
     i_cl: Union[float, list[float]],
 ):
-    """This function returns the correction factor for the total insulation of the
+    """Return the correction factor for the total insulation of the
     clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
     This correction factor takes into account of the fact that the values of
     (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
@@ -1193,7 +1193,8 @@ f_r_garments = {
 
 
 class DefaultSkinTemperature(NamedTuple):
-    """Default skin temperature in degree Celsius for 17 local body parts
+    """Default skin temperature in degree Celsius for 17 local body parts.
+
     The data comes from Hui Zhang's experiments
     https://escholarship.org/uc/item/3f4599hx
     """

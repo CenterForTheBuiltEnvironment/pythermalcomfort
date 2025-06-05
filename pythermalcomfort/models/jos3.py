@@ -958,7 +958,7 @@ class JOS3:
         # Matrix A = Matrix for heat exchange due to blood flow and conduction occurring between tissues
         # (85, 85,) ndarray
 
-        # Calculates the blood flow in arteries and veins for core, muscle, fat, skin,
+        # Calculate the blood flow in arteries and veins for core, muscle, fat, skin,
         # and arteriovenous anastomoses (AVA) in hands and feet,
         # and combines them into two arrays:
         # 1) bf_local for the local blood flow and 2) bf_whole for the whole-body blood flow.
@@ -1001,7 +1001,7 @@ class JOS3:
         arr_b /= self._cap  # Change unit [W/K] to [/sec]
         arr_b *= dtime  # Change unit [/sec] to [-]
 
-        # Calculates the off-diagonal and diagonal elements of the matrix A,
+        # Calculate the off-diagonal and diagonal elements of the matrix A,
         # which represents the heat transfer coefficients between different parts of the body,
         # and combines them to form the full matrix A (arrA).
         # Then, the inverse of matrix A is computed (arrA_inv).
@@ -1142,7 +1142,7 @@ class JOS3:
         )
 
     def results(self) -> JOS3Output:
-        """This method consolidates the results into a single JOS3Output instance. This makes
+        """Consolidate the results into a single JOS3Output instance. This makes
         it very easy to access the time series data for each parameter.
 
         Returns

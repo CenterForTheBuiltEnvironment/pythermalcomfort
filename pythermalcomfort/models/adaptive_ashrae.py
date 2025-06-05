@@ -22,7 +22,7 @@ def adaptive_ashrae(
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:
-    """Determines the adaptive thermal comfort based on ASHRAE 55. The adaptive
+    """Calculate the adaptive thermal comfort based on ASHRAE 55. The adaptive
     model relates indoor design temperatures or acceptable temperature ranges
     to outdoor meteorological or climatological parameters. The adaptive model
     can only be used in occupant-controlled naturally conditioned spaces that

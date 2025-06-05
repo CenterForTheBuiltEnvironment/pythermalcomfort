@@ -13,7 +13,7 @@ def heat_index_rothfusz(
     round_output: bool = True,
     limit_inputs: bool = True,
 ) -> HI:
-    """The Heat Index (HI) calculated in accordance with the Rothfusz (1990) model [Rothfusz1990]_.
+    """Calculate the Heat Index (HI) in accordance with the Rothfusz (1990) model [Rothfusz1990]_.
 
     Parameters
     ----------

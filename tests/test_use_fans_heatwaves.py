@@ -2,7 +2,8 @@ from pythermalcomfort.models import use_fans_heatwaves
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_use_fans_heatwaves(get_test_url, retrieve_data):
+def test_use_fans_heatwaves(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the use of fans during heatwaves correctly for various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,

@@ -11,7 +11,7 @@ LAYER_NAMES = ["artery", "vein", "sfvein", "core", "muscle", "fat", "skin"]
 
 
 def index_order():
-    """Defines the index's order of the matrix.
+    """Define the index's order of the matrix.
 
     Returns
     -------
@@ -426,7 +426,7 @@ def whole_body(bf_art, bf_vein, bf_ava_hand, bf_ava_foot):
 
 
 def remove_body_name(text):
-    """Removing the body name from the parameter name.
+    """Remove the body name from the parameter name.
 
     Parameters
     ----------

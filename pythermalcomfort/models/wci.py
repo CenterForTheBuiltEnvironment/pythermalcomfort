@@ -11,7 +11,7 @@ def wci(
     v: Union[float, list[float]],
     round_output: bool = True,
 ) -> WCI:
-    """Calculates the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [ashrae2017]_.
+    """Calculate the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [ashrae2017]_.
 
     The wind chill index (WCI) is an empirical index based on cooling measurements
     taken on a cylindrical flask partially filled with water in Antarctica

@@ -12,7 +12,7 @@ def net(
     v: Union[float, list[float]],
     round_output: bool = True,
 ) -> NET:
-    """Calculates the Normal Effective Temperature (NET). Missenard (1933)
+    """Calculate the Normal Effective Temperature (NET). Missenard (1933)
     devised a formula for calculating effective temperature. The index
     establishes a link between the same condition of the organism's
     thermoregulatory capability (warm and cold perception) and the surrounding

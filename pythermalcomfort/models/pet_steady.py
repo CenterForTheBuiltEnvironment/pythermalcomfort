@@ -24,9 +24,11 @@ def pet_steady(
     height: Union[float, list[float]] = 1.8,
     wme: Union[float, list[float]] = 0,
 ) -> PETSteady:
-    """The steady physiological equivalent temperature (PET) is calculated using the Munich
-    Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
-    circumstances in a medically realistic manner. PET is defined as the air temperature
+    """Calculate the steady physiological equivalent temperature (PET) using the Munich
+    Energy-balance Model for Individuals (MEMI) to simulate the human body's thermal
+    state in a medically realistic manner.
+
+    PET is defined as the air temperature
     at which, in a typical indoor setting the heat budget of the human body is balanced
     with the same core and skin temperature as under the complex outdoor conditions to be
     assessed [Hoppe1999]_.
@@ -153,8 +155,7 @@ def _pet_steady_vectorised(
     met = met * met_factor  # metabolic rate
 
     def vasomotricity(t_cr, t_sk):
-        """Defines the vasomotricity (blood flow) in function of the core and
-        skin temperatures.
+        """Vasomotricity (blood flow) in function of the core and skin temperatures.
 
         Parameters
         ----------
@@ -194,8 +195,7 @@ def _pet_steady_vectorised(
         return {"m_blood": m_blood, "alpha": alpha}
 
     def sweat_rate(t_body):
-        """Defines the sweating mechanism depending on the body and core
-        temperatures.
+        """Sweating mechanism depending on the body and core temperatures.
 
         Parameters
         ----------
@@ -234,10 +234,9 @@ def _pet_steady_vectorised(
         _clo=0.9,
         actual_environment=False,
     ):
-        """This function allows solving for the PET : either it solves the vectorial balance
-        of the 3 unknown temperatures (T_core, T_sk, T_clo) or it solves for the
-        environment operative temperature that would yield the same energy balance as the
-        actual environment.
+        """Solve PET by either computing the vectorial balance of the three unknown temperatures
+        (T_core, T_sk, T_clo) or by finding the environment operative temperature that yields
+        the same energy balance as the actual environment.
 
         Parameters
         ----------
@@ -451,7 +450,7 @@ def _pet_steady_vectorised(
         return e_bal_scal
 
     def pet_fc(_t_stable):
-        """Function to find the solution.
+        """Find the solution.
 
         Parameters
         ----------

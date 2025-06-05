@@ -26,7 +26,7 @@ def set_tmp(
     round_output: bool = True,
     calculate_ce: bool = False,
 ) -> SET:
-    """Calculates the Standard Effective Temperature (SET). The SET is the
+    """Calculate the Standard Effective Temperature (SET). The SET is the
     temperature of a hypothetical isothermal environment at 50% (rh), <0.1 m/s
     (20 fpm) average air speed (v), and tr = tdb, in which the total heat loss
     from the skin of an imaginary occupant wearing clothing, standardized for
