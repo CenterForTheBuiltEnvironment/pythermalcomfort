@@ -35,8 +35,8 @@ def heat_index_rothfusz(
 
         from pythermalcomfort.models import heat_index_rothfusz
 
-        result = heat_index_rothfusz(tdb=25, rh=50)
-        print(result.hi)    # 29.7
+        result = heat_index_rothfusz(tdb=29, rh=50)
+        print(result.hi)  # 29.7
         print(result.stress_category)  # "caution"
     """
     # Validate inputs using the HeatIndexInputs class
@@ -68,6 +68,6 @@ def heat_index_rothfusz(
     }
 
     if round_output:
-        hi = np.around(hi, 1)
+        hi_valid = np.around(hi_valid, 1)
 
-    return HI(hi=hi_valid, stress_category=mapping(hi, heat_index_categories))
+    return HI(hi=hi_valid, stress_category=mapping(hi_valid, heat_index_categories))

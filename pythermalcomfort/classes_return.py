@@ -233,7 +233,7 @@ class HI:
         Heat Index, [°C] or [°F] depending on the units.
     """
 
-    hi: Union[float, list[float]]
+    hi: npt.ArrayLike
     stress_category: Union[str, list[str]]
 
     def __getitem__(self, item):
