@@ -20,7 +20,9 @@ from pythermalcomfort.models.pmv_ppd_ashrae import pmv_ppd_ashrae
 from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
 from pythermalcomfort.models.set_tmp import set_tmp
 from pythermalcomfort.models.solar_gain import solar_gain
+from pythermalcomfort.models.thi import thi
 from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
+from pythermalcomfort.models.two_nodes_gagge_ji import two_nodes_gagge_ji
 from pythermalcomfort.models.two_nodes_gagge_sleep import two_nodes_gagge_sleep
 from pythermalcomfort.models.use_fans_heatwaves import use_fans_heatwaves
 from pythermalcomfort.models.utci import utci
@@ -58,4 +60,6 @@ __all__ = [
     "discomfort_index",
     "JOS3",
     "esi",
+    "two_nodes_gagge_ji",
+    "thi",
 ]

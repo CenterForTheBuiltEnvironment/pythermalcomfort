@@ -213,7 +213,6 @@ def weight_rate(weight: float) -> float:
     return weight / Default.weight
 
 
-# todo remove all the defaults
 def bfb_rate(
     height: float,
     weight: float,

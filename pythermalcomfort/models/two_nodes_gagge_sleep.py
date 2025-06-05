@@ -122,7 +122,7 @@ def two_nodes_gagge_sleep(
         )
     duration = lengths[0]
 
-    # this should be the same dataclass as the return of _optimised
+    # Initialize physiological state variables to be updated in each iteration
     result = {
         "t_core": temp_core_neutral,
         "t_skin": temp_skin_neutral,
@@ -135,6 +135,7 @@ def two_nodes_gagge_sleep(
     results = []
 
     for i in range(duration):
+        # Calculate metabolic rate using polynomial equation from Yan et al. (2022)
         met = (
             -0.000000000000575 * ((i - 1) / 60) ** 5
             + 0.000000000785521 * ((i - 1) / 60) ** 4
@@ -144,6 +145,7 @@ def two_nodes_gagge_sleep(
             + 1.09952538864493
         )
 
+        # Calculate core temperature using quadratic equation from Yan et al. (2022)
         t_core = 0.022234 * ((i - 1) / 60) ** 2 - 0.27677 * ((i - 1) / 60) + 37.02
 
         result = _sleep_set(
@@ -186,28 +188,28 @@ def two_nodes_gagge_sleep(
 
 
 def _sleep_set(
-    tdb,
-    tr,
-    v,
-    rh,
-    clo,
-    thickness,
-    met,
-    wme,
-    p_atm,
-    ltime,
-    height,
-    weight,
-    c_sw,
-    c_dil,
-    c_str,
-    temp_skin_neutral,
-    temp_core_neutral,
-    e_skin,
-    alfa,
-    skin_blood_flow,
-    met_shivering,
-):
+    tdb: float,
+    tr: float,
+    v: float,
+    rh: float,
+    clo: float,
+    thickness: float,
+    met: float,
+    wme: float,
+    p_atm: float,
+    ltime: int,
+    height: float,
+    weight: float,
+    c_sw: float,
+    c_dil: float,
+    c_str: float,
+    temp_skin_neutral: float,
+    temp_core_neutral: float,
+    e_skin: float,
+    alfa: float,
+    skin_blood_flow: float,
+    met_shivering: float,
+) -> dict:
     m = met * 58.2
     w = wme * 58.2
     k_clo = 0.25
@@ -351,7 +353,12 @@ def _sleep_set(
     while not flag1:
         err1 = _fnerre(xold, q_skin, h_d, t_skin, wet, h_e, p_s_sk)
         err2 = _fnerre(xold + delta, q_skin, h_d, t_skin, wet, h_e, p_s_sk)
-        x = xold - delta * err1 / (err2 - err1)
+        err_diff = err2 - err1
+        if abs(err_diff) < 1e-10:  # Avoid division by very small values
+            # Use a fallback approach or break iteration
+            break
+        else:
+            x = xold - delta * err1 / err_diff
         if abs(x - xold) > 0.01:
             xold = x
             flag1 = False
@@ -400,12 +407,38 @@ def _sleep_set(
 
 
 def _fnsvp(t):
+    """
+    Calculate saturation vapor pressure at temperature t.
+
+    Parameters
+    ----------
+    t : float
+        Temperature [°C]
+
+    Returns
+    -------
+    float
+        Saturation vapor pressure [Pa]
+    """
+
     return math.exp(18.6686 - 4030.183 / (t + 235))
 
 
 def _fnerre(x, hsk, hd, tsk, w, he, pssk):
+    """
+    Error function for iterative solution of SET temperature.
+
+    Used in the Newton-Raphson algorithm.
+    """
+
     return hsk - hd * (tsk - x) - w * he * (pssk - 0.5 * _fnsvp(x))
 
 
 def _fnerrs(x, hsk, hd_s, tsk, w, he_s, pssk):
+    """
+    Error function for iterative solution of SET temperature (second version).
+
+    Used in the Newton-Raphson algorithm.
+    """
+
     return hsk - hd_s * (tsk - x) - w * he_s * (pssk - 0.5 * _fnsvp(x))
