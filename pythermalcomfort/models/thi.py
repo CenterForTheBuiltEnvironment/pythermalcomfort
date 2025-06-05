@@ -21,7 +21,7 @@ def thi(
         Dry bulb air temperature, [°C].
     rh: float or list of floats
         Relative humidity, [%].
-    round_output : bool, optionalruff format
+    round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
