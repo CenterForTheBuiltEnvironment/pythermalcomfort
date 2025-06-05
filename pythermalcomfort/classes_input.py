@@ -54,6 +54,7 @@ class BaseInputs:
     max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
     thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
+    vapor_pressure: Union[float, int, np.ndarray, list] = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -237,6 +238,11 @@ class BaseInputs:
             self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
             validate_type(
                 self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
+            )
+        if self.vapor_pressure is not None:
+            self.vapor_pressure = convert_series_to_list(self.vapor_pressure)
+            validate_type(
+                self.vapor_pressure, "vapor_pressure", (float, int, np.ndarray, list)
             )
 
 
@@ -765,6 +771,36 @@ class GaggeTwoNodesInputs(BaseInputs):
             round_output=round_output,
             max_sweating=max_sweating,
             w_max=w_max,
+        )
+
+
+@dataclass
+class GaggeTwoNodesJiInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        tr,
+        v,
+        met,
+        clo,
+        vapor_pressure,
+        wme,
+        body_surface_area,
+        p_atm,
+        position,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            met=met,
+            clo=clo,
+            vapor_pressure=vapor_pressure,
+            wme=wme,
+            body_surface_area=body_surface_area,
+            p_atm=p_atm,
+            position=position,
         )
 
 
