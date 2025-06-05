@@ -1,7 +1,8 @@
-from pythermalcomfort.models import heat_index_rothfusz
-from tests.conftest import Urls, retrieve_reference_table, validate_result
 import numpy as np
 import pytest
+
+from pythermalcomfort.models import heat_index_rothfusz
+from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
 def test_heat_index(get_test_url, retrieve_data):
