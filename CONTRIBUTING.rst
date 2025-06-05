@@ -68,7 +68,6 @@ Now you can make your changes locally.
 
 .. code-block:: bash
 
-    black .
     autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
     ruff check --fix
     ruff format

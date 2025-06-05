@@ -9,7 +9,8 @@ from setuptools import find_packages, setup
 
 def read(*names, **kwargs):
     with open(
-        join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
+        join(dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8"),
     ) as fh:
         return fh.read()
 
@@ -27,8 +28,9 @@ setup(
         "to estimate physiological responses such as core temperature, skin temperature, and skin wettedness. "
     ),
     long_description="{}\n{}".format(
-        re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
-            "", read("README.rst")
+        re.compile("^.. start-badges.*^.. end-badges", re.MULTILINE | re.DOTALL).sub(
+            "",
+            read("README.rst"),
         ),
         re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
     ),
@@ -95,6 +97,6 @@ setup(
     entry_points={
         "console_scripts": [
             "pythermalcomfort = pythermalcomfort.cli:main",
-        ]
+        ],
     },
 )

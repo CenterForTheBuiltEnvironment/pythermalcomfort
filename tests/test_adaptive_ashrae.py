@@ -8,7 +8,9 @@ from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 def test_adaptive_ashrae(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.ADAPTIVE_ASHRAE.name
+        get_test_url,
+        retrieve_data,
+        Urls.ADAPTIVE_ASHRAE.name,
     )
     tolerance = reference_table["tolerance"]
 
@@ -17,7 +19,11 @@ def test_adaptive_ashrae(get_test_url, retrieve_data):
         outputs = entry["outputs"]
         units = inputs.get("units", Units.SI.value)
         result = adaptive_ashrae(
-            inputs["tdb"], inputs["tr"], inputs["t_running_mean"], inputs["v"], units
+            inputs["tdb"],
+            inputs["tr"],
+            inputs["t_running_mean"],
+            inputs["v"],
+            units,
         )
 
         validate_result(result, outputs, tolerance)
@@ -53,7 +59,11 @@ def test_ashrae_inputs_invalid_v_type():
 def test_nan_values_for_invalid_inputs():
     # Test with invalid inputs where limit_inputs=True
     result = adaptive_ashrae(
-        tdb=5.0, tr=5.0, t_running_mean=5.0, v=3.0, limit_inputs=True
+        tdb=5.0,
+        tr=5.0,
+        t_running_mean=5.0,
+        v=3.0,
+        limit_inputs=True,
     )
 
     # Check that the comfort temperature is nan

@@ -4,9 +4,12 @@ from pythermalcomfort.models import solar_gain
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_solar_gain(get_test_url, retrieve_data):
+def test_solar_gain(get_test_url, retrieve_data) -> None:
+    """Test that the solar gain function calculates correctly for various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.SOLAR_GAIN.name
+        get_test_url,
+        retrieve_data,
+        Urls.SOLAR_GAIN.name,
     )
     tolerance = reference_table["tolerance"]
 
@@ -18,7 +21,8 @@ def test_solar_gain(get_test_url, retrieve_data):
         validate_result(result, outputs, tolerance)
 
 
-def test_solar_gain_array():
+def test_solar_gain_array() -> None:
+    """Test that the solar gain function works with arrays."""
     np.allclose(
         solar_gain(
             sol_altitude=[0, 30],

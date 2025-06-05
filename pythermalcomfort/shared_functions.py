@@ -7,7 +7,7 @@ def valid_range(x, valid):
 
 
 def mapping(value, map_dictionary, right=True):
-    """Maps a temperature array to stress categories.
+    """Map a temperature array to stress categories.
 
     Parameters
     ----------
@@ -21,6 +21,7 @@ def mapping(value, map_dictionary, right=True):
     Returns
     -------
     Stress category for each input temperature.
+
     """
     bins = np.array(list(map_dictionary.keys()))
     words = np.append(np.array(list(map_dictionary.values())), "unknown")

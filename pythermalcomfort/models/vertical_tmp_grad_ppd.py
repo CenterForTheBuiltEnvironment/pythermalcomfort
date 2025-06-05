@@ -18,7 +18,7 @@ def vertical_tmp_grad_ppd(
     vertical_tmp_grad: Union[float, list[float]],
     round_output: bool = True,
 ) -> VerticalTGradPPD:
-    """Calculates the percentage of thermally dissatisfied people with a
+    """Calculate the percentage of thermally dissatisfied people with a
     vertical temperature gradient between feet and head [55ASHRAE2023]_. This equation is
     only applicable for vr < 0.2 m/s (40 fps).
 
@@ -83,6 +83,7 @@ def vertical_tmp_grad_ppd(
         )
         print(result.ppd_vg)  # 12.6
         print(result.acceptability)  # False
+
     """
     # Validate inputs using the VerticalTmpGradPPDInputs class
     VerticalTGradPPDInputs(
@@ -109,7 +110,12 @@ def vertical_tmp_grad_ppd(
         met_valid,
         clo_valid,
     ) = _check_standard_compliance_array(
-        standard="ashrae", tdb=tdb, tr=tr, v_limited=vr, met=met, clo=clo
+        standard="ashrae",
+        tdb=tdb,
+        tr=tr,
+        v_limited=vr,
+        met=met,
+        clo=clo,
     )
 
     tsv = pmv_ppd_ashrae(

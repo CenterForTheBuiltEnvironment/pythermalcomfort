@@ -15,12 +15,12 @@ def pmv_a(
     rh: Union[float, list[float]],
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
-    a_coefficient: Union[float, int],
+    a_coefficient: float,
     wme: Union[float, list[float]] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> APMV:
-    """Returns Adaptive Predicted Mean Vote (aPMV) [Yao2009]_. This index was
+    """Return Adaptive Predicted Mean Vote (aPMV) [Yao2009]_. This index was
     developed by Yao, R. et al. (2009). The model takes into account factors
     such as culture, climate, social, psychological, and behavioral
     adaptations, which have an impact on the senses used to detect thermal
@@ -100,6 +100,7 @@ def pmv_a(
         )
         print(results)  # AdaptivePMV(a_pmv=0.74)
         print(results.a_pmv)  # 0.71
+
     """
     # Validate inputs using the APMVInputs class
     APMVInputs(

@@ -11,7 +11,7 @@ def wct(
     v: Union[float, list[float]],
     round_output: bool = True,
 ) -> WCT:
-    """Calculates the Wind Chill Temperature (`WCT`_).
+    """Calculate the Wind Chill Temperature (`WCT`_).
 
     We validated the implementation of this model by comparing the results with the Wind Chill
     Temperature Calculator on `Calculator.net`_
@@ -45,6 +45,7 @@ def wct(
 
         result = wc(tdb=[-5, -10], v=[5.5, 10], round_output=True)
         print(result.wct)  # [1255.2 1603.9]
+
     """
     # Validate inputs using the WCYInputs class
     WCTInputs(

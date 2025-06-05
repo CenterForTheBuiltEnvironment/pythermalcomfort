@@ -27,7 +27,7 @@ def pmv_ppd_iso(
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
-    """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+    """Return Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
     calculated in accordance with the ISO 7730.
 
     The ISO uses the same formulation of the PMV as published by Fanger [Fanger1970]_.
@@ -131,6 +131,7 @@ def pmv_ppd_iso(
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
+
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -159,7 +160,7 @@ def pmv_ppd_iso(
     model = model.lower()
     if model not in [Models.iso_7730_2005.value]:
         raise ValueError(
-            "PMV calculations can only be performed in compliance with ISO 7730-2005"
+            "PMV calculations can only be performed in compliance with ISO 7730-2005",
         )
 
     (
@@ -180,7 +181,7 @@ def pmv_ppd_iso(
     pmv_array = _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
 
     ppd_array = 100.0 - 95.0 * np.exp(
-        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0
+        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0,
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan

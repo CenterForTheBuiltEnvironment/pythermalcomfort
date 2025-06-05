@@ -20,7 +20,7 @@ def solar_gain(
     floor_reflectance: Union[float, list[float]] = 0.6,
     round_output: bool = True,
 ) -> SolarGain:
-    """Calculates the solar gain to the human body using the Effective Radiant
+    """Calculate the solar gain to the human body using the Effective Radiant
     Field (ERF) [55ASHRAE2023]_. The ERF is a measure of the net energy flux to or from
     the human body. ERF is expressed in W over human body surface area [W/m2].
     In addition, it calculates the delta mean radiant temperature. Which is the
@@ -99,6 +99,7 @@ def solar_gain(
         )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
+
     """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(
@@ -161,7 +162,7 @@ def _solar_gain_vectorised(
     floor_reflectance,
 ):
     def find_span(arr, x):
-        for i in range(0, len(arr)):
+        for i in range(len(arr)):
             if arr[i + 1] >= x >= arr[i]:
                 return i
         return -1

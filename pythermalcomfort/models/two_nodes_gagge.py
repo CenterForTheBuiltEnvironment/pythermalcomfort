@@ -92,10 +92,9 @@ def two_nodes_gagge(
         result = two_nodes_gagge(tdb=25, tr=25, v=0.1, rh=50, clo=0.5, met=1.2)
         print(result.w)  # 100.0
 
-        result = two_nodes_gagge(
-            tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5
-        )
+        result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
+
     """
     # Validate inputs using the TwoNodesInputs class
     GaggeTwoNodesInputs(
@@ -199,7 +198,7 @@ def two_nodes_gagge(
     }
 
     if round_output:
-        for key in output.keys():
+        for key in output:
             output[key] = np.around(output[key], 2)
 
     return GaggeTwoNodes(**output)
@@ -269,8 +268,7 @@ def _gagge_two_nodes_optimized(
     m = met * met_factor  # metabolic rate
 
     e_comfort = 0.42 * (rm - met_factor)  # evaporative heat loss during comfort
-    if e_comfort < 0:
-        e_comfort = 0
+    e_comfort = max(e_comfort, 0)
 
     i_cl = 1.0  # permeation efficiency of water vapour naked skin
     if clo > 0:
@@ -362,13 +360,10 @@ def _gagge_two_nodes_optimized(
         bd_sig = t_body - temp_body_neutral
         warm_b = (bd_sig > 0) * bd_sig
         m_bl = (skin_blood_flow_neutral + c_dil * c_warm) / (1 + c_str * colds)
-        if m_bl > max_skin_blood_flow:
-            m_bl = max_skin_blood_flow
-        if m_bl < 0.5:
-            m_bl = 0.5
+        m_bl = min(m_bl, max_skin_blood_flow)
+        m_bl = max(m_bl, 0.5)
         m_rsw = c_sw * warm_b * math.exp(warm_sk / 10.7)  # regulatory sweating
-        if m_rsw > max_sweating:
-            m_rsw = max_sweating
+        m_rsw = min(m_rsw, max_sweating)
         e_rsw = 0.68 * m_rsw  # heat lost by vaporization sweat
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
@@ -413,8 +408,7 @@ def _gagge_two_nodes_optimized(
     if not calculate_ce and met > 0.85:
         h_c_met = 5.66 * (met - 0.85) ** 0.39
         h_c_s = max(h_c_s, h_c_met)
-    if h_c_s < 3.0:
-        h_c_s = 3.0
+    h_c_s = max(h_c_s, 3.0)
 
     h_t_s = (
         h_c_s + h_r_s
@@ -553,7 +547,7 @@ def _gagge_two_nodes_optimized(
             float64,
             float64,
             float64,
-        )
+        ),
     ],
     cache=True,
 )

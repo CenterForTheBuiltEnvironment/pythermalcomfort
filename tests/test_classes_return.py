@@ -13,7 +13,8 @@ class TestDataClass(AutoStrMixin):
     field3: list
 
 
-def test_autostr_with_dataclass():
+def test_autostr_with_dataclass() -> None:
+    """Test that the AutoStrMixin generates a string representation for a dataclass."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     expected_output = (
         "-------- TestDataClass --------\n"
@@ -24,7 +25,8 @@ def test_autostr_with_dataclass():
     assert str(obj) == expected_output
 
 
-def test_autostr_with_multiline_field():
+def test_autostr_with_multiline_field() -> None:
+    """Test that the AutoStrMixin handles multiline fields correctly."""
     obj = TestDataClass(field1=42, field2="test", field3=["line1", "line2"])
     expected_output = (
         "-------- TestDataClass --------\n"
@@ -35,7 +37,9 @@ def test_autostr_with_multiline_field():
     assert str(obj) == expected_output
 
 
-def test_autostr_empty_dataclass():
+def test_autostr_empty_dataclass() -> None:
+    """Test that the AutoStrMixin handles an empty dataclass correctly."""
+
     @dataclass
     class EmptyDataClass(AutoStrMixin):
         pass
@@ -45,8 +49,8 @@ def test_autostr_empty_dataclass():
     assert str(obj) == expected_output
 
 
-def test_autostr_repr_method():
-    """Test that the __repr__ method returns the same as __str__"""
+def test_autostr_repr_method() -> None:
+    """Test that the __repr__ method returns the same as __str__."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     expected_output = (
         "-------- TestDataClass --------\n"
@@ -59,16 +63,16 @@ def test_autostr_repr_method():
     assert repr(obj) == str(obj)
 
 
-def test_autostr_getitem_method():
-    """Test that the __getitem__ method works correctly"""
+def test_autostr_getitem_method() -> None:
+    """Test that the __getitem__ method works correctly."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     assert obj["field1"] == 42
     assert obj["field2"] == "test"
     assert obj["field3"] == [1, 2, 3]
 
 
-def test_autostr_getitem_method_key_error():
-    """Test that __getitem__ raises AttributeError for non-existent keys"""
+def test_autostr_getitem_method_key_error() -> None:
+    """Test that __getitem__ raises AttributeError for non-existent keys."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     with pytest.raises(KeyError):
         _ = obj["non_existent"]

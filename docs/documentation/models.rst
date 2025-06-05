@@ -121,10 +121,10 @@ Two-node model sleep
     :members:
 
 Gagge-Ji two-node model
-----------------------
+-----------------------
 
 .. autofunction:: pythermalcomfort.models.two_nodes_gagge_ji.two_nodes_gagge_ji
-    
+
 .. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodesJi
     :members:
 
@@ -383,9 +383,9 @@ Work capacity (NIOSH)
 .. autoclass:: pythermalcomfort.classes_return.WorkCapacity
 
 Temperature Humidity Index (THI)
------------------------------
+--------------------------------
 
 .. autofunction:: pythermalcomfort.models.thi.thi
-    
+
 .. autoclass:: pythermalcomfort.classes_return.THI
     :members:

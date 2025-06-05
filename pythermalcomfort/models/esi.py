@@ -12,7 +12,7 @@ def esi(
     sol_radiation_global: Union[float, list[float]],
     round_output: bool = True,
 ) -> ESI:
-    """Calculates the Environmental Stress Index (ESI) [Moran2001]_.
+    """Calculate the Environmental Stress Index (ESI) [Moran2001]_.
 
     Parameters
     ----------
@@ -40,12 +40,10 @@ def esi(
         result = esi(tdb=30.2, rh=42.2, sol_radiation_global=766)
         print(result.esi)  # 26.2
 
-        result = esi(
-            tdb=[30.2, 27.0], rh=[42.2, 68.8], sol_radiation_global=[766, 289]
-        )
+        result = esi(tdb=[30.2, 27.0], rh=[42.2, 68.8], sol_radiation_global=[766, 289])
         print(result.esi)  # [26.2, 25.6]
-    """
 
+    """
     ESIInputs(
         tdb=tdb,
         rh=rh,

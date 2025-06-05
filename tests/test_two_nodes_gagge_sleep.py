@@ -5,8 +5,8 @@ from pythermalcomfort.classes_return import GaggeTwoNodesSleep
 from pythermalcomfort.models import two_nodes_gagge_sleep
 
 
-def test_two_nodes_gagge_sleep_single_input():
-    # run with scalar inputs
+def test_two_nodes_gagge_sleep_single_input() -> None:
+    """Test the two_nodes_gagge_sleep function with scalar inputs."""
     result = two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, thickness_quilt=1.76)
 
     # expected outputs
@@ -29,7 +29,8 @@ def test_two_nodes_gagge_sleep_single_input():
         np.testing.assert_allclose(actual, exp, rtol=1e-6, atol=1e-8)
 
 
-def test_two_nodes_gagge_sleep_long_duration():
+def test_two_nodes_gagge_sleep_long_duration() -> None:
+    """Test the two_nodes_gagge_sleep function with a longer duration input."""
     duration = 481
     ta = np.repeat(18, duration)
     tr = np.repeat(18, duration)
@@ -105,7 +106,8 @@ def test_two_nodes_gagge_sleep_long_duration():
         )
 
 
-def test_length_mismatch_raises_value_error():
+def test_length_mismatch_raises_value_error() -> None:
+    """Test that length mismatch in input lists raises ValueError."""
     with pytest.raises(ValueError) as exc:
         two_nodes_gagge_sleep(
             [18, 18],
@@ -119,21 +121,22 @@ def test_length_mismatch_raises_value_error():
     assert "must have the same length" in str(exc.value)
 
 
-def test_unexpected_kwargs_raises_type_error():
-    # passing an unknown kwarg
+def test_unexpected_kwargs_raises_type_error() -> None:
+    """Test that unexpected keyword arguments raise TypeError."""
     with pytest.raises(TypeError) as exc:
         two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, 1.76, foo=123)
     assert "Unexpected arguments" in str(exc.value)
 
 
-def test_invalid_kwarg_type_raises_type_error():
+def test_invalid_kwarg_type_raises_type_error() -> None:
+    """Test that a non-numeric type for tdb raises TypeError."""
     with pytest.raises(TypeError) as exc:
         two_nodes_gagge_sleep("string", 18, 0.05, 50, 1.4, 1.76)
     msg = str(exc.value)
     assert "tdb" in msg
 
 
-def test_tickness_quilt_negative():
-    # Test with a specific thickness_quilt value
+def test_tickness_quilt_negative() -> None:
+    """Test that a negative thickness_quilt raises ValueError."""
     with pytest.raises(ValueError):
         two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, thickness_quilt=-1.76)

@@ -28,7 +28,7 @@ def use_fans_heatwaves(
     round_output: bool = True,
     max_sweating: float = 500,
 ) -> UseFansHeatwaves:
-    """It helps you to estimate if the conditions you have selected would cause
+    """Estimate if the conditions you have selected would cause
     heat strain. This occurs when either the following variables reaches its
     maximum value:
 
@@ -86,9 +86,7 @@ def use_fans_heatwaves(
 
         from pythermalcomfort.models import use_fans_heatwaves
 
-        result = use_fans_heatwaves(
-            tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5
-        )
+        result = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # 63.0
 
     """
@@ -154,11 +152,15 @@ def use_fans_heatwaves(
     ]
 
     output["heat_strain_blood_flow"] = np.where(
-        output["m_bl"] == max_skin_blood_flow, True, False
+        output["m_bl"] == max_skin_blood_flow,
+        True,
+        False,
     )
     output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
     output["heat_strain_sweating"] = np.where(
-        output["m_rsw"] == max_sweating, True, False
+        output["m_rsw"] == max_sweating,
+        True,
+        False,
     )
 
     output["heat_strain"] = np.any(
@@ -181,7 +183,13 @@ def use_fans_heatwaves(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+            standard="fan_heatwaves",
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            met=met,
+            clo=clo,
         )
         all_valid = ~(
             np.isnan(tdb_valid)

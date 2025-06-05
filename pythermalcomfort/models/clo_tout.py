@@ -11,8 +11,8 @@ def clo_tout(
     tout: Union[float, list[float]],
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CloTOut:
-    """Representative clothing insulation Icl as a function of outdoor air
-    temperature at 06:00 a.m [Schiavon2013]_.
+    """Calculate representative clothing insulation Icl based on outdoor air
+    temperature at 06:00 a.m. [Schiavon2013]_.
 
     Parameters
     ----------
@@ -56,6 +56,7 @@ def clo_tout(
 
         result = clo_tout(tout=[27, 25])
         print(result.clo_tout)  # array([0.46, 0.47])
+
     """
     # Validate inputs using the CloTOutInputs class
     CloTOutInputs(

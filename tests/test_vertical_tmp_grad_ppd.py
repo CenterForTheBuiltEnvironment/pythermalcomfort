@@ -4,9 +4,12 @@ from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_vertical_tmp_grad_ppd(get_test_url, retrieve_data):
+def test_vertical_tmp_grad_ppd(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the output correctly for various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.VERTICAL_TMP_GRAD_PPD.name
+        get_test_url,
+        retrieve_data,
+        Urls.VERTICAL_TMP_GRAD_PPD.name,
     )
     tolerance = reference_table["tolerance"]
 

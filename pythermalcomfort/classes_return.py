@@ -41,6 +41,7 @@ class APMV(AutoStrMixin):
     ----------
     a_pmv : float or list of floats
         Predicted Mean Vote.
+
     """
 
     a_pmv: Union[float, npt.ArrayLike]
@@ -67,6 +68,7 @@ class AdaptiveASHRAE(AutoStrMixin):
         Acceptability for 80% occupants.
     acceptability_90 : bool or list of bools
         Acceptability for 90% occupants.
+
     """
 
     tmp_cmf: Union[float, npt.ArrayLike]
@@ -105,6 +107,7 @@ class AdaptiveEN(AutoStrMixin):
         Lower acceptable comfort temperature for category II, default in [°C] or in [°F].
     tmp_cmf_cat_iii_low : float or list of floats
         Lower acceptable comfort temperature for category III, default in [°C] or in [°F].
+
     """
 
     tmp_cmf: Union[float, npt.ArrayLike]
@@ -129,6 +132,7 @@ class AnkleDraft(AutoStrMixin):
         Predicted Percentage of Dissatisfied occupants with ankle draft, [%].
     acceptability : bool or list of bools
         Indicates if the air speed at the ankle level is acceptable according to ASHRAE 55 2020 standard.
+
     """
 
     ppd_ad: Union[float, npt.ArrayLike]
@@ -143,6 +147,7 @@ class AT(AutoStrMixin):
     ----------
     at : float or list of floats
         Apparent temperature, [°C]
+
     """
 
     at: float
@@ -157,6 +162,7 @@ class ATHB(AutoStrMixin):
     ----------
     athb_pmv : float or list of floats
         Predicted Mean Vote calculated with the Adaptive Thermal Heat Balance framework.
+
     """
 
     athb_pmv: Union[float, npt.ArrayLike]
@@ -171,6 +177,7 @@ class CloTOut(AutoStrMixin):
     ----------
     clo_tout : float or list of floats
         Representative clothing insulation Icl.
+
     """
 
     clo_tout: Union[float, list[float]]
@@ -184,6 +191,7 @@ class CE(AutoStrMixin):
     ----------
     ce : float or list of floats
         Cooling Effect value.
+
     """
 
     ce: Union[float, list[float]]
@@ -199,6 +207,7 @@ class DI(AutoStrMixin):
         Discomfort Index, [°C].
     discomfort_condition : str or list of str
         Classification of the thermal comfort conditions according to the discomfort index.
+
     """
 
     di: Union[float, list[float]]
@@ -214,6 +223,7 @@ class EPMV(AutoStrMixin):
     ----------
     e_pmv : float or list of floats
         Adjusted Predicted Mean Votes with Expectancy Factor.
+
     """
 
     e_pmv: Union[float, list[float]]
@@ -227,6 +237,7 @@ class ESI(AutoStrMixin):
     ----------
     esi : float or list of floats
         Environmental Stress Index.
+
     """
 
     esi: Union[float, list[float]]
@@ -240,9 +251,11 @@ class HI(AutoStrMixin):
     ----------
     hi : float or list of floats
         Heat Index, [°C] or [°F] depending on the units.
+
     """
 
-    hi: Union[float, list[float]]
+    hi: npt.ArrayLike
+    stress_category: Optional[Union[str, list[str]]] = None
 
 
 @dataclass(frozen=True, repr=False)
@@ -255,6 +268,7 @@ class Humidex(AutoStrMixin):
         Humidex value, [°C].
     discomfort : str or list of str
         Degree of comfort or discomfort as defined in Havenith and Fiala (2016).
+
     """
 
     humidex: Union[float, list[float]]
@@ -269,6 +283,7 @@ class NET(AutoStrMixin):
     ----------
     net : float or list of floats
         Normal Effective Temperature, [°C].
+
     """
 
     net: Union[float, list[float]]
@@ -282,6 +297,7 @@ class PETSteady(AutoStrMixin):
     ----------
     pet : float or list of floats
         Physiological Equivalent Temperature.
+
     """
 
     pet: Union[float, list[float]]
@@ -313,6 +329,7 @@ class PHS(AutoStrMixin):
         Maximum water loss in watts, [W].
     water_loss : float or list of floats
         Maximum water loss, [g].
+
     """
 
     t_re: Union[float, list[float]]
@@ -335,6 +352,7 @@ class PMV(AutoStrMixin):
     ----------
     pmv : float or list of floats
         Predicted Mean Vote.
+
     """
 
     pmv: Union[float, npt.ArrayLike]
@@ -353,6 +371,7 @@ class PMVPPD(AutoStrMixin):
         Predicted Percentage of Dissatisfied.
     tsv : str or list of strings
         Predicted thermal sensation vote.
+
     """
 
     pmv: Union[float, list[float]]
@@ -378,6 +397,7 @@ class SET(AutoStrMixin):
     ----------
     set : float or list of floats
         Standard effective temperature, [°C].
+
     """
 
     set: Union[float, list[float]]
@@ -394,6 +414,7 @@ class SolarGain(AutoStrMixin):
     delta_mrt : float or list of floats
         Delta mean radiant temperature. The amount by which the mean radiant
         temperature of the space should be increased if no solar radiation is present.
+
     """
 
     erf: Union[float, list[float]]
@@ -443,6 +464,7 @@ class GaggeTwoNodes(AutoStrMixin):
         Thermal discomfort.
     t_sens : float or list of floats
         Predicted Thermal Sensation.
+
     """
 
     e_skin: Union[float, list[float]]
@@ -475,6 +497,7 @@ class GaggeTwoNodesJi(AutoStrMixin):
         Core temperature, [°C].
     t_skin : float or list of floats
         Skin temperature, [°C].
+
     """
 
     t_core: Union[float, list[float]]
@@ -489,6 +512,7 @@ class THI(AutoStrMixin):
     ----------
     thi : float or list of floats
         Temperature-Humidity Index (THI).
+
     """
 
     thi: Union[float, list[float]]
@@ -520,6 +544,7 @@ class GaggeTwoNodesSleep(AutoStrMixin):
         Dynamic fraction of total body mass assigned to the skin node (dimensionless).
     skin_blood_flow: float or list of floats
         Skin-blood-flow rate per unit surface area, [kg/h/m2].
+
     """
 
     set: Union[float, list[float]]
@@ -572,6 +597,7 @@ class UseFansHeatwaves(AutoStrMixin):
         True if heat strain is caused by skin wettedness (w) reaching its maximum value.
     heat_strain_sweating : bool or list of bools
         True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value.
+
     """
 
     e_skin: Union[float, list[float]]
@@ -602,6 +628,7 @@ class UTCI(AutoStrMixin):
         Universal Thermal Climate Index, [°C] or in [°F].
     stress_category : str or list of strs
         UTCI categorized in terms of thermal stress [Blazejczyk2013]_.
+
     """
 
     utci: Union[float, list[float]]
@@ -619,6 +646,7 @@ class VerticalTGradPPD(AutoStrMixin):
         Predicted Percentage of Dissatisfied occupants with vertical temperature gradient.
     acceptability : bool or list of bools
         True if the value of air speed at the ankle level is acceptable (PPD_vg <= 5%).
+
     """
 
     ppd_vg: Union[float, list[float]]
@@ -633,6 +661,7 @@ class WBGT(AutoStrMixin):
     ----------
     wbgt : float or list of floats
         Wet Bulb Globe Temperature Index.
+
     """
 
     wbgt: Union[float, npt.ArrayLike]
@@ -646,6 +675,7 @@ class WCI(AutoStrMixin):
     ----------
     wci : float or list of floats
         Wind Chill Index, [W/m^2].
+
     """
 
     wci: Union[float, list[float]]
@@ -659,6 +689,7 @@ class WCT(AutoStrMixin):
     ----------
     wct : float or list of floats
         Wind Chill Temperature, [°C].
+
     """
 
     wct: Union[float, list[float]]
@@ -721,6 +752,7 @@ class JOS3BodyParts(AutoStrMixin):
         Index of the right leg.
     right_foot : float
         Index of the right hand.
+
     """
 
     head: Optional[float] = None
@@ -874,6 +906,7 @@ class JOS3Output(AutoStrMixin):
         Sensible heat loss by respiration [W].
     q_res_latent : np.ndarray
         Latent heat loss by respiration [W].
+
     """
 
     simulation_time: Optional[dt.timedelta] = None

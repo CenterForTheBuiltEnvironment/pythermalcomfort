@@ -40,17 +40,17 @@ def simple_simulation():
     df = pd.DataFrame(model.dict_results())  # Make pandas.DataFrame
     df.t_skin_mean.plot()  # Plot time series of mean skin temperature.
     plt.ylabel(
-        "Mean skin temperature [°C]"
+        "Mean skin temperature [°C]",
     )  # Set y-label as 'Mean skin temperature [°C]'
     plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
     plt.savefig(
-        os.path.join(jos3_example_directory, "jos3_example1_mean_skin_temperature.png")
+        os.path.join(jos3_example_directory, "jos3_example1_mean_skin_temperature.png"),
     )  # Save plot at the current directory
     plt.show()  # Show the plot
 
     # Exporting the results as csv
     model.to_csv(
-        os.path.join(jos3_example_directory, "jos3_example1 (default output).csv")
+        os.path.join(jos3_example_directory, "jos3_example1 (default output).csv"),
     )
 
     # Print the BMR value using the getter
@@ -97,7 +97,7 @@ def detailed_simulation():
             0.1,  # right thigh
             0.1,  # right leg
             0.1,  # right foot
-        ]
+        ],
     )
     model.clo = local_clo_typical_ensembles[
         "briefs, socks, undershirt, work jacket, work pants, safety shoes"
@@ -160,7 +160,7 @@ def detailed_simulation():
     plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
     plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
     plt.savefig(
-        os.path.join(jos3_example_directory, "jos3_example2_skin_temperatures.png")
+        os.path.join(jos3_example_directory, "jos3_example2_skin_temperatures.png"),
     )  # Save plot at the current directory
     plt.show()  # Show the plot
 
@@ -190,13 +190,13 @@ def female_simulation():
     plt.ylabel("Mean skin temperature [°C]")
     plt.xlabel("Time [min]")
     plt.savefig(
-        os.path.join(jos3_example_directory, "jos3_example3_mean_skin_temperature.png")
+        os.path.join(jos3_example_directory, "jos3_example3_mean_skin_temperature.png"),
     )
     plt.show()
 
     # Exporting the results as csv
     model.to_csv(
-        os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv")
+        os.path.join(jos3_example_directory, "jos3_example3 (female simulation).csv"),
     )
 
 
@@ -218,7 +218,9 @@ def validation_simulation():
         # Loop through each sheet name and read the data into a DataFrame
         for sheet_name, header in sheet_names:
             exp_dataset[sheet_name] = pd.read_excel(
-                exp_dataset_path, header=header, sheet_name=sheet_name
+                exp_dataset_path,
+                header=header,
+                sheet_name=sheet_name,
             )
     # Handle the case where the file is not found
     except FileNotFoundError:
@@ -252,7 +254,7 @@ def validation_simulation():
                     0.3,
                     0.3,
                     0,
-                ]
+                ],
             )
             model.par = 1.2
             model.posture = "sitting"
@@ -314,21 +316,21 @@ def validation_simulation():
                 height=1.95,
                 weight=88.6,
                 age=25,
-            )
+            ),
         )
         models.append(
             JOS3(
                 height=1.84,
                 weight=76.1,
                 age=22,
-            )
+            ),
         )
         models.append(
             JOS3(
                 height=1.75,
                 weight=110,
                 age=23,
-            )
+            ),
         )
 
         tolist = inputcons[d]["to"]
@@ -361,21 +363,21 @@ def validation_simulation():
                 height=1.91,
                 weight=77.2,
                 age=25,
-            )
+            ),
         )
         models.append(
             JOS3(
                 height=1.91,
                 weight=84.5,
                 age=26,
-            )
+            ),
         )
         models.append(
             JOS3(
                 height=1.88,
                 weight=92.7,
                 age=22,
-            )
+            ),
         )
 
         tolist = inputcons[d]["to"]
@@ -413,7 +415,7 @@ def validation_simulation():
                 "TreSim": gsim.loc[gsim["Condition"] == dn, "t_core_pelvis"],
                 "TskExp": gexp.loc[gexp["Condition"] == dn, "Tsk"],
                 "TskSim": gsim.loc[gsim["Condition"] == dn, "t_skin_mean"],
-            }
+            },
         )
 
     dfs = []
@@ -525,7 +527,11 @@ def validation_simulation():
     gexp = exp_dataset["Stolwijk1966"].copy()
     gsim = sim_dataset["Stolwijk1966"].copy()
     fig, axes = plt.subplots(
-        nrows=5, ncols=2, sharex=True, sharey=True, figsize=(8, 12)
+        nrows=5,
+        ncols=2,
+        sharex=True,
+        sharey=True,
+        figsize=(8, 12),
     )
 
     for i, dn in enumerate(
@@ -539,7 +545,7 @@ def validation_simulation():
             "B-FIG.3",
             "B-FIG.4",
             "B-FIG.5",
-        ]
+        ],
     ):
         # if i >= 4:
         i += 1
@@ -587,7 +593,7 @@ def validation_simulation():
 
     plt.tight_layout(rect=[0.05, 0.05, 1, 1])
     fig.savefig(
-        os.path.join(jos3_example_directory, "jos3_validation_with_Stolwijk1966.png")
+        os.path.join(jos3_example_directory, "jos3_validation_with_Stolwijk1966.png"),
     )
 
 

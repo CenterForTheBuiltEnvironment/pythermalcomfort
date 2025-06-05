@@ -23,12 +23,12 @@ def phs(
     met: Union[float, list[float]],
     clo: Union[float, list[float]],
     posture: Union[str, list[str]],
-    wme: Union[float, int, np.ndarray, list[float], list[int]] = 0,
+    wme: Union[float, np.ndarray, list[float], list[int]] = 0,
     round_output: bool = True,
     model: str = Models.iso_7933_2023.value,
     **kwargs,
 ) -> PHS:
-    """Calculates the Predicted Heat Strain (PHS) index based in compliance
+    """Calculate the Predicted Heat Strain (PHS) index based in compliance
     with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933
     provides a method for the analytical evaluation and interpretation of the thermal
     stress experienced by a subject in a hot environment. It describes a method for
@@ -147,12 +147,12 @@ def phs(
             wme=[0, 0],
         )
         print(result.t_re)  # [37.5 43.4]
-    """
 
+    """
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
         raise ValueError(
             f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. "
-            "Please check the documentation."
+            "Please check the documentation.",
         )
 
     PHSInputs(
@@ -239,7 +239,7 @@ def phs(
 
     if weight <= 0 or weight > 1000:
         raise ValueError(
-            "The weight of the person should be in kg and it cannot exceed 1000"
+            "The weight of the person should be in kg and it cannot exceed 1000",
         )
 
     if not t_re:
@@ -308,7 +308,13 @@ def phs(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            model, tdb=tdb, tr=tr, v=v, met=met, clo=clo, p_a=p_a
+            model,
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            met=met,
+            clo=clo,
+            p_a=p_a,
         )
         all_valid = ~(
             np.isnan(tdb_valid)
@@ -318,11 +324,11 @@ def phs(
             | np.isnan(met_valid)
             | np.isnan(clo_valid)
         )
-        for key in output.keys():
+        for key in output:
             output[key] = np.where(all_valid, output[key], np.nan)
 
     if round_output:
-        for key in output.keys():
+        for key in output:
             if key != "t_sk_t_cr_wg":
                 output[key] = np.around(output[key], 1)
             else:
@@ -409,10 +415,8 @@ def _phs_optimized(
     # evaluation of the max sweat rate as a function of the metabolic rate
     if model == Models.iso_7933_2004.value:
         sw_max = (met - 32) * a_dubois
-        if sw_max > 400:
-            sw_max = 400
-        if sw_max < 250:
-            sw_max = 250
+        sw_max = min(sw_max, 400)
+        sw_max = max(sw_max, 250)
         if acclimatized == 100:
             sw_max = sw_max * 1.25
     else:  # model == Models.iso_7933_2023.value:
@@ -437,15 +441,13 @@ def _phs_optimized(
     if def_speed > 0:
         if def_dir == 1:  # Unidirectional walking
             v_r = abs(v - walk_sp * math.cos(3.14159 * theta / 180))
-        else:  # Omnidirectional walking IF
-            if v < walk_sp:
-                v_r = walk_sp
-            else:
-                v_r = v
+        elif v < walk_sp:
+            v_r = walk_sp
+        else:
+            v_r = v
     else:
         walk_sp = 0.0052 * (met - 58)
-        if walk_sp > 0.7:
-            walk_sp = 0.7
+        walk_sp = min(walk_sp, 0.7)
         v_r = v
 
     # Dynamic clothing insulation - correction for wind (Var) and walking speed
@@ -457,14 +459,12 @@ def _phs_optimized(
         w_a_ux = 1.5
     # correction for the dynamic total dry thermal insulation at or above 0.6 clo
     corr_cl = 1.044 * math.exp(
-        (0.066 * v_ux - 0.398) * v_ux + (0.094 * w_a_ux - 0.378) * w_a_ux
+        (0.066 * v_ux - 0.398) * v_ux + (0.094 * w_a_ux - 0.378) * w_a_ux,
     )
-    if corr_cl > 1:
-        corr_cl = 1
+    corr_cl = min(corr_cl, 1)
     # correction for the dynamic total dry thermal insulation at 0 clo
     corr_ia = math.exp((0.047 * v_r - 0.472) * v_r + (0.117 * w_a_ux - 0.342) * w_a_ux)
-    if corr_ia > 1:
-        corr_ia = 1
+    corr_ia = min(corr_ia, 1)
     corr_tot = corr_cl
     if clo <= 0.6:
         corr_tot = ((0.6 - clo) * corr_ia + clo * corr_cl) / 0.6
@@ -476,8 +476,7 @@ def _phs_optimized(
     # correction for the dynamic permeability index
     corr_e = (2.6 * corr_tot - 6.5) * corr_tot + 4.9
     im_dyn = i_mst * corr_e
-    if im_dyn > 0.9:
-        im_dyn = 0.9
+    im_dyn = min(im_dyn, 0.9)
     r_t_dyn = i_tot_dyn / im_dyn / 16.7
     t_exp = 28.56 + 0.115 * tdb + 0.641 * p_a  # expired air temperature
     # respiratory convective heat flow [W/m2]
@@ -495,8 +494,7 @@ def _phs_optimized(
         t_cl = tr + 0.1  # clothing surface temperature
         hc_dyn = 2.38 * abs(t_cl - tdb) ** 0.25
 
-    if z > hc_dyn:
-        hc_dyn = z
+    hc_dyn = max(hc_dyn, z)
 
     aux_r = 5.67e-08 * a_r_du
 
@@ -574,8 +572,7 @@ def _phs_optimized(
             e_v_eff = max(0.05, e_v_eff)
 
             sw_req = e_req / e_v_eff
-            if sw_req > sw_max:
-                sw_req = sw_max
+            sw_req = min(sw_req, sw_max)
         sweat_rate = sweat_rate * const_sw + sw_req * (1 - const_sw)
 
         if sweat_rate <= 0:
@@ -586,8 +583,7 @@ def _phs_optimized(
             wp = 1
             if k >= 0.5:
                 wp = -k + math.sqrt(k * k + 2)
-            if wp > w_max:
-                wp = w_max
+            wp = min(wp, w_max)
             e_p = wp * e_max
 
         # body heat storage rate [W/m2]
@@ -595,10 +591,8 @@ def _phs_optimized(
         t_cr_new = t_cr0
         while True:
             t_sk_t_cr_wg = 0.3 - 0.09 * (t_cr_new - 36.8)
-            if t_sk_t_cr_wg > 0.3:
-                t_sk_t_cr_wg = 0.3
-            if t_sk_t_cr_wg < 0.1:
-                t_sk_t_cr_wg = 0.1
+            t_sk_t_cr_wg = min(t_sk_t_cr_wg, 0.3)
+            t_sk_t_cr_wg = max(t_sk_t_cr_wg, 0.1)
             t_cr = (
                 d_storage / sp_heat
                 + t_sk0 * t_sk_t_cr_wg0 / 2

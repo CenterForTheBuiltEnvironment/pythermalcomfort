@@ -4,7 +4,9 @@ from tests.conftest import Urls, is_equal, retrieve_reference_table, validate_re
 
 def test_at(get_test_url, retrieve_data):
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.AT.name
+        get_test_url,
+        retrieve_data,
+        Urls.AT.name,
     )
     tolerance = reference_table["tolerance"]
 
