@@ -837,6 +837,29 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
 
 @dataclass
+class THIInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        rh,
+        round_output=True,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %")
+
+
+@dataclass
 class UseFansHeatwavesInputs(BaseInputs):
     def __init__(
         self,

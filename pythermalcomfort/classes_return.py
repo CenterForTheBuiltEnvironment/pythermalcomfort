@@ -480,6 +480,19 @@ class GaggeTwoNodesJi(AutoStrMixin):
     t_core: Union[float, list[float]]
     t_skin: Union[float, list[float]]
 
+      
+@dataclass(frozen=True, repr=False)
+class THI(AutoStrMixin):
+    """Dataclass to represent the Temperature-Humidity Index (THI).
+
+    Attributes
+    ----------
+    thi : float or list of floats
+        Temperature-Humidity Index (THI).
+    """
+
+    thi: Union[float, list[float]]
+
 
 @dataclass(frozen=True, repr=False)
 class GaggeTwoNodesSleep(AutoStrMixin):
