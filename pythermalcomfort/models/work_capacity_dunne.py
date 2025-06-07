@@ -8,7 +8,7 @@ from pythermalcomfort.classes_return import WorkCapacity
 
 def work_capacity_dunne(
     wbgt: Union[float, list[float]],
-    intensity: str = WorkIntensity.HEAVY.value,
+    work_intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
     """
     Estimate work capacity due to heat based ISO standards as described by Dunne et al [Dunne2013]_
@@ -29,7 +29,7 @@ def work_capacity_dunne(
     ----------
     wbgt : float or list of floats
         Wet bulb globe temperature, [°C].
-    intensity : str
+    work_intensity : str
         Which work intensity to use for the calculation, choice of "heavy",
         "moderate" or "light". Default is "heavy".
 
@@ -48,10 +48,10 @@ def work_capacity_dunne(
     """
 
     # validate inputs
-    WorkCapacityHothapsInputs(wbgt=wbgt, intensity=intensity)
+    WorkCapacityHothapsInputs(wbgt=wbgt, work_intensity=work_intensity)
 
     # convert str to enum
-    intensity = WorkIntensity(intensity.lower())
+    work_intensity = WorkIntensity(work_intensity.lower())
     wbgt = np.array(wbgt)
 
     capacity = np.clip((100 - (25 * (np.maximum(0, wbgt - 25)) ** (2 / 3))), 0, 100)
@@ -62,6 +62,6 @@ def work_capacity_dunne(
         WorkIntensity.LIGHT: 4,
     }
 
-    capacity = np.clip(capacity * factor_map[intensity], 0, 100)
+    capacity = np.clip(capacity * factor_map[work_intensity], 0, 100)
 
     return WorkCapacity(capacity=capacity)

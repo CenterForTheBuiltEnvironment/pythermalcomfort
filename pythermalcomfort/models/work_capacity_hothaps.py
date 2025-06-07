@@ -8,7 +8,7 @@ from pythermalcomfort.classes_return import WorkCapacity
 
 def work_capacity_hothaps(
     wbgt: Union[float, list[float]],
-    intensity: str = WorkIntensity.HEAVY.value,
+    work_intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
     """
     Estimate work capacity due to heat based on Kjellstrom et al. [Kjellstrom2018]_
@@ -51,7 +51,7 @@ def work_capacity_hothaps(
     ----------
     wbgt : float or list of floats
         Wet bulb globe temperature, [°C].
-    intensity : str
+    work_intensity : str
         Which work intensity to use for the calculation, choice of "heavy",
         "moderate" or "light".
 
@@ -66,10 +66,10 @@ def work_capacity_hothaps(
 
     """
     # validate inputs
-    WorkCapacityHothapsInputs(wbgt=wbgt, intensity=intensity)
+    WorkCapacityHothapsInputs(wbgt=wbgt, work_intensity=work_intensity)
 
     # convert str to enum
-    intensity = WorkIntensity(intensity.lower())
+    work_intensity = WorkIntensity(work_intensity.lower())
     wbgt = np.array(wbgt)
 
     params = {
@@ -77,8 +77,8 @@ def work_capacity_hothaps(
         WorkIntensity.MODERATE: {"divisor": 32.93, "exponent": 17.81},
         WorkIntensity.LIGHT: {"divisor": 34.64, "exponent": 22.72},
     }
-    divisor = params[intensity]["divisor"]
-    exponent = params[intensity]["exponent"]
+    divisor = params[work_intensity]["divisor"]
+    exponent = params[work_intensity]["exponent"]
     capacity = np.clip(100 * (0.1 + (0.9 / (1 + (wbgt / divisor) ** exponent))), 0, 100)
 
     return WorkCapacity(capacity=capacity)

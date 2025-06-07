@@ -14,7 +14,7 @@ def _expected_capacity(wbgt, divisor, exponent):
 
 
 def test_scalar_heavy():
-    result = work_capacity_hothaps(30.0, intensity=WorkIntensity.HEAVY.value)
+    result = work_capacity_hothaps(30.0, work_intensity=WorkIntensity.HEAVY.value)
     assert isinstance(result, WorkCapacity)
     assert isinstance(result.capacity, float)
     exp = _expected_capacity(30.0, divisor=30.94, exponent=16.64)
@@ -22,7 +22,7 @@ def test_scalar_heavy():
 
 
 def test_scalar_moderate():
-    result = work_capacity_hothaps(30.0, intensity=WorkIntensity.MODERATE.value)
+    result = work_capacity_hothaps(30.0, work_intensity=WorkIntensity.MODERATE.value)
     assert isinstance(result.capacity, float)
     assert isinstance(result, WorkCapacity)
     exp = _expected_capacity(30.0, divisor=32.93, exponent=17.81)
@@ -30,7 +30,7 @@ def test_scalar_moderate():
 
 
 def test_scalar_light():
-    result = work_capacity_hothaps(30.0, intensity=WorkIntensity.LIGHT.value)
+    result = work_capacity_hothaps(30.0, work_intensity=WorkIntensity.LIGHT.value)
     assert isinstance(result.capacity, float)
     assert isinstance(result, WorkCapacity)
     exp = _expected_capacity(30.0, divisor=34.64, exponent=22.72)
@@ -39,7 +39,7 @@ def test_scalar_light():
 
 def test_list_input():
     wbgts = [20.0, 40.0]
-    result = work_capacity_hothaps(wbgts, intensity="heavy")
+    result = work_capacity_hothaps(wbgts, work_intensity="heavy")
     assert isinstance(result.capacity, np.ndarray)
     exp_list = _expected_capacity(wbgts, divisor=30.94, exponent=16.64).tolist()
     assert all(
@@ -48,15 +48,15 @@ def test_list_input():
 
 
 def test_low_wbgt_clamped_to_100():
-    result = work_capacity_hothaps(0.0, intensity="light")
+    result = work_capacity_hothaps(0.0, work_intensity="light")
     assert result.capacity == pytest.approx(100.0, rel=1e-6)
 
 
 def test_high_wbgt_approaches_10_percent():
-    result = work_capacity_hothaps(100.0, intensity="moderate")
+    result = work_capacity_hothaps(100.0, work_intensity="moderate")
     assert result.capacity == pytest.approx(10.0, rel=1e-3)
 
 
 def test_invalid_intensity_raises():
     with pytest.raises(ValueError):
-        work_capacity_hothaps(30.0, intensity="invalid")
+        work_capacity_hothaps(30.0, work_intensity="invalid")

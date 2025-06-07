@@ -62,7 +62,7 @@ class BaseInputs:
     max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
     w_max: Union[float, int, np.ndarray, list] = field(default=None)
     wbgt: Union[float, int, np.ndarray, list] = field(default=None)
-    intensity: Union[str, WorkIntensity] = field(default=None)
+    work_intensity: Union[str, WorkIntensity] = field(default=None)
     thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
     vapor_pressure: Union[float, int, np.ndarray, list] = field(default=None)
 
@@ -251,11 +251,11 @@ class BaseInputs:
         if self.wbgt is not None:
             self.wbgt = convert_series_to_list(self.wbgt)
             validate_type(self.wbgt, "wbgt", (float, int, np.ndarray, list))
-        if self.intensity is not None:
-            self.intensity = convert_series_to_list(self.intensity)
+        if self.work_intensity is not None:
+            self.work_intensity = convert_series_to_list(self.work_intensity)
             _validate_str_values(
-                "intensity",
-                self.intensity,
+                "work_intensity",
+                self.work_intensity,
                 [i.value for i in WorkIntensity],
             )
         if self.thickness_quilt is not None:
@@ -1028,9 +1028,9 @@ class WorkCapacityHothapsInputs(BaseInputs):
     def __init__(
         self,
         wbgt,
-        intensity,
+        work_intensity,
     ):
-        super().__init__(wbgt=wbgt, intensity=intensity)
+        super().__init__(wbgt=wbgt, work_intensity=work_intensity)
 
 
 @dataclass
