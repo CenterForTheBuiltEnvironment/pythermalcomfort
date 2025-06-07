@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import math
 import warnings
 from enum import Enum
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 import numpy as np
 
@@ -39,7 +41,7 @@ class Sex(Enum):
     female = "female"
 
 
-def p_sat_torr(tdb: Union[float, list[float]]):
+def p_sat_torr(tdb: float | list[float]):
     """Estimates the saturation vapor pressure in [torr]
 
     Parameters
@@ -57,8 +59,8 @@ def p_sat_torr(tdb: Union[float, list[float]]):
 
 
 def enthalpy_air(
-    tdb: Union[float, list[float]],
-    hr: Union[float, list[float]],
+    tdb: float | list[float],
+    hr: float | list[float],
 ):
     """Calculate air enthalpy_air.
 
@@ -96,7 +98,7 @@ c12 = -0.14452093 * 1e-7
 c13 = 6.5459673
 
 
-def p_sat(tdb: Union[float, list[float]]):
+def p_sat(tdb: float | list[float]):
     """Calculate vapour pressure of water at different temperatures.
 
     Parameters
@@ -129,7 +131,7 @@ def p_sat(tdb: Union[float, list[float]]):
     return pascals
 
 
-def antoine(tdb: Union[float, np.ndarray]) -> np.ndarray:
+def antoine(tdb: float | np.ndarray) -> np.ndarray:
     """Calculate saturated vapor pressure using Antoine equation [kPa].
 
     Parameters
@@ -148,8 +150,8 @@ def antoine(tdb: Union[float, np.ndarray]) -> np.ndarray:
 
 
 def psy_ta_rh(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     p_atm=101325,
 ) -> PsychrometricValues:
     """Calculate psychrometric values of air based on dry bulb air temperature and
@@ -202,8 +204,8 @@ def psy_ta_rh(
 
 
 def wet_bulb_tmp(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
 ):
     """Calculate the wet-bulb temperature using the Stull equation [Stull2011]_
 
@@ -232,8 +234,8 @@ def wet_bulb_tmp(
 
 
 def dew_point_tmp(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
 ):
     """Calculate the dew point temperature.
 
@@ -263,11 +265,11 @@ def dew_point_tmp(
 
 
 def mean_radiant_tmp(
-    tg: Union[float, list[float]],
-    tdb: Union[float, list[float]],
-    v: Union[float, list[float]],
-    d: Union[float, list[float]] = 0.15,
-    emissivity: Union[float, list[float]] = 0.95,
+    tg: float | list[float],
+    tdb: float | list[float],
+    v: float | list[float],
+    d: float | list[float] = 0.15,
+    emissivity: float | list[float] = 0.95,
     standard="Mixed Convection",
 ):
     """Convert the globe temperature reading into mean radiant temperature in accordance
@@ -594,7 +596,7 @@ def f_svv(w, h, d):
     )
 
 
-def v_relative(v: Union[float, list[float]], met: Union[float, list[float]]):
+def v_relative(v: float | list[float], met: float | list[float]):
     """Estimates the relative air speed which combines the average air speed of the
     space plus the relative air speed caused by the body movement. The same equation is
     used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
@@ -618,8 +620,8 @@ def v_relative(v: Union[float, list[float]], met: Union[float, list[float]]):
 
 
 def clo_dynamic_ashrae(
-    clo: Union[float, list[float]],
-    met: Union[float, list[float]],
+    clo: float | list[float],
+    met: float | list[float],
     model: str = Models.ashrae_55_2023.value,
 ):
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The ASHRAE
@@ -662,12 +664,12 @@ def clo_dynamic_ashrae(
 
 
 def clo_dynamic_iso(
-    clo: Union[float, list[float]],
-    met: Union[float, list[float]],
-    v: Union[float, list[float]],
-    i_a: Union[float, list[float]] = 0.7,
+    clo: float | list[float],
+    met: float | list[float],
+    v: float | list[float],
+    i_a: float | list[float] = 0.7,
     model: str = Models.iso_9920_2007.value,
-):
+) -> float | list[float]:
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
     as well as the air speed modify the insulation characteristics of the clothing.
     Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
@@ -726,7 +728,7 @@ def running_mean_outdoor_temperature(
     temp_array: list[float],
     alpha: float = 0.8,
     units: str = Units.SI.value,
-):
+) -> float:
     """Estimate the running mean temperature also known as prevailing mean outdoor
     temperature.
 
@@ -782,7 +784,7 @@ def units_converter(from_units=Units.IP.value, **kwargs):
     converted values in SI units
 
     """
-    results = list()
+    results = []
     from_units = from_units.upper()
     if from_units == Units.IP.value:
         for key, value in kwargs.items():
@@ -810,11 +812,11 @@ def units_converter(from_units=Units.IP.value, **kwargs):
 
 
 def operative_tmp(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
     standard: str = "ISO",
-):
+) -> float | list[float]:
     """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
 
     Parameters
@@ -843,9 +845,11 @@ def operative_tmp(
         return a * tdb + (1 - a) * tr
 
 
-def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
+def clo_intrinsic_insulation_ensemble(clo_garments: float | list[float]):
     """Calculate the intrinsic insulation of a clothing ensemble based on individual
-    garments. This equation is in accordance with the ISO 9920:2009 standard [ISO9920]_
+    garments.
+
+    This equation is in accordance with the ISO 9920:2009 standard [ISO9920]_
     Section 4.3. It should be noted that this equation is only valid for clothing
     ensembles with rather uniform insulation values across the body.
 
@@ -864,9 +868,11 @@ def clo_intrinsic_insulation_ensemble(clo_garments: Union[float, list[float]]):
     return np.sum(clo_garments) * 0.835 + 0.161
 
 
-def clo_area_factor(i_cl: Union[float, list[float]]):
+def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
     """Calculate the clothing area factor (f_cl) of the clothing ensemble as a function
-    of the intrinsic insulation of the clothing ensemble. This equation is in accordance
+    of the intrinsic insulation of the clothing ensemble.
+
+    This equation is in accordance
     with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
     correlation between f_cl and i_cl is low especially for non-western clothing
     ensembles. The application of this equation is limited to clothing ensembles with
@@ -889,11 +895,13 @@ def clo_area_factor(i_cl: Union[float, list[float]]):
 
 # TODO implement the vr and v_walk functions as a function of the met
 def clo_insulation_air_layer(
-    vr: Union[float, list[float]],
-    v_walk: Union[float, list[float]],
-    i_a_static: Union[float, list[float]],
+    vr: float | list[float],
+    v_walk: float | list[float],
+    i_a_static: float | list[float],
 ):
-    """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`). The static
+    """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`).
+
+    The static
     boundary air value is 0.7 clo (0.109 m2K/W) for air velocities around 0.1 m/s to
     0.15 m/s. Thus, for static conditions, the standard recommends using the value of
     0.7 clo (0.109 m2K/W) for the boundary air layer insulation. For walking conditions,
@@ -932,16 +940,18 @@ def clo_insulation_air_layer(
 
 
 def clo_total_insulation(
-    i_t: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    v_walk: Union[float, list[float]],
-    i_a_static: Union[float, list[float]],
-    i_cl: Union[float, list[float]],
-):
+    i_t: float | list[float],
+    vr: float | list[float],
+    v_walk: float | list[float],
+    i_a_static: float | list[float],
+    i_cl: float | list[float],
+) -> float | list[float]:
     """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
-    conditions and activities. It accounts for the effects of movements and wind. The
+    conditions and activities.
+
+    It accounts for the effects of movements and wind. The
     ISO 7790 standard [ISO9920]_ provides different equations to calculate it as a
     function of the total thermal insulation of clothing (`I`:sub:`T`), the insulation
     of the boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
@@ -979,7 +989,7 @@ def clo_total_insulation(
     i_a_static = np.array(i_a_static)
     i_cl = np.array(i_cl)
 
-    def normal_clothing(_vr, _vw, _i_t):
+    def normal_clothing(_vr, _vw, _i_t) -> float:
         return _i_t * _correction_normal_clothing(_vw=_vw, _vr=_vr)
 
     def nude(_vr, _vw, _i_a_static):
@@ -1001,10 +1011,10 @@ def clo_total_insulation(
 
 
 def clo_correction_factor_environment(
-    vr: Union[float, list[float]],
-    v_walk: Union[float, list[float]],
-    i_cl: Union[float, list[float]],
-):
+    vr: float | list[float],
+    v_walk: float | list[float],
+    i_cl: float | list[float],
+) -> float | list[float]:
     """Return the correction factor for the total insulation of the
     clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
     This correction factor takes into account of the fact that the values of
@@ -1049,7 +1059,8 @@ def clo_correction_factor_environment(
     return c_f
 
 
-def _correction_nude(_vr, _vw):
+def _correction_nude(_vr, _vw) -> float:
+    """Calculate the correction factor for the total insulation of the clothing ensemble"""
     return np.exp(
         -0.533 * (_vr - 0.15)
         + 0.069 * (_vr - 0.15) ** 2
@@ -1058,7 +1069,8 @@ def _correction_nude(_vr, _vw):
     )
 
 
-def _correction_normal_clothing(_vr, _vw):
+def _correction_normal_clothing(_vr, _vw) -> float:
+    """Calculate the correction factor for normal clothing."""
     return np.exp(
         -0.281 * (_vr - 0.15)
         + 0.044 * (_vr - 0.15) ** 2

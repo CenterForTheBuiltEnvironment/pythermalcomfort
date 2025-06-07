@@ -2,7 +2,8 @@ from pythermalcomfort.models import cooling_effect
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_cooling_effect(get_test_url, retrieve_data):
+def test_cooling_effect(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the cooling effect correctly for various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,

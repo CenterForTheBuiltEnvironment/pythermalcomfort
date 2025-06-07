@@ -5,7 +5,8 @@ from pythermalcomfort.models import heat_index_rothfusz
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_heat_index(get_test_url, retrieve_data):
+def test_heat_index(get_test_url, retrieve_data) -> None:
+    """Test the heat index function with various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,
@@ -21,20 +22,23 @@ def test_heat_index(get_test_url, retrieve_data):
         validate_result(result, outputs, tolerance)
 
 
-def test_single_input_caution():
+def test_single_input_caution() -> None:
+    """Test that the function returns a single value with caution category."""
     result = heat_index_rothfusz(tdb=29, rh=50, round_output=True)
     assert result.hi.shape == ()  # zero-dim ndarray
     assert result.hi.item() == pytest.approx(29.7, rel=1e-3)
     assert result.stress_category == "caution"
 
 
-def test_below_threshold_produces_nan():
+def test_below_threshold_produces_nan() -> None:
+    """Test that the function returns NaN for heat index below threshold."""
     result = heat_index_rothfusz(tdb=25, rh=80)
     assert np.isnan(result.hi).item()
     assert isinstance(result.stress_category, np.str_)
 
 
-def test_vector_input_no_rounding():
+def test_vector_input_no_rounding() -> None:
+    """Test that the function handles vector inputs correctly without rounding."""
     tdb = [30.0, 20.0, 28.5]
     rh = [70.0, 90.0, 50.0]
     result = heat_index_rothfusz(tdb=tdb, rh=rh, round_output=False)

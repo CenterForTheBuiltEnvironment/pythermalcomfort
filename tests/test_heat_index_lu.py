@@ -3,7 +3,8 @@ import numpy as np
 from pythermalcomfort.models import heat_index_lu
 
 
-def test_extended_heat_index():
+def test_extended_heat_index() -> None:
+    """Test the heat index function with extended inputs."""
     index = 0
     hi_test_values = [
         199.9994020652,
@@ -68,6 +69,7 @@ def test_extended_heat_index():
             index += 1
 
 
-def test_extended_heat_index_array_input():
+def test_extended_heat_index_array_input() -> None:
+    """Test the heat index function with array inputs."""
     hi = heat_index_lu([20, 40], 50).hi
     assert np.allclose(hi, [19.0, 63.4], atol=0.1)

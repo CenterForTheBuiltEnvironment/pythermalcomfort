@@ -14,6 +14,8 @@ unit_test_data_prefix = "https://raw.githubusercontent.com/FedericoTartarini/val
 
 
 class Urls(Enum):
+    """Enum for URLs of test data files."""
+
     ADAPTIVE_EN = "ts_adaptive_en.json"
     ADAPTIVE_ASHRAE = "ts_adaptive_ashrae.json"
     A_PMV = "ts_a_pmv.json"
@@ -56,7 +58,7 @@ def get_test_url():
 def retrieve_data():
     def _retrieve_data(url):
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 return json.loads(response.text)
             response.raise_for_status()
@@ -67,7 +69,8 @@ def retrieve_data():
     return _retrieve_data
 
 
-def is_equal(a, b, tolerance=1e-6):
+def is_equal(a, b, tolerance=1e-6) -> bool:
+    """Compare two values for equality with a specified tolerance."""
     if isinstance(a, np.ndarray):
         if not isinstance(b, np.ndarray):
             b = np.array(b, dtype=a.dtype)
@@ -91,8 +94,10 @@ def retrieve_reference_table(get_test_url, retrieve_data, url_name):
     return reference_table
 
 
-def validate_result(result, expected_output, tolerance: dict):
-    """Parameters
+def validate_result(result, expected_output, tolerance: dict) -> None:
+    """Validate the result of a function against expected output with a tolerance.
+
+    Parameters
     ----------
     result this is the result of the function that is being tested
     expected_output this is the expected output of the function that is being tested
@@ -116,10 +121,7 @@ def validate_result(result, expected_output, tolerance: dict):
             _result = result
 
         # if the key is not in the tolerance dictionary we set the tolerance to 1e-6
-        if key in tolerance:
-            _tolerance = tolerance[key]
-        else:
-            _tolerance = 1e-6
+        _tolerance = tolerance.get(key, 1e-06)
 
         try:
             assert is_equal(_result, _expected_output, _tolerance)

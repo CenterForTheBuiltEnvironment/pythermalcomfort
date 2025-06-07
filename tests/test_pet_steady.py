@@ -5,7 +5,8 @@ from pythermalcomfort.models import pet_steady
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_pet_steady(get_test_url, retrieve_data):
+def test_pet_steady(get_test_url, retrieve_data) -> None:
+    """Test that the PET function calculates correctly for various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,
@@ -35,9 +36,10 @@ PET_TEST_MATRIX = (
 )
 
 
-@pytest.mark.parametrize("shape", ((10, 10), 10, (3, 3, 3)))
+@pytest.mark.parametrize("shape", [(10, 10), 10, (3, 3, 3)])
 @pytest.mark.parametrize(("tdb", "tr", "rh", "v", "met", "clo", "exp"), PET_TEST_MATRIX)
-def test_pet_array(shape, tdb, tr, rh, v, met, clo, exp):
+def test_pet_array(shape, tdb, tr, rh, v, met, clo, exp) -> None:
+    """Test that the PET function calculates correctly for various inputs."""
     tdb_arr = list(np.full(shape, tdb))
     tr_arr = list(np.full(shape, tr))
     rh_arr = list(np.full(shape, rh))

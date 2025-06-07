@@ -2,7 +2,8 @@ from pythermalcomfort.models import at
 from tests.conftest import Urls, is_equal, retrieve_reference_table, validate_result
 
 
-def test_at(get_test_url, retrieve_data):
+def test_at(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the AT correctly for various inputs."""
     reference_table = retrieve_reference_table(
         get_test_url,
         retrieve_data,
@@ -18,11 +19,13 @@ def test_at(get_test_url, retrieve_data):
         validate_result(result, outputs, tolerance)
 
 
-def test_at_list_input():
+def test_at_list_input() -> None:
+    """Test that the function calculates the AT correctly for list inputs."""
     result = at([25, 25, 25], [30, 30, 30], [0.1, 0.1, 0.1])
     is_equal(result, [24.1, 24.1, 24.1], 0.1)
 
 
-def test_at_q():
+def test_at_q() -> None:
+    """Test that the function calculates the AT correctly for given inputs."""
     result = at(25, 30, 0.1, 100)
     is_equal(result, 25.3, 0.1)

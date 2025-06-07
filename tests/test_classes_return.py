@@ -8,6 +8,8 @@ from pythermalcomfort.classes_return import AutoStrMixin
 
 @dataclass(repr=False)
 class TestDataClass(AutoStrMixin):
+    """A test dataclass to demonstrate the AutoStrMixin functionality."""
+
     field1: int
     field2: str
     field3: list
