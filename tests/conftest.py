@@ -45,7 +45,7 @@ class Urls(Enum):
 
 @pytest.fixture
 def get_test_url():
-    def _get_test_url(model_name):
+    def _get_test_url(model_name) -> str:
         try:
             return unit_test_data_prefix + Urls[model_name.upper()].value
         except KeyError:
@@ -63,7 +63,8 @@ def retrieve_data():
                 return json.loads(response.text)
             response.raise_for_status()
         except requests.RequestException as e:
-            print(f"Error fetching data from {url}: {e}")
+            message = f"Error fetching data from {url}: {e}"
+            raise RuntimeError(message) from e
         return None
 
     return _retrieve_data
@@ -87,22 +88,26 @@ def is_equal(a, b, tolerance=1e-6) -> bool:
     return a == b
 
 
-def retrieve_reference_table(get_test_url, retrieve_data, url_name):
+def retrieve_reference_table(get_test_url: str, retrieve_data, url_name):
+    """Retrieve the reference table for a given model from the test data URL."""
     reference_table = retrieve_data(get_test_url(url_name))
     if reference_table is None:
         pytest.fail(f"Failed to retrieve reference table for {url_name.lower()}")
     return reference_table
 
 
-def validate_result(result, expected_output, tolerance: dict) -> None:
+def validate_result(result: dict, expected_output: dict, tolerance: dict) -> None:
     """Validate the result of a function against expected output with a tolerance.
 
     Parameters
     ----------
-    result this is the result of the function that is being tested
-    expected_output this is the expected output of the function that is being tested
-    tolerance this is the tolerance that is used to compare the result with the
-    expected output
+    result : dict
+        this is the result of the function that is being tested
+    expected_output :dict
+        this is the expected output of the function that is being tested
+    tolerance : dict
+        this is the tolerance that is used to compare the result with the
+        expected output
 
     Returns
     -------
@@ -126,5 +131,5 @@ def validate_result(result, expected_output, tolerance: dict) -> None:
         try:
             assert is_equal(_result, _expected_output, _tolerance)
         except Exception as e:
-            print(f"Expected {_expected_output}, got {_result}\nError: {e!s}")
-            raise
+            message = f"Expected {_expected_output}, got {_result}\nError: {e!s}"
+            raise RuntimeError(message) from e

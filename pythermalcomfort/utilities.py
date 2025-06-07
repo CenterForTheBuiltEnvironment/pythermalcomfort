@@ -24,6 +24,8 @@ met_to_w_m2 = 58.15
 
 
 class Models(Enum):
+    """Models options"""
+
     ashrae_55_2023 = "55-2023"
     iso_7730_2005 = "7730-2005"
     iso_9920_2007 = "9920-2007"
@@ -32,17 +34,21 @@ class Models(Enum):
 
 
 class Units(Enum):
+    """Units options."""
+
     SI = "SI"
     IP = "IP"
 
 
 class Sex(Enum):
+    """Sex options."""
+
     male = "male"
     female = "female"
 
 
-def p_sat_torr(tdb: float | list[float]):
-    """Estimates the saturation vapor pressure in [torr]
+def p_sat_torr(tdb: float | list[float]) -> float | list[float]:
+    """Estimates the saturation vapor pressure in [torr].
 
     Parameters
     ----------
@@ -61,7 +67,7 @@ def p_sat_torr(tdb: float | list[float]):
 def enthalpy_air(
     tdb: float | list[float],
     hr: float | list[float],
-):
+) -> float | list[float]:
     """Calculate air enthalpy_air.
 
     Parameters
@@ -98,7 +104,7 @@ c12 = -0.14452093 * 1e-7
 c13 = 6.5459673
 
 
-def p_sat(tdb: float | list[float]):
+def p_sat(tdb: float | list[float]) -> float | list[float]:
     """Calculate vapour pressure of water at different temperatures.
 
     Parameters
@@ -115,7 +121,7 @@ def p_sat(tdb: float | list[float]):
     ta_k = tdb + c_to_k
     # pre-calculate the value before passing it to .where
     log_ta_k = np.log(ta_k)
-    pascals = np.where(
+    return np.where(
         ta_k < c_to_k,
         np.exp(
             c1 / ta_k
@@ -127,8 +133,6 @@ def p_sat(tdb: float | list[float]):
             c8 / ta_k + c9 + ta_k * (c10 + ta_k * (c11 + ta_k * c12)) + c13 * log_ta_k,
         ),
     )
-
-    return pascals
 
 
 def antoine(tdb: float | np.ndarray) -> np.ndarray:
@@ -155,7 +159,9 @@ def psy_ta_rh(
     p_atm=101325,
 ) -> PsychrometricValues:
     """Calculate psychrometric values of air based on dry bulb air temperature and
-    relative humidity. For more accurate results we recommend the use of the Python
+    relative humidity.
+
+    For more accurate results we recommend the use of the Python
     package `psychrolib`_.
 
     .. _psychrolib: https://pypi.org/project/PsychroLib/
@@ -206,8 +212,8 @@ def psy_ta_rh(
 def wet_bulb_tmp(
     tdb: float | list[float],
     rh: float | list[float],
-):
-    """Calculate the wet-bulb temperature using the Stull equation [Stull2011]_
+) -> float | list[float]:
+    """Calculate the wet-bulb temperature using the Stull equation [Stull2011]_.
 
     Parameters
     ----------
@@ -236,7 +242,7 @@ def wet_bulb_tmp(
 def dew_point_tmp(
     tdb: float | list[float],
     rh: float | list[float],
-):
+) -> float | list[float]:
     """Calculate the dew point temperature.
 
     Parameters
@@ -271,7 +277,7 @@ def mean_radiant_tmp(
     d: float | list[float] = 0.15,
     emissivity: float | list[float] = 0.95,
     standard="Mixed Convection",
-):
+) -> float | list[float]:
     """Convert the globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
     7726:1998 Standard [7726ISO1998]_.
@@ -845,7 +851,9 @@ def operative_tmp(
         return a * tdb + (1 - a) * tr
 
 
-def clo_intrinsic_insulation_ensemble(clo_garments: float | list[float]):
+def clo_intrinsic_insulation_ensemble(
+    clo_garments: float | list[float],
+) -> float | list[float]:
     """Calculate the intrinsic insulation of a clothing ensemble based on individual
     garments.
 
@@ -870,9 +878,7 @@ def clo_intrinsic_insulation_ensemble(clo_garments: float | list[float]):
 
 def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
     """Calculate the clothing area factor (f_cl) of the clothing ensemble as a function
-    of the intrinsic insulation of the clothing ensemble.
-
-    This equation is in accordance
+    of the intrinsic insulation of the clothing ensemble. This equation is in accordance
     with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
     correlation between f_cl and i_cl is low especially for non-western clothing
     ensembles. The application of this equation is limited to clothing ensembles with
@@ -898,7 +904,7 @@ def clo_insulation_air_layer(
     vr: float | list[float],
     v_walk: float | list[float],
     i_a_static: float | list[float],
-):
+) -> float | list[float]:
     """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`).
 
     The static
@@ -946,12 +952,12 @@ def clo_total_insulation(
     i_a_static: float | list[float],
     i_cl: float | list[float],
 ) -> float | list[float]:
-    """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`) which is
+    """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`).
+
+    The clothing ensemble (`I`:sub:`T,r`) which is
     the actual thermal insulation from the body surface to the environment, considering
     all clothing, enclosed air layers, and boundary air layers under given environmental
-    conditions and activities.
-
-    It accounts for the effects of movements and wind. The
+    conditions and activities. It accounts for the effects of movements and wind. The
     ISO 7790 standard [ISO9920]_ provides different equations to calculate it as a
     function of the total thermal insulation of clothing (`I`:sub:`T`), the insulation
     of the boundary air layer (`I`:sub:`a`), the walking speed (`v`:sub:`walk`), and the
@@ -992,10 +998,10 @@ def clo_total_insulation(
     def normal_clothing(_vr, _vw, _i_t) -> float:
         return _i_t * _correction_normal_clothing(_vw=_vw, _vr=_vr)
 
-    def nude(_vr, _vw, _i_a_static):
+    def nude(_vr, _vw, _i_a_static) -> float:
         return _i_a_static * _correction_nude(_vr=_vr, _vw=_vw)
 
-    def low_clothing(_vr, _vw, _i_a_static, _i_cl, _i_t):
+    def low_clothing(_vr, _vw, _i_a_static, _i_cl, _i_t) -> float:
         return (
             (0.6 - _i_cl) * nude(_vr, _vw, _i_a_static)
             + _i_cl * normal_clothing(_vr, _vw, _i_t)
@@ -1006,8 +1012,7 @@ def clo_total_insulation(
         low_clothing(_vr=vr, _vw=v_walk, _i_a_static=i_a_static, _i_cl=i_cl, _i_t=i_t),
         normal_clothing(_vr=vr, _vw=v_walk, _i_t=i_t),
     )
-    i_t_r = np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
-    return i_t_r
+    return np.where(i_cl == 0, nude(_vr=vr, _vw=v_walk, _i_a_static=i_a_static), i_t_r)
 
 
 def clo_correction_factor_environment(
@@ -1017,6 +1022,7 @@ def clo_correction_factor_environment(
 ) -> float | list[float]:
     """Return the correction factor for the total insulation of the
     clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+
     This correction factor takes into account of the fact that the values of
     (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
     environments the person may be walking, activity may pump air through the clothing,
@@ -1044,7 +1050,7 @@ def clo_correction_factor_environment(
     v_walk = np.array(v_walk)
     i_cl = np.array(i_cl)
 
-    def correction_low_clothing(_vr, _vw, _i_cl):
+    def correction_low_clothing(_vr, _vw, _i_cl) -> float:
         return (
             (0.6 - _i_cl) * _correction_nude(_vr, _vw)
             + _i_cl * _correction_normal_clothing(_vr, _vw)
@@ -1055,12 +1061,11 @@ def clo_correction_factor_environment(
         correction_low_clothing(_vr=vr, _vw=v_walk, _i_cl=i_cl),
         _correction_normal_clothing(_vr=vr, _vw=v_walk),
     )
-    c_f = np.where(i_cl == 0, _correction_nude(_vr=vr, _vw=v_walk), c_f)
-    return c_f
+    return np.where(i_cl == 0, _correction_nude(_vr=vr, _vw=v_walk), c_f)
 
 
 def _correction_nude(_vr, _vw) -> float:
-    """Calculate the correction factor for the total insulation of the clothing ensemble"""
+    """Calculate the correction factor for the total insulation of the clothing ensemble."""
     return np.exp(
         -0.533 * (_vr - 0.15)
         + 0.069 * (_vr - 0.15) ** 2

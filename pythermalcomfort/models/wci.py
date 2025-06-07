@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,8 +7,8 @@ from pythermalcomfort.classes_return import WCI
 
 
 def wci(
-    tdb: Union[float, list[float]],
-    v: Union[float, list[float]],
+    tdb: float | list[float],
+    v: float | list[float],
     round_output: bool = True,
 ) -> WCI:
     """Calculate the Wind Chill Index (WCI) in accordance with the ASHRAE 2017 Handbook Fundamentals - Chapter 9 [ashrae2017]_.

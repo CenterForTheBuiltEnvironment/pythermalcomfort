@@ -24,12 +24,15 @@ def use_fans_heatwaves(
     p_atm: Union[float, list[float]] = 101325,
     position: str = Postures.standing.value,
     max_skin_blood_flow: float = 80,
+    max_sweating: float = 500,
+    *,
     limit_inputs: bool = True,
     round_output: bool = True,
-    max_sweating: float = 500,
 ) -> UseFansHeatwaves:
     """Estimate if the conditions you have selected would cause
-    heat strain. This occurs when either the following variables reaches its
+    heat strain.
+
+    This occurs when either the following variables reaches its
     maximum value:
 
     * m_rsw Rate at which regulatory sweat is generated, [mL/h/m2]
@@ -72,6 +75,8 @@ def use_fans_heatwaves(
         0.1 < v [m/s] < 4.5, 0.7 < met [met] < 2, and 0 < clo [clo] < 1.
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
+    max_sweating : float or list of floats, optional
+        Maximum rate at which regulatory sweat is generated, [kg/h/m2]. Defaults to 500.
 
     Returns
     -------

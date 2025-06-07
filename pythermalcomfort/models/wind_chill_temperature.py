@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,8 +7,8 @@ from pythermalcomfort.classes_return import WCT
 
 
 def wct(
-    tdb: Union[float, list[float]],
-    v: Union[float, list[float]],
+    tdb: float | list[float],
+    v: float | list[float],
     round_output: bool = True,
 ) -> WCT:
     """Calculate the Wind Chill Temperature (`WCT`_).
