@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.4.0 (2025-06-08)
+------------------
+
+* Added the `work_capacity_dunne`.
+* Added the `work_capacity_hothaps`.
+* Added the `work_capacity_iso`.
+* Added the `work_capacity_niosh`.
+
 3.3.0 (2025-06-05)
 ------------------
 
