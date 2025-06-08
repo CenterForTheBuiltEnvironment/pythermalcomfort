@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,10 +7,10 @@ from pythermalcomfort.classes_return import WorkCapacity
 
 
 def work_capacity_iso(
-    wbgt: Union[float, list[float]], met: Union[float, list[float]]
+    wbgt: float | list[float],
+    met: float | list[float],
 ) -> WorkCapacity:
-    """
-    Estimate work capacity due to heat based on ISO standards as described by Brode et al
+    """Estimate work capacity due to heat based on ISO standards as described by Brode et al
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%

@@ -703,6 +703,7 @@ class WorkCapacity(AutoStrMixin):
     ----------
     capacity : float or list of floats
         Work capacity affected by heat.
+
     """
 
     capacity: Union[float, npt.ArrayLike]
