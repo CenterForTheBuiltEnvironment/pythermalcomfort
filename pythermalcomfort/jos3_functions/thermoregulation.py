@@ -136,9 +136,8 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
             Postures.sedentary.value,
             Postures.supine.value,
         ]
-        raise ValueError(
-            f"Invalid posture: '{posture}'. Must be one of {valid_postures}",
-        )
+        error_msg = f"Invalid posture '{posture}'. Must be one of {valid_postures}."
+        raise ValueError(error_msg)
     return hc_natural
 
 
@@ -330,8 +329,9 @@ def rad_coef(posture: str) -> np.ndarray:
             Postures.sedentary.value,
             Postures.supine.value,
         ]
+        error_msg = f"Invalid posture '{posture}'. Must be one of {valid_postures}."
         raise ValueError(
-            f"Invalid posture '{posture}'. Must be one of {valid_postures}",
+            error_msg,
         )
     return hr
 
@@ -961,9 +961,10 @@ def basal_met(
             "japanese",
             "ganpule",
         ]
-        raise ValueError(
-            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}",
+        error_msg = (
+            f"Invalid equation: '{bmr_equation}'. Must be one of {valid_equations}."
         )
+        raise ValueError(error_msg)
 
     bmr *= 0.048  # [kcal/day] to [W]
 

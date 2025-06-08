@@ -88,12 +88,12 @@ def to_array_body_parts(inp) -> np.ndarray:
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
             return inp.copy()
-        raise ValueError(
-            f"The input list or ndarray is not of length {Default.num_body_parts}",
+        error_msg = (
+            f"The input list or ndarray is not of length {Default.num_body_parts}"
         )
-    raise ValueError(
-        "Unsupported input type. Supported types: int, float, list, dict, ndarray",
-    )
+        raise ValueError(error_msg)
+    error_msg = f"Unsupported input type: {type(inp)}. Supported types: int, float, list, dict, ndarray"
+    raise ValueError(error_msg)
 
 
 def bsa_rate(

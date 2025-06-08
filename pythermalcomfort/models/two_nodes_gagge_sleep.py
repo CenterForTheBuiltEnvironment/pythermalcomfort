@@ -94,7 +94,8 @@ def two_nodes_gagge_sleep(
     met_shivering = kwargs.pop("met_shivering", 0)
 
     if kwargs:
-        raise TypeError(f"Unexpected arguments: {', '.join(kwargs)}")
+        error_msg = f"Unexpected keyword arguments: {list(kwargs.keys())}"
+        raise TypeError(error_msg)
 
     GaggeTwoNodesSleepInputs(
         tdb=tdb,
@@ -117,9 +118,10 @@ def two_nodes_gagge_sleep(
     # These variables should have the same length, which will be the duration
     lengths = [len(x) for x in (tdb, tr, v, rh, clo, thickness_quilt)]
     if len(set(lengths)) != 1:
-        raise ValueError(
+        error_message = (
             f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}",
         )
+        raise ValueError(error_message)
     duration = lengths[0]
 
     # Initialize physiological state variables to be updated in each iteration

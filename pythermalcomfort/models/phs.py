@@ -151,10 +151,11 @@ def phs(
 
     """
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
-        raise ValueError(
-            f"Model should be '{Models.iso_7933_2004.value}' or '{Models.iso_7933_2023.value}'. "
-            "Please check the documentation.",
+        error_msg = (
+            f"Model '{model}' is not supported. "
+            f"Supported models are: {Models.iso_7933_2004.value} and {Models.iso_7933_2023.value}."
         )
+        raise ValueError(error_msg)
 
     PHSInputs(
         tdb=tdb,

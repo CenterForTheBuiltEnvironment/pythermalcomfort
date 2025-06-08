@@ -114,7 +114,8 @@ def two_nodes_gagge_ji(
     acclimatized = kwargs.pop("acclimatized", True)
 
     if kwargs:
-        raise TypeError(f"Unexpected arguments: {', '.join(kwargs)}")
+        error_msg = f"Unexpected keyword arguments: {list(kwargs.keys())}"
+        raise TypeError(error_msg)
 
     tdb = np.array(tdb)
     tr = np.array(tr)

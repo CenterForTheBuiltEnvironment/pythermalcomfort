@@ -78,7 +78,8 @@ class BaseInputs:
             values = np.atleast_1d(value)
             for val in values.astype(str):
                 if val.lower() not in allowed:
-                    raise ValueError(f"{name} must be one of {allowed!r}")
+                    error_msg = f"{name} must be one of {allowed!r}, "
+                    raise ValueError(error_msg)
 
         # Only validate attributes that are not None
         if self.units.upper() not in [Units.SI.value, Units.IP.value]:

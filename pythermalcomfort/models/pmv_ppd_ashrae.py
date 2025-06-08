@@ -168,9 +168,11 @@ def pmv_ppd_ashrae(
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
-        raise ValueError(
-            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}",
+        error_msg = (
+            f"Model '{model}' is not supported. "
+            f"Supported models are: {Models.ashrae_55_2023.value}."
         )
+        raise ValueError(error_msg)
 
     (
         tdb_valid,

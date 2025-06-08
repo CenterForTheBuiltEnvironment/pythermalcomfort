@@ -30,7 +30,11 @@ class AutoStrMixin:
         try:
             return getattr(self, item)
         except AttributeError as exc:
-            raise KeyError(f"{self.__class__.__name__} has no field '{item}'") from exc
+            error_msg = (
+                f"{self.__class__.__name__} has no field '{item}'. "
+                f"Available fields: {[f.name for f in fields(self)]}"
+            )
+            raise KeyError(error_msg) from exc
 
 
 @dataclass(frozen=True, repr=False)
