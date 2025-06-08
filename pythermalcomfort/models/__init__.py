@@ -29,6 +29,10 @@ from pythermalcomfort.models.utci import utci
 from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
 from pythermalcomfort.models.wbgt import wbgt
 from pythermalcomfort.models.wci import wci
+from pythermalcomfort.models.work_capacity_dunne import work_capacity_dunne
+from pythermalcomfort.models.work_capacity_hothaps import work_capacity_hothaps
+from pythermalcomfort.models.work_capacity_iso import work_capacity_iso
+from pythermalcomfort.models.work_capacity_niosh import work_capacity_niosh
 
 __all__ = [
     "JOS3",
@@ -61,5 +65,15 @@ __all__ = [
     "utci",
     "vertical_tmp_grad_ppd",
     "wbgt",
+    "net",
+    "discomfort_index",
+    "JOS3",
+    "esi",
+    "work_capacity_dunne",
+    "work_capacity_hothaps",
+    "work_capacity_iso",
+    "work_capacity_niosh",
+    "two_nodes_gagge_ji",
+    "thi",
     "wci",
 ]

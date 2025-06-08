@@ -350,6 +350,37 @@ Wind chill temperature
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
+    
+Work capacity (Dunne et al.)
+-----------------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_dunne.work_capacity_dunne
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:
+
+Work capacity (Hothaps)
+-----------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_hothaps.work_capacity_hothaps
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:
+
+Work capacity (ISO)
+-------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_iso.work_capacity_iso
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:
+
+Work capacity (NIOSH)
+---------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_niosh.work_capacity_niosh
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
 
 Temperature Humidity Index (THI)
 --------------------------------

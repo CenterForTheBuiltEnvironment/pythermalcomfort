@@ -695,6 +695,19 @@ class WCT(AutoStrMixin):
     wct: Union[float, list[float]]
 
 
+@dataclass(frozen=True)
+class WorkCapacity(AutoStrMixin):
+    """Dataclass to represent work loss.
+
+    Attributes
+    ----------
+    capacity : float or list of floats
+        Work capacity affected by heat.
+    """
+
+    capacity: Union[float, npt.ArrayLike]
+
+
 @dataclass(frozen=True, repr=False)
 class JOS3BodyParts(AutoStrMixin):
     """Dataclass to represent the body parts in the JOS3 model. It is very important to
