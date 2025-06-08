@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 from numba import float64, vectorize
@@ -10,10 +10,10 @@ from pythermalcomfort.utilities import Units, units_converter
 
 
 def utci(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
     units: str = Units.SI.value,
     limit_inputs: bool = True,
     round_output: bool = True,

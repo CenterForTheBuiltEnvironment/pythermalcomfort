@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -8,8 +8,8 @@ from pythermalcomfort.utilities import dew_point_tmp
 
 
 def humidex(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     model: str = "rana",
     round_output: bool = True,
 ) -> Humidex:

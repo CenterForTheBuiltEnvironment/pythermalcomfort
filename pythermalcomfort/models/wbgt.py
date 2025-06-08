@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 import numpy.typing as npt
@@ -8,9 +8,9 @@ from pythermalcomfort.classes_return import WBGT
 
 
 def wbgt(
-    twb: Union[float, npt.ArrayLike],
-    tg: Union[float, npt.ArrayLike],
-    tdb: Union[float, npt.ArrayLike] = None,
+    twb: float | npt.ArrayLike,
+    tg: float | npt.ArrayLike,
+    tdb: float | npt.ArrayLike = None,
     with_solar_load: bool = False,
     round_output: bool = True,
 ) -> WBGT:

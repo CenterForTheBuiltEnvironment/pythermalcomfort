@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,9 +7,9 @@ from pythermalcomfort.classes_return import ESI
 
 
 def esi(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    sol_radiation_global: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
+    sol_radiation_global: float | list[float],
     round_output: bool = True,
 ) -> ESI:
     """Calculate the Environmental Stress Index (ESI) [Moran2001]_.

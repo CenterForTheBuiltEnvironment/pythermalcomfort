@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -12,15 +12,15 @@ from pythermalcomfort.utilities import (
 
 
 def set_tmp(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
-    body_surface_area: Union[float, list[float]] = 1.8258,
-    p_atm: Union[float, list[float]] = 101325,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
+    body_surface_area: float | list[float] = 1.8258,
+    p_atm: float | list[float] = 101325,
     position: str = Postures.standing.value,
     limit_inputs: bool = True,
     round_output: bool = True,

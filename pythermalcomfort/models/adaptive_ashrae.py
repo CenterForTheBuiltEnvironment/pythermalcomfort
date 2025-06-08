@@ -1,7 +1,6 @@
-from typing import Literal, Union
+from typing import Literal
 
 import numpy as np
-import numpy.typing as npt
 
 from pythermalcomfort.classes_input import ASHRAEInputs
 from pythermalcomfort.classes_return import AdaptiveASHRAE
@@ -15,10 +14,10 @@ from pythermalcomfort.utilities import (
 
 
 def adaptive_ashrae(
-    tdb: Union[float, npt.ArrayLike],
-    tr: Union[float, npt.ArrayLike],
-    t_running_mean: Union[float, npt.ArrayLike],
-    v: Union[float, npt.ArrayLike],
+    tdb: float | list[float],
+    tr: float | list[float],
+    t_running_mean: float | list[float],
+    v: float | list[float],
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> AdaptiveASHRAE:

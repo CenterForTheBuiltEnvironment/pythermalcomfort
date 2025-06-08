@@ -4,8 +4,6 @@ thermoregulation.
 The values of a NumPy array containing 17 body parts
 """
 
-from typing import Union
-
 import numpy as np
 
 from pythermalcomfort.classes_return import JOS3BodyParts
@@ -207,9 +205,9 @@ def forced_convection(v: float) -> np.ndarray:
 
 def conv_coef(
     posture: str,
-    v: Union[float, np.ndarray],
-    tdb: Union[float, np.ndarray],
-    t_skin: Union[float, np.ndarray],
+    v: float | np.ndarray,
+    tdb: float | np.ndarray,
+    t_skin: float | np.ndarray,
 ) -> np.ndarray:
     """Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
     Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5

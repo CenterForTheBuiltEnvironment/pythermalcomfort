@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import datetime as dt
 from dataclasses import dataclass, fields, is_dataclass
-from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -44,7 +45,7 @@ class APMV(AutoStrMixin):
 
     """
 
-    a_pmv: Union[float, npt.ArrayLike]
+    a_pmv: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -71,13 +72,13 @@ class AdaptiveASHRAE(AutoStrMixin):
 
     """
 
-    tmp_cmf: Union[float, npt.ArrayLike]
-    tmp_cmf_80_low: Union[float, npt.ArrayLike]
-    tmp_cmf_80_up: Union[float, npt.ArrayLike]
-    tmp_cmf_90_low: Union[float, npt.ArrayLike]
-    tmp_cmf_90_up: Union[float, npt.ArrayLike]
-    acceptability_80: Union[bool, npt.ArrayLike]
-    acceptability_90: Union[bool, npt.ArrayLike]
+    tmp_cmf: float | list[float]
+    tmp_cmf_80_low: float | list[float]
+    tmp_cmf_80_up: float | list[float]
+    tmp_cmf_90_low: float | list[float]
+    tmp_cmf_90_up: float | list[float]
+    acceptability_80: bool | list[bool]
+    acceptability_90: bool | list[bool]
 
 
 @dataclass
@@ -110,16 +111,16 @@ class AdaptiveEN(AutoStrMixin):
 
     """
 
-    tmp_cmf: Union[float, npt.ArrayLike]
-    acceptability_cat_i: Union[bool, npt.ArrayLike]
-    acceptability_cat_ii: Union[bool, npt.ArrayLike]
-    acceptability_cat_iii: Union[bool, npt.ArrayLike]
-    tmp_cmf_cat_i_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_ii_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_iii_up: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_i_low: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_ii_low: Union[float, npt.ArrayLike]
-    tmp_cmf_cat_iii_low: Union[float, npt.ArrayLike]
+    tmp_cmf: float | list[float]
+    acceptability_cat_i: bool | list[bool]
+    acceptability_cat_ii: bool | list[bool]
+    acceptability_cat_iii: bool | list[bool]
+    tmp_cmf_cat_i_up: float | list[float]
+    tmp_cmf_cat_ii_up: float | list[float]
+    tmp_cmf_cat_iii_up: float | list[float]
+    tmp_cmf_cat_i_low: float | list[float]
+    tmp_cmf_cat_ii_low: float | list[float]
+    tmp_cmf_cat_iii_low: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -135,8 +136,8 @@ class AnkleDraft(AutoStrMixin):
 
     """
 
-    ppd_ad: Union[float, npt.ArrayLike]
-    acceptability: Union[bool, npt.ArrayLike]
+    ppd_ad: float | list[float]
+    acceptability: bool | list[bool]
 
 
 @dataclass(frozen=True, repr=False)
@@ -165,7 +166,7 @@ class ATHB(AutoStrMixin):
 
     """
 
-    athb_pmv: Union[float, npt.ArrayLike]
+    athb_pmv: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -180,7 +181,7 @@ class CloTOut(AutoStrMixin):
 
     """
 
-    clo_tout: Union[float, list[float]]
+    clo_tout: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -194,7 +195,7 @@ class CE(AutoStrMixin):
 
     """
 
-    ce: Union[float, list[float]]
+    ce: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -210,8 +211,8 @@ class DI(AutoStrMixin):
 
     """
 
-    di: Union[float, list[float]]
-    discomfort_condition: Union[str, list[str]]
+    di: float | list[float]
+    discomfort_condition: str | list[str]
 
 
 @dataclass(frozen=True, repr=False)
@@ -226,7 +227,7 @@ class EPMV(AutoStrMixin):
 
     """
 
-    e_pmv: Union[float, list[float]]
+    e_pmv: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -240,7 +241,7 @@ class ESI(AutoStrMixin):
 
     """
 
-    esi: Union[float, list[float]]
+    esi: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -255,7 +256,7 @@ class HI(AutoStrMixin):
     """
 
     hi: npt.ArrayLike
-    stress_category: Optional[Union[str, list[str]]] = None
+    stress_category: str | list[str] | None = None
 
 
 @dataclass(frozen=True, repr=False)
@@ -271,8 +272,8 @@ class Humidex(AutoStrMixin):
 
     """
 
-    humidex: Union[float, list[float]]
-    discomfort: Union[str, list[str]]
+    humidex: float | list[float]
+    discomfort: str | list[str]
 
 
 @dataclass(frozen=True, repr=False)
@@ -286,7 +287,7 @@ class NET(AutoStrMixin):
 
     """
 
-    net: Union[float, list[float]]
+    net: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -300,7 +301,7 @@ class PETSteady(AutoStrMixin):
 
     """
 
-    pet: Union[float, list[float]]
+    pet: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -332,16 +333,16 @@ class PHS(AutoStrMixin):
 
     """
 
-    t_re: Union[float, list[float]]
-    t_sk: Union[float, list[float]]
-    t_cr: Union[float, list[float]]
-    t_cr_eq: Union[float, list[float]]
-    t_sk_t_cr_wg: Union[float, list[float]]
-    d_lim_loss_50: Union[float, list[float]]
-    d_lim_loss_95: Union[float, list[float]]
-    d_lim_t_re: Union[float, list[float]]
-    water_loss_watt: Union[float, list[float]]
-    water_loss: Union[float, list[float]]
+    t_re: float | list[float]
+    t_sk: float | list[float]
+    t_cr: float | list[float]
+    t_cr_eq: float | list[float]
+    t_sk_t_cr_wg: float | list[float]
+    d_lim_loss_50: float | list[float]
+    d_lim_loss_95: float | list[float]
+    d_lim_t_re: float | list[float]
+    water_loss_watt: float | list[float]
+    water_loss: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -355,7 +356,7 @@ class PMV(AutoStrMixin):
 
     """
 
-    pmv: Union[float, npt.ArrayLike]
+    pmv: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -374,19 +375,19 @@ class PMVPPD(AutoStrMixin):
 
     """
 
-    pmv: Union[float, list[float]]
-    ppd: Union[float, list[float]]
-    tsv: Union[float, list[float]]
+    pmv: float | list[float]
+    ppd: float | list[float]
+    tsv: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
 class PsychrometricValues(AutoStrMixin):
-    p_sat: Union[float, list[float]]
-    p_vap: Union[float, list[float]]
-    hr: Union[float, list[float]]
-    wet_bulb_tmp: Union[float, list[float]]
-    dew_point_tmp: Union[float, list[float]]
-    h: Union[float, list[float]]
+    p_sat: float | list[float]
+    p_vap: float | list[float]
+    hr: float | list[float]
+    wet_bulb_tmp: float | list[float]
+    dew_point_tmp: float | list[float]
+    h: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -400,7 +401,7 @@ class SET(AutoStrMixin):
 
     """
 
-    set: Union[float, list[float]]
+    set: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -417,8 +418,8 @@ class SolarGain(AutoStrMixin):
 
     """
 
-    erf: Union[float, list[float]]
-    delta_mrt: Union[float, list[float]]
+    erf: float | list[float]
+    delta_mrt: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -467,24 +468,24 @@ class GaggeTwoNodes(AutoStrMixin):
 
     """
 
-    e_skin: Union[float, list[float]]
-    e_rsw: Union[float, list[float]]
-    e_max: Union[float, list[float]]
-    q_sensible: Union[float, list[float]]
-    q_skin: Union[float, list[float]]
-    q_res: Union[float, list[float]]
-    t_core: Union[float, list[float]]
-    t_skin: Union[float, list[float]]
-    m_bl: Union[float, list[float]]
-    m_rsw: Union[float, list[float]]
-    w: Union[float, list[float]]
-    w_max: Union[float, list[float]]
-    set: Union[float, list[float]]
-    et: Union[float, list[float]]
-    pmv_gagge: Union[float, list[float]]
-    pmv_set: Union[float, list[float]]
-    disc: Union[float, list[float]]
-    t_sens: Union[float, list[float]]
+    e_skin: float | list[float]
+    e_rsw: float | list[float]
+    e_max: float | list[float]
+    q_sensible: float | list[float]
+    q_skin: float | list[float]
+    q_res: float | list[float]
+    t_core: float | list[float]
+    t_skin: float | list[float]
+    m_bl: float | list[float]
+    m_rsw: float | list[float]
+    w: float | list[float]
+    w_max: float | list[float]
+    set: float | list[float]
+    et: float | list[float]
+    pmv_gagge: float | list[float]
+    pmv_set: float | list[float]
+    disc: float | list[float]
+    t_sens: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -500,8 +501,8 @@ class GaggeTwoNodesJi(AutoStrMixin):
 
     """
 
-    t_core: Union[float, list[float]]
-    t_skin: Union[float, list[float]]
+    t_core: float | list[float]
+    t_skin: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -515,7 +516,7 @@ class THI(AutoStrMixin):
 
     """
 
-    thi: Union[float, list[float]]
+    thi: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -547,16 +548,16 @@ class GaggeTwoNodesSleep(AutoStrMixin):
 
     """
 
-    set: Union[float, list[float]]
-    t_core: Union[float, list[float]]
-    t_skin: Union[float, list[float]]
-    wet: Union[float, list[float]]
-    t_sens: Union[float, list[float]]
-    disc: Union[float, list[float]]
-    e_skin: Union[float, list[float]]
-    met_shivering: Union[float, list[float]]
-    alfa: Union[float, list[float]]
-    skin_blood_flow: Union[float, list[float]]
+    set: float | list[float]
+    t_core: float | list[float]
+    t_skin: float | list[float]
+    wet: float | list[float]
+    t_sens: float | list[float]
+    disc: float | list[float]
+    e_skin: float | list[float]
+    met_shivering: float | list[float]
+    alfa: float | list[float]
+    skin_blood_flow: float | list[float]
 
 
 @dataclass(frozen=True)
@@ -600,22 +601,22 @@ class UseFansHeatwaves(AutoStrMixin):
 
     """
 
-    e_skin: Union[float, list[float]]
-    e_rsw: Union[float, list[float]]
-    e_max: Union[float, list[float]]
-    q_sensible: Union[float, list[float]]
-    q_skin: Union[float, list[float]]
-    q_res: Union[float, list[float]]
-    t_core: Union[float, list[float]]
-    t_skin: Union[float, list[float]]
-    m_bl: Union[float, list[float]]
-    m_rsw: Union[float, list[float]]
-    w: Union[float, list[float]]
-    w_max: Union[float, list[float]]
-    heat_strain: Union[bool, list[bool]]
-    heat_strain_blood_flow: Union[bool, list[bool]]
-    heat_strain_w: Union[bool, list[bool]]
-    heat_strain_sweating: Union[bool, list[bool]]
+    e_skin: float | list[float]
+    e_rsw: float | list[float]
+    e_max: float | list[float]
+    q_sensible: float | list[float]
+    q_skin: float | list[float]
+    q_res: float | list[float]
+    t_core: float | list[float]
+    t_skin: float | list[float]
+    m_bl: float | list[float]
+    m_rsw: float | list[float]
+    w: float | list[float]
+    w_max: float | list[float]
+    heat_strain: bool | list[bool]
+    heat_strain_blood_flow: bool | list[bool]
+    heat_strain_w: bool | list[bool]
+    heat_strain_sweating: bool | list[bool]
 
 
 @dataclass(frozen=True, repr=False)
@@ -631,8 +632,8 @@ class UTCI(AutoStrMixin):
 
     """
 
-    utci: Union[float, list[float]]
-    stress_category: Union[str, list[str]]
+    utci: float | list[float]
+    stress_category: str | list[str]
 
 
 @dataclass(frozen=True, repr=False)
@@ -649,8 +650,8 @@ class VerticalTGradPPD(AutoStrMixin):
 
     """
 
-    ppd_vg: Union[float, list[float]]
-    acceptability: Union[bool, list[bool]]
+    ppd_vg: float | list[float]
+    acceptability: bool | list[bool]
 
 
 @dataclass(frozen=True, repr=False)
@@ -664,7 +665,7 @@ class WBGT(AutoStrMixin):
 
     """
 
-    wbgt: Union[float, npt.ArrayLike]
+    wbgt: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -678,7 +679,7 @@ class WCI(AutoStrMixin):
 
     """
 
-    wci: Union[float, list[float]]
+    wci: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -692,7 +693,7 @@ class WCT(AutoStrMixin):
 
     """
 
-    wct: Union[float, list[float]]
+    wct: float | list[float]
 
 
 @dataclass(frozen=True)
@@ -706,7 +707,7 @@ class WorkCapacity(AutoStrMixin):
 
     """
 
-    capacity: Union[float, npt.ArrayLike]
+    capacity: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -756,23 +757,23 @@ class JOS3BodyParts(AutoStrMixin):
 
     """
 
-    head: Optional[float] = None
-    neck: Optional[float] = None
-    chest: Optional[float] = None
-    back: Optional[float] = None
-    pelvis: Optional[float] = None
-    left_shoulder: Optional[float] = None
-    left_arm: Optional[float] = None
-    left_hand: Optional[float] = None
-    right_shoulder: Optional[float] = None
-    right_arm: Optional[float] = None
-    right_hand: Optional[float] = None
-    left_thigh: Optional[float] = None
-    left_leg: Optional[float] = None
-    left_foot: Optional[float] = None
-    right_thigh: Optional[float] = None
-    right_leg: Optional[float] = None
-    right_foot: Optional[float] = None
+    head: float | None = None
+    neck: float | None = None
+    chest: float | None = None
+    back: float | None = None
+    pelvis: float | None = None
+    left_shoulder: float | None = None
+    left_arm: float | None = None
+    left_hand: float | None = None
+    right_shoulder: float | None = None
+    right_arm: float | None = None
+    right_hand: float | None = None
+    left_thigh: float | None = None
+    left_leg: float | None = None
+    left_foot: float | None = None
+    right_thigh: float | None = None
+    right_leg: float | None = None
+    right_foot: float | None = None
 
     @classmethod
     def get_attribute_names(cls):
@@ -910,62 +911,62 @@ class JOS3Output(AutoStrMixin):
 
     """
 
-    simulation_time: Optional[dt.timedelta] = None
-    dt: Optional[float] = None
-    t_skin_mean: Optional[float] = None
-    t_skin: Optional[JOS3BodyParts] = None
-    t_core: Optional[JOS3BodyParts] = None
-    w_mean: Optional[float] = None
-    w: Optional[JOS3BodyParts] = None
-    weight_loss_by_evap_and_res: Optional[float] = None
-    cardiac_output: Optional[float] = None
-    q_thermogenesis_total: Optional[float] = None
-    q_res: Optional[float] = None
-    q_skin2env: Optional[JOS3BodyParts] = None
-    height: Optional[float] = None
-    weight: Optional[float] = None
-    bsa: Optional[JOS3BodyParts] = None
-    fat: Optional[float] = None
-    sex: Optional[str] = None
-    age: Optional[int] = None
-    t_core_set: Optional[JOS3BodyParts] = None
-    t_skin_set: Optional[JOS3BodyParts] = None
-    t_cb: Optional[float] = None
-    t_artery: Optional[JOS3BodyParts] = None
-    t_vein: Optional[JOS3BodyParts] = None
-    t_superficial_vein: Optional[JOS3BodyParts] = None
-    t_muscle: Optional[JOS3BodyParts] = None
-    t_fat: Optional[JOS3BodyParts] = None
-    to: Optional[JOS3BodyParts] = None
-    r_t: Optional[JOS3BodyParts] = None
-    r_et: Optional[JOS3BodyParts] = None
-    tdb: Optional[JOS3BodyParts] = None
-    tr: Optional[JOS3BodyParts] = None
-    rh: Optional[JOS3BodyParts] = None
-    v: Optional[JOS3BodyParts] = None
-    par: Optional[float] = None
-    clo: Optional[JOS3BodyParts] = None
-    e_skin: Optional[JOS3BodyParts] = None
-    e_max: Optional[JOS3BodyParts] = None
-    e_sweat: Optional[JOS3BodyParts] = None
-    bf_core: Optional[JOS3BodyParts] = None
-    bf_muscle: Optional[JOS3BodyParts] = None
-    bf_fat: Optional[JOS3BodyParts] = None
-    bf_skin: Optional[JOS3BodyParts] = None
-    bf_ava_hand: Optional[float] = None
-    bf_ava_foot: Optional[float] = None
-    q_bmr_core: Optional[JOS3BodyParts] = None
-    q_bmr_muscle: Optional[JOS3BodyParts] = None
-    q_bmr_fat: Optional[JOS3BodyParts] = None
-    q_bmr_skin: Optional[JOS3BodyParts] = None
-    q_work: Optional[JOS3BodyParts] = None
-    q_shiv: Optional[JOS3BodyParts] = None
-    q_nst: Optional[JOS3BodyParts] = None
-    q_thermogenesis_core: Optional[JOS3BodyParts] = None
-    q_thermogenesis_muscle: Optional[JOS3BodyParts] = None
-    q_thermogenesis_fat: Optional[JOS3BodyParts] = None
-    q_thermogenesis_skin: Optional[JOS3BodyParts] = None
-    q_skin2env_sensible: Optional[JOS3BodyParts] = None
-    q_skin2env_latent: Optional[JOS3BodyParts] = None
-    q_res_sensible: Optional[float] = None
-    q_res_latent: Optional[float] = None
+    simulation_time: dt.timedelta | None = None
+    dt: float | None = None
+    t_skin_mean: float | None = None
+    t_skin: JOS3BodyParts | None = None
+    t_core: JOS3BodyParts | None = None
+    w_mean: float | None = None
+    w: JOS3BodyParts | None = None
+    weight_loss_by_evap_and_res: float | None = None
+    cardiac_output: float | None = None
+    q_thermogenesis_total: float | None = None
+    q_res: float | None = None
+    q_skin2env: JOS3BodyParts | None = None
+    height: float | None = None
+    weight: float | None = None
+    bsa: JOS3BodyParts | None = None
+    fat: float | None = None
+    sex: str | None = None
+    age: int | None = None
+    t_core_set: JOS3BodyParts | None = None
+    t_skin_set: JOS3BodyParts | None = None
+    t_cb: float | None = None
+    t_artery: JOS3BodyParts | None = None
+    t_vein: JOS3BodyParts | None = None
+    t_superficial_vein: JOS3BodyParts | None = None
+    t_muscle: JOS3BodyParts | None = None
+    t_fat: JOS3BodyParts | None = None
+    to: JOS3BodyParts | None = None
+    r_t: JOS3BodyParts | None = None
+    r_et: JOS3BodyParts | None = None
+    tdb: JOS3BodyParts | None = None
+    tr: JOS3BodyParts | None = None
+    rh: JOS3BodyParts | None = None
+    v: JOS3BodyParts | None = None
+    par: float | None = None
+    clo: JOS3BodyParts | None = None
+    e_skin: JOS3BodyParts | None = None
+    e_max: JOS3BodyParts | None = None
+    e_sweat: JOS3BodyParts | None = None
+    bf_core: JOS3BodyParts | None = None
+    bf_muscle: JOS3BodyParts | None = None
+    bf_fat: JOS3BodyParts | None = None
+    bf_skin: JOS3BodyParts | None = None
+    bf_ava_hand: float | None = None
+    bf_ava_foot: float | None = None
+    q_bmr_core: JOS3BodyParts | None = None
+    q_bmr_muscle: JOS3BodyParts | None = None
+    q_bmr_fat: JOS3BodyParts | None = None
+    q_bmr_skin: JOS3BodyParts | None = None
+    q_work: JOS3BodyParts | None = None
+    q_shiv: JOS3BodyParts | None = None
+    q_nst: JOS3BodyParts | None = None
+    q_thermogenesis_core: JOS3BodyParts | None = None
+    q_thermogenesis_muscle: JOS3BodyParts | None = None
+    q_thermogenesis_fat: JOS3BodyParts | None = None
+    q_thermogenesis_skin: JOS3BodyParts | None = None
+    q_skin2env_sensible: JOS3BodyParts | None = None
+    q_skin2env_latent: JOS3BodyParts | None = None
+    q_res_sensible: float | None = None
+    q_res_latent: float | None = None

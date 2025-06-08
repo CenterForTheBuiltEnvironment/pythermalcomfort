@@ -1,4 +1,6 @@
-from typing import Literal, Union
+from __future__ import annotations
+
+from typing import Literal
 
 import numpy as np
 
@@ -9,14 +11,14 @@ from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_a(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
     a_coefficient: float,
-    wme: Union[float, list[float]] = 0,
+    wme: float | list[float] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
     limit_inputs: bool = True,
 ) -> APMV:

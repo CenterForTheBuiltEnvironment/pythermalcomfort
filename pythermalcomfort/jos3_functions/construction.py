@@ -4,8 +4,6 @@ weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
 """
 
-from typing import Union
-
 import numpy as np
 
 from pythermalcomfort.classes_return import JOS3BodyParts
@@ -102,7 +100,7 @@ def bsa_rate(
     height: float,
     weight: float,
     bsa_equation: str,
-) -> Union[float, np.ndarray]:
+) -> float | np.ndarray:
     """Calculate the ratio of body surface area (BSA) to the standard body.
 
     This function computes the ratio of an individual's body surface area to that of a standard body,

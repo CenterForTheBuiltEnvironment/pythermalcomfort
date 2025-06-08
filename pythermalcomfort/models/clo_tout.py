@@ -1,4 +1,6 @@
-from typing import Literal, Union
+from __future__ import annotations
+
+from typing import Literal
 
 import numpy as np
 
@@ -8,7 +10,7 @@ from pythermalcomfort.utilities import Units, units_converter
 
 
 def clo_tout(
-    tout: Union[float, list[float]],
+    tout: float | list[float],
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CloTOut:
     """Calculate representative clothing insulation Icl based on outdoor air

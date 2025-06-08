@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -9,13 +9,13 @@ from pythermalcomfort.utilities import Models, _check_standard_compliance_array
 
 
 def vertical_tmp_grad_ppd(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    vertical_tmp_grad: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    vertical_tmp_grad: float | list[float],
     round_output: bool = True,
 ) -> VerticalTGradPPD:
     """Calculate the percentage of thermally dissatisfied people with a

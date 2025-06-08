@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import math
-from typing import Union
 
 import numpy as np
 from numba import jit
@@ -16,14 +17,14 @@ from pythermalcomfort.utilities import (
 
 
 def phs(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    posture: Union[str, list[str]],
-    wme: Union[float, np.ndarray, list[float], list[int]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    posture: str | list[str],
+    wme: float | np.ndarray | list[float] | list[int] = 0,
     round_output: bool = True,
     model: str = Models.iso_7933_2023.value,
     **kwargs,

@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -8,8 +8,8 @@ from pythermalcomfort.shared_functions import mapping
 
 
 def heat_index_rothfusz(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     round_output: bool = True,
     limit_inputs: bool = True,
 ) -> HI:

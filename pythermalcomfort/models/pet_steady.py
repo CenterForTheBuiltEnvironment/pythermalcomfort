@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 import numpy.typing as npt
@@ -10,19 +10,19 @@ from pythermalcomfort.utilities import Postures, Sex, body_surface_area, p_sat
 
 
 def pet_steady(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    p_atm: Union[float, list[float]] = 1013.25,
-    position: Union[str, list[str]] = Postures.sitting.value,
-    age: Union[int, list[int]] = 23,
-    sex: Union[int, list[int]] = Sex.male.value,
-    weight: Union[float, list[float]] = 75,
-    height: Union[float, list[float]] = 1.8,
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    p_atm: float | list[float] = 1013.25,
+    position: str | list[str] = Postures.sitting.value,
+    age: int | list[int] = 23,
+    sex: int | list[int] = Sex.male.value,
+    weight: float | list[float] = 75,
+    height: float | list[float] = 1.8,
+    wme: float | list[float] = 0,
 ) -> PETSteady:
     """Calculate the steady physiological equivalent temperature (PET) using the Munich
     Energy-balance Model for Individuals (MEMI) to simulate the human body's thermal

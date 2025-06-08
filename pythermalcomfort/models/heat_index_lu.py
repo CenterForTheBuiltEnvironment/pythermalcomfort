@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import math
-from typing import Union
 
 import numpy as np
 
@@ -8,8 +9,8 @@ from pythermalcomfort.classes_return import HI
 
 
 def heat_index_lu(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     round_output: bool = True,
 ) -> HI:
     """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model [lu]_.

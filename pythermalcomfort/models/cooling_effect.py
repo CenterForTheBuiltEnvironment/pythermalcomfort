@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import warnings
-from typing import Literal, Union
+from typing import Literal
 
 import numpy as np
 from scipy import optimize
@@ -11,13 +13,13 @@ from pythermalcomfort.utilities import Units, units_converter
 
 
 def cooling_effect(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
     """Return the value of the Cooling Effect (`CE`_) calculated in compliance

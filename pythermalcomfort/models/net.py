@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,9 +7,9 @@ from pythermalcomfort.classes_return import NET
 
 
 def net(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    v: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
+    v: float | list[float],
     round_output: bool = True,
 ) -> NET:
     """Calculate the Normal Effective Temperature (NET). Missenard (1933)

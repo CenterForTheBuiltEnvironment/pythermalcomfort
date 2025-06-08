@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -14,13 +14,13 @@ from pythermalcomfort.utilities import (
 
 
 def ankle_draft(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    v_ankle: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    v_ankle: float | list[float],
     units: str = Units.SI.value,
 ) -> AnkleDraft:
     """Calculate the percentage of thermally dissatisfied people with the

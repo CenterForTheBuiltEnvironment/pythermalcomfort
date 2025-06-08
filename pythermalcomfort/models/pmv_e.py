@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -9,14 +9,14 @@ from pythermalcomfort.utilities import Models, Units
 
 
 def pmv_e(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    e_coefficient: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    e_coefficient: float | list[float],
+    wme: float | list[float] = 0,
     units: str = Units.SI.value,
     limit_inputs: bool = True,
 ) -> EPMV:
