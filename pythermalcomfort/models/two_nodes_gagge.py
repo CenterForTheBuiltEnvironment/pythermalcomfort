@@ -220,7 +220,26 @@ def _gagge_two_nodes_optimized(
     max_skin_blood_flow=90,
     max_sweating=500,
     w_max=None,
-):
+) -> tuple[
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+]:
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
     k_clo = 0.25
@@ -326,7 +345,8 @@ def _gagge_two_nodes_optimized(
             n_iterations += 1
 
             if n_iterations > iteration_limit:
-                raise StopIteration("Max iterations exceeded")
+                max_iteration_exceeded = "Max iterations exceeded"
+                raise StopIteration(max_iteration_exceeded)
 
         q_sensible = (t_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # hf_cs rate of energy transport between core and skin, W
@@ -509,7 +529,7 @@ def _gagge_two_nodes_optimized(
     e_req_set = rm - c_res - q_res - dry_set
     pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
 
-    # # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
+    # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
     # ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
 
     return (

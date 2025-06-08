@@ -260,10 +260,7 @@ def _two_nodes_ji_optimized(
 
     r_clo = 0.155 * clo  # thermal resistance of clothing, K*m2/W
     # increase in body surface area due to clothing
-    if clo < 0.5:
-        f_a_cl = 1.0 + 0.2 * clo
-    else:
-        f_a_cl = 1.05 + 0.1 * clo
+    f_a_cl = 1.0 + 0.2 * clo if clo < 0.5 else 1.05 + 0.1 * clo
     lr = 2.2 / pressure_in_atmospheres  # Lewis relation
     m = met * met_factor  # metabolic rate in W/m2
 

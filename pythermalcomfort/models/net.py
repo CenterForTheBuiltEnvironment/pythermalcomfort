@@ -26,8 +26,8 @@ def net(
     subjects working in the heat are decided on by prevailing levels of ET,
     depending on metabolic rates. The NET is also constantly monitored by the
     Hong Kong Observatory [Blazejczyk2012]_. In central Europe the following thresholds are
-    in use: <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
-    23–27 = warm; >27°C = hot [Blazejczyk2012]_.
+    in use: <1°C = very cold; 1-9 = cold; 9-17 = cool; 17-21 = fresh; 21-23 = comfortable;
+    23-27 = warm; >27°C = hot [Blazejczyk2012]_.
 
     Parameters
     ----------

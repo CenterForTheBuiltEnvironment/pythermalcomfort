@@ -61,7 +61,7 @@ def solar_gain(
         See Table C2-2 and equation C-7 ASHRAE 55 2020 [55ASHRAE2023]_.
     asw : float or list of floats, optional
         The average short-wave absorptivity of the occupant. It will range widely,
-        depending on the color of the occupant’s skin as well as the color and
+        depending on the color of the skin of the occupant as well as the color and
         amount of clothing covering the body. Defaults to 0.7.
 
         .. note::
@@ -129,7 +129,10 @@ def solar_gain(
         Postures.supine.value,
         Postures.sitting.value,
     ]:
-        raise ValueError("Posture has to be either standing, supine or sitting")
+        error_msg_posture = (
+            "Posture has to be either 'standing', 'supine' or 'sitting'."
+        )
+        raise ValueError(error_msg_posture)
 
     erf, d_mrt = _solar_gain_vectorised(
         sol_altitude=sol_altitude,

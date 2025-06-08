@@ -396,14 +396,9 @@ def _phs_optimized(
 
     sweat_rate = sw_tot
 
-    def_dir = 0
-    if theta != 0:
-        # def_dir = 1 for unidirectional walking, def_dir = 0 for omni-directional walking
-        def_dir = 1
-    if walk_sp == 0:
-        def_speed = 0
-    else:
-        def_speed = 1
+    # def_dir = 1 for unidirectional walking, def_dir = 0 for omni-directional walking
+    def_dir = 1 if theta != 0 else 0
+    def_speed = 0 if walk_sp == 0 else 1
 
     # radiating area dubois
     if posture == Postures.standing.value:
@@ -429,10 +424,7 @@ def _phs_optimized(
     # static clothing insulation
     i_cl_st = clo * 0.155
 
-    if model == Models.iso_7933_2023.value:
-        fcl = 1 + 0.28 * clo
-    else:  # model == Models.iso_7933_2004.value:
-        fcl = 1 + 0.3 * clo
+    fcl = 1 + 0.28 * clo if model == Models.iso_7933_2023.value else 1 + 0.3 * clo
 
     # Static boundary layer thermal insulation in quiet air
     i_a_st = 0.111
@@ -565,10 +557,7 @@ def _phs_optimized(
         elif w_req >= 1.7:
             sw_req = sw_max
         else:
-            if w_req > 1:
-                e_v_eff = (2 - w_req) ** 2 / 2
-            else:
-                e_v_eff = 1 - w_req**2 / 2
+            e_v_eff = (2 - w_req) ** 2 / 2 if w_req > 1 else 1 - w_req**2 / 2
 
             e_v_eff = max(0.05, e_v_eff)
 

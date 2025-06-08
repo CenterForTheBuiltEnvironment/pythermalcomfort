@@ -18,7 +18,9 @@ def utci(
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UTCI:
-    """Calculate the Universal Thermal Climate Index (UTCI). The UTCI is the equivalent
+    """Calculate the Universal Thermal Climate Index (UTCI).
+
+    The UTCI is the equivalent
     temperature for the environment derived from a reference environment. It is defined
     as the air temperature of the reference environment which produces the same strain
     index value in comparison with the reference individual's response to the real

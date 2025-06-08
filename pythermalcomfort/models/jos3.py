@@ -1274,10 +1274,8 @@ class JOS3:
             row = {}
             for key, value in dictout.__dict__.items():
                 keys = key2keys[key]
-                if len(keys) == 1:
-                    values = [value]  # make list if value is not iter
-                else:
-                    values = value.__dict__
+                # make list if value is not iter
+                values = [value] if len(keys) == 1 else value.__dict__
                 row.update(dict(zip(keys, values)))
             data.append(row)
 
