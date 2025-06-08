@@ -10,7 +10,7 @@ def work_capacity_iso(
     wbgt: float | list[float],
     met: float | list[float],
 ) -> WorkCapacity:
-    """Estimate work capacity due to heat based on ISO standards as described by Brode et al
+    """Estimate work capacity due to heat based on ISO standards as described by Brode et al.
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -19,12 +19,12 @@ def work_capacity_iso(
     The function definitions / parameters can be found in: 1. Bröde P, Fiala D,
     Lemke B, Kjellstrom T. Estimated work ability in warm outdoor environments
     depends on the chosen heat stress assessment metric. International Journal
-    of Biometeorology. 2018 Mar;62(3):331–45.
+    of Biometeorology. 2018 Mar;62(3):331 45.
 
     For a comparison of different functions see Fig 1 of Day E, Fankhauser S, Kingsmill
     N, Costa H, Mavrogianni A. Upholding labour productivity under climate
     change: an assessment of adaptation options. Climate Policy. 2019
-    Mar;19(3):367–85.
+    Mar;19(3):367 85.
 
     Parameters
     ----------

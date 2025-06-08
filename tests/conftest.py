@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import json
 from enum import Enum
+from typing import Any, Callable
 
 import numpy as np
 import pytest
@@ -44,8 +47,18 @@ class Urls(Enum):
 
 
 @pytest.fixture
-def get_test_url():
-    def _get_test_url(model_name) -> str:
+def get_test_url() -> Callable[[str], str]:
+    """Return a function that builds the full test data URL for a given model name.
+
+    Returns
+    -------
+    Callable[[str], str]
+        Callable accepting a model_name string and returning the complete URL.
+
+    """
+
+    def _get_test_url(model_name: str) -> str:
+        """Construct the test URL for the given model name or return empty on failure."""
         try:
             return unit_test_data_prefix + Urls[model_name.upper()].value
         except KeyError:
@@ -55,8 +68,17 @@ def get_test_url():
 
 
 @pytest.fixture
-def retrieve_data():
-    def _retrieve_data(url):
+def retrieve_data() -> Callable[[str], dict[str, Any] | None]:
+    """Return a function that fetches JSON data from a URL.
+
+    Returns
+    -------
+    Callable[[str], Optional[Dict[str, Any]]]
+        A callable accepting a URL string and returning a dict or None.
+
+    """
+
+    def _retrieve_data(url: str) -> dict[str, Any] | None:
         try:
             response = requests.get(url, timeout=10)
             if response.status_code == 200:

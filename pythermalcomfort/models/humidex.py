@@ -10,8 +10,8 @@ from pythermalcomfort.utilities import dew_point_tmp
 def humidex(
     tdb: Union[float, list[float]],
     rh: Union[float, list[float]],
-    round_output: bool = True,
     model: str = "rana",
+    round_output: bool = True,
 ) -> Humidex:
     """Calculate the humidex (short for "humidity index"). It has been
     developed by the Canadian Meteorological service. It was introduced in 1965
@@ -26,8 +26,6 @@ def humidex(
         Dry bulb air temperature, [°C].
     rh : float or list of floats
         Relative humidity, [%].
-    round_output : bool, optional
-        If True, rounds output value. If False, it does not round it. Defaults to True.
     model : str, optional
         The model to be used for the calculation. Options are 'rana' and 'masterson'. Defaults to 'rana'.
 
@@ -36,6 +34,8 @@ def humidex(
             The 'masterson' model is the Humidex model proposed by Masterson and Richardson (1979) [Masterson1979]_.
 
             .. _Rana et al. (2013): https://doi.org/10.1016/j.enbuild.2013.04.019
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------

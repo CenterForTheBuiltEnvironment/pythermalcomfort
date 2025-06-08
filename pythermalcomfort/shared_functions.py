@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def valid_range(x, valid):
+def valid_range(x, valid) -> np.ndarray:
     """Filter values based on a valid range."""
     return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
 

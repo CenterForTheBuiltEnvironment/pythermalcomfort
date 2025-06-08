@@ -867,13 +867,13 @@ class JOS3:
         # Calculate non-shivering thermogenesis (NST) [W]
         if self.options["nonshivering_thermogenesis"]:
             q_nst = threg.nonshivering(
-                err_sk,
-                self._height,
-                self._weight,
-                self._bsa_equation,
-                self._age,
-                self.options["cold_acclimated"],
-                self.options["bat_positive"],
+                err_sk=err_sk,
+                height=self._height,
+                weight=self._weight,
+                bsa_equation=self._bsa_equation,
+                age=self._age,
+                cold_acclimation=self.options["cold_acclimated"],
+                batpositive=self.options["bat_positive"],
             )
         else:  # not consider NST
             q_nst = np.zeros(Default.num_body_parts)

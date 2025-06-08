@@ -10,7 +10,7 @@ def work_capacity_dunne(
     wbgt: float | list[float],
     work_intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
-    """Estimate work capacity due to heat based ISO standards as described by Dunne et al [Dunne2013]_
+    """Estimate work capacity due to heat based ISO standards as described by Dunne et al [Dunne2013]_.
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -18,7 +18,7 @@ def work_capacity_dunne(
 
     This is based upon NIOSH safety standards. See:
     Dunne JP, Stouffer RJ, John JG. Reductions in labour capacity from heat
-    stress under climate warming. Nature Climate Change. 2013 Jun;3(6):563–6.
+    stress under climate warming. Nature Climate Change. 2013 Jun;3(6):563 6.
 
     Heavy intensity work is sometimes labelled as 400 W, but this is only
     nominal. Moderate work is assumed to be half as much as heavy intensity, and

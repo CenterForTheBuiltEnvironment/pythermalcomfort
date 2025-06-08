@@ -24,7 +24,7 @@ met_to_w_m2 = 58.15
 
 
 class Models(Enum):
-    """Models options"""
+    """Models options."""
 
     ashrae_55_2023 = "55-2023"
     iso_7730_2005 = "7730-2005"
@@ -395,10 +395,14 @@ def validate_type(value, name: str, allowed_types: tuple):
     if isinstance(value, np.generic):
         value = value.item()
     if not isinstance(value, allowed_types):
-        raise TypeError(f"{name} must be one of the following types: {allowed_types}.")
+        invalid_type_msg = (
+            f"{name} must be one of the following types: {allowed_types}."
+        )
+        raise TypeError(invalid_type_msg)
 
 
-def transpose_sharp_altitude(sharp, altitude):
+def transpose_sharp_altitude(sharp: float, altitude: float) -> float:
+    """Transpose the solar altitude and solar azimuth angles."""
     altitude_new = math.degrees(
         math.asin(
             math.sin(math.radians(abs(sharp - 90))) * math.cos(math.radians(altitude)),
@@ -511,6 +515,8 @@ def _check_standard_compliance_array(standard, **kwargs):
 
 
 class Postures(Enum):
+    """Postures options."""
+
     standing = "standing"
     sitting = "sitting"
     sedentary = "sedentary"
@@ -521,6 +527,8 @@ class Postures(Enum):
 
 
 class BodySurfaceAreaEquations(Enum):
+    """Body Surface Area Equations."""
+
     dubois = "dubois"
     takahira = "takahira"
     fujimoto = "fujimoto"
@@ -572,12 +580,13 @@ def body_surface_area(
         return 0.1882 * (weight**0.444) * (height**0.663)
     if formula == BodySurfaceAreaEquations.kurazumi.value:
         return 0.2440 * (weight**0.383) * (height**0.693)
-    raise ValueError(
-        f"Formula '{formula}' for calculating body surface area is not recognized.",
+    invalid_formula_msg = (
+        f"Formula '{formula}' for calculating body surface area is not recognized."
     )
+    raise ValueError(invalid_formula_msg)
 
 
-def f_svv(w, h, d):
+def f_svv(w: float, h: float, d: float) -> float:
     """Calculate the sky-vault view fraction.
 
     Parameters
@@ -602,7 +611,7 @@ def f_svv(w, h, d):
     )
 
 
-def v_relative(v: float | list[float], met: float | list[float]):
+def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
     """Estimates the relative air speed which combines the average air speed of the
     space plus the relative air speed caused by the body movement. The same equation is
     used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
@@ -629,7 +638,7 @@ def clo_dynamic_ashrae(
     clo: float | list[float],
     met: float | list[float],
     model: str = Models.ashrae_55_2023.value,
-):
+) -> np.ndarray:
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The ASHRAE
     55:2023 refers to it as (I :sub:`cl,active`). The activity as well as the air speed
     modify the insulation characteristics of the clothing. Consequently, the ASHRAE 55
@@ -662,9 +671,8 @@ def clo_dynamic_ashrae(
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
-        raise ValueError(
-            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}",
-        )
+        invalid_model_msg = f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        raise ValueError(invalid_model_msg)
 
     return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
 
@@ -675,7 +683,7 @@ def clo_dynamic_iso(
     v: float | list[float],
     i_a: float | list[float] = 0.7,
     model: str = Models.iso_9920_2007.value,
-) -> float | list[float]:
+) -> np.ndarray:
     """Estimates the dynamic intrinsic clothing insulation (I :sub:`cl,r`). The activity
     as well as the air speed modify the insulation characteristics of the clothing.
     Consequently, the ISO standard states that (I :sub:`cl,`) shall be corrected
@@ -706,9 +714,8 @@ def clo_dynamic_iso(
     """
     model = model.lower()
     if model not in [Models.iso_9920_2007.value]:
-        raise ValueError(
-            f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}",
-        )
+        invalid_model_msg = f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
+        raise ValueError(invalid_model_msg)
 
     clo = np.array(clo)
     met = np.array(met)
@@ -776,7 +783,7 @@ def running_mean_outdoor_temperature(
     return round(t_rm, 1)
 
 
-def units_converter(from_units=Units.IP.value, **kwargs):
+def units_converter(from_units=Units.IP.value, **kwargs) -> list[float]:
     """Convert IP values to SI units.
 
     Parameters
@@ -849,6 +856,11 @@ def operative_tmp(
         a = np.where(v < 0.6, 0.6, 0.7)
         a = np.where(v < 0.2, 0.5, a)
         return a * tdb + (1 - a) * tr
+    error_message = (
+        f"Operative temperature can only be calculated in compliance with ISO or ASHRAE standards. "
+        f"Received standard: {standard}"
+    )
+    raise ValueError(error_message)
 
 
 def clo_intrinsic_insulation_ensemble(

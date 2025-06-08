@@ -535,7 +535,7 @@ def _gagge_two_nodes_optimized(
 
 
 @vectorize(
-    [
+    [  # signature: output(float64)
         float64(
             float64,
             float64,
@@ -564,15 +564,15 @@ def _gagge_two_nodes_optimized_return_set(
     position,
 ):
     return _gagge_two_nodes_optimized(
-        tdb,
-        tr,
-        v,
-        met,
-        clo,
-        vapor_pressure,
-        wme,
-        body_surface_area,
-        p_atm,
-        position,
-        True,
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atm=p_atm,
+        position=position,
+        calculate_ce=True,
     )[0]

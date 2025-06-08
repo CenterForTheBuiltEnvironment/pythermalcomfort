@@ -10,7 +10,7 @@ def work_capacity_hothaps(
     wbgt: float | list[float],
     work_intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
-    """Estimate work capacity due to heat based on Kjellstrom et al. [Kjellstrom2018]_
+    """Estimate work capacity due to heat based on Kjellstrom et al. [Kjellstrom2018]_.
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -32,7 +32,7 @@ def work_capacity_hothaps(
     The correction citation is: Bröde P, Fiala D, Lemke B, Kjellstrom T.
     Estimated work ability in warm outdoor environments depends on the chosen
     heat stress assessment metric. International Journal of Biometeorology.
-    2018 Mar;62(3):331–45.
+    2018 Mar;62(3):331 45.
 
 
     The relevant definitions of the functions can be found most clearly in:
@@ -44,7 +44,7 @@ def work_capacity_hothaps(
     For a comparison of different functions see Fig 1 of Day E, Fankhauser S, Kingsmill
     N, Costa H, Mavrogianni A. Upholding labour productivity under climate
     change: an assessment of adaptation options. Climate Policy. 2019
-    Mar;19(3):367–85.
+    Mar;19(3):367 85.
 
     Parameters
     ----------

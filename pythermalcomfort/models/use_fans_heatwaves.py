@@ -25,7 +25,6 @@ def use_fans_heatwaves(
     position: str = Postures.standing.value,
     max_skin_blood_flow: float = 80,
     max_sweating: float = 500,
-    *,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UseFansHeatwaves:
