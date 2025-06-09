@@ -143,6 +143,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
 
 def forced_convection(v: float) -> np.ndarray:
     """Calculate the forced convection heat transfer coefficient.
+
     Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
 
     Parameters
@@ -209,6 +210,7 @@ def conv_coef(
     t_skin: float | np.ndarray,
 ) -> np.ndarray:
     """Calculate convective heat transfer coefficient (hc) [W/(m2*K)].
+
     Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
     Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
 
@@ -380,7 +382,7 @@ def fixed_hr(hr: np.ndarray) -> np.ndarray:
 
 # TODO this function is a duplicate in utils
 def operative_temp(tdb, tr, hc, hr):
-    """Calculate operative temperature [°C]
+    """Calculate operative temperature [°C].
 
     Parameters
     ----------
@@ -405,7 +407,7 @@ def operative_temp(tdb, tr, hc, hr):
 
 # TODO this function is a duplicate in utils and they are different
 def clo_area_factor(clo):
-    """Calculate clothing area factor [-]
+    """Calculate clothing area factor.
 
     Parameters
     ----------
@@ -1098,7 +1100,7 @@ def local_mbase(
 
 
 def local_q_work(bmr, par):
-    """Calculate local thermogenesis by work [W]
+    """Calculate local thermogenesis by work [W].
 
     Parameters
     ----------
@@ -1284,7 +1286,7 @@ def nonshivering(
     cold_acclimation=False,
     batpositive=True,
 ):
-    """Calculate local metabolic rate by non-shivering [W]
+    """Calculate local metabolic rate by non-shivering [W].
 
     Parameters
     ----------

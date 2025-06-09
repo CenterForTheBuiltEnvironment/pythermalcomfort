@@ -27,7 +27,8 @@ def two_nodes_gagge(
     w_max: float | list[float] = False,
     calculate_ce: bool = False,
 ) -> SET | GaggeTwoNodes:
-    """Gagge Two-node model of human temperature regulation Gagge et al. (1986).
+    """Gagge Two-node model of human temperature regulation Gagge et al (1986) [Gagge1986]_.
+
     [Gagge1986]_ This model can be used to calculate a variety of indices, including:
 
     * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [Gagge1986]_.

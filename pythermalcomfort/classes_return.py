@@ -716,7 +716,9 @@ class WorkCapacity(AutoStrMixin):
 
 @dataclass(frozen=True, repr=False)
 class JOS3BodyParts(AutoStrMixin):
-    """Dataclass to represent the body parts in the JOS3 model. It is very important to
+    """Dataclass to represent the body parts in the JOS3 model.
+
+    It is very important to
     keep the order of the attributes as they are defined in the dataclass ['head',
     'neck', 'chest', 'back', 'pelvis', 'left_shoulder', 'left_arm', 'left_hand',
     'right_shoulder', 'right_arm', 'right_hand', 'left_thigh', 'left_leg', 'left_foot',

@@ -1,4 +1,4 @@
-"""In this example I am calculating the Standard Effective Temperature (SET) with the pythermalcomfort package"""
+"""In this example I am calculating the Standard Effective Temperature (SET) with the pythermalcomfort package."""
 
 from pythermalcomfort.models import set_tmp
 

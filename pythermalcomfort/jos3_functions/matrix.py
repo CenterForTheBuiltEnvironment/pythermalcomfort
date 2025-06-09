@@ -173,7 +173,7 @@ def local_arr(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
 
 
 def vessel_blood_flow(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
-    """Get artery and vein blood flow rate [l/h]"""
+    """Get artery and vein blood flow rate [l/h]."""
     xbf = bf_core + bf_muscle + bf_fat + bf_skin
 
     bf_art = np.zeros(Default.num_body_parts)

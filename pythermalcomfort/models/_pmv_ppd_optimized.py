@@ -50,7 +50,7 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     while np.abs(xn - xf) > eps:
         xf = (xf + xn) / 2
         hcn = 2.38 * np.abs(100.0 * xf - taa) ** 0.25
-        hc = hcf if hcf > hcn else hcn
+        hc = max(hcn, hcf)
         xn = (p5 + p4 * hc - p2 * xf**4) / (100 + p3 * hc)
         n += 1
         if n > 150:

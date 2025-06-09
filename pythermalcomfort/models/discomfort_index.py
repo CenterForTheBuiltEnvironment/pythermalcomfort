@@ -11,7 +11,9 @@ def discomfort_index(
     tdb: float | list[float],
     rh: float | list[float],
 ) -> DI:
-    """Calculate the Discomfort Index (DI). The index is essentially an
+    """Calculate the Discomfort Index (DI).
+
+    The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usually divided into 6 discomfort categories and it only applies to
     warm environments: [Polydoros2015]_

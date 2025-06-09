@@ -18,14 +18,13 @@ import sys
 
 
 def main(argv=sys.argv):
-    """Args:
-        argv (list): List of arguments
+    """Print command line arguments and return an exit code.
+
+    Args:
+        argv (list): List of command line arguments.
 
     Returns:
-        int: A return code
-
-    Does stuff.
-
+        int: Exit code.
     """
     print(argv)
     return 0

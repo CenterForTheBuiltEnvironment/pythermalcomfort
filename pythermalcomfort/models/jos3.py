@@ -1519,7 +1519,7 @@ class JOS3:
 
     @property
     def t_body(self):
-        """t_body : numpy.ndarray (85,) All segment temperatures of JOS-3"""
+        """t_body : numpy.ndarray (85,) All segment temperatures of JOS-3."""
         return self._t_body
 
     @t_body.setter
@@ -1643,7 +1643,7 @@ class JOS3:
 
     @property
     def body_names(self) -> np.ndarray[float]:
-        """body_names : list JOS3 body names"""
+        """body_names : list JOS3 body names."""
         return JOS3BodyParts.get_attribute_names()
 
     @property
