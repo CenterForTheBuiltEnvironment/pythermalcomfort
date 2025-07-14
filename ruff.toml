@@ -17,6 +17,14 @@ select = [
     "UP",  # alert you when better syntax is available in your python version
     "I",  # import order
     "D401",   # pydocstyle
+    "RUF002",
+    "SIM108",
+    "FA100",
+    "EM102",
+    "D415",
+#    "ANN202",
+    #    "TRY003",
+    #    "EM101",
 #    "ALL",  # all rules
 ]
 ignore = [
@@ -29,7 +37,14 @@ ignore = [
     "D100",
     "PT011",
     "ANN001",
-    "PLR0913"
+    "PLR0913",
+    "SLF001",
+    "D205",
+    "D104",
+    "FBT002",
+    "FBT001",
+    "PLC0206",
+#    "PLR1714",
 ]
 
 [format]
