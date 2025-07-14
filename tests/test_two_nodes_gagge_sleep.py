@@ -125,7 +125,7 @@ def test_unexpected_kwargs_raises_type_error() -> None:
     """Test that unexpected keyword arguments raise TypeError."""
     with pytest.raises(TypeError) as exc:
         two_nodes_gagge_sleep(18, 18, 0.05, 50, 1.4, 1.76, foo=123)
-    assert "Unexpected arguments" in str(exc.value)
+    assert "Unexpected keyword arguments" in str(exc.value)
 
 
 def test_invalid_kwarg_type_raises_type_error() -> None:

@@ -209,7 +209,7 @@ def test_unexpected_kwarg_raises_type_error() -> None:
             length_time_simulation=120,
             foo="bar",  # unexpected argument
         )
-    assert "Unexpected arguments: foo" in str(excinfo.value)
+    assert "Unexpected keyword arguments: ['foo']" in str(excinfo.value)
 
 
 def test_non_numeric_tdb_raises_type_error() -> None:
