@@ -113,7 +113,7 @@ def ankle_draft(
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)
 
     tdb_valid, tr_valid, v_valid, v_limited = _check_standard_compliance_array(
-        standard="ashrae",
+        standard=Models.ashrae_55_2023.value,
         tdb=tdb,
         tr=tr,
         v_limited=vr,

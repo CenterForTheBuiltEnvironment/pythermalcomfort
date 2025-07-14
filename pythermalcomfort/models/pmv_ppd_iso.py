@@ -170,7 +170,7 @@ def pmv_ppd_iso(
         met_valid,
         clo_valid,
     ) = _check_standard_compliance_array(
-        standard="iso",
+        standard=Models.iso_7730_2005.value,
         tdb=tdb,
         tr=tr,
         v=vr,

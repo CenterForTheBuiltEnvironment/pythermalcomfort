@@ -6,6 +6,7 @@ from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.utilities import (
+    Models,
     Postures,
     _check_standard_compliance_array,
 )
@@ -138,7 +139,7 @@ def set_tmp(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="ashrae",
+            standard=Models.ashrae_55_2023.value,
             tdb=tdb,
             tr=tr,
             v=v,

@@ -181,7 +181,7 @@ def pmv_ppd_ashrae(
         met_valid,
         clo_valid,
     ) = _check_standard_compliance_array(
-        standard="ashrae",
+        standard=Models.ashrae_55_2023.value,
         tdb=tdb,
         tr=tr,
         v=vr,

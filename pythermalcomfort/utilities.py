@@ -422,7 +422,7 @@ def _check_standard_compliance_array(standard, **kwargs):
     params = {**default_kwargs, **kwargs}
     values_to_return = {}
 
-    if standard == "ashrae":  # based on table 7.3.4 ashrae 55 2020
+    if standard == Models.ashrae_55_2023.value:  # based on table 7.3.4 ashrae 55 2020
         tdb_valid = valid_range(params["tdb"], (10.0, 40.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
 
@@ -504,7 +504,7 @@ def _check_standard_compliance_array(standard, **kwargs):
 
         return tdb_valid, tr_valid, v_valid, rh_valid, met_valid, clo_valid
 
-    if standard == "iso":  # based on ISO 7730:2005 page 3
+    if standard == Models.iso_7730_2005.value:  # based on ISO 7730:2005 page 3
         tdb_valid = valid_range(params["tdb"], (10.0, 30.0))
         tr_valid = valid_range(params["tr"], (10.0, 40.0))
         v_valid = valid_range(params["v"], (0.0, 1.0))

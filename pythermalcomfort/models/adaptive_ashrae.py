@@ -6,6 +6,7 @@ from pythermalcomfort.classes_input import ASHRAEInputs
 from pythermalcomfort.classes_return import AdaptiveASHRAE
 from pythermalcomfort.shared_functions import valid_range
 from pythermalcomfort.utilities import (
+    Models,
     Units,
     _check_standard_compliance_array,
     operative_tmp,
@@ -114,7 +115,7 @@ def adaptive_ashrae(
         )
 
     tdb_valid, tr_valid, v_valid = _check_standard_compliance_array(
-        standard,
+        Models.ashrae_55_2023.value,
         tdb=tdb,
         tr=tr,
         v=v,
