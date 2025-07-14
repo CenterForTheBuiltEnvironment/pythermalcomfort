@@ -10,7 +10,7 @@ def work_capacity_dunne(
     wbgt: float | list[float],
     work_intensity: str = WorkIntensity.HEAVY.value,
 ) -> WorkCapacity:
-    """Estimate work capacity due to heat based ISO standards as described by Dunne et al [Dunne2013]_.
+    """Estimate work capacity due to heat based on Dunne et al [Dunne2013]_.
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%

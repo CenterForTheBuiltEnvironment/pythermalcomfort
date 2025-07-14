@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.4.1 (2025-07-14)
+------------------
+
+* fixed some typo in the documentation
+* better formatted the code
+
 3.4.0 (2025-06-08)
 ------------------
 

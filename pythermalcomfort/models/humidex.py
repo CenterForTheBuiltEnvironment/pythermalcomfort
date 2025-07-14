@@ -72,7 +72,7 @@ def humidex(
     if np.any(rh > 100) or np.any(rh < 0):
         raise ValueError("Relative humidity must be between 0 and 100%")
 
-    if model not in [model.value for model in HumidexModels]:
+    if model not in HumidexModels._value2member_map_:
         raise ValueError(
             "Invalid model. The model must be either 'rana' or 'masterson'",
         )

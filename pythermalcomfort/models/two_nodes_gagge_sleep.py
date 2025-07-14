@@ -118,9 +118,7 @@ def two_nodes_gagge_sleep(
     # These variables should have the same length, which will be the duration
     lengths = [len(x) for x in (tdb, tr, v, rh, clo, thickness_quilt)]
     if len(set(lengths)) != 1:
-        error_message = (
-            f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}",
-        )
+        error_message = f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}"
         raise ValueError(error_message)
     duration = lengths[0]
 
