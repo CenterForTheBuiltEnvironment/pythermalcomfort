@@ -80,11 +80,11 @@ def to_array_body_parts(inp) -> np.ndarray:
         If the input type is not supported or if the input list or ndarray is not of length 17.
 
     """
-    if isinstance(inp, (int, float)):
+    if isinstance(inp, int | float):
         return np.full(Default.num_body_parts, inp)
     if isinstance(inp, dict):
         return np.array([inp[key] for key in JOS3BodyParts.get_attribute_names()])
-    if isinstance(inp, (list, np.ndarray)):
+    if isinstance(inp, list | np.ndarray):
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
             return inp.copy()
@@ -788,6 +788,8 @@ def pass_values_to_jos3_body_parts(values, round_digits=2, body_parts=None):
     return JOS3BodyParts(
         **{
             name: value
-            for name, value in zip(body_parts, np.round(values, round_digits))
+            for name, value in zip(
+                body_parts, np.round(values, round_digits), strict=False
+            )
         },
     )

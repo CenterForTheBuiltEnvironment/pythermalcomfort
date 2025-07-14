@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pytest
@@ -104,7 +105,7 @@ def is_equal(a, b, tolerance=1e-6) -> bool:
         return np.allclose(a, b, atol=tolerance, equal_nan=True)
     if (a is None and np.isnan(b)) or (b is None and np.isnan(a)):
         return True
-    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+    if isinstance(a, int | float) and isinstance(b, int | float):
         # Compare scalar values with tolerance
         return np.isclose(a, b, atol=tolerance)
     return a == b

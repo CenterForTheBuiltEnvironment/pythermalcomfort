@@ -39,7 +39,7 @@ def test_list_input_pairwise() -> None:
     result = work_capacity_iso(wbgts, mets)
     assert isinstance(result.capacity, np.ndarray)
     expected = _expected_capacity(wbgts, mets)
-    for got, exp in zip(result.capacity, expected):
+    for got, exp in zip(result.capacity, expected, strict=False):
         assert pytest.approx(exp, rel=1e-3) == got
 
 

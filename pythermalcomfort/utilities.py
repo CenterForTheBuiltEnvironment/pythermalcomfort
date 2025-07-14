@@ -775,7 +775,7 @@ def running_mean_outdoor_temperature(
             temp_array[ix] = units_converter(tdb=temp_array[ix])[0]
 
     coeff = [alpha**ix for ix, x in enumerate(temp_array)]
-    t_rm = sum([a * b for a, b in zip(coeff, temp_array)]) / sum(coeff)
+    t_rm = sum([a * b for a, b in zip(coeff, temp_array, strict=False)]) / sum(coeff)
 
     if units == Units.IP.value:
         t_rm = units_converter(tmp=t_rm, from_units=Units.SI.value.lower())[0]
