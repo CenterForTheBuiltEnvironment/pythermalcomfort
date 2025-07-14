@@ -32,11 +32,10 @@ jobs:
   test:
     needs: format
 
-    # I am only testing with py310 but travis is Testing the other versions of Python
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.11', '3.12' ]
+        python-version: [ '3.10', '3.13' ]
         platform: [ ubuntu-latest ]
 
     steps:

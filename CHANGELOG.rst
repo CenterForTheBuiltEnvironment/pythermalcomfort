@@ -4,6 +4,12 @@ Changelog
 3.4.1 (2025-07-14)
 ------------------
 
+.. warning::
+    removed support for Python 3.8 and 3.9
+    pythermalcomfort now requires Python 3.10 or higher.
+    Added support for Python 3.13
+
+
 * fixed some typo in the documentation
 * better formatted the code
 
