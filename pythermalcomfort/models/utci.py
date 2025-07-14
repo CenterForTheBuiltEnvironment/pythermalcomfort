@@ -160,7 +160,9 @@ def utci(
     ],
     cache=True,
 )
-def _utci_optimized(tdb, v, delta_t_tr, pa):
+def _utci_optimized(
+    tdb: float64, v: float64, delta_t_tr: float64, pa: float64
+) -> float64:
     return (
         tdb
         + 0.607562052
