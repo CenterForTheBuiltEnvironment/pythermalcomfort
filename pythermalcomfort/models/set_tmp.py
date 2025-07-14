@@ -19,7 +19,7 @@ def set_tmp(
     rh: float | list[float],
     met: float | list[float],
     clo: float | list[float],
-    wme: float | list[float] = 0,
+    wme: float | list[float] = 0.0,
     body_surface_area: float | list[float] = 1.8258,
     p_atm: float | list[float] = 101325,
     position: str = Postures.standing.value,
