@@ -1276,10 +1276,12 @@ class JOS3:
                 keys = key2keys[key]
                 # make list if value is not iter
                 values = [value] if len(keys) == 1 else value.__dict__
-                row.update(dict(zip(keys, values)))
+                row.update(dict(zip(keys, values, strict=False)))
             data.append(row)
 
-        out_dict = dict(zip(data[0].keys(), [[] for _ in range(len(data[0].keys()))]))
+        out_dict = dict(
+            zip(data[0].keys(), [[] for _ in range(len(data[0].keys()))], strict=False)
+        )
         for row in data:
             for k in data[0].keys():
                 out_dict[k].append(row[k])

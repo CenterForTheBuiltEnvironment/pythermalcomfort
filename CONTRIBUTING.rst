@@ -120,5 +120,5 @@ To Add a Function
 1. Add the function to the Python file `pythermalcomfort/models/` and document it.
 2. Add any related functions that are used by your function either in `pythermalcomfort/utilities.py`. See existing code as examples.
 3. Ensure that all new functions accept arrays as input and return a dataclass. You can use the code in `pmv_ppd_iso.py` as a template.
-4. Test your function by writing a test in `tests/test_XXXX.py`. Test it by running `tox -e pyXX` where `XX` is the Python version you want to use, e.g., `37`.
+4. Test your function by writing a test in `tests/test_XXXX.py`. Test it by running `tox -e pyXX` where `XX` is the Python version you want to use, e.g., `312`.
 5. Add `autofunction` to `doc.reference.pythermalcomfort.py`.

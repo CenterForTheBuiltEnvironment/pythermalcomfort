@@ -86,7 +86,7 @@ def test_two_nodes_gagge_sleep_long_duration() -> None:
     ]
 
     # check first row
-    for field, exp in zip(fields, first_row_expected):
+    for field, exp in zip(fields, first_row_expected, strict=False):
         np.testing.assert_allclose(
             getattr(result, field)[0],
             exp,
@@ -96,7 +96,7 @@ def test_two_nodes_gagge_sleep_long_duration() -> None:
         )
 
     # check last row
-    for field, exp in zip(fields, last_row_expected):
+    for field, exp in zip(fields, last_row_expected, strict=False):
         np.testing.assert_allclose(
             getattr(result, field)[-1],
             exp,

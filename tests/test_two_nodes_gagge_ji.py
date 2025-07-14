@@ -165,7 +165,7 @@ def test_two_nodes_gagge_ji_list_tdb() -> None:
     expected_t_core = 37.446
     expected_t_skin = 34.596
 
-    for core_arr, skin_arr in zip(t_core_list, t_skin_list):
+    for core_arr, skin_arr in zip(t_core_list, t_skin_list, strict=False):
         assert core_arr[-1] == pytest.approx(expected_t_core, rel=1e-3)
         assert skin_arr[-1] == pytest.approx(expected_t_skin, rel=1e-3)
 

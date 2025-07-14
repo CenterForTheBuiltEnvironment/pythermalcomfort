@@ -68,7 +68,8 @@ def test_list_input() -> None:
     assert isinstance(result.capacity, np.ndarray)
     exp_list = _expected_capacity(wbgts, divisor=30.94, exponent=16.64).tolist()
     assert all(
-        pytest.approx(e, rel=1e-3) == r for e, r in zip(exp_list, result.capacity)
+        pytest.approx(e, rel=1e-3) == r
+        for e, r in zip(exp_list, result.capacity, strict=False)
     )
 
 
