@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -16,20 +16,20 @@ from pythermalcomfort.utilities import (
 
 
 def pmv_ppd_ashrae(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
     model: str = Models.ashrae_55_2023.value,
     units: str = Units.SI.value,
     limit_inputs: bool = True,
     airspeed_control: bool = True,
     round_output: bool = True,
 ) -> PMVPPD:
-    """Returns Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+    """Return Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
     calculated in accordance with the ASHRAE 55 Standard.
 
     While the PMV equation is the same for both the ISO and ASHRAE standards, in the
@@ -139,6 +139,7 @@ def pmv_ppd_ashrae(
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
+
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -167,9 +168,11 @@ def pmv_ppd_ashrae(
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
-        raise ValueError(
-            f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        error_msg = (
+            f"Model '{model}' is not supported. "
+            f"Supported models are: {Models.ashrae_55_2023.value}."
         )
+        raise ValueError(error_msg)
 
     (
         tdb_valid,
@@ -178,7 +181,7 @@ def pmv_ppd_ashrae(
         met_valid,
         clo_valid,
     ) = _check_standard_compliance_array(
-        standard="ashrae",
+        standard=Models.ashrae_55_2023.value,
         tdb=tdb,
         tr=tr,
         v=vr,
@@ -201,7 +204,7 @@ def pmv_ppd_ashrae(
     pmv_array = _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme)
 
     ppd_array = 100.0 - 95.0 * np.exp(
-        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0
+        -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0,
     )
 
     # Checks that inputs are within the bounds accepted by the model if not return nan

@@ -2,9 +2,12 @@ from pythermalcomfort.models import discomfort_index
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_discomfort_index(get_test_url, retrieve_data):
+def test_discomfort_index(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the Discomfort Index correctly for various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.DISCOMFORT_INDEX.name
+        get_test_url,
+        retrieve_data,
+        Urls.DISCOMFORT_INDEX.name,
     )
     tolerance = reference_table["tolerance"]
 

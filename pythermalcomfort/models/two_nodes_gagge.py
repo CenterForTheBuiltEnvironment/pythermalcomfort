@@ -27,7 +27,8 @@ def two_nodes_gagge(
     w_max: float | list[float] = False,
     calculate_ce: bool = False,
 ) -> SET | GaggeTwoNodes:
-    """Gagge Two-node model of human temperature regulation Gagge et al. (1986).
+    """Gagge Two-node model of human temperature regulation Gagge et al (1986) [Gagge1986]_.
+
     [Gagge1986]_ This model can be used to calculate a variety of indices, including:
 
     * Gagge's version of Fanger's Predicted Mean Vote (PMV). This function uses the Fanger's PMV equations but it replaces the heat loss and gain terms with those calculated by the two-node model developed by Gagge et al. (1986) [Gagge1986]_.
@@ -80,8 +81,8 @@ def two_nodes_gagge(
     -------
     GaggeTwoNodes
         A dataclass containing the results of the two-node model of human temperature regulation.
-        See :py:class:`~pythermalcomfort.classes_return.TwoNodes` for more details.
-        To access the results, use the corresponding attributes of the returned `TwoNodes` instance, e.g., `result.e_skin`.
+        See :py:class:`~pythermalcomfort.classes_return.GaggeTwoNodes` for more details.
+        To access the results, use the corresponding attributes of the returned `GaggeTwoNodes` instance, e.g., `result.e_skin`.
 
     Examples
     --------
@@ -92,10 +93,9 @@ def two_nodes_gagge(
         result = two_nodes_gagge(tdb=25, tr=25, v=0.1, rh=50, clo=0.5, met=1.2)
         print(result.w)  # 100.0
 
-        result = two_nodes_gagge(
-            tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5
-        )
+        result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
+
     """
     # Validate inputs using the TwoNodesInputs class
     GaggeTwoNodesInputs(
@@ -199,7 +199,7 @@ def two_nodes_gagge(
     }
 
     if round_output:
-        for key in output.keys():
+        for key in output:
             output[key] = np.around(output[key], 2)
 
     return GaggeTwoNodes(**output)
@@ -221,7 +221,26 @@ def _gagge_two_nodes_optimized(
     max_skin_blood_flow=90,
     max_sweating=500,
     w_max=None,
-):
+) -> tuple[
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+]:
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
     k_clo = 0.25
@@ -269,8 +288,7 @@ def _gagge_two_nodes_optimized(
     m = met * met_factor  # metabolic rate
 
     e_comfort = 0.42 * (rm - met_factor)  # evaporative heat loss during comfort
-    if e_comfort < 0:
-        e_comfort = 0
+    e_comfort = max(e_comfort, 0)
 
     i_cl = 1.0  # permeation efficiency of water vapour naked skin
     if clo > 0:
@@ -328,7 +346,8 @@ def _gagge_two_nodes_optimized(
             n_iterations += 1
 
             if n_iterations > iteration_limit:
-                raise StopIteration("Max iterations exceeded")
+                max_iteration_exceeded = "Max iterations exceeded"
+                raise StopIteration(max_iteration_exceeded)
 
         q_sensible = (t_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # hf_cs rate of energy transport between core and skin, W
@@ -362,13 +381,10 @@ def _gagge_two_nodes_optimized(
         bd_sig = t_body - temp_body_neutral
         warm_b = (bd_sig > 0) * bd_sig
         m_bl = (skin_blood_flow_neutral + c_dil * c_warm) / (1 + c_str * colds)
-        if m_bl > max_skin_blood_flow:
-            m_bl = max_skin_blood_flow
-        if m_bl < 0.5:
-            m_bl = 0.5
+        m_bl = min(m_bl, max_skin_blood_flow)
+        m_bl = max(m_bl, 0.5)
         m_rsw = c_sw * warm_b * math.exp(warm_sk / 10.7)  # regulatory sweating
-        if m_rsw > max_sweating:
-            m_rsw = max_sweating
+        m_rsw = min(m_rsw, max_sweating)
         e_rsw = 0.68 * m_rsw  # heat lost by vaporization sweat
         r_ea = 1.0 / (lr * f_a_cl * h_cc)  # evaporative resistance air layer
         r_ecl = r_clo / (lr * i_cl)
@@ -413,8 +429,7 @@ def _gagge_two_nodes_optimized(
     if not calculate_ce and met > 0.85:
         h_c_met = 5.66 * (met - 0.85) ** 0.39
         h_c_s = max(h_c_s, h_c_met)
-    if h_c_s < 3.0:
-        h_c_s = 3.0
+    h_c_s = max(h_c_s, 3.0)
 
     h_t_s = (
         h_c_s + h_r_s
@@ -515,7 +530,7 @@ def _gagge_two_nodes_optimized(
     e_req_set = rm - c_res - q_res - dry_set
     pmv_set = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req_set - e_comfort - e_diff)
 
-    # # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
+    # Predicted  Percent  Satisfied  With  the  Level  of  Air  Movement
     # ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
 
     return (
@@ -541,7 +556,7 @@ def _gagge_two_nodes_optimized(
 
 
 @vectorize(
-    [
+    [  # signature: output(float64)
         float64(
             float64,
             float64,
@@ -553,7 +568,7 @@ def _gagge_two_nodes_optimized(
             float64,
             float64,
             float64,
-        )
+        ),
     ],
     cache=True,
 )
@@ -570,15 +585,15 @@ def _gagge_two_nodes_optimized_return_set(
     position,
 ):
     return _gagge_two_nodes_optimized(
-        tdb,
-        tr,
-        v,
-        met,
-        clo,
-        vapor_pressure,
-        wme,
-        body_surface_area,
-        p_atm,
-        position,
-        True,
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atm=p_atm,
+        position=position,
+        calculate_ce=True,
     )[0]

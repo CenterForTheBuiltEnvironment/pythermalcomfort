@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import math
-from typing import Union
 
 import numpy as np
 
@@ -8,11 +9,11 @@ from pythermalcomfort.classes_return import HI
 
 
 def heat_index_lu(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     round_output: bool = True,
 ) -> HI:
-    """The Heat Index (HI) calculated in accordance with the Lu and Romps (2022) model [lu]_.
+    """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model [lu]_.
 
     Parameters
     ----------
@@ -37,12 +38,14 @@ def heat_index_lu(
 
         result = heat_index_lu(tdb=25, rh=50)
         print(result.hi)  # 25.9
+
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(
         tdb=tdb,
         rh=rh,
         round_output=round_output,
+        limit_inputs=False,
     )
 
     tdb = np.array(tdb)
@@ -76,22 +79,21 @@ def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
     def pv_star(t):
         if t == 0.0:
             return 0.0
-        elif t < t_c_k:
+        if t < t_c_k:
             return (
                 p_triple_point
                 * (t / t_c_k) ** ((cpv - cvs) / rgasv)
                 * math.exp(
-                    (e0v + e0s - (cvv - cvs) * t_c_k) / rgasv * (1.0 / t_c_k - 1.0 / t)
+                    (e0v + e0s - (cvv - cvs) * t_c_k) / rgasv * (1.0 / t_c_k - 1.0 / t),
                 )
             )
-        else:
-            return (
-                p_triple_point
-                * (t / t_c_k) ** ((cpv - cvl) / rgasv)
-                * math.exp(
-                    (e0v - (cvv - cvl) * t_c_k) / rgasv * (1.0 / t_c_k - 1.0 / t)
-                )
+        return (
+            p_triple_point
+            * (t / t_c_k) ** ((cpv - cvl) / rgasv)
+            * math.exp(
+                (e0v - (cvv - cvl) * t_c_k) / rgasv * (1.0 / t_c_k - 1.0 / t),
             )
+        )
 
     # The latent heat of vaporization of water
     def latent_heat_vap(t):
@@ -140,7 +142,8 @@ def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
         return 52.1 if rs == 0.0387 else 6.0e8 * rs**5
 
     def ra(
-        ts, ta
+        ts,
+        ta,
     ):  # heat transfer resistance through air, exposed part of skin, K m^2/W
         hc = 17.4
         phi_rad = 0.85
@@ -148,7 +151,8 @@ def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
         return 1.0 / (hc + hr)
 
     def ra_bar(
-        tf, ta
+        tf,
+        ta,
     ):  # heat transfer resistance through air, clothed part of skin, K m^2/W
         hc = 11.6
         phi_rad = 0.79
@@ -156,7 +160,8 @@ def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
         return 1.0 / (hc + hr)
 
     def ra_un(
-        ts, ta
+        ts,
+        ta,
     ):  # heat transfer resistance through air, when being naked, K m^2/W
         hc = 12.3
         phi_rad = 0.80
@@ -302,19 +307,18 @@ def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
         fb = f(b)
         if fa * fb > 0.0:
             raise SystemExit("wrong initial interval in the root solver")
-        else:
-            for i in range(_max_iter):
-                c = (a + b) / 2.0
-                fc = f(c)
-                if fb * fc > 0.0:
-                    b = c
-                    fb = fc
-                else:
-                    a = c
-                if abs(a - b) < _tol:
-                    return c
-                if i == _max_iter - 1:
-                    raise SystemExit("reaching maximum iteration in the root solver")
+        for i in range(_max_iter):
+            c = (a + b) / 2.0
+            fc = f(c)
+            if fb * fc > 0.0:
+                b = c
+                fb = fc
+            else:
+                a = c
+            if abs(a - b) < _tol:
+                return c
+            if i == _max_iter - 1:
+                raise SystemExit("reaching maximum iteration in the root solver")
 
     dic = {"phi": 1, "rf": 2, "rs": 3, "rs*": 3, "d_tc_dt": 4}
     eq_vars = find_eq_var(tdb, rh)

@@ -78,8 +78,8 @@ def two_nodes_gagge_sleep(
         A dataclass containing the results of the Gagge two-node model for sleep thermal environment.
         See :py:class:`~pythermalcomfort.classes_return.GaggeTwoNodesSleep` for more details.
         To access the results, use the corresponding attributes of the returned instance, e.g. `result.e_skin`.
-    """
 
+    """
     ltime = kwargs.pop("ltime", 1)
     height = kwargs.pop("height", 171)
     weight = kwargs.pop("weight", 70)
@@ -94,7 +94,8 @@ def two_nodes_gagge_sleep(
     met_shivering = kwargs.pop("met_shivering", 0)
 
     if kwargs:
-        raise TypeError(f"Unexpected arguments: {', '.join(kwargs)}")
+        error_msg = f"Unexpected keyword arguments: {list(kwargs.keys())}"
+        raise TypeError(error_msg)
 
     GaggeTwoNodesSleepInputs(
         tdb=tdb,
@@ -117,9 +118,8 @@ def two_nodes_gagge_sleep(
     # These variables should have the same length, which will be the duration
     lengths = [len(x) for x in (tdb, tr, v, rh, clo, thickness_quilt)]
     if len(set(lengths)) != 1:
-        raise ValueError(
-            f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}"
-        )
+        error_message = f"Parameters tdb, tr, v, rh, clo and thickness must have the same length. Got lengths {lengths}"
+        raise ValueError(error_message)
     duration = lengths[0]
 
     # Initialize physiological state variables to be updated in each iteration
@@ -179,7 +179,7 @@ def two_nodes_gagge_sleep(
         output = {}
     else:
         output = {}
-        for key in results[0].keys():
+        for key in results[0]:
             vals = [d[key] for d in results]
             # only wrap in an array if there’s more than one element
             output[key] = np.array(vals) if len(vals) > 1 else vals[0]
@@ -357,8 +357,7 @@ def _sleep_set(
         if abs(err_diff) < 1e-10:  # Avoid division by very small values
             # Use a fallback approach or break iteration
             break
-        else:
-            x = xold - delta * err1 / err_diff
+        x = xold - delta * err1 / err_diff
         if abs(x - xold) > 0.01:
             xold = x
             flag1 = False
@@ -407,8 +406,7 @@ def _sleep_set(
 
 
 def _fnsvp(t):
-    """
-    Calculate saturation vapor pressure at temperature t.
+    """Calculate saturation vapor pressure at temperature t.
 
     Parameters
     ----------
@@ -419,26 +417,22 @@ def _fnsvp(t):
     -------
     float
         Saturation vapor pressure [Pa]
-    """
 
+    """
     return math.exp(18.6686 - 4030.183 / (t + 235))
 
 
 def _fnerre(x, hsk, hd, tsk, w, he, pssk):
-    """
-    Error function for iterative solution of SET temperature.
+    """Error function for iterative solution of SET temperature.
 
     Used in the Newton-Raphson algorithm.
     """
-
     return hsk - hd * (tsk - x) - w * he * (pssk - 0.5 * _fnsvp(x))
 
 
 def _fnerrs(x, hsk, hd_s, tsk, w, he_s, pssk):
-    """
-    Error function for iterative solution of SET temperature (second version).
+    """Error function for iterative solution of SET temperature (second version).
 
     Used in the Newton-Raphson algorithm.
     """
-
     return hsk - hd_s * (tsk - x) - w * he_s * (pssk - 0.5 * _fnsvp(x))

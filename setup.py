@@ -1,22 +1,36 @@
-#!/usr/bin/env python
 from __future__ import annotations
 
 import re
-from os.path import dirname, join
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
 
-def read(*names, **kwargs):
-    with open(
-        join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
-    ) as fh:
-        return fh.read()
+def read(*names: str, encoding: str = "utf8") -> str:
+    """Read and return the contents of a text file located by path segments
+    relative to this file's directory.
+
+    Parameters
+    ----------
+    *names : str
+        Sequence of path components under the project root.
+    encoding : str, default "utf8"
+        File encoding to use when reading.
+
+    Returns
+    -------
+    str
+        The full text content of the file.
+
+    """
+    base_dir = Path(__file__).parent
+    file_path = base_dir.joinpath(*names)
+    return file_path.read_text(encoding=encoding)
 
 
 setup(
     name="pythermalcomfort",
-    version="3.3.0",
+    version="3.4.1",
     license="MIT",
     description=(
         "pythermalcomfort is a comprehensive toolkit for calculating "
@@ -27,8 +41,9 @@ setup(
         "to estimate physiological responses such as core temperature, skin temperature, and skin wettedness. "
     ),
     long_description="{}\n{}".format(
-        re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
-            "", read("README.rst")
+        re.compile("^.. start-badges.*^.. end-badges", re.MULTILINE | re.DOTALL).sub(
+            "",
+            read("README.rst"),
         ),
         re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
     ),
@@ -95,6 +110,6 @@ setup(
     entry_points={
         "console_scripts": [
             "pythermalcomfort = pythermalcomfort.cli:main",
-        ]
+        ],
     },
 )

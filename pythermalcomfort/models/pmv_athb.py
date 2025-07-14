@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -9,13 +9,13 @@ from pythermalcomfort.utilities import met_to_w_m2
 
 
 def pmv_athb(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    t_running_mean: Union[float, list[float]],
-    clo: Union[bool, float, list[float]] = False,
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    t_running_mean: float | list[float],
+    clo: bool | float | list[float] = False,
 ) -> ATHB:
     """Return the PMV value calculated with the Adaptive Thermal Heat Balance
     Framework [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework
@@ -81,6 +81,7 @@ def pmv_athb(
             t_running_mean=[20, 20, 20],
         )
         print(results.athb_pmv)
+
     """
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)

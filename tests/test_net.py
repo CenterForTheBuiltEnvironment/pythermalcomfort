@@ -2,9 +2,12 @@ from pythermalcomfort.models import net
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_net(get_test_url, retrieve_data):
+def test_net(get_test_url, retrieve_data) -> None:
+    """Test the NET model with various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.NET.name
+        get_test_url,
+        retrieve_data,
+        Urls.NET.name,
     )
     tolerance = reference_table["tolerance"]
 

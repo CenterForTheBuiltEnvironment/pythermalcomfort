@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -8,10 +8,12 @@ from pythermalcomfort.shared_functions import mapping
 
 
 def discomfort_index(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
 ) -> DI:
-    """Calculates the Discomfort Index (DI). The index is essentially an
+    """Calculate the Discomfort Index (DI).
+
+    The index is essentially an
     effective temperature based on air temperature and humidity. The discomfort
     index is usually divided into 6 discomfort categories and it only applies to
     warm environments: [Polydoros2015]_

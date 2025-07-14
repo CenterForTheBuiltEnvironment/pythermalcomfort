@@ -60,7 +60,7 @@ class Default:
             0.209,
             0.112,
             0.056,
-        ]
+        ],
     )
 
     # Environment information
@@ -388,19 +388,20 @@ def show_out_param_docs():
     -------
     docstring : str
         Text of the documentation of the output parameters
+
     """
     outparams = textwrap.dedent(
         """
         Output parameters
         -------
-        """
+        """,
     )
 
     exoutparams = textwrap.dedent(
         """
         Extra output parameters
         -------
-        """
+        """,
     )
 
     sortkeys = list(ALL_OUT_PARAMS.keys())

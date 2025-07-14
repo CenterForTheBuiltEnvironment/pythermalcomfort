@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import math
-from typing import Union
 
 import numpy as np
 
@@ -9,18 +10,18 @@ from pythermalcomfort.utilities import Postures, transpose_sharp_altitude
 
 
 def solar_gain(
-    sol_altitude: Union[float, list[float]],
-    sharp: Union[float, list[float]],
-    sol_radiation_dir: Union[float, list[float]],
-    sol_transmittance: Union[float, list[float]],
-    f_svv: Union[float, list[float]],
-    f_bes: Union[float, list[float]],
-    asw: Union[float, list[float]] = 0.7,
+    sol_altitude: float | list[float],
+    sharp: float | list[float],
+    sol_radiation_dir: float | list[float],
+    sol_transmittance: float | list[float],
+    f_svv: float | list[float],
+    f_bes: float | list[float],
+    asw: float | list[float] = 0.7,
     posture: str = Postures.sitting.value,
-    floor_reflectance: Union[float, list[float]] = 0.6,
+    floor_reflectance: float | list[float] = 0.6,
     round_output: bool = True,
 ) -> SolarGain:
-    """Calculates the solar gain to the human body using the Effective Radiant
+    """Calculate the solar gain to the human body using the Effective Radiant
     Field (ERF) [55ASHRAE2023]_. The ERF is a measure of the net energy flux to or from
     the human body. ERF is expressed in W over human body surface area [W/m2].
     In addition, it calculates the delta mean radiant temperature. Which is the
@@ -60,7 +61,7 @@ def solar_gain(
         See Table C2-2 and equation C-7 ASHRAE 55 2020 [55ASHRAE2023]_.
     asw : float or list of floats, optional
         The average short-wave absorptivity of the occupant. It will range widely,
-        depending on the color of the occupant’s skin as well as the color and
+        depending on the color of the skin of the occupant as well as the color and
         amount of clothing covering the body. Defaults to 0.7.
 
         .. note::
@@ -99,6 +100,7 @@ def solar_gain(
         )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
+
     """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(
@@ -127,7 +129,10 @@ def solar_gain(
         Postures.supine.value,
         Postures.sitting.value,
     ]:
-        raise ValueError("Posture has to be either standing, supine or sitting")
+        error_msg_posture = (
+            "Posture has to be either 'standing', 'supine' or 'sitting'."
+        )
+        raise ValueError(error_msg_posture)
 
     erf, d_mrt = _solar_gain_vectorised(
         sol_altitude=sol_altitude,
@@ -161,7 +166,7 @@ def _solar_gain_vectorised(
     floor_reflectance,
 ):
     def find_span(arr, x):
-        for i in range(0, len(arr)):
+        for i in range(len(arr)):
             if arr[i + 1] >= x >= arr[i]:
                 return i
         return -1

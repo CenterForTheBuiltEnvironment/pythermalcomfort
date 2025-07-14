@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -8,12 +8,12 @@ from pythermalcomfort.utilities import dew_point_tmp
 
 
 def humidex(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    round_output: bool = True,
+    tdb: float | list[float],
+    rh: float | list[float],
     model: str = "rana",
+    round_output: bool = True,
 ) -> Humidex:
-    """Calculates the humidex (short for "humidity index"). It has been
+    """Calculate the humidex (short for "humidity index"). It has been
     developed by the Canadian Meteorological service. It was introduced in 1965
     and then it was revised by Masterson and Richardson (1979) [Masterson1979]_. It aims
     to describe how hot, humid weather is felt by the average person. The
@@ -26,8 +26,6 @@ def humidex(
         Dry bulb air temperature, [°C].
     rh : float or list of floats
         Relative humidity, [%].
-    round_output : bool, optional
-        If True, rounds output value. If False, it does not round it. Defaults to True.
     model : str, optional
         The model to be used for the calculation. Options are 'rana' and 'masterson'. Defaults to 'rana'.
 
@@ -36,6 +34,8 @@ def humidex(
             The 'masterson' model is the Humidex model proposed by Masterson and Richardson (1979) [Masterson1979]_.
 
             .. _Rana et al. (2013): https://doi.org/10.1016/j.enbuild.2013.04.019
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
 
     Returns
     -------
@@ -57,6 +57,7 @@ def humidex(
         print(result.humidex)  # [28.2, 39.1]
         print(result.discomfort)
         # ['Little or no discomfort', 'Evident discomfort']
+
     """
     # Validate inputs using the HumidexInputs class
     HumidexInputs(
@@ -71,9 +72,9 @@ def humidex(
     if np.any(rh > 100) or np.any(rh < 0):
         raise ValueError("Relative humidity must be between 0 and 100%")
 
-    if model not in [model.value for model in HumidexModels]:
+    if model not in HumidexModels._value2member_map_:
         raise ValueError(
-            "Invalid model. The model must be either 'rana' or 'masterson'"
+            "Invalid model. The model must be either 'rana' or 'masterson'",
         )
 
     hi = tdb + 5 / 9 * ((6.112 * 10 ** (7.5 * tdb / (237.7 + tdb)) * rh / 100) - 10)
@@ -81,7 +82,7 @@ def humidex(
         hi = tdb + 5 / 9 * (
             6.11
             * np.exp(
-                5417.753 * (1 / 273.15 - 1 / (dew_point_tmp(tdb=tdb, rh=rh) + 273.15))
+                5417.753 * (1 / 273.15 - 1 / (dew_point_tmp(tdb=tdb, rh=rh) + 273.15)),
             )
             - 10
         )

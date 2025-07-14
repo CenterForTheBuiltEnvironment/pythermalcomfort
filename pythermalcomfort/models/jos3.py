@@ -303,9 +303,7 @@ class JOS3:
             ]["local_body_part"]
         )
         # par should be input as int, float.
-        model.par = (
-            1.2  # Physical activity ratio [-], assuming a sitting position
-        )
+        model.par = 1.2  # Physical activity ratio [-], assuming a sitting position
         # posture should be input as int (0, 1, or 2) or str ("standing", "sitting" or "lying").
         # (0="standing", 1="sitting" or 2="lying")
         model.posture = "sitting"  # Posture [-], assuming a sitting position
@@ -365,11 +363,10 @@ class JOS3:
         ).transpose()  # Make pandas.DataFrame
         df.plot()  # Plot time series of local skin temperature.
         plt.legend(["Head", "Pelvis"])  # Reset the legends
-        plt.ylabel(
-            "Skin temperature [°C]"
-        )  # Set y-label as 'Skin temperature [°C]'
+        plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
         plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
         plt.show()  # Show the plot
+
     """
 
     def __init__(
@@ -438,27 +435,42 @@ class JOS3:
 
         # Calculate body surface area (bsa) rate
         self._bsa_rate = cons.bsa_rate(
-            height=height, weight=weight, bsa_equation=bsa_equation
+            height=height,
+            weight=weight,
+            bsa_equation=bsa_equation,
         )
 
         # Calculate local body surface area
         self._bsa = cons.local_bsa(
-            height=height, weight=weight, bsa_equation=bsa_equation
+            height=height,
+            weight=weight,
+            bsa_equation=bsa_equation,
         )
 
         # Calculate basal blood flow (BFB) rate [-]
         self._bfb_rate = cons.bfb_rate(
-            height=height, weight=weight, bsa_equation=bsa_equation, age=age, ci=ci
+            height=height,
+            weight=weight,
+            bsa_equation=bsa_equation,
+            age=age,
+            ci=ci,
         )
 
         # Calculate thermal conductance (CDT) [W/K]
         self._cdt = cons.conductance(
-            height=height, weight=weight, bsa_equation=bsa_equation, fat=fat
+            height=height,
+            weight=weight,
+            bsa_equation=bsa_equation,
+            fat=fat,
         )
 
         # Calculate thermal capacity [J/K]
         self._cap = cons.capacity(
-            height=height, weight=weight, bsa_equation=bsa_equation, age=age, ci=ci
+            height=height,
+            weight=weight,
+            bsa_equation=bsa_equation,
+            age=age,
+            ci=ci,
         )
 
         # Set initial core and skin temperature set points [°C]
@@ -488,7 +500,7 @@ class JOS3:
         self.ex_q = np.zeros(NUM_NODES)  # External heat gain
         self._time = dt.timedelta(0)  # Elapsed time
         self.model_name = "JOS3"  # Model name
-        # todo expose them as single properties and not as a dict and document them
+        # TODO expose them as single properties and not as a dict and document them
         self.options = {
             "nonshivering_thermogenesis": True,
             "cold_acclimated": False,
@@ -496,7 +508,7 @@ class JOS3:
             "limit_dshiv/dt": False,
             "bat_positive": False,
             "ava_zero": False,
-            # todo shivering is not used in the model
+            # TODO shivering is not used in the model
             "shivering": False,
         }
 
@@ -511,7 +523,7 @@ class JOS3:
 
         # Reset set-point temperature and save the last model parameters
         dict_results = self._reset_setpt()
-        # todo why the first element of the simulation is for a naked person?
+        # TODO why the first element of the simulation is for a naked person?
         self._history.append(dict_results)
 
     def _calculate_operative_temp_when_pmv_is_zero(
@@ -539,8 +551,8 @@ class JOS3:
         -------
         to : float
             Operative temperature [°C].
-        """
 
+        """
         # Default parameters
         initial_to = 28
         tolerance = 0.001
@@ -554,7 +566,13 @@ class JOS3:
         # Main loop for finding PMV=0
         for _i in range(max_iterations):
             pmv_value = pmv_ppd_iso(
-                to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
+                to,
+                to,
+                v,
+                rh,
+                met,
+                clo,
+                model=Models.iso_7730_2005.value,
             ).pmv
 
             # Check for NaN and handle retries
@@ -563,7 +581,13 @@ class JOS3:
                     adjustment_factor = retry_adjustment_factor
                     to = initial_to  # Reset to initial temperature for retry
                     pmv_value = pmv_ppd_iso(
-                        to, to, v, rh, met, clo, model=Models.iso_7730_2005.value
+                        to,
+                        to,
+                        v,
+                        rh,
+                        met,
+                        clo,
+                        model=Models.iso_7730_2005.value,
                     ).pmv
 
                     if abs(pmv_value) < tolerance:
@@ -584,7 +608,7 @@ class JOS3:
 
         return to
 
-    # todo check the name of the function and the docstring
+    # TODO check the name of the function and the docstring
     def _reset_setpt(self) -> JOS3Output:
         """Reset set-point temperatures under steady state conditions. For a nude person in a reference environment,
         of 50% RH, 0.1 m/s air velocity, and par=1.25.
@@ -599,16 +623,20 @@ class JOS3:
         -------
         dict
             Parameters of the JOS-3 model.
+
         """
         # Set operative temperature under PMV=0 environment
-        # todo shall these be the reference values for naked?
+        # TODO shall these be the reference values for naked?
         par: float = 1.25  # Physical activity ratio
         met = self.bmr * par / met_to_w_m2  # [met]
         rh = 50
         v = 0.1
         clo = 0
         self.to = self._calculate_operative_temp_when_pmv_is_zero(
-            met=met, rh=rh, v=v, clo=clo
+            met=met,
+            rh=rh,
+            v=v,
+            clo=clo,
         )
         self.rh = rh
         self.v = v
@@ -617,12 +645,12 @@ class JOS3:
 
         # Steady-calculation
         self.options["ava_zero"] = True
-        # todo how these values range, and dtime where selected?
+        # TODO how these values range, and dtime where selected?
         for _ in range(10):
             dict_out = self._run(dtime=60000, passive=True)
 
         # Set new set-point temperatures for core and skin
-        # todo why are not we simply just setting these values and not returning anything?
+        # TODO why are not we simply just setting these values and not returning anything?
         self.cr_set_point = self.t_core
         self.sk_set_point = self.t_skin
         self.options["ava_zero"] = False
@@ -630,8 +658,7 @@ class JOS3:
         return dict_out
 
     def simulate(self, times: int, dtime=60, output: bool = True) -> None:
-        """
-        Run the JOS-3 model simulation.
+        """Run the JOS-3 model simulation.
 
         This method executes the JOS-3 model for a specified number of loops, simulating
         human thermoregulation over time. The results of each simulation step can be recorded
@@ -668,6 +695,7 @@ class JOS3:
             # Access the results
             results = jos3_model.dict_results()
             print(results)
+
         """
         # Loop through the simulation for the given number of times
         for _ in range(times):
@@ -708,6 +736,7 @@ class JOS3:
             mean skin wettedness, skin wettedness, weight loss by evaporation and respiration,
             cardiac output, total thermogenesis, respiratory heat loss, and total heat loss
             from the skin to the environment.
+
         """
         # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
@@ -731,7 +760,7 @@ class JOS3:
         hr = threg.fixed_hr(
             threg.rad_coef(
                 self._posture,
-            )
+            ),
         )
 
         # Manually set convective and radiative heat transfer coefficients if necessary
@@ -838,13 +867,13 @@ class JOS3:
         # Calculate non-shivering thermogenesis (NST) [W]
         if self.options["nonshivering_thermogenesis"]:
             q_nst = threg.nonshivering(
-                err_sk,
-                self._height,
-                self._weight,
-                self._bsa_equation,
-                self._age,
-                self.options["cold_acclimated"],
-                self.options["bat_positive"],
+                err_sk=err_sk,
+                height=self._height,
+                weight=self._weight,
+                bsa_equation=self._bsa_equation,
+                age=self._age,
+                cold_acclimation=self.options["cold_acclimated"],
+                batpositive=self.options["bat_positive"],
             )
         else:  # not consider NST
             q_nst = np.zeros(Default.num_body_parts)
@@ -903,7 +932,9 @@ class JOS3:
         # Calculate heat loss by respiratory
         p_a = antoine(self._tdb) * self._rh / 100
         res_sh, res_lh = threg.resp_heat_loss(
-            self._tdb[0], p_a[0], q_thermogenesis_total
+            self._tdb[0],
+            p_a[0],
+            q_thermogenesis_total,
         )
 
         # Calculate sensible heat loss [W]
@@ -927,16 +958,26 @@ class JOS3:
         # Matrix A = Matrix for heat exchange due to blood flow and conduction occurring between tissues
         # (85, 85,) ndarray
 
-        # Calculates the blood flow in arteries and veins for core, muscle, fat, skin,
+        # Calculate the blood flow in arteries and veins for core, muscle, fat, skin,
         # and arteriovenous anastomoses (AVA) in hands and feet,
         # and combines them into two arrays:
         # 1) bf_local for the local blood flow and 2) bf_whole for the whole-body blood flow.
         # These arrays are then combined to form arr_bf.
         bf_art, bf_vein = matrix.vessel_blood_flow(
-            bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot
+            bf_core,
+            bf_muscle,
+            bf_fat,
+            bf_skin,
+            bf_ava_hand,
+            bf_ava_foot,
         )
         bf_local = matrix.local_arr(
-            bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot
+            bf_core,
+            bf_muscle,
+            bf_fat,
+            bf_skin,
+            bf_ava_hand,
+            bf_ava_foot,
         )
         bf_whole = matrix.whole_body(bf_art, bf_vein, bf_ava_hand, bf_ava_foot)
         arr_bf = np.zeros((NUM_NODES, NUM_NODES))
@@ -960,7 +1001,7 @@ class JOS3:
         arr_b /= self._cap  # Change unit [W/K] to [/sec]
         arr_b *= dtime  # Change unit [/sec] to [-]
 
-        # Calculates the off-diagonal and diagonal elements of the matrix A,
+        # Calculate the off-diagonal and diagonal elements of the matrix A,
         # which represents the heat transfer coefficients between different parts of the body,
         # and combines them to form the full matrix A (arrA).
         # Then, the inverse of matrix A is computed (arrA_inv).
@@ -1040,10 +1081,12 @@ class JOS3:
             t_vein=pass_values_to_jos3_body_parts(self.t_vein),
             t_superficial_vein=pass_values_to_jos3_body_parts(self.t_superficial_vein),
             t_muscle=pass_values_to_jos3_body_parts(
-                self.t_muscle, body_parts=["head", "pelvis"]
+                self.t_muscle,
+                body_parts=["head", "pelvis"],
             ),
             t_fat=pass_values_to_jos3_body_parts(
-                self.t_fat, body_parts=["head", "pelvis"]
+                self.t_fat,
+                body_parts=["head", "pelvis"],
             ),
             to=pass_values_to_jos3_body_parts(to),
             r_t=pass_values_to_jos3_body_parts(r_t, 3),
@@ -1059,20 +1102,24 @@ class JOS3:
             e_sweat=pass_values_to_jos3_body_parts(e_sweat),
             bf_core=pass_values_to_jos3_body_parts(bf_core),
             bf_muscle=pass_values_to_jos3_body_parts(
-                bf_muscle[VINDEX["muscle"]], body_parts=["head", "pelvis"]
+                bf_muscle[VINDEX["muscle"]],
+                body_parts=["head", "pelvis"],
             ),
             bf_fat=pass_values_to_jos3_body_parts(
-                bf_fat[VINDEX["fat"]], body_parts=["head", "pelvis"]
+                bf_fat[VINDEX["fat"]],
+                body_parts=["head", "pelvis"],
             ),
             bf_skin=pass_values_to_jos3_body_parts(bf_skin),
             bf_ava_hand=np.round(bf_ava_hand, 2),
             bf_ava_foot=np.round(bf_ava_foot, 2),
             q_bmr_core=pass_values_to_jos3_body_parts(q_bmr_local[0]),
             q_bmr_muscle=pass_values_to_jos3_body_parts(
-                q_bmr_local[1][VINDEX["muscle"]], body_parts=["head", "pelvis"]
+                q_bmr_local[1][VINDEX["muscle"]],
+                body_parts=["head", "pelvis"],
             ),
             q_bmr_fat=pass_values_to_jos3_body_parts(
-                q_bmr_local[2][VINDEX["fat"]], body_parts=["head", "pelvis"]
+                q_bmr_local[2][VINDEX["fat"]],
+                body_parts=["head", "pelvis"],
             ),
             q_bmr_skin=pass_values_to_jos3_body_parts(q_bmr_local[3]),
             q_work=pass_values_to_jos3_body_parts(q_work),
@@ -1080,10 +1127,12 @@ class JOS3:
             q_nst=pass_values_to_jos3_body_parts(q_nst),
             q_thermogenesis_core=pass_values_to_jos3_body_parts(q_thermogenesis_core),
             q_thermogenesis_muscle=pass_values_to_jos3_body_parts(
-                q_thermogenesis_muscle[VINDEX["muscle"]], body_parts=["head", "pelvis"]
+                q_thermogenesis_muscle[VINDEX["muscle"]],
+                body_parts=["head", "pelvis"],
             ),
             q_thermogenesis_fat=pass_values_to_jos3_body_parts(
-                q_thermogenesis_fat[VINDEX["fat"]], body_parts=["head", "pelvis"]
+                q_thermogenesis_fat[VINDEX["fat"]],
+                body_parts=["head", "pelvis"],
             ),
             q_thermogenesis_skin=pass_values_to_jos3_body_parts(q_thermogenesis_skin),
             q_skin2env_sensible=pass_values_to_jos3_body_parts(shl_sk),
@@ -1093,8 +1142,7 @@ class JOS3:
         )
 
     def results(self) -> JOS3Output:
-        """
-        This method consolidates the results into a single JOS3Output instance. This makes
+        """Consolidate the results into a single JOS3Output instance. This makes
         it very easy to access the time series data for each parameter.
 
         Returns
@@ -1114,6 +1162,7 @@ class JOS3:
             output = model.results()
             print(output.t_skin_mean)
             print(output.t_skin.head)
+
         """
         merged_data = defaultdict(list)
 
@@ -1125,7 +1174,7 @@ class JOS3:
                         merged_data[field.name] = defaultdict(list)
                     for part in fields(JOS3BodyParts):
                         merged_data[field.name][part.name].append(
-                            getattr(value, part.name)
+                            getattr(value, part.name),
                         )
                 else:
                     merged_data[field.name].append(value)
@@ -1133,7 +1182,7 @@ class JOS3:
         for key, value in merged_data.items():
             if isinstance(value, defaultdict):
                 merged_data[key] = JOS3BodyParts(
-                    **{k: np.array(v) for k, v in value.items()}
+                    **{k: np.array(v) for k, v in value.items()},
                 )
             else:
                 merged_data[key] = np.array(value)
@@ -1141,8 +1190,7 @@ class JOS3:
         return JOS3Output(**merged_data)
 
     def dict_results(self):
-        """
-        Get simulation results as a dictionary.
+        """Get simulation results as a dictionary.
 
         This method returns the results of the JOS-3 model simulation as a dictionary,
         where each key corresponds to a specific parameter and the value is an array
@@ -1167,6 +1215,7 @@ class JOS3:
             print(
                 results["t_skin_mean"]
             )  # Access the mean skin temperature time series
+
         """
         if not self._history:
             print("The model has no data.")
@@ -1225,10 +1274,8 @@ class JOS3:
             row = {}
             for key, value in dictout.__dict__.items():
                 keys = key2keys[key]
-                if len(keys) == 1:
-                    values = [value]  # make list if value is not iter
-                else:
-                    values = value.__dict__
+                # make list if value is not iter
+                values = [value] if len(keys) == 1 else value.__dict__
                 row.update(dict(zip(keys, values)))
             data.append(row)
 
@@ -1280,6 +1327,7 @@ class JOS3:
 
             # Export results to a CSV file
             model.to_csv()
+
         """
         # Use the model name and current time as default output file name
         if path is None:
@@ -1344,6 +1392,7 @@ class JOS3:
         -------
         array
             Extra heat gain of model.
+
         """
         self.ex_q[INDEX[tissue]] = value
         return self.ex_q
@@ -1358,6 +1407,7 @@ class JOS3:
         -------
         ndarray
             A NumPy array of shape (17).
+
         """
         return self._tdb
 
@@ -1367,7 +1417,7 @@ class JOS3:
 
     @property
     def tr(self):
-        """tr : numpy.ndarray (17) Mean radiant temperature [°C]."""
+        """Tr : numpy.ndarray (17) Mean radiant temperature [°C]."""
         return self._tr
 
     @tr.setter
@@ -1389,7 +1439,7 @@ class JOS3:
         hr = threg.fixed_hr(
             threg.rad_coef(
                 self._posture,
-            )
+            ),
         )
         return threg.operative_temp(
             self._tdb,
@@ -1399,7 +1449,7 @@ class JOS3:
         )
 
     @to.setter
-    # todo to should not be a setter otherwise people can erroneously overrite it
+    # TODO to should not be a setter otherwise people can erroneously overrite it
     def to(self, inp):
         self._tdb = to_array_body_parts(inp)
         self._tr = to_array_body_parts(inp)
@@ -1445,7 +1495,7 @@ class JOS3:
         else:
             self._posture = Postures.standing.value
             print(
-                f"posture must be 0={Postures.standing.value}, 1={Postures.sitting.value} or 2={Postures.lying.value}."
+                f"posture must be 0={Postures.standing.value}, 1={Postures.sitting.value} or 2={Postures.lying.value}.",
             )
             print(f"posture was set {Postures.standing.value}.")
 
@@ -1469,7 +1519,7 @@ class JOS3:
 
     @property
     def t_body(self):
-        """t_body : numpy.ndarray (85,) All segment temperatures of JOS-3"""
+        """t_body : numpy.ndarray (85,) All segment temperatures of JOS-3."""
         return self._t_body
 
     @t_body.setter
@@ -1496,14 +1546,15 @@ class JOS3:
         hr = threg.fixed_hr(
             threg.rad_coef(
                 self._posture,
-            )
+            ),
         )
         return threg.dry_r(hc, hr, self._clo)
 
     @property
     def r_et(self):
         """r_et : numpy.ndarray (17) w (Evaporative) heat resistances between the skin and
-        ambience areas by local body segments [(m2*kPa)/W]."""
+        ambience areas by local body segments [(m2*kPa)/W].
+        """
         hc = threg.fixed_hc(
             threg.conv_coef(
                 self._posture,
@@ -1545,7 +1596,7 @@ class JOS3:
         """t_skin_mean : float Mean skin temperature of the whole body [°C]."""
         return float(np.average(self._t_body[INDEX["skin"]], weights=Default.local_bsa))
 
-    # todo all the properties should be returning JOS3BodyParts
+    # TODO all the properties should be returning JOS3BodyParts
     @property
     def t_skin(self) -> np.ndarray[float]:
         """t_skin : numpy.ndarray (17) Skin temperatures by the local body segments [°C]."""
@@ -1592,7 +1643,7 @@ class JOS3:
 
     @property
     def body_names(self) -> np.ndarray[float]:
-        """body_names : list JOS3 body names"""
+        """body_names : list JOS3 body names."""
         return JOS3BodyParts.get_attribute_names()
 
     @property

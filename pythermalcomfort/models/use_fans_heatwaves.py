@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from dataclasses import asdict
-from typing import Union
 
 import numpy as np
 
@@ -13,23 +14,25 @@ from pythermalcomfort.utilities import (
 
 
 def use_fans_heatwaves(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
-    body_surface_area: Union[float, list[float]] = 1.8258,
-    p_atm: Union[float, list[float]] = 101325,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
+    body_surface_area: float | list[float] = 1.8258,
+    p_atm: float | list[float] = 101325,
     position: str = Postures.standing.value,
     max_skin_blood_flow: float = 80,
+    max_sweating: float = 500,
     limit_inputs: bool = True,
     round_output: bool = True,
-    max_sweating: float = 500,
 ) -> UseFansHeatwaves:
-    """It helps you to estimate if the conditions you have selected would cause
-    heat strain. This occurs when either the following variables reaches its
+    """Estimate if the conditions you have selected would cause
+    heat strain.
+
+    This occurs when either the following variables reaches its
     maximum value:
 
     * m_rsw Rate at which regulatory sweat is generated, [mL/h/m2]
@@ -72,6 +75,8 @@ def use_fans_heatwaves(
         0.1 < v [m/s] < 4.5, 0.7 < met [met] < 2, and 0 < clo [clo] < 1.
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
+    max_sweating : float or list of floats, optional
+        Maximum rate at which regulatory sweat is generated, [kg/h/m2]. Defaults to 500.
 
     Returns
     -------
@@ -86,9 +91,7 @@ def use_fans_heatwaves(
 
         from pythermalcomfort.models import use_fans_heatwaves
 
-        result = use_fans_heatwaves(
-            tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5
-        )
+        result = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # 63.0
 
     """
@@ -154,11 +157,15 @@ def use_fans_heatwaves(
     ]
 
     output["heat_strain_blood_flow"] = np.where(
-        output["m_bl"] == max_skin_blood_flow, True, False
+        output["m_bl"] == max_skin_blood_flow,
+        True,
+        False,
     )
     output["heat_strain_w"] = np.where(output["w"] == output["w_max"], True, False)
     output["heat_strain_sweating"] = np.where(
-        output["m_rsw"] == max_sweating, True, False
+        output["m_rsw"] == max_sweating,
+        True,
+        False,
     )
 
     output["heat_strain"] = np.any(
@@ -181,7 +188,13 @@ def use_fans_heatwaves(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="fan_heatwaves", tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo
+            standard="fan_heatwaves",
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            rh=rh,
+            met=met,
+            clo=clo,
         )
         all_valid = ~(
             np.isnan(tdb_valid)

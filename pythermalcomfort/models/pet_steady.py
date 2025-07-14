@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 import numpy.typing as npt
@@ -10,23 +10,25 @@ from pythermalcomfort.utilities import Postures, Sex, body_surface_area, p_sat
 
 
 def pet_steady(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    p_atm: Union[float, list[float]] = 1013.25,
-    position: Union[str, list[str]] = Postures.sitting.value,
-    age: Union[int, list[int]] = 23,
-    sex: Union[int, list[int]] = Sex.male.value,
-    weight: Union[float, list[float]] = 75,
-    height: Union[float, list[float]] = 1.8,
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    p_atm: float | list[float] = 1013.25,
+    position: str | list[str] = Postures.sitting.value,
+    age: int | list[int] = 23,
+    sex: int | list[int] = Sex.male.value,
+    weight: float | list[float] = 75,
+    height: float | list[float] = 1.8,
+    wme: float | list[float] = 0,
 ) -> PETSteady:
-    """The steady physiological equivalent temperature (PET) is calculated using the Munich
-    Energy-balance Model for Individuals (MEMI), which simulates the human body's thermal
-    circumstances in a medically realistic manner. PET is defined as the air temperature
+    """Calculate the steady physiological equivalent temperature (PET) using the Munich
+    Energy-balance Model for Individuals (MEMI) to simulate the human body's thermal
+    state in a medically realistic manner.
+
+    PET is defined as the air temperature
     at which, in a typical indoor setting the heat budget of the human body is balanced
     with the same core and skin temperature as under the complex outdoor conditions to be
     assessed [Hoppe1999]_.
@@ -129,7 +131,7 @@ def pet_steady(
             weight=weight,
             height=height,
             wme=wme,
-        )
+        ),
     )
 
 
@@ -153,8 +155,7 @@ def _pet_steady_vectorised(
     met = met * met_factor  # metabolic rate
 
     def vasomotricity(t_cr, t_sk):
-        """Defines the vasomotricity (blood flow) in function of the core and
-        skin temperatures.
+        """Vasomotricity (blood flow) in function of the core and skin temperatures.
 
         Parameters
         ----------
@@ -169,6 +170,7 @@ def _pet_steady_vectorised(
             "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
             mass
             between core and skin [].
+
         """
         # skin and core temperatures set values
         tc_set = 36.6  # 36.8
@@ -193,8 +195,7 @@ def _pet_steady_vectorised(
         return {"m_blood": m_blood, "alpha": alpha}
 
     def sweat_rate(t_body):
-        """Defines the sweating mechanism depending on the body and core
-        temperatures.
+        """Sweating mechanism depending on the body and core temperatures.
 
         Parameters
         ----------
@@ -205,6 +206,7 @@ def _pet_steady_vectorised(
         -------
         m_rsw : float
             The sweating flow rate, [g/m2/h].
+
         """
         tc_set = 36.6  # 36.8
         tsk_set = 34  # 33.7
@@ -218,8 +220,7 @@ def _pet_steady_vectorised(
         # from Gagge's model
         m_rsw = 304.94 * sig_body
         # 500 g/m^2/h is the upper sweat rate limit
-        if m_rsw > 500:
-            m_rsw = 500
+        m_rsw = min(m_rsw, 500)
 
         return m_rsw
 
@@ -233,10 +234,9 @@ def _pet_steady_vectorised(
         _clo=0.9,
         actual_environment=False,
     ):
-        """This function allows solving for the PET : either it solves the vectorial balance
-        of the 3 unknown temperatures (T_core, T_sk, T_clo) or it solves for the
-        environment operative temperature that would yield the same energy balance as the
-        actual environment.
+        """Solve PET by either computing the vectorial balance of the three unknown temperatures
+        (T_core, T_sk, T_clo) or by finding the environment operative temperature that yields
+        the same energy balance as the actual environment.
 
         Parameters
         ----------
@@ -354,8 +354,7 @@ def _pet_steady_vectorised(
         # Clothed fraction of the body approximation
         r_cl = _clo / 6.45  # Conversion in [m2.K/W]
         y = 0
-        if f_a_cl > 1.0:
-            f_a_cl = 1.0
+        f_a_cl = min(f_a_cl, 1.0)
         if _clo >= 2.0:
             y = 1.0
         if 0.6 < _clo < 2.0:
@@ -393,8 +392,7 @@ def _pet_steady_vectorised(
             delta = esw - e_max
             if delta < 0:
                 esw = e_max
-        if esw < 0:
-            esw = 0
+        esw = max(esw, 0)
         # i_m= Woodcock's ratio (see above)
         r_ecl = (1 / (fcl * hc) + r_cl) / (
             lr * i_m
@@ -448,12 +446,11 @@ def _pet_steady_vectorised(
         if actual_environment:
             # if we solve for the system we need to return 3 temperatures
             return list(e_bal_vec)
-        else:
-            # solving for the PET requires the scalar balance only
-            return e_bal_scal
+        # solving for the PET requires the scalar balance only
+        return e_bal_scal
 
     def pet_fc(_t_stable):
-        """Function to find the solution.
+        """Find the solution.
 
         Parameters
         ----------
@@ -464,6 +461,7 @@ def _pet_steady_vectorised(
         -------
         float
             The PET comfort index.
+
         """
 
         # Definition of a function with the input variables of the PET reference situation

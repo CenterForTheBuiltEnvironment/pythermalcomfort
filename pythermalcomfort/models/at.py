@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -8,13 +8,13 @@ from pythermalcomfort.utilities import psy_ta_rh
 
 
 def at(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    v: Union[float, list[float]],
-    q: Union[float, list[float]] = None,
+    tdb: float | list[float],
+    rh: float | list[float],
+    v: float | list[float],
+    q: float | list[float] = None,
     round_output: bool = True,
 ) -> AT:
-    """Calculates the Apparent Temperature (AT). The AT is defined as the
+    """Calculate the Apparent Temperature (AT). The AT is defined as the
     temperature at the reference humidity level producing the same amount of
     discomfort as that experienced under the current ambient temperature,
     humidity, and solar radiation [Steadman1984]_. In other words, the AT is an
@@ -54,6 +54,7 @@ def at(
 
         at(tdb=25, rh=30, v=0.1)
         # AT(at=24.1)
+
     """
     # Validate inputs
     ATInputs(tdb=tdb, rh=rh, v=v, q=q, round_output=round_output)

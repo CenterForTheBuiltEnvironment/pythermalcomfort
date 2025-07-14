@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def valid_range(x, valid):
+def valid_range(x, valid) -> np.ndarray:
     """Filter values based on a valid range."""
     return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
 
 
 def mapping(value, map_dictionary, right=True):
-    """Maps a temperature array to stress categories.
+    """Map a temperature array to stress categories.
 
     Parameters
     ----------
@@ -21,6 +21,7 @@ def mapping(value, map_dictionary, right=True):
     Returns
     -------
     Stress category for each input temperature.
+
     """
     bins = np.array(list(map_dictionary.keys()))
     words = np.append(np.array(list(map_dictionary.values())), "unknown")

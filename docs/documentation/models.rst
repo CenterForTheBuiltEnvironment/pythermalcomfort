@@ -121,10 +121,10 @@ Two-node model sleep
     :members:
 
 Gagge-Ji two-node model
-----------------------
+-----------------------
 
 .. autofunction:: pythermalcomfort.models.two_nodes_gagge_ji.two_nodes_gagge_ji
-    
+
 .. autoclass:: pythermalcomfort.classes_return.GaggeTwoNodesJi
     :members:
 
@@ -351,10 +351,45 @@ Wind chill temperature
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:
 
-Temperature Humidity Index (THI)
+Work capacity (Dunne et al.)
 -----------------------------
 
+.. autofunction:: pythermalcomfort.models.work_capacity_dunne.work_capacity_dunne
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :members:
+
+Work capacity (Hothaps)
+-----------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_hothaps.work_capacity_hothaps
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :noindex:
+    :members:
+
+Work capacity (ISO)
+-------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_iso.work_capacity_iso
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :noindex:
+    :members:
+
+Work capacity (NIOSH)
+---------------------
+
+.. autofunction:: pythermalcomfort.models.work_capacity_niosh.work_capacity_niosh
+
+.. autoclass:: pythermalcomfort.classes_return.WorkCapacity
+    :noindex:
+    :members:
+
+Temperature Humidity Index (THI)
+--------------------------------
+
 .. autofunction:: pythermalcomfort.models.thi.thi
-    
+
 .. autoclass:: pythermalcomfort.classes_return.THI
     :members:

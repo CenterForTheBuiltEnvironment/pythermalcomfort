@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 import numpy.typing as npt
@@ -8,14 +8,16 @@ from pythermalcomfort.classes_return import WBGT
 
 
 def wbgt(
-    twb: Union[float, npt.ArrayLike],
-    tg: Union[float, npt.ArrayLike],
-    tdb: Union[float, npt.ArrayLike] = None,
+    twb: float | npt.ArrayLike,
+    tg: float | npt.ArrayLike,
+    tdb: float | npt.ArrayLike = None,
     with_solar_load: bool = False,
     round_output: bool = True,
 ) -> WBGT:
-    """Calculates the Wet Bulb Globe Temperature (WBGT) index in compliance
-    with the ISO 7243 Standard [7243ISO2017]_. The WBGT is a heat stress index that
+    """Calculate the Wet Bulb Globe Temperature (WBGT) index in compliance
+    with the ISO 7243 Standard [7243ISO2017]_.
+
+    The WBGT is a heat stress index that
     measures the thermal environment to which a person is exposed. In most
     situations, this index is simple to calculate. It should be used as a
     screening tool to determine whether heat stress is present. The PHS model
@@ -64,6 +66,7 @@ def wbgt(
 
         result = wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
         print(result.wbgt)  # 25.9
+
     """
     # Validate inputs using the WBGTInputs class
     WBGTInputs(

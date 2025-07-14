@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -49,8 +49,8 @@ from pythermalcomfort.jos3_functions.thermoregulation import (
 from pythermalcomfort.models import JOS3
 
 
-# test JOS-3 class
-def test_JOS3_class():
+def test_jos3_class() -> None:
+    """Test the JOS3 class and its methods."""
     # Test for the initialization of JOS3 class
     # Instantiate JOS3 class
     model = JOS3()
@@ -64,7 +64,7 @@ def test_JOS3_class():
     # Call the simulate method
     model.simulate(times=60)
 
-    # Test: _reset_setpt()
+    # Test the reset_setpt method
     result = model._reset_setpt()
     result = result.__dict__
     assert "t_core" in result
@@ -86,7 +86,7 @@ def test_JOS3_class():
     dict_output = model.dict_results()
     assert not np.isnan(dict_output["t_skin_mean"]).any()
 
-    # Test: simulate()
+    # Test the simulate method with different parameters
     model = JOS3(height=1.7, weight=60, age=30)
     # Set the first phase
     model.to = 28  # Operative temperature [°C]
@@ -104,15 +104,15 @@ def test_JOS3_class():
 
     # Results to compare (example data in csv file)
     # Get the absolute path of the current script
-    current_script_path = os.path.abspath(__file__)
+    current_script_path = Path(__file__).resolve()
     # Get the project directory by going up two levels from the current script path
-    project_directory = os.path.dirname(os.path.dirname(current_script_path))
+    project_directory = Path(current_script_path).parent.parent
     # Specify the relative path to the CSV file
-    relative_path = os.path.join(
-        "examples", "jos3_output_example", "jos3_example1 (default output).csv"
+    relative_path = (
+        Path("examples") / "jos3_output_example" / "jos3_example1 (default output).csv"
     )
     # Generate the absolute path by combining the project and the relative path
-    file_path = os.path.join(project_directory, relative_path)
+    file_path = project_directory / Path(relative_path)
 
     # Read the 't_skin_mean' column from the CSV file into a DataFrame
     df_t_skin_mean = (
@@ -123,7 +123,6 @@ def test_JOS3_class():
     assert isinstance(dict_output, dict)
     assert np.allclose(dict_output["t_skin_mean"], df_t_skin_mean)
 
-    # Test: _run()
     # Call the _run method
     model._run(dtime=60000, passive=True)
     result = model.dict_results()
@@ -155,8 +154,8 @@ def test_JOS3_class():
         JOS3(fat=91)
 
 
-# test for construction.py
-def test_body_parameters():
+def test_body_parameters() -> None:
+    """Test the validate_body_parameters function."""
     # Test with valid parameters
     validate_body_parameters(height=1.75, weight=70.0, age=30, body_fat=15)
     # Test with invalid height
@@ -173,7 +172,8 @@ def test_body_parameters():
         validate_body_parameters(height=1.75, weight=210.0, age=101, body_fat=91)
 
 
-def test_to17array():
+def test_to17array() -> None:
+    """Test the to_array_body_parts function from construction.py."""
     # Test with integer input
     result = construction.to_array_body_parts(5)
     assert isinstance(result, np.ndarray)
@@ -218,14 +218,16 @@ def test_to17array():
         construction.to_array_body_parts("unsupported")
 
 
-def test_bsa_rate():
+def test_bsa_rate() -> None:
+    """Test the bsa_rate function from construction.py."""
     # Test with default parameters
     expected_result = (
         1.0  # Since height and weight are set to default values, bsa_rate should be 1.0
     )
     result = construction.bsa_rate(height=1.72, weight=74.43, bsa_equation="dubois")
     assert result == pytest.approx(
-        expected_result, rel=1e-3
+        expected_result,
+        rel=1e-3,
     )  # a relative tolerance of 1e-3
 
     # Test with custom parameters
@@ -245,7 +247,8 @@ def test_bsa_rate():
         construction.bsa_rate(weight="non-numeric", height=1.72, bsa_equation="dubois")
 
 
-def test_local_bsa():
+def test_local_bsa() -> None:
+    """Test the local_bsa function from construction.py."""
     # Test with default parameters
     result = local_bsa(height=1.72, weight=74.43, bsa_equation="dubois")
     assert isinstance(result, np.ndarray)
@@ -269,14 +272,16 @@ def test_local_bsa():
         local_bsa(weight="non-numeric", height=1.72, bsa_equation="dubois")
 
 
-def test_weight_rate():
+def test_weight_rate() -> None:
+    """Test the weight_rate function from construction.py."""
     # Test with default parameters
     result = weight_rate(weight=74.43)
     expected_result = (
         1.0  # Since height and weight are set to default values, bsa_rate should be 1.0
     )
     assert result == pytest.approx(
-        expected_result, rel=1e-3
+        expected_result,
+        rel=1e-3,
     )  # a relative tolerance of 1e-3
 
     # Test with custom weight
@@ -292,7 +297,8 @@ def test_weight_rate():
         weight_rate(weight="non-numeric")
 
 
-def test_bfb_rate():
+def test_bfb_rate() -> None:
+    """Test the bfb_rate function from construction.py."""
     # Test with default parameters
     result = bfb_rate(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59)
     assert isinstance(result, float)
@@ -303,10 +309,18 @@ def test_bfb_rate():
 
     # Test with different ages
     result_young = bfb_rate(
-        age=40, height=1.72, weight=74.43, bsa_equation="dubois", ci=2.59
+        age=40,
+        height=1.72,
+        weight=74.43,
+        bsa_equation="dubois",
+        ci=2.59,
     )
     result_old = bfb_rate(
-        age=60, height=1.72, weight=74.43, bsa_equation="dubois", ci=2.59
+        age=60,
+        height=1.72,
+        weight=74.43,
+        bsa_equation="dubois",
+        ci=2.59,
     )
     assert result_old < result_young  # The BFB rate should decrease with age
 
@@ -317,29 +331,46 @@ def test_bfb_rate():
     # Test with non-numeric height
     with pytest.raises(TypeError):
         bfb_rate(
-            height="non-numeric", weight=74.43, age=20, ci=2.59, bsa_equation="dubois"
+            height="non-numeric",
+            weight=74.43,
+            age=20,
+            ci=2.59,
+            bsa_equation="dubois",
         )
 
     # Test with non-numeric weight
     with pytest.raises(TypeError):
         bfb_rate(
-            weight="non-numeric", height=1.72, age=20, ci=2.59, bsa_equation="dubois"
+            weight="non-numeric",
+            height=1.72,
+            age=20,
+            ci=2.59,
+            bsa_equation="dubois",
         )
 
     # Test with non-numeric age
     with pytest.raises(TypeError):
         bfb_rate(
-            age="non-numeric", height=1.72, weight=74.43, ci=2.59, bsa_equation="dubois"
+            age="non-numeric",
+            height=1.72,
+            weight=74.43,
+            ci=2.59,
+            bsa_equation="dubois",
         )
 
     # Test with non-numeric ci
     with pytest.raises(TypeError):
         bfb_rate(
-            ci="non-numeric", height=1.72, weight=74.43, age=20, bsa_equation="dubois"
+            ci="non-numeric",
+            height=1.72,
+            weight=74.43,
+            age=20,
+            bsa_equation="dubois",
         )
 
 
-def test_conductance():
+def test_conductance() -> None:
+    """Test the conductance function from construction.py."""
     # Test with default parameters
     result = conductance(height=1.72, weight=74.43, bsa_equation="dubois", fat=15.0)
     assert isinstance(result, np.ndarray)
@@ -350,13 +381,19 @@ def test_conductance():
 
     # Test with different fat rates
     result_low_fat = conductance(
-        height=1.72, weight=74.43, bsa_equation="dubois", fat=10.0
+        height=1.72,
+        weight=74.43,
+        bsa_equation="dubois",
+        fat=10.0,
     )
     result_high_fat = conductance(
-        height=1.72, weight=74.43, bsa_equation="dubois", fat=30.0
+        height=1.72,
+        weight=74.43,
+        bsa_equation="dubois",
+        fat=30.0,
     )
     assert np.any(
-        result_low_fat != result_high_fat
+        result_low_fat != result_high_fat,
     )  # The conductance matrix should differ
 
     # Test with non-numeric height
@@ -372,7 +409,8 @@ def test_conductance():
         conductance(height=1.72, weight=74.43, fat="non-numeric", bsa_equation="dubois")
 
 
-def test_capacity():
+def test_capacity() -> None:
+    """Test the capacity function from construction.py."""
     # Test with default parameters
     result = capacity(height=1.72, weight=74.43, bsa_equation="dubois", age=20, ci=2.59)
     assert isinstance(result, np.ndarray)
@@ -386,12 +424,16 @@ def test_capacity():
     # Test with invalid equation
     with pytest.raises(ValueError):
         capacity(
-            bsa_equation="invalid_equation", height=1.72, weight=74.43, age=20, ci=2.59
+            bsa_equation="invalid_equation",
+            height=1.72,
+            weight=74.43,
+            age=20,
+            ci=2.59,
         )
 
 
-# test for matrix.py
-def test_index_order():
+def test_index_order() -> None:
+    """Test the index_order function from matrix.py."""
     index_dict, order_count = index_order()
 
     # Test that output is of correct type
@@ -418,7 +460,8 @@ def test_index_order():
     assert total_layers + 1 == order_count  # +1 because of the "CB" key
 
 
-def test_index_by_layer():
+def test_index_by_layer() -> None:
+    """Test the index_by_layer function from matrix.py."""
     # Test that output is of correct type and length for each layer
     for layer in LAYER_NAMES:
         indices = index_by_layer(layer)
@@ -446,7 +489,8 @@ def test_index_by_layer():
             )  # +1 because of the "CB" key
 
 
-def test_valid_index_by_layer():
+def test_valid_index_by_layer() -> None:
+    """Test the valid_index_by_layer function from matrix.py."""
     # Test that output is of correct type and length for each layer
     for layer in LAYER_NAMES:
         indices = valid_index_by_layer(layer)
@@ -468,14 +512,16 @@ def test_valid_index_by_layer():
         valid_index_by_layer("non_existent_layer")
 
 
-def test_local_arr():
+def test_local_arr() -> None:
+    """Test the local_arr function from matrix.py."""
     # Initialize some random blood flow values
-    bf_core = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
-    bf_muscle = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
-    bf_fat = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
-    bf_skin = np.random.rand(len(JOS3BodyParts.get_attribute_names()))
-    bf_ava_hand = np.random.rand(1)[0]
-    bf_ava_foot = np.random.rand(1)[0]
+    rng = np.random.default_rng(1337)
+    bf_core = rng.random(len(JOS3BodyParts.get_attribute_names()))
+    bf_muscle = rng.random(len(JOS3BodyParts.get_attribute_names()))
+    bf_fat = rng.random(len(JOS3BodyParts.get_attribute_names()))
+    bf_skin = rng.random(len(JOS3BodyParts.get_attribute_names()))
+    bf_ava_hand = rng.random(1)[0]
+    bf_ava_foot = rng.random(1)[0]
 
     # Call the function with these values
     result = local_arr(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot)
@@ -491,55 +537,72 @@ def test_local_arr():
         index_of = IDICT[bn]
 
         assert np.isclose(
-            result[index_of["core"], index_of["artery"]], 1.067 * bf_core[i]
+            result[index_of["core"], index_of["artery"]],
+            1.067 * bf_core[i],
         )
         assert np.isclose(
-            result[index_of["skin"], index_of["artery"]], 1.067 * bf_skin[i]
+            result[index_of["skin"], index_of["artery"]],
+            1.067 * bf_skin[i],
         )
         assert np.isclose(
-            result[index_of["vein"], index_of["core"]], 1.067 * bf_core[i]
+            result[index_of["vein"], index_of["core"]],
+            1.067 * bf_core[i],
         )
         assert np.isclose(
-            result[index_of["vein"], index_of["skin"]], 1.067 * bf_skin[i]
+            result[index_of["vein"], index_of["skin"]],
+            1.067 * bf_skin[i],
         )
 
         if index_of["muscle"] is not None:
             assert np.isclose(
-                result[index_of["muscle"], index_of["artery"]], 1.067 * bf_muscle[i]
+                result[index_of["muscle"], index_of["artery"]],
+                1.067 * bf_muscle[i],
             )
             assert np.isclose(
-                result[index_of["vein"], index_of["muscle"]], 1.067 * bf_muscle[i]
+                result[index_of["vein"], index_of["muscle"]],
+                1.067 * bf_muscle[i],
             )
         if index_of["fat"] is not None:
             assert np.isclose(
-                result[index_of["fat"], index_of["artery"]], 1.067 * bf_fat[i]
+                result[index_of["fat"], index_of["artery"]],
+                1.067 * bf_fat[i],
             )
             assert np.isclose(
-                result[index_of["vein"], index_of["fat"]], 1.067 * bf_fat[i]
+                result[index_of["vein"], index_of["fat"]],
+                1.067 * bf_fat[i],
             )
 
-        if i == 7 or i == 10:
+        if i in [7, 10]:
             assert np.isclose(
-                result[index_of["sfvein"], index_of["artery"]], 1.067 * bf_ava_hand
+                result[index_of["sfvein"], index_of["artery"]],
+                1.067 * bf_ava_hand,
             )
-        if i == 13 or i == 16:
+        if i in [13, 16]:
             assert np.isclose(
-                result[index_of["sfvein"], index_of["artery"]], 1.067 * bf_ava_foot
+                result[index_of["sfvein"], index_of["artery"]],
+                1.067 * bf_ava_foot,
             )
 
 
-def test_vessel_blood_flow():
+def test_vessel_blood_flow() -> None:
+    """Test the vessel_blood_flow function from matrix.py."""
     # Initialize some random blood flow values
-    bf_core = np.random.rand(17)
-    bf_muscle = np.random.rand(17)
-    bf_fat = np.random.rand(17)
-    bf_skin = np.random.rand(17)
-    bf_ava_hand = np.random.rand(1)[0]
-    bf_ava_foot = np.random.rand(1)[0]
+    rng = np.random.default_rng(1337)
+    bf_core = rng.random(17)
+    bf_muscle = rng.random(17)
+    bf_fat = rng.random(17)
+    bf_skin = rng.random(17)
+    bf_ava_hand = rng.random(1)[0]
+    bf_ava_foot = rng.random(1)[0]
 
     # Call the function with these values
     bf_art, bf_vein = vessel_blood_flow(
-        bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot
+        bf_core,
+        bf_muscle,
+        bf_fat,
+        bf_skin,
+        bf_ava_hand,
+        bf_ava_foot,
     )
 
     # Check that the result is a 1D array with the correct dimensions
@@ -566,7 +629,8 @@ def test_vessel_blood_flow():
 
 
 # test for thermoregulation.py
-def test_conv_coef():
+def test_conv_coef() -> None:
+    """Test the conv_coef function for calculating convective coefficients based on posture."""
     # Test case 1: Default values
     hc_expected = np.array(
         [
@@ -587,10 +651,11 @@ def test_conv_coef():
             2.80,
             2.04,
             2.04,
-        ]
+        ],
     )
     assert np.array_equal(
-        conv_coef(posture="standing", v=0.1, tdb=28.8, t_skin=34), hc_expected
+        conv_coef(posture="standing", v=0.1, tdb=28.8, t_skin=34),
+        hc_expected,
     )
 
     # Test case 2: Sitting posture
@@ -613,10 +678,11 @@ def test_conv_coef():
             2.98,
             2.98,
             2.62,
-        ]
+        ],
     )
     assert np.array_equal(
-        conv_coef(posture="sitting", tdb=28.8, v=0.1, t_skin=34.0), hc_expected
+        conv_coef(posture="sitting", tdb=28.8, v=0.1, t_skin=34.0),
+        hc_expected,
     )
 
     # Test case 3: Invalid posture
@@ -645,7 +711,7 @@ def test_conv_coef():
             0.945,
             0.385,
             0.200,
-        ]
+        ],
     ) * (
         abs(tdb - t_skin)
         ** np.array(
@@ -667,7 +733,7 @@ def test_conv_coef():
                 0.447,
                 0.580,
                 0.966,
-            ]
+            ],
         )
     )
     assert np.allclose(
@@ -696,7 +762,7 @@ def test_conv_coef():
             14.0,
             15.8,
             15.1,
-        ]
+        ],
     ) * (
         v
         ** np.array(
@@ -718,15 +784,17 @@ def test_conv_coef():
                 0.61,
                 0.74,
                 0.62,
-            ]
+            ],
         )
     )
     assert np.allclose(
-        conv_coef(v=v, tdb=28.8, posture="standing", t_skin=34.0), hc_expected
+        conv_coef(v=v, tdb=28.8, posture="standing", t_skin=34.0),
+        hc_expected,
     )
 
 
-def test_rad_coef():
+def test_rad_coef() -> None:
+    """Test the rad_coef function for calculating radiative coefficients based on posture."""
     # Test with valid postures
     valid_postures = {
         "standing": np.array(
@@ -748,7 +816,7 @@ def test_rad_coef():
                 4.77,
                 5.34,
                 6.14,
-            ]
+            ],
         ),
         "sitting": np.array(
             [
@@ -769,7 +837,7 @@ def test_rad_coef():
                 4.10,
                 4.74,
                 6.36,
-            ]
+            ],
         ),
         "lying": np.array(
             [
@@ -790,7 +858,7 @@ def test_rad_coef():
                 4.440,
                 5.547,
                 6.085,
-            ]
+            ],
         ),
         "sedentary": np.array(
             [
@@ -811,7 +879,7 @@ def test_rad_coef():
                 4.10,
                 4.74,
                 6.36,
-            ]
+            ],
         ),
         "supine": np.array(
             [
@@ -832,7 +900,7 @@ def test_rad_coef():
                 4.440,
                 5.547,
                 6.085,
-            ]
+            ],
         ),
     }
     for posture, expected in valid_postures.items():
@@ -845,7 +913,8 @@ def test_rad_coef():
             rad_coef(posture=posture)
 
 
-def test_fixed_hc():
+def test_fixed_hc() -> None:
+    """Test the fixed_hc function for calculating fixed convective heat transfer coefficient."""
     hc = np.ones(17) * 3
     v = np.ones(17) * 0.1
 
@@ -866,7 +935,8 @@ def test_fixed_hc():
     assert np.allclose(fixed_hc_values, expected_fixed_hc)
 
 
-def test_fixed_hr():
+def test_fixed_hr() -> None:
+    """Test the fixed_hr function for calculating radiative coefficient."""
     hr = np.ones(17) * 5
 
     # Call the fixed_hr function
@@ -884,7 +954,8 @@ def test_fixed_hr():
     assert np.allclose(fixed_hr_values, expected_fixed_hr)
 
 
-def test_operative_temp():
+def test_operative_temp() -> None:
+    """Test the operative_temp function for calculating operative temperature."""
     # Test with scalar inputs
     tdb = 25.0
     tr = 25.0
@@ -915,7 +986,8 @@ def test_operative_temp():
     assert np.allclose(to, expected_to)
 
 
-def test_clo_area_factor():
+def test_clo_area_factor() -> None:
+    """Test the clo_area_factor function for calculating clothing area factor."""
     # Test with single value less than 0.5
     clo = 0.4
     expected_result = 1.08
@@ -937,7 +1009,8 @@ def test_clo_area_factor():
     np.testing.assert_allclose(clo_area_factor(clo), expected_result, rtol=1e-3)
 
 
-def test_dry_r():
+def test_dry_r() -> None:
+    """Test the dry_r function for calculating dry resistance."""
     # Test with single values
     hc, hr, clo = 3, 5, 0.5
     expected_result = 0.191
@@ -961,7 +1034,8 @@ def test_dry_r():
         dry_r(hc, hr, clo)
 
 
-def test_wet_r():
+def test_wet_r() -> None:
+    """Test the wet_r function for calculating wet resistance."""
     # Test with single values
     hc = 10.0
     clo = 0.5
@@ -976,10 +1050,12 @@ def test_wet_r():
     i_clo = np.array([0.45, 0.45])
     lewis_rate = 16.5
     expected_result = np.array(
-        [0.01594, 0.01594]
+        [0.01594, 0.01594],
     )  # Replace with actual expected result based on your function's logic
     np.testing.assert_allclose(
-        wet_r(hc, clo, i_clo, lewis_rate), expected_result, rtol=1e-3
+        wet_r(hc, clo, i_clo, lewis_rate),
+        expected_result,
+        rtol=1e-3,
     )
 
     # Test with zero values
@@ -993,7 +1069,8 @@ def test_wet_r():
         wet_r(hc, clo, i_clo, lewis_rate)
 
 
-def test_error_signals():
+def test_error_signals() -> None:
+    """Test the error_signals function for calculating error signals."""
     # Test with default value:
     wrms, clds = error_signals()
     assert wrms == 0
@@ -1011,7 +1088,7 @@ def test_error_signals():
 
     # Test with array
     err_sk = np.array(
-        [-2, 2, -3, 3, -1, 1, 0, -0.5, 0.5, -2, 2, -1, 1, -0.5, 0.5, -1, 1]
+        [-2, 2, -3, 3, -1, 1, 0, -0.5, 0.5, -2, 2, -1, 1, -0.5, 0.5, -1, 1],
     )
     wrms, clds = error_signals(err_sk)
     assert wrms > 0
@@ -1023,7 +1100,8 @@ def test_error_signals():
         error_signals(err_sk)
 
 
-def test_evaporation():
+def test_evaporation() -> None:
+    """Test the evaporation function for calculating evaporation rate."""
     # Test with basic parameters
     err_cr = np.array([0.5])
     err_sk = np.array(
@@ -1045,7 +1123,7 @@ def test_evaporation():
             1.6,
             1.7,
             1.8,
-        ]
+        ],
     )
     t_skin = np.array([34.0] * 17)
     tdb = np.array([25.0] * 17)
@@ -1069,7 +1147,8 @@ def test_evaporation():
     assert isinstance(e_sk, np.ndarray)
     assert isinstance(e_max, np.ndarray)
     assert isinstance(e_sweat, np.ndarray)
-    assert np.all(wet >= 0) and np.all(wet <= 1)
+    assert np.all(wet >= 0)
+    assert np.all(wet <= 1)
 
     # Test age effects
     err_cr = np.array([0.5])
@@ -1173,14 +1252,15 @@ def test_evaporation():
     expected_wet = 1
     # Check that all elements in e_max have been replaced with 0.001
     assert np.all(
-        e_max == expected_e_max
+        e_max == expected_e_max,
     )  # Verify that e_max has been replaced by 0.001
     assert np.all(
-        wet == pytest.approx(expected_wet, rel=1e-3)
+        wet == pytest.approx(expected_wet, rel=1e-3),
     )  # Verify that wet is nealy 1
 
 
-def test_skin_blood_flow():
+def test_skin_blood_flow() -> None:
+    """Test the skin_blood_flow function for calculating blood flow in the skin."""
     # Test with basic values
     err_cr = np.array([0.5])
     err_sk = np.array(
@@ -1202,7 +1282,7 @@ def test_skin_blood_flow():
             1.6,
             1.7,
             1.8,
-        ]
+        ],
     )
 
     bf_skin = skin_blood_flow(
@@ -1276,7 +1356,8 @@ def test_skin_blood_flow():
         )
 
 
-def test_ava_blood_flow():
+def test_ava_blood_flow() -> None:
+    """Test the ava_blood_flow function for calculating blood flow in arteriovenous anastomoses (AVA)."""
     # Test with basic parameters
     err_cr = np.array([0.5, 0.6, 0.7, 0.8, 0.9])
     err_sk = np.array(
@@ -1298,7 +1379,7 @@ def test_ava_blood_flow():
             1.6,
             1.7,
             1.8,
-        ]
+        ],
     )
 
     bf_ava_hand, bf_ava_foot = ava_blood_flow(
@@ -1380,17 +1461,26 @@ def test_ava_blood_flow():
     assert bf_ava_foot == pytest.approx(expected_result_foot, rel=1e-3)
 
 
-def test_basal_met():
+def test_basal_met() -> None:
+    """Test the basal_met function for calculating basal metabolic rate (BMR)."""
     # Test with default values
     bmr = basal_met(
-        height=1.72, weight=74.43, age=20, sex="male", bmr_equation="harris-benedict"
+        height=1.72,
+        weight=74.43,
+        age=20,
+        sex="male",
+        bmr_equation="harris-benedict",
     )
     expected_result = 87.95
     assert bmr == pytest.approx(expected_result, rel=1e-3)
 
     # Test with custom values
     bmr = basal_met(
-        height=1.80, weight=70, age=25, sex="male", bmr_equation="harris-benedict"
+        height=1.80,
+        weight=70,
+        age=25,
+        sex="male",
+        bmr_equation="harris-benedict",
     )
     expected_result = 85.66
     assert bmr == pytest.approx(expected_result, rel=1e-3)
@@ -1404,7 +1494,11 @@ def test_basal_met():
     ]
     for valid_equation in valid_equations_list:
         bmr = basal_met(
-            bmr_equation=valid_equation, height=1.72, weight=74.4, age=20, sex="male"
+            bmr_equation=valid_equation,
+            height=1.72,
+            weight=74.4,
+            age=20,
+            sex="male",
         )
         assert isinstance(bmr, float)
 
@@ -1420,7 +1514,8 @@ def test_basal_met():
         )
 
 
-def test_local_mbase():
+def test_local_mbase() -> None:
+    """Test the local_mbase function for calculating local metabolic rates."""
     # Test with default values
     mbase_cr, mbase_ms, mbase_fat, mbase_sk = local_mbase()
     assert isinstance(mbase_cr, np.ndarray)
@@ -1430,7 +1525,11 @@ def test_local_mbase():
 
     # Test with custom values
     mbase_cr, mbase_ms, mbase_fat, mbase_sk = local_mbase(
-        height=1.80, weight=70, age=25, sex="male", bmr_equation="harris-benedict"
+        height=1.80,
+        weight=70,
+        age=25,
+        sex="male",
+        bmr_equation="harris-benedict",
     )
 
     # Check that each element of mbase_cr is greater than the corresponding elements
@@ -1440,7 +1539,8 @@ def test_local_mbase():
     assert all(mbase_cr > mbase_sk)
 
 
-def test_local_q_work():
+def test_local_q_work() -> None:
+    """Test the local_q_work function for calculating local work rate."""
     # Test with par = 1.5
     q_work = local_q_work(bmr=100, par=1.5)
     assert all(q_work >= 0)
@@ -1452,7 +1552,8 @@ def test_local_q_work():
         local_q_work(bmr=100, par=0.8)
 
 
-def test_shivering():
+def test_shivering() -> None:
+    """Test the shivering function for calculating shivering thermogenesis."""
     # Test with zero error signals
     err_cr = np.zeros(17)
     err_sk = np.zeros(17)
@@ -1545,7 +1646,8 @@ def test_shivering():
         assert all(q_shiv_by_age[age_younger] > q_shiv_by_age[age_older])
 
 
-def test_nonshivering():
+def test_nonshivering() -> None:
+    """Test the nonshivering function for calculating non-shivering thermogenesis."""
     # Test with zero error signals
     err_sk = np.zeros(17)
     q_nst = nonshivering(
@@ -1593,7 +1695,11 @@ def test_nonshivering():
 
     for age in age_list:
         q_nst = nonshivering(
-            err_sk, age=age, height=1.72, weight=74.43, bsa_equation="dubois"
+            err_sk,
+            age=age,
+            height=1.72,
+            weight=74.43,
+            bsa_equation="dubois",
         )
         q_nst_by_age[age] = q_nst
         sum_q_nst_by_age[age] = np.sum(q_nst_by_age[age])
@@ -1605,7 +1711,8 @@ def test_nonshivering():
         assert sum_q_nst_by_age[age_younger] > sum_q_nst_by_age[age_older]
 
 
-def test_cold_acclimation_non_shivering():
+def test_cold_acclimation_non_shivering() -> None:
+    """Test the cold acclimation effect on non-shivering thermogenesis."""
     # Test cold acclimation that affects NST limit
     err_sk = np.ones(17) * -10  # Set -10 to check the NST limit is working
     q_nst_no_acclimation = nonshivering(
@@ -1629,7 +1736,8 @@ def test_cold_acclimation_non_shivering():
     assert not np.array_equal(q_nst_no_acclimation, q_nst_with_acclimation)
 
 
-def test_sum_bf():
+def test_sum_bf() -> None:
+    """Test the sum_bf function for calculating body fat."""
     # Test to check output type
     bf_core = np.array([1, 2, 3, 4])
     bf_muscle = np.array([1, 2, 3, 4])
@@ -1681,7 +1789,8 @@ def test_sum_bf():
     assert np.array_equal(bf_skin, bf_skin_copy)
 
 
-def test_resp_heat_loss():
+def test_resp_heat_loss() -> None:
+    """Test the resp_heat_loss function for calculating respiratory heat loss."""
     # Test to check output type
     tdb = 25.0
     p_a = 1.0

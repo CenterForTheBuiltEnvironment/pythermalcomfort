@@ -1,60 +1,71 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Union
 
 import numpy as np
 
 from pythermalcomfort.utilities import Postures, Sex, Units, validate_type
 
 
+class WorkIntensity(str, Enum):
+    """Enumeration for work intensity levels."""
+
+    HEAVY = "heavy"
+    MODERATE = "moderate"
+    LIGHT = "light"
+
+
 @dataclass
 class BaseInputs:
     """Base class containing all possible input parameters."""
 
-    body_surface_area: Union[float, int, np.ndarray, list] = field(default=1.8258)
-    tdb: Union[float, int, np.ndarray, list] = field(default=None)
-    tr: Union[float, int, np.ndarray, list] = field(default=None)
-    twb: Union[float, int, np.ndarray, list] = field(default=None)
-    tg: Union[float, int, np.ndarray, list] = field(default=None)
-    vr: Union[float, int, np.ndarray, list] = field(default=None)
-    v: Union[float, int, np.ndarray, list] = field(default=None)
-    rh: Union[float, int, np.ndarray, list] = field(default=None)
-    met: Union[float, int, np.ndarray, list] = field(default=None)
-    clo: Union[float, int, np.ndarray, list] = field(default=None)
-    wme: Union[float, int, np.ndarray, list] = field(default=0)
+    body_surface_area: float | int | np.ndarray | list = field(default=1.8258)
+    tdb: float | int | np.ndarray | list = field(default=None)
+    tr: float | int | np.ndarray | list = field(default=None)
+    twb: float | int | np.ndarray | list = field(default=None)
+    tg: float | int | np.ndarray | list = field(default=None)
+    vr: float | int | np.ndarray | list = field(default=None)
+    v: float | int | np.ndarray | list = field(default=None)
+    rh: float | int | np.ndarray | list = field(default=None)
+    met: float | int | np.ndarray | list = field(default=None)
+    clo: float | int | np.ndarray | list = field(default=None)
+    wme: float | int | np.ndarray | list = field(default=0)
     round_output: bool = field(default=True)
     limit_inputs: bool = field(default=True)
     with_solar_load: bool = field(default=False)
     airspeed_control: bool = field(default=True)
     units: str = field(default=Units.SI.value)
-    a_coefficient: Union[float, int] = field(default=None)
-    e_coefficient: Union[float, int] = field(default=None)
-    v_ankle: Union[float, int, np.ndarray, list] = field(default=None)
-    t_running_mean: Union[float, int, np.ndarray, list] = field(default=None)
-    q: Union[float, int, np.ndarray, list] = field(default=None)
-    tout: Union[float, int, np.ndarray, list] = field(default=None)
-    p_atm: Union[float, int, np.ndarray, list] = field(default=101325)
-    age: Union[float, int, np.ndarray, list] = field(default=None)
-    weight: Union[float, int, np.ndarray, list] = field(default=None)
-    height: Union[float, int, np.ndarray, list] = field(default=None)
-    sol_altitude: Union[float, int, np.ndarray, list] = field(default=None)
-    sharp: Union[float, int, np.ndarray, list] = field(default=None)
-    sol_radiation_dir: Union[float, int, np.ndarray, list] = field(default=None)
-    sol_radiation_global: Union[float, int, np.ndarray, list] = field(default=None)
-    sol_transmittance: Union[float, int, np.ndarray, list] = field(default=None)
-    f_svv: Union[float, int, np.ndarray, list] = field(default=None)
-    f_bes: Union[float, int, np.ndarray, list] = field(default=None)
-    asw: Union[float, int, np.ndarray, list] = field(default=None)
-    floor_reflectance: Union[float, int, np.ndarray, list] = field(default=None)
-    vertical_tmp_grad: Union[float, int, np.ndarray, list] = field(default=None)
-    position: Union[str, np.ndarray, list] = field(default=None)
-    sex: Union[str, np.ndarray, list] = field(default=None)
-    posture: Union[str, np.ndarray, list] = field(default=None)
-    max_skin_blood_flow: Union[float, int, np.ndarray, list] = field(default=80)
-    max_sweating: Union[float, int, np.ndarray, list] = field(default=500)
-    w_max: Union[float, int, np.ndarray, list] = field(default=None)
-    thickness_quilt: Union[float, int, np.ndarray, list] = field(default=None)
-    vapor_pressure: Union[float, int, np.ndarray, list] = field(default=None)
+    a_coefficient: float | int = field(default=None)
+    e_coefficient: float | int = field(default=None)
+    v_ankle: float | int | np.ndarray | list = field(default=None)
+    t_running_mean: float | int | np.ndarray | list = field(default=None)
+    q: float | int | np.ndarray | list = field(default=None)
+    tout: float | int | np.ndarray | list = field(default=None)
+    p_atm: float | int | np.ndarray | list = field(default=101325)
+    age: float | int | np.ndarray | list = field(default=None)
+    weight: float | int | np.ndarray | list = field(default=None)
+    height: float | int | np.ndarray | list = field(default=None)
+    sol_altitude: float | int | np.ndarray | list = field(default=None)
+    sharp: float | int | np.ndarray | list = field(default=None)
+    sol_radiation_dir: float | int | np.ndarray | list = field(default=None)
+    sol_radiation_global: float | int | np.ndarray | list = field(default=None)
+    sol_transmittance: float | int | np.ndarray | list = field(default=None)
+    f_svv: float | int | np.ndarray | list = field(default=None)
+    f_bes: float | int | np.ndarray | list = field(default=None)
+    asw: float | int | np.ndarray | list = field(default=None)
+    floor_reflectance: float | int | np.ndarray | list = field(default=None)
+    vertical_tmp_grad: float | int | np.ndarray | list = field(default=None)
+    position: str | np.ndarray | list = field(default=None)
+    sex: str | np.ndarray | list = field(default=None)
+    posture: str | np.ndarray | list = field(default=None)
+    max_skin_blood_flow: float | int | np.ndarray | list = field(default=80)
+    max_sweating: float | int | np.ndarray | list = field(default=500)
+    w_max: float | int | np.ndarray | list = field(default=None)
+    wbgt: float | int | np.ndarray | list = field(default=None)
+    work_intensity: str | WorkIntensity = field(default=None)
+    thickness_quilt: float | int | np.ndarray | list = field(default=None)
+    vapor_pressure: float | int | np.ndarray | list = field(default=None)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -67,7 +78,8 @@ class BaseInputs:
             values = np.atleast_1d(value)
             for val in values.astype(str):
                 if val.lower() not in allowed:
-                    raise ValueError(f"{name} must be one of {allowed!r}")
+                    error_msg = f"{name} must be one of {allowed!r}, "
+                    raise ValueError(error_msg)
 
         # Only validate attributes that are not None
         if self.units.upper() not in [Units.SI.value, Units.IP.value]:
@@ -136,7 +148,9 @@ class BaseInputs:
         if self.t_running_mean is not None:
             self.t_running_mean = convert_series_to_list(self.t_running_mean)
             validate_type(
-                self.t_running_mean, "t_running_mean", (float, int, np.ndarray, list)
+                self.t_running_mean,
+                "t_running_mean",
+                (float, int, np.ndarray, list),
             )
         if self.q is not None:
             self.q = convert_series_to_list(self.q)
@@ -167,7 +181,9 @@ class BaseInputs:
         if self.sol_altitude is not None:
             self.sol_altitude = convert_series_to_list(self.sol_altitude)
             validate_type(
-                self.sol_altitude, "sol_altitude", (float, int, np.ndarray, list)
+                self.sol_altitude,
+                "sol_altitude",
+                (float, int, np.ndarray, list),
             )
         if self.sharp is not None:
             self.sharp = convert_series_to_list(self.sharp)
@@ -181,7 +197,7 @@ class BaseInputs:
             )
         if self.sol_radiation_global is not None:
             self.sol_radiation_global = convert_series_to_list(
-                self.sol_radiation_global
+                self.sol_radiation_global,
             )
             validate_type(
                 self.sol_radiation_global,
@@ -234,15 +250,29 @@ class BaseInputs:
         if self.w_max is not None:
             self.w_max = convert_series_to_list(self.w_max)
             validate_type(self.w_max, "w_max", (float, int, np.ndarray, list))
+        if self.wbgt is not None:
+            self.wbgt = convert_series_to_list(self.wbgt)
+            validate_type(self.wbgt, "wbgt", (float, int, np.ndarray, list))
+        if self.work_intensity is not None:
+            self.work_intensity = convert_series_to_list(self.work_intensity)
+            _validate_str_values(
+                "work_intensity",
+                self.work_intensity,
+                [i.value for i in WorkIntensity],
+            )
         if self.thickness_quilt is not None:
             self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
             validate_type(
-                self.thickness_quilt, "thickness_quilt", (float, int, np.ndarray, list)
+                self.thickness_quilt,
+                "thickness_quilt",
+                (float, int, np.ndarray, list),
             )
         if self.vapor_pressure is not None:
             self.vapor_pressure = convert_series_to_list(self.vapor_pressure)
             validate_type(
-                self.vapor_pressure, "vapor_pressure", (float, int, np.ndarray, list)
+                self.vapor_pressure,
+                "vapor_pressure",
+                (float, int, np.ndarray, list),
             )
 
 
@@ -502,12 +532,14 @@ class HIInputs(BaseInputs):
         tdb,
         rh,
         round_output,
+        limit_inputs,
     ):
         # Initialize with only required fields, setting others to None
         super().__init__(
             tdb=tdb,
             rh=rh,
             round_output=round_output,
+            limit_inputs=limit_inputs,
         )
 
 
@@ -991,3 +1023,33 @@ class WCTInputs(BaseInputs):
             v=v,
             round_output=round_output,
         )
+
+
+@dataclass
+class WorkCapacityHothapsInputs(BaseInputs):
+    def __init__(
+        self,
+        wbgt,
+        work_intensity,
+    ):
+        super().__init__(wbgt=wbgt, work_intensity=work_intensity)
+
+
+@dataclass
+class WorkCapacityStandardsInputs(BaseInputs):
+    def __init__(
+        self,
+        wbgt,
+        met,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            wbgt=wbgt,
+            met=met,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+        met = np.asarray(self.met, dtype=float)
+        if np.any(met < 0) or np.any(met > 2500):
+            raise ValueError("Metabolic rate out of plausible range")

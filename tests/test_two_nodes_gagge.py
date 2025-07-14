@@ -2,9 +2,12 @@ from pythermalcomfort.models import two_nodes_gagge
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_two_nodes(get_test_url, retrieve_data):
+def test_two_nodes(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the two nodes Gagge model correctly for various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.TWO_NODES.name
+        get_test_url,
+        retrieve_data,
+        Urls.TWO_NODES.name,
     )
     tolerance = reference_table["tolerance"]
 

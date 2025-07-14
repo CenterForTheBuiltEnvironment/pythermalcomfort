@@ -9,17 +9,20 @@ from pythermalcomfort.utilities import Models, Units
 from tests.conftest import Urls, retrieve_reference_table, validate_result
 
 
-def test_pmv_ppd(get_test_url, retrieve_data):
+def test_pmv_ppd(get_test_url, retrieve_data) -> None:
+    """Test that the function calculates the PMV and PPD model correctly for various inputs."""
     reference_table = retrieve_reference_table(
-        get_test_url, retrieve_data, Urls.PMV_PPD.name
+        get_test_url,
+        retrieve_data,
+        Urls.PMV_PPD.name,
     )
     tolerance = reference_table["tolerance"]
 
     for entry in reference_table["data"]:
         inputs = entry["inputs"]
         outputs = entry["outputs"]
-        # todo change the validation table code and removed the following
-        if "standard" not in inputs.keys():
+        # TODO change the validation table code and removed the following
+        if "standard" not in inputs:
             inputs["standard"] = "iso"
         if inputs["standard"] == "iso":
             inputs["model"] = Models.iso_7730_2005.value
@@ -30,8 +33,10 @@ def test_pmv_ppd(get_test_url, retrieve_data):
 
 
 class TestPmvPpd:
-    #  Returns NaN for invalid input values
-    def test_returns_nan_for_invalid_input_values(self):
+    """Test cases for the PMV and PPD model."""
+
+    def test_returns_nan_for_invalid_input_values(self) -> None:
+        """Test that the function returns NaN for invalid input values."""
         # Arrange
         tdb = [25, 50]
         tr = [23, 45]
@@ -42,7 +47,13 @@ class TestPmvPpd:
 
         # Act
         result = pmv_ppd_iso(
-            tdb, tr, vr, rh, met, clo, model=Models.iso_7730_2005.value
+            tdb,
+            tr,
+            vr,
+            rh,
+            met,
+            clo,
+            model=Models.iso_7730_2005.value,
         )
 
         # Assert
@@ -111,11 +122,13 @@ class TestPmvPpd:
             PMVPPD(pmv=np.float64(2.4), ppd=np.float64(91.0), tsv="Warm"),
         )
 
-    def test_wrong_standard(self):
+    def test_wrong_standard(self) -> None:
+        """Test that the function raises ValueError for an unsupported standard."""
         with pytest.raises(ValueError):
             pmv_ppd_iso(25, 25, 0.1, 50, 1.1, 0.5, model="random")
 
-    def test_no_rounding(self):
+    def test_no_rounding(self) -> None:
+        """Test that the function calculates PMV and PPD without rounding."""
         np.isclose(
             pmv_ppd_iso(
                 25,

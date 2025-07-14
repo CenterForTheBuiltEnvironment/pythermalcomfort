@@ -14,7 +14,7 @@ from pythermalcomfort.utilities import met_to_w_m2
             float64,
             float64,
             float64,
-        )
+        ),
     ],
     cache=True,
 )
@@ -26,10 +26,9 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     w = wme * met_to_w_m2  # external work in W/M2
     mw = m - w  # internal heat production in the human body
     # calculation of the clothing area factor
-    if icl <= 0.078:
-        f_cl = 1 + (1.29 * icl)  # ratio of surface clothed body over nude body
-    else:
-        f_cl = 1.05 + (0.645 * icl)
+    f_cl = (
+        1 + 1.29 * icl if icl <= 0.078 else 1.05 + 0.645 * icl
+    )  # ratio of surface clothed body over nude body
 
     # heat transfer coefficient by forced convection
     hcf = 12.1 * np.sqrt(vr)
@@ -51,10 +50,7 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     while np.abs(xn - xf) > eps:
         xf = (xf + xn) / 2
         hcn = 2.38 * np.abs(100.0 * xf - taa) ** 0.25
-        if hcf > hcn:
-            hc = hcf
-        else:
-            hc = hcn
+        hc = max(hcn, hcf)
         xn = (p5 + p4 * hc - p2 * xf**4) / (100 + p3 * hc)
         n += 1
         if n > 150:
@@ -65,10 +61,7 @@ def _pmv_ppd_optimized(tdb, tr, vr, rh, met, clo, wme):
     # heat loss diff. through skin
     hl1 = 3.05 * 0.001 * (5733 - (6.99 * mw) - pa)
     # heat loss by sweating
-    if mw > met_to_w_m2:
-        hl2 = 0.42 * (mw - met_to_w_m2)
-    else:
-        hl2 = 0
+    hl2 = 0.42 * (mw - met_to_w_m2) if mw > met_to_w_m2 else 0
     # latent respiration heat loss
     hl3 = 1.7 * 0.00001 * m * (5867 - pa)
     # dry respiration heat loss

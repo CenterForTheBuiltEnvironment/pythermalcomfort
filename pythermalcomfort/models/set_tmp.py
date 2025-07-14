@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -6,27 +6,30 @@ from pythermalcomfort.classes_input import SETInputs
 from pythermalcomfort.classes_return import SET
 from pythermalcomfort.models.two_nodes_gagge import two_nodes_gagge
 from pythermalcomfort.utilities import (
+    Models,
     Postures,
     _check_standard_compliance_array,
 )
 
 
 def set_tmp(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
-    body_surface_area: Union[float, list[float]] = 1.8258,
-    p_atm: Union[float, list[float]] = 101325,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0.0,
+    body_surface_area: float | list[float] = 1.8258,
+    p_atm: float | list[float] = 101325,
     position: str = Postures.standing.value,
     limit_inputs: bool = True,
     round_output: bool = True,
     calculate_ce: bool = False,
 ) -> SET:
-    """Calculates the Standard Effective Temperature (SET). The SET is the
+    """Calculate the Standard Effective Temperature (SET).
+
+    The SET is the
     temperature of a hypothetical isothermal environment at 50% (rh), <0.1 m/s
     (20 fpm) average air speed (v), and tr = tdb, in which the total heat loss
     from the skin of an imaginary occupant wearing clothing, standardized for
@@ -88,6 +91,7 @@ def set_tmp(
 
         result = set_tmp(tdb=[25, 25], tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
         print(result.set)  # [24.3, 24.3]
+
     """
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -135,7 +139,12 @@ def set_tmp(
             met_valid,
             clo_valid,
         ) = _check_standard_compliance_array(
-            standard="ashrae", tdb=tdb, tr=tr, v=v, met=met, clo=clo
+            standard=Models.ashrae_55_2023.value,
+            tdb=tdb,
+            tr=tr,
+            v=v,
+            met=met,
+            clo=clo,
         )
         all_valid = ~(
             np.isnan(tdb_valid)

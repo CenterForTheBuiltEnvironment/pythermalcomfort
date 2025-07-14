@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 from numba import float64, vectorize
@@ -10,16 +10,17 @@ from pythermalcomfort.utilities import Units, units_converter
 
 
 def utci(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    rh: float | list[float],
     units: str = Units.SI.value,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UTCI:
-    """
-    Determines the Universal Thermal Climate Index (UTCI). The UTCI is the equivalent
+    """Calculate the Universal Thermal Climate Index (UTCI).
+
+    The UTCI is the equivalent
     temperature for the environment derived from a reference environment. It is defined
     as the air temperature of the reference environment which produces the same strain
     index value in comparison with the reference individual's response to the real
@@ -69,6 +70,7 @@ def utci(
 
         result = utci(tdb=[25, 40], tr=25, v=1.0, rh=50)
         print(result.utci)  # [24.6, 40.6]
+
     """
     # Validate inputs using the UtciInputs class
     UTCIInputs(
@@ -121,7 +123,8 @@ def utci(
 
     if units.upper() == Units.IP.value:
         utci_approx = units_converter(
-            tmp=utci_approx, from_units=Units.SI.value.lower()
+            tmp=utci_approx,
+            from_units=Units.SI.value.lower(),
         )[0]
 
     stress_categories = {
@@ -153,11 +156,13 @@ def utci(
             float64,
             float64,
             float64,
-        )
+        ),
     ],
     cache=True,
 )
-def _utci_optimized(tdb, v, delta_t_tr, pa):
+def _utci_optimized(
+    tdb: float64, v: float64, delta_t_tr: float64, pa: float64
+) -> float64:
     return (
         tdb
         + 0.607562052

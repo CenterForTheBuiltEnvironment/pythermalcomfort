@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,12 +7,12 @@ from pythermalcomfort.classes_return import NET
 
 
 def net(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    v: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
+    v: float | list[float],
     round_output: bool = True,
 ) -> NET:
-    """Calculates the Normal Effective Temperature (NET). Missenard (1933)
+    """Calculate the Normal Effective Temperature (NET). Missenard (1933)
     devised a formula for calculating effective temperature. The index
     establishes a link between the same condition of the organism's
     thermoregulatory capability (warm and cold perception) and the surrounding
@@ -26,8 +26,8 @@ def net(
     subjects working in the heat are decided on by prevailing levels of ET,
     depending on metabolic rates. The NET is also constantly monitored by the
     Hong Kong Observatory [Blazejczyk2012]_. In central Europe the following thresholds are
-    in use: <1°C = very cold; 1–9 = cold; 9–17 = cool; 17–21 = fresh; 21–23 = comfortable;
-    23–27 = warm; >27°C = hot [Blazejczyk2012]_.
+    in use: <1°C = very cold; 1-9 = cold; 9-17 = cool; 17-21 = fresh; 21-23 = comfortable;
+    23-27 = warm; >27°C = hot [Blazejczyk2012]_.
 
     Parameters
     ----------
@@ -55,9 +55,7 @@ def net(
         result = net(tdb=37, rh=100, v=0.1)
         print(result.net)  # 37.0
 
-        result = net(
-            tdb=[37, 30], rh=[100, 60], v=[0.1, 0.5], round_output=False
-        )
+        result = net(tdb=[37, 30], rh=[100, 60], v=[0.1, 0.5], round_output=False)
         print(result.net)  # [37.0, 26.38977535]
 
     """

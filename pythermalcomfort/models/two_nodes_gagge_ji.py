@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import math
-from typing import Union
 
 import numpy as np
 
@@ -9,15 +10,15 @@ from pythermalcomfort.utilities import Postures
 
 
 def two_nodes_gagge_ji(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    v: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    vapor_pressure: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
-    body_surface_area: Union[float, list[float]] = 1.8258,
-    p_atm: Union[float, list[float]] = 101325,
+    tdb: float | list[float],
+    tr: float | list[float],
+    v: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    vapor_pressure: float | list[float],
+    wme: float | list[float] = 0,
+    body_surface_area: float | list[float] = 1.8258,
+    p_atm: float | list[float] = 101325,
     position: str = Postures.sitting.value,
     **kwargs,
 ) -> GaggeTwoNodesJi:
@@ -106,7 +107,6 @@ def two_nodes_gagge_ji(
         )
 
     """
-
     body_weight = kwargs.pop("body_weight", 70)
     length_time_simulation = kwargs.pop("length_time_simulation", 120)
     initial_skin_temp = kwargs.pop("initial_skin_temp", 36.8)
@@ -114,7 +114,8 @@ def two_nodes_gagge_ji(
     acclimatized = kwargs.pop("acclimatized", True)
 
     if kwargs:
-        raise TypeError(f"Unexpected arguments: {', '.join(kwargs)}")
+        error_msg = f"Unexpected keyword arguments: {list(kwargs.keys())}"
+        raise TypeError(error_msg)
 
     tdb = np.array(tdb)
     tr = np.array(tr)
@@ -150,7 +151,9 @@ def two_nodes_gagge_ji(
     }
 
     results_array_of_dicts = np.vectorize(
-        _two_nodes_ji_optimized, excluded=excluded_params, otypes=[object]
+        _two_nodes_ji_optimized,
+        excluded=excluded_params,
+        otypes=[object],
     )(
         tdb=tdb,
         tr=tr,
@@ -258,10 +261,7 @@ def _two_nodes_ji_optimized(
 
     r_clo = 0.155 * clo  # thermal resistance of clothing, K*m2/W
     # increase in body surface area due to clothing
-    if clo < 0.5:
-        f_a_cl = 1.0 + 0.2 * clo
-    else:
-        f_a_cl = 1.05 + 0.1 * clo
+    f_a_cl = 1.0 + 0.2 * clo if clo < 0.5 else 1.05 + 0.1 * clo
     lr = 2.2 / pressure_in_atmospheres  # Lewis relation
     m = met * met_factor  # metabolic rate in W/m2
 
@@ -392,8 +392,7 @@ def _two_nodes_ji_optimized(
             * math.exp(t_sk_sw / 10.7)
         )
         # Apply max sweating rate
-        if m_rsw > m_rsw_max:
-            m_rsw = m_rsw_max
+        m_rsw = min(m_rsw, m_rsw_max)
         # Energy lost via evaporation
         e_rsw = 0.68 * m_rsw  # heat lost by vaporization sweat
 

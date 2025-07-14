@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -14,16 +14,16 @@ from pythermalcomfort.utilities import (
 
 
 def ankle_draft(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    v_ankle: Union[float, list[float]],
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    v_ankle: float | list[float],
     units: str = Units.SI.value,
 ) -> AnkleDraft:
-    """Calculates the percentage of thermally dissatisfied people with the
+    """Calculate the percentage of thermally dissatisfied people with the
     ankle draft (0.1 m) above floor level [Liu2017]_.
 
     This equation is only applicable for vr < 0.2 m/s (40 fps).
@@ -86,10 +86,18 @@ def ankle_draft(
         results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
         print(results)
         # AnkleDraft(ppd_ad=18.5, acceptability=True)
+
     """
     # Validate inputs using the AnkleDraftInputs class
     AnkleDraftInputs(
-        tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, clo=clo, v_ankle=v_ankle, units=units
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        v_ankle=v_ankle,
+        units=units,
     )
 
     # Convert lists to numpy arrays
@@ -105,7 +113,7 @@ def ankle_draft(
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)
 
     tdb_valid, tr_valid, v_valid, v_limited = _check_standard_compliance_array(
-        standard="ashrae",
+        standard=Models.ashrae_55_2023.value,
         tdb=tdb,
         tr=tr,
         v_limited=vr,
@@ -114,11 +122,17 @@ def ankle_draft(
 
     if np.all(np.isnan(v_limited)):
         raise ValueError(
-            "This equation is only applicable for air speed lower than 0.2 m/s"
+            "This equation is only applicable for air speed lower than 0.2 m/s",
         )
 
     tsv = pmv_ppd_ashrae(
-        tdb, tr, vr, rh, met, clo, model=Models.ashrae_55_2023.value
+        tdb,
+        tr,
+        vr,
+        rh,
+        met,
+        clo,
+        model=Models.ashrae_55_2023.value,
     ).pmv
     ppd_val = np.around(
         np.exp(-2.58 + 3.05 * v_ankle - 1.06 * tsv)

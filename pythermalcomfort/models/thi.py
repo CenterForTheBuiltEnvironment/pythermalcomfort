@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
@@ -7,12 +7,11 @@ from pythermalcomfort.classes_return import THI
 
 
 def thi(
-    tdb: Union[float, list[float]],
-    rh: Union[float, list[float]],
+    tdb: float | list[float],
+    rh: float | list[float],
     round_output: bool = True,
 ) -> THI:
-    """
-    Calculates the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent to
+    """Calculate the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent to
     the definition in [Schlatter1987]_, but uses Celsius instead of Fahrenheit.
 
     Parameters
@@ -31,8 +30,8 @@ def thi(
         See :py:class:`~pythermalcomfort.classes_return.THI` for more details.
         To access the `thi` value, use the `thi` attribute of the returned `THI`
         instance, e.g., `result.thi`.
-    """
 
+    """
     # Validate inputs using the THIInputs class
     THIInputs(
         tdb=tdb,

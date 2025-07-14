@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import warnings
-from typing import Literal, Union
+from typing import Literal
 
 import numpy as np
 from scipy import optimize
@@ -11,16 +13,16 @@ from pythermalcomfort.utilities import Units, units_converter
 
 
 def cooling_effect(
-    tdb: Union[float, list[float]],
-    tr: Union[float, list[float]],
-    vr: Union[float, list[float]],
-    rh: Union[float, list[float]],
-    met: Union[float, list[float]],
-    clo: Union[float, list[float]],
-    wme: Union[float, list[float]] = 0,
+    tdb: float | list[float],
+    tr: float | list[float],
+    vr: float | list[float],
+    rh: float | list[float],
+    met: float | list[float],
+    clo: float | list[float],
+    wme: float | list[float] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
-    """Returns the value of the Cooling Effect (`CE`_) calculated in compliance
+    """Return the value of the Cooling Effect (`CE`_) calculated in compliance
     with the ASHRAE 55 2020 Standard [55ASHRAE2023]_. The `CE`_ of the elevated air speed
     is the value that, when subtracted equally from both the average air
     temperature and the mean radiant temperature, yields the same `SET`_ under
@@ -102,6 +104,7 @@ def cooling_effect(
             units="IP",
         )
         print(result.ce)  # [0, 3.95]
+
     """
     # Validate inputs using the CoolingEffectInputs class
     CEInputs(
