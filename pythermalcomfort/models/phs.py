@@ -29,126 +29,26 @@ def phs(
     model: str = Models.iso_7933_2023.value,
     **kwargs,
 ) -> PHS:
-    """Calculate the Predicted Heat Strain (PHS) index based in compliance
-    with the ISO 7933:2004 [7933ISO2004]_ or 2023 Standard [7933ISO2023]_. The ISO 7933
-    provides a method for the analytical evaluation and interpretation of the thermal
-    stress experienced by a subject in a hot environment. It describes a method for
-    predicting the sweat rate and the internal core temperature that the human
-    body will develop in response to the working conditions.
-
-    The PHS model can be used to predict the: heat by respiratory convection, heat flow
-    by respiratory evaporation, steady state mean skin temperature, instantaneous value
-    of skin temperature, heat accumulation associated with the metabolic rate, maximum
-    evaporative heat flow at the skin surface, predicted sweat rate, predicted evaporative
-    heat flow, and rectal temperature.
-
-    Parameters
-    ----------
-    tdb : float or list of floats
-        Dry bulb air temperature, [°C].
-    tr : float or list of floats
-        Mean radiant temperature, [°C].
-    v : float or list of floats
-        Air speed, [m/s].
-    rh : float or list of floats
-        Relative humidity, [%].
-    met : float or list of floats
-        Metabolic rate, [met].
-    clo : float or list of floats
-        Clothing insulation, [clo].
-    posture: string or list of strings
-        a string value presenting posture of person "sitting", "standing", or "crouching"
-    wme : float or list of floats
-        external work, [met] default 0
-    round_output : bool, optional
-        If True, rounds output value. If False, it does not round it. Defaults to True.
-    model : str, optional
-        Select the model you want to use to calculate the PHS. The default option is
-        "7933-2023", and the other option is "7933-2004".
-
-    Other Parameters
-    ----------------
-    limit_inputs : bool, optional
-        If True, limits the input parameters to the standard's applicability limits. Defaults to True.
-
-        .. note::
-            By default, if the inputs are outside the standard applicability limits the
-            function returns nan. If False returns values even if input values are
-            outside the applicability limits of the model.
-
-            The 7933 limits are 15 < tdb [°C] < 50, 0 < tr [°C] < 60,
-            0 < vr [m/s] < 3, 1.7 < met [met] < 7.5, and 0.1 < clo [clo] < 1.
-
-    i_mst : float, optional
-        Static moisture permeability index, [dimensionless]. Defaults to 0.38.
-    a_p : float, optional
-        Fraction of the body surface covered by the reflective clothing, [dimensionless]. Defaults to 0.54.
-    drink : int, optional
-        1 if workers can drink freely, 0 otherwise. Defaults to 1.
-    weight : float, optional
-        Body weight, [kg]. Defaults to 75.
-    height : float, optional
-        Height, [m]. Defaults to 1.8.
-    walk_sp : float, optional
-        Walking speed, [m/s]. Defaults to 0.
-    theta : float, optional
-        Angle between walking direction and wind direction, [degrees]. Defaults to 0.
-    acclimatized : int, optional
-        100 if acclimatized subject, 0 otherwise. Defaults to 100.
-    duration : int, optional
-        Duration of the work sequence, [minutes]. Defaults to 480.
-    f_r : float, optional
-        Emissivity of the reflective clothing, [dimensionless]. Defaults to 0.97 in the 2004 standard and
-        0.42 in the 2023 standard.
-    t_sk : float, optional
-        Mean skin temperature when worker starts working, [°C]. Defaults to 34.1.
-    t_cr : float, optional
-        Mean core temperature when worker starts working, [°C]. Defaults to 36.8.
-    t_re : float, optional
-        Mean rectal temperature when worker starts working, [°C]. If False in the 2004 standard,
-        then t_re = t_cr, whereas in the 2023 standard t_re = 36.8 °C
-    t_cr_eq : float, optional
-        Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
-        standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
-    sweat_rate : float, optional
-        Initial sweat rate, [W/m2]. Defaults to 0.
-
-    Returns
-    -------
-    PHS
-        A dataclass containing the Predicted Heat Strain. See :py:class:`~pythermalcomfort.classes_return.PHS` for more details.
-        To access the individual attributes, use the corresponding attribute of the returned `PHS` instance, e.g., `result.t_re`.
-
-    Examples
-    --------
-    .. code-block:: python
-
-        from pythermalcomfort.models import phs
-
-        result = phs(
-            tdb=40,
-            tr=40,
-            rh=33.85,
-            v=0.3,
-            met=2.5,
-            clo=0.5,
-            posture="standing",
-            wme=0,
-        )
-        print(result.t_re)  # 37.5
-
-        result = phs(
-            tdb=[40, 45],
-            tr=[40, 45],
-            v=[0.3, 0.4],
-            rh=[33.85, 40],
-            met=[2.5, 2.6],
-            clo=[0.5, 0.6],
-            posture=["standing", "standing"],
-            wme=[0, 0],
-        )
-        print(result.t_re)  # [37.5 43.4]
-
+    """
+    Calculate the Predicted Heat Strain (PHS) index according to ISO 7933:2004 or ISO 7933:2023 standards.
+    
+    This function predicts physiological heat strain responses—including rectal temperature, skin temperature, core temperature, sweat rate, and maximum allowable exposure times—based on environmental, clothing, and individual parameters. It supports both single values and lists/arrays for batch calculations, and applies model-specific logic and limits as defined by the selected ISO standard.
+    
+    Parameters:
+        tdb (float or list of float): Dry bulb air temperature in °C.
+        tr (float or list of float): Mean radiant temperature in °C.
+        v (float or list of float): Air speed in m/s.
+        rh (float or list of float): Relative humidity in %.
+        met (float or list of float): Metabolic rate in met units.
+        clo (float or list of float): Clothing insulation in clo units.
+        posture (str or list of str): Posture of the person ("sitting", "standing", or "crouching").
+        wme (float or list of float, optional): External work in met units. Defaults to 0.
+        round_output (bool, optional): If True, rounds output values. Defaults to True.
+        model (str, optional): ISO standard version ("7933-2023" or "7933-2004"). Defaults to "7933-2023".
+        **kwargs: Additional optional physiological and environmental parameters, such as acclimatization, drink permission, body weight, height, walking speed, clothing properties, initial temperatures, and sweat rate.
+    
+    Returns:
+        PHS: A dataclass instance containing predicted rectal temperature, skin temperature, core temperature, equilibrium core temperature, skin-core weighting factor, sweat rate, total sweat loss, and maximum allowable exposure times for water loss and heat storage.
     """
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
         error_msg = (
