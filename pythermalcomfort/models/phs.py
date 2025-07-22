@@ -111,7 +111,7 @@ def phs(
         Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
         standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
     sweat_rate : float, optional
-        Initial sweat rate, [g/h]. Defaults to 0.
+        Initial sweat rate, [W/m2]. Defaults to 0.
 
     Returns
     -------
