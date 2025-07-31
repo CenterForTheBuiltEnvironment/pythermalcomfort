@@ -346,7 +346,7 @@ Wind chill index
 Wind chill temperature
 ----------------------
 
-.. autofunction:: pythermalcomfort.models.wind_chill_temperature.wct
+.. autofunction:: pythermalcomfort.models.wind_chill_temperature.wind_chill_temperature
 
 .. autoclass:: pythermalcomfort.classes_return.WCT
     :members:

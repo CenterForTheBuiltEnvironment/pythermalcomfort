@@ -29,6 +29,7 @@ from pythermalcomfort.models.utci import utci
 from pythermalcomfort.models.vertical_tmp_grad_ppd import vertical_tmp_grad_ppd
 from pythermalcomfort.models.wbgt import wbgt
 from pythermalcomfort.models.wci import wci
+from pythermalcomfort.models.wind_chill_temperature import wind_chill_temperature
 from pythermalcomfort.models.work_capacity_dunne import work_capacity_dunne
 from pythermalcomfort.models.work_capacity_hothaps import work_capacity_hothaps
 from pythermalcomfort.models.work_capacity_iso import work_capacity_iso
@@ -66,6 +67,7 @@ __all__ = [
     "vertical_tmp_grad_ppd",
     "wbgt",
     "wci",
+    "wind_chill_temperature",
     "work_capacity_dunne",
     "work_capacity_hothaps",
     "work_capacity_iso",
