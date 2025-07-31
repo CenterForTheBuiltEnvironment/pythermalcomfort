@@ -11,11 +11,11 @@ allow_dirty = false
 commit_message = "Bump version: {current_version} → {new_version}"
 
 [[tool.bumpversion.files]]
+path = "setup.py"
+search = 'version="{current_version}"'
+replace = 'version="{new_version}"'
+
+[[tool.bumpversion.files]]
 path = "pythermalcomfort/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
-
-[[tool.bumpversion.files]]
-path = ".bumpversion.toml"
-search = 'current_version = "{current_version}"'
-replace = 'current_version = "{new_version}"'
