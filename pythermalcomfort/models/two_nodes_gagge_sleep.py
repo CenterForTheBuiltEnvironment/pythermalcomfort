@@ -247,7 +247,7 @@ def _sleep_set(
         i_cl = 0.45
 
     temp_diff = abs(t_skin - tdb)
-    chc = 0.881 * temp_diff**0.368
+    chc = 4.4854 * temp_diff**0.2740 * v**0.1242
     h_r = 3.235
     ctc = h_r + chc
     r_a = 1 / (f_a_cl * ctc)
