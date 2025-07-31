@@ -46,12 +46,12 @@ def wci(
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import wc
+        from pythermalcomfort.models import wci
 
-        result = wc(tdb=-5, v=5.5)
+        result = wci(tdb=-5, v=5.5)
         print(result.wci)  # 1255.2
 
-        result = wc(tdb=[-5, -10], v=[5.5, 10], round_output=True)
+        result = wci(tdb=[-5, -10], v=[5.5, 10], round_output=True)
         print(result.wci)  # [1255.2 1603.9]
 
     """
