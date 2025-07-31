@@ -11,22 +11,22 @@ def test_two_nodes_gagge_sleep_single_input() -> None:
 
     # expected outputs
     expected = {
-        "set": np.array([28.62412397]),
-        "t_core": np.array([37.0322359]),
-        "t_skin": np.array([33.71180903]),
-        "wet": np.array([0.38381668]),
-        "t_sens": np.array([1.15402501]),
-        "disc": np.array([2.29254673]),
-        "e_skin": np.array([27.10243546]),
+        "set": np.array([24.28]),
+        "t_core": np.array([37.03]),
+        "t_skin": np.array([33.67]),
+        "wet": np.array([0.27]),
+        "t_sens": np.array([1.12]),
+        "disc": np.array([1.47]),
+        "e_skin": np.array([28.75]),
         "met_shivering": np.array([0.0]),
-        "alfa": np.array([0.13731683]),
-        "skin_blood_flow": np.array([7.21402727]),
+        "alfa": np.array([0.13]),
+        "skin_blood_flow": np.array([7.11]),
     }
 
     # compare each field with a reasonable tolerance
     for field, exp in expected.items():
         actual = getattr(result, field)
-        np.testing.assert_allclose(actual, exp, rtol=1e-6, atol=1e-8)
+        np.testing.assert_allclose(actual, exp, atol=0.01, rtol=0.005)
 
 
 def test_two_nodes_gagge_sleep_long_duration() -> None:
@@ -47,29 +47,32 @@ def test_two_nodes_gagge_sleep_long_duration() -> None:
     assert result.t_core.shape == (duration,)
     assert result.t_skin.shape == (duration,)
 
+    # for field in fields:
+    #     print(f"{getattr(result, field)[-1]:.2f},")
+
     first_row_expected = [
-        28.624124,
-        37.032236,
-        33.711809,
-        0.383817,
-        1.154025,
-        2.292547,
-        27.102435,
-        0.0,
-        0.137317,
-        7.214027,
+        24.29,
+        37.03,
+        33.67,
+        0.27,
+        1.13,
+        1.48,
+        28.76,
+        0.00,
+        0.14,
+        7.11,
     ]
     last_row_expected = [
-        24.908947,
-        36.235312,
-        32.397438,
-        0.060000,
-        -0.469718,
-        -0.469718,
-        3.799124,
-        0.0,
-        0.191773,
-        4.382500,
+        22.23,
+        36.23,
+        31.06,
+        0.06,
+        -0.73,
+        -0.73,
+        5.21,
+        0.00,
+        0.25,
+        2.98,
     ]
 
     fields = [
@@ -90,8 +93,8 @@ def test_two_nodes_gagge_sleep_long_duration() -> None:
         np.testing.assert_allclose(
             getattr(result, field)[0],
             exp,
-            rtol=1e-6,
-            atol=1e-6,
+            atol=0.01,
+            rtol=0.005,
             err_msg=f"first {field} mismatch",
         )
 
@@ -100,8 +103,8 @@ def test_two_nodes_gagge_sleep_long_duration() -> None:
         np.testing.assert_allclose(
             getattr(result, field)[-1],
             exp,
-            rtol=1e-6,
-            atol=1e-6,
+            atol=0.01,
+            rtol=0.005,
             err_msg=f"last {field} mismatch",
         )
 

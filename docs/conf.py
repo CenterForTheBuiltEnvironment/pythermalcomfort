@@ -21,12 +21,7 @@ project = "pythermalcomfort"
 year = "2025"
 author = "Federico Tartarini"
 project_copyright = f"{year}, {author}"
-try:
-    import pythermalcomfort
-
-    version = release = pythermalcomfort.__version__
-except ImportError:
-    version = release = "0.0.0"
+version = release = "3.4.4"
 
 autodoc_typehints = "none"
 pygments_style = "trac"
