@@ -1,5 +1,5 @@
 [tool.bumpversion]
-current_version = "3.4.2"
+current_version = "3.4.3"
 commit = true
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
@@ -11,10 +11,6 @@ allow_dirty = false
 commit_message = "Bump version: {current_version} → {new_version}"
 
 [[tool.bumpversion.files]]
-filename = "pythermalcomfort/__init__.py"
-
-[[tool.bumpversion.files]]
-filename = "setup.py"
-
-[[tool.bumpversion.files]]
-filename = "docs/conf.py"
+path = "pythermalcomfort/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'

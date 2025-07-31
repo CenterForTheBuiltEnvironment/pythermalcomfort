@@ -1,6 +1,16 @@
 Changelog
 =========
 
+3.4.3 (2025-07-31)
+------------------
+
+* fix: wind chill temperature was not imported in pythermalcomfort.models
+
+3.4.2 (2025-07-22)
+------------------
+
+* fixed unit of `sweat_rate` in the PHS model
+
 3.4.1 (2025-07-14)
 ------------------
 

@@ -6,7 +6,7 @@ from pythermalcomfort.classes_input import WCTInputs
 from pythermalcomfort.classes_return import WCT
 
 
-def wct(
+def wind_chill_temperature(
     tdb: float | list[float],
     v: float | list[float],
     round_output: bool = True,
@@ -38,13 +38,13 @@ def wct(
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import wc
+        from pythermalcomfort.models import wind_chill_temperature
 
-        result = wc(tdb=-5, v=5.5)
-        print(result.wct)  # 1255.2
+        result = wind_chill_temperature(tdb=-5, v=5.5)
+        print(result.wct)  # -7.5
 
-        result = wc(tdb=[-5, -10], v=[5.5, 10], round_output=True)
-        print(result.wct)  # [1255.2 1603.9]
+        result = wind_chill_temperature(tdb=[-5, -10], v=[5.5, 10], round_output=True)
+        print(result.wct)  # [-7.5, -15.3]
 
     """
     # Validate inputs using the WCYInputs class

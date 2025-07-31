@@ -6,6 +6,17 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 
+def get_version() -> str:
+    version_file = Path(__name__).parent / "pythermalcomfort" / "__init__.py"
+    content = version_file.read_text(encoding="utf8")
+    match = re.search(r'^__version__\s*=\s*["\']([^"\']+)["\']', content, re.M)
+    if not match:
+        raise RuntimeError(
+            "Unable to find version string in `pythermalcomfort/__init__.py`."
+        )
+    return match.group(1)
+
+
 def read(*names: str, encoding: str = "utf8") -> str:
     """Read and return the contents of a text file located by path segments
     relative to this file's directory.
@@ -30,7 +41,7 @@ def read(*names: str, encoding: str = "utf8") -> str:
 
 setup(
     name="pythermalcomfort",
-    version="3.4.2",
+    version=get_version(),
     license="MIT",
     description=(
         "pythermalcomfort is a comprehensive toolkit for calculating "
