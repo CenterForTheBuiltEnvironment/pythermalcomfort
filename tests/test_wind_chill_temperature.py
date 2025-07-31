@@ -11,9 +11,9 @@ class TestWct:
 
     def test_wct_results(self) -> None:
         """Test that the function calculates WCT correctly for various inputs."""
-        np.equal(wind_chill_temperature(tdb=-20, v=5).wct, -24.3)
-        np.equal(wind_chill_temperature(tdb=-20, v=15).wct, -29.1)
-        np.equal(wind_chill_temperature(tdb=-20, v=60).wct, -36.5)
+        assert np.isclose(wind_chill_temperature(tdb=-20, v=5).wct, -24.3, atol=0.1)
+        assert np.isclose(wind_chill_temperature(tdb=-20, v=15).wct, -29.1, atol=0.1)
+        assert np.isclose(wind_chill_temperature(tdb=-20, v=60).wct, -36.5, atol=0.1)
 
     # Calculate WCT correctly for single float inputs of temperature and wind speed
     def test_wct_single_float_inputs(self) -> None:
@@ -32,7 +32,7 @@ class TestWct:
     def test_wct_empty_lists(self) -> None:
         """Test that the function handles empty lists for tdb and v inputs."""
         # Test with empty lists
-        np.allclose(
+        assert np.allclose(
             wind_chill_temperature(tdb=[], v=[]).wct, np.array([]), equal_nan=True
         )
 

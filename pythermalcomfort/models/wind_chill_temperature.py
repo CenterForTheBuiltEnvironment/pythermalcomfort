@@ -41,10 +41,10 @@ def wind_chill_temperature(
         from pythermalcomfort.models import wind_chill_temperature
 
         result = wind_chill_temperature(tdb=-5, v=5.5)
-        print(result.wct)  # 1255.2
+        print(result.wct)  # -7.5
 
         result = wind_chill_temperature(tdb=[-5, -10], v=[5.5, 10], round_output=True)
-        print(result.wct)  # [1255.2 1603.9]
+        print(result.wct)  # [-7.5, -15.3]
 
     """
     # Validate inputs using the WCYInputs class

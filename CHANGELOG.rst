@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.4.2 (2025-07-31)
+3.4.3 (2025-07-31)
 ------------------
 
 * fix: wind chill temperature was not imported in pythermalcomfort.models
