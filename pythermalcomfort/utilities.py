@@ -1245,3 +1245,41 @@ class DefaultSkinTemperature(NamedTuple):
     right_thigh: float = 34.3
     right_leg: float = 32.8
     right_foot: float = 33.3
+
+
+def scale_wind_speed(
+    va: float | list[float],
+    h: float | list[float],
+) -> float | list[float]:
+    """Scale a 10 m wind speed to an arbitrary height using a logarithmic wind profile.
+
+    This implementation follows the convention used in UTCI-related literature
+    (Bröde et al., 2012) and adapts the approach implemented in the thermofeel library.
+
+    Parameters
+    ----------
+    va: float or list of floats
+        wind speed measured at 10 m above ground level, [m/s]
+    h : float or list of floats
+        target height at which to scale the wind speed, [m]; must be > 0.01 m
+
+    Returns
+    -------
+    vh : float or list of floats
+        wind speed at height `h`, [m/s]
+
+    Raises
+    ------
+    ValueError
+        If the specified height `h` is less than or equal to 0.01 m.
+
+    """
+
+    va = np.array(va)
+    h = np.array(h)
+
+    if np.any(h <= 0.01):
+        raise ValueError("Height `h` must be greater than 0.01 m.")
+
+    denom = np.log10(10.0 / 0.01)
+    return va * (np.log10(h / 0.01) / denom)
