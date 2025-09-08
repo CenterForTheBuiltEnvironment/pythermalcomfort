@@ -1245,3 +1245,32 @@ class DefaultSkinTemperature(NamedTuple):
     right_thigh: float = 34.3
     right_leg: float = 32.8
     right_foot: float = 33.3
+
+
+def scale_windspeed(va: float | list[float], h: float | list[float]) -> np.ndarray:
+    """Scale wind speed from 10m reference height to a specified height.
+
+    Based on the logarithmic scaling formula from Bröde et al. (2012) [Brode2012]_.
+    Uses a roughness length of 0.01m typical for open terrain conditions.
+
+    Parameters
+    ----------
+    va : float or list of floats
+        Wind speed at 10m reference height, [m/s]
+    h : float or list of floats
+        Height at which wind speed needs to be scaled, [m]
+
+    Returns
+    -------
+    vh : numpy.ndarray
+        Wind speed at height h, [m/s]
+
+    """
+    va = np.array(va)
+    h = np.array(h)
+
+    # Scaling factor: 1/log10(reference_height/roughness_length)
+    c = 1 / np.log10(10 / 0.01)
+    vh = va * np.log10(h / 0.01) * c
+
+    return np.asarray(vh)

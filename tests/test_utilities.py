@@ -13,6 +13,7 @@ from pythermalcomfort.utilities import (
     clo_total_insulation,
     f_svv,
     running_mean_outdoor_temperature,
+    scale_windspeed,
     transpose_sharp_altitude,
     units_converter,
     v_relative,
@@ -401,3 +402,54 @@ def test_validate_type() -> None:
     with pytest.raises(TypeError) as exc_info:
         validate_type(np.str_("hello"), "np_str", allowed)
     assert "np_str must be one of the following types:" in str(exc_info.value)
+
+
+def test_scale_windspeed() -> None:
+    """Test the scale_windspeed function for wind speed scaling from 10m height."""
+    # Test scaling with scalar inputs
+    assert np.allclose(
+        scale_windspeed(5.0, 2.0),
+        5.0 * np.log10(2.0 / 0.01) * (1 / np.log10(10 / 0.01)),
+        atol=1e-6,
+    )
+    assert isinstance(scale_windspeed(5.0, 2.0), np.ndarray)
+
+    # Test with array wind speeds and scalar height
+    assert np.allclose(
+        scale_windspeed([3.0, 6.0, 9.0], 2.0),
+        np.array([3.0, 6.0, 9.0]) * np.log10(2.0 / 0.01) * (1 / np.log10(10 / 0.01)),
+        atol=1e-6,
+    )
+
+    # Test with scalar wind speed and array heights
+    assert np.allclose(
+        scale_windspeed(4.0, [1.0, 2.0, 5.0]),
+        4.0 * np.log10(np.array([1.0, 2.0, 5.0]) / 0.01) * (1 / np.log10(10 / 0.01)),
+        atol=1e-6,
+    )
+
+    # Test with both wind speed and height as arrays
+    assert np.allclose(
+        scale_windspeed([2.0, 4.0, 6.0], [1.0, 2.0, 5.0]),
+        np.array([2.0, 4.0, 6.0])
+        * np.log10(np.array([1.0, 2.0, 5.0]) / 0.01)
+        * (1 / np.log10(10 / 0.01)),
+        atol=1e-6,
+    )
+
+    # Test case when scaling to reference height (10m)
+    result_10m = scale_windspeed(5.0, 10.0)
+    assert np.allclose(
+        result_10m, 5.0 * np.log10(10.0 / 0.01) * (1 / np.log10(10 / 0.01)), atol=1e-6
+    )
+
+    # Test wind speed scaling to lower height
+    result_low = scale_windspeed(5.0, 0.5)
+    assert result_low < 5.0  # Wind speed should be lower at lower height
+
+    # Test wind speed scaling to higher height
+    result_high = scale_windspeed(5.0, 20.0)
+    assert result_high > 5.0  # Wind speed should be higher at greater height
+
+    # Test case with zero wind speed
+    assert np.allclose(scale_windspeed(0.0, 2.0), 0.0, atol=1e-6)

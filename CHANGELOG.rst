@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.4.4 (2025-09-08)
+------------------
+
+* Added the `scale_windspeed` function to scale wind speed from 10m to specified height.
+
 3.4.3 (2025-07-31)
 ------------------
 
