@@ -1245,3 +1245,56 @@ class DefaultSkinTemperature(NamedTuple):
     right_thigh: float = 34.3
     right_leg: float = 32.8
     right_foot: float = 33.3
+
+
+def scale_windspeed(va, h, z0=0.01, round_output=True):
+    """
+    Scale wind speed from 10 m to height h using a logarithmic profile.
+
+    This implements the equation referenced in pythermalcomfort issue #204
+    (“Implement equation to scale wind speed”), adapted from thermofeel and
+    based on Bröde et al. (2012).  The default settings match the reference
+    snippet (z0 = 0.01 m, base-10 logarithm).
+
+    Parameters
+    ----------
+    va : float or array-like
+        Wind speed at 10 m above ground level [m/s].
+    h : float or array-like
+        Target height above ground level [m]; must be > z0.
+    z0 : float, optional
+        Surface roughness length [m]. Default = 0.01 to match the reference.
+    round_output : bool, optional
+        If True, round results to 3 decimals. Default True.
+
+    Returns
+    -------
+    float or numpy.ndarray
+        Wind speed at height h [m/s].
+
+    Notes
+    -----
+    Reference: Bröde et al. (2012), Int J Biometeorol.
+    DOI: 10.1007/s00484-011-0454-1
+
+    The constant c is 1 / log10(10 / z0). With z0 = 0.01, c = 1 / log10(1000) = 1/3.
+    """
+    va = np.asarray(va)
+    h = np.asarray(h)
+
+    if np.any(h <= z0):
+        raise ValueError("h must be greater than z0 (surface roughness length).")
+
+    # constant c per reference issue snippet
+    c = 1.0 / np.log10(10.0 / z0)
+
+    vh = va * np.log10(h / z0) * c
+
+    if round_output:
+        vh = np.around(vh, 3)
+
+    # If the caller passed scalars, return a scalar
+    if np.isscalar(va) and np.isscalar(h):
+        return float(vh)
+
+    return vh
