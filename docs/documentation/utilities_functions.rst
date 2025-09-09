@@ -62,3 +62,8 @@ Wet bulb temperature
 --------------------
 
 .. autofunction:: pythermalcomfort.utilities.wet_bulb_tmp
+
+Wind speed scaling
+------------------
+
+.. autofunction:: pythermalcomfort.utilities.scale_wind_speed
