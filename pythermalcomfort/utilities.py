@@ -1334,6 +1334,16 @@ def scale_windspeed(
             "Height (h) must be greater than surface roughness length (z0)"
         )
 
+    # Ensure z0 is below the 10 m reference height to avoid singular/negative scaling
+    ref_height = 10.0
+    if np.any(z0 >= ref_height):
+        raise ValueError(
+            "Surface roughness length (z0) must be less than the 10 m reference height"
+        )
+
+    # Calculate scaling factor: 1/log10(reference_height/roughness_length)
+    c = 1 / np.log10(ref_height / z0)
+
     # Calculate scaling factor: 1/log10(reference_height/roughness_length)
     c = 1 / np.log10(10 / z0)
 
