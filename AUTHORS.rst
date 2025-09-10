@@ -14,12 +14,14 @@ Contributors
 * `Tyler Hoyt`_
 * Chris Mackey
 * `Jonas Kittner`_
+* `Shunhao Li`_
 
 .. _Federico Tartarini: https://www.linkedin.com/in/federico-tartarini-3991995b/
 .. _Stefano Schiavon: https://www.linkedin.com/in/stefanoschiavon/
 .. _Tyler Hoyt: https://www.linkedin.com/in/tyler-hoyt1/
 .. _Jonas Kittner: https://github.com/jkittner/
 .. _Akihisa Nomoto: https://www.linkedin.com/in/akihisa-nomoto-3b872611b/
+.. _Shunhao Li: https://www.linkedin.com/in/shunhao-li-708691232/
 
 Acknowledgements
 ----------------

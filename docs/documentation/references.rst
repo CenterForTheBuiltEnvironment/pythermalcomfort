@@ -39,3 +39,5 @@ References
 .. [Ji2022] Ji L, Laouadi A, Wang L, Lacasse MA. Development of a bioheat model for older people under hot and cold exposures. Building Simulation. 2022;15(10):1815-1829.
 .. [Yan2025] Yan J, Tong Z, Wang Y, Feng S, Su Y, Song Y, Wen Q, Yin C. From measurements to regulations: An actionable approach for sustainable urban cooling via heat-resilient urban planning. Sustainable Cities and Society. 2025;125:106361.
 .. [Schlatter1987] Schlatter TW. Temperature-humidity index. In: Climatology. Encyclopedia of Earth Science. Springer; 1987. DOI: 10.1007/0-387-30749-4_176
+.. [BRODE2012] Bröde, P., Fiala, D. et al. (2012). Deriving the operational procedure for the Universal Thermal Climate Index (UTCI). International Journal of Biometeorology, 56(3), 481-494. DOI: doi.org/10.1007/s00484-011-0454-1
+.. [SPAGNOLO2003] Spagnolo, J.C. and de Dear, R.J. (2003). A human thermal climatology of subtropical Sydney. International Journal of Climatology, 23, 1383–1395. DOI: doi.org/10.1002/joc.939

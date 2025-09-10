@@ -1248,9 +1248,9 @@ class DefaultSkinTemperature(NamedTuple):
 
 
 def scale_wind_speed(
-    va: float | list[float],
-    h: float | list[float],
-    z0: float | list[float] = 0.01,
+    va: float | list[float] | np.ndarray,
+    h: float | list[float] | np.ndarray,
+    z0: float | list[float] | np.ndarray = 0.01,
 ) -> np.ndarray:
     """Scale a 10 m wind speed to an arbitrary height using a logarithmic wind profile.
 
@@ -1262,11 +1262,11 @@ def scale_wind_speed(
 
     Parameters
     ----------
-    va: float or list of floats
+    va: float or list of floats or np.ndarray
         wind speed measured at 10 m above ground level, [m/s]
-    h : float or list of floats
+    h : float or list of floats or np.ndarray
         target height at which to scale the wind speed, [m]
-    z0: float or list of floats, optional
+    z0: float or list of floats or np.ndarray, optional
         surface roughness length, [m]; default is 0.01 m
         Must satisfy 0 < z0 < 10 to avoid division by zero or negative scaling.
 
@@ -1302,23 +1302,27 @@ def scale_wind_speed(
     # Ensure shapes are compatible
     try:
         va, h, z0 = np.broadcast_arrays(va, h, z0)
-    except ValueError:
-        raise ValueError("va, h, and z0 must be broadcastable to the same shape.")
+    except ValueError as err:
+        raise ValueError(
+            "va, h, and z0 must be broadcastable to the same shape."
+        ) from err
 
     # Physical constraints
-    if not (np.all(np.isfinite(va)) and np.all(np.isfinite(h)) and np.all(np.isfinite(z0))):
+    if not (
+        np.all(np.isfinite(va)) and np.all(np.isfinite(h)) and np.all(np.isfinite(z0))
+    ):
         raise ValueError("Inputs `va`, `h`, `z0` must be finite.")
     if np.any(va < 0.0):
         raise ValueError("Wind speed `va` must be non-negative.")
+    if np.any(z0 <= 0.0) or np.any(z0 >= zref_10m):
+        raise ValueError("Surface roughness length `z0` must satisfy 0 < z0 < 10.")
     if np.any(h <= z0):
         raise ValueError("Height `h` must be greater than `z0`.")
     if np.any(h <= 0.0):
         raise ValueError("Height `h` must be positive.")
-    if np.any(z0 <= 0.0) or np.any(z0 >= zref_10m):
-        raise ValueError("Surface roughness length `z0` must satisfy 0 < z0 < 10.")
 
     # Precompute the inverse of the denominator to optimize performance
     inv_denom = 1.0 / np.log10(zref_10m / z0)
     vh = va * np.log10(h / z0) * inv_denom
 
-    return np.asarray(vh)
+    return vh
