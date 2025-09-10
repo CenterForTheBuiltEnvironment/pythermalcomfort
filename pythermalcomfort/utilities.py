@@ -1282,19 +1282,20 @@ def scale_windspeed(
     --------
     >>> # Scale wind speed to 2m height (default open terrain z0=0.01)
     >>> scale_windspeed(5.0, 2.0)
-    array([4.0])
+    array(3.83471...)
 
     >>> # Scale wind speed to 2m height over rough terrain
     >>> scale_windspeed(5.0, 2.0, z0=0.1)
-    array([3.2])
+    array(3.25257...)
 
     >>> # Scale multiple wind speeds to different heights
     >>> scale_windspeed([3.0, 5.0], [1.5, 2.5])
-    array([2.4, 4.4])
+    array([2.17635..., 3.99765...])
 
     >>> # Scale with different surface roughness for each measurement
     >>> scale_windspeed([3.0, 5.0], [1.5, 2.5], [0.01, 0.1])
-    array([2.4, 3.9])
+    array([2.17635..., 3.50515...])
+
     """
     # Validate input types
     allowed_types = (float, int, list, tuple, np.ndarray)
