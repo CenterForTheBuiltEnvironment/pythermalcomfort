@@ -406,50 +406,85 @@ def test_validate_type() -> None:
 
 def test_scale_windspeed() -> None:
     """Test the scale_windspeed function for wind speed scaling from 10m height."""
-    # Test scaling with scalar inputs
-    assert np.allclose(
-        scale_windspeed(5.0, 2.0),
-        5.0 * np.log10(2.0 / 0.01) * (1 / np.log10(10 / 0.01)),
-        atol=1e-6,
-    )
-    assert isinstance(scale_windspeed(5.0, 2.0), np.ndarray)
 
-    # Test with array wind speeds and scalar height
-    assert np.allclose(
-        scale_windspeed([3.0, 6.0, 9.0], 2.0),
-        np.array([3.0, 6.0, 9.0]) * np.log10(2.0 / 0.01) * (1 / np.log10(10 / 0.01)),
-        atol=1e-6,
-    )
+    # Basic functionality - scalar and array inputs
+    va, h, z0 = 5.0, 2.0, 0.01
+    expected = va * np.log10(h / z0) / np.log10(10 / z0)
+    result = scale_windspeed(va, h, z0)
+    assert np.allclose(result, expected, atol=1e-6)
+    assert isinstance(result, np.ndarray)
 
-    # Test with scalar wind speed and array heights
-    assert np.allclose(
-        scale_windspeed(4.0, [1.0, 2.0, 5.0]),
-        4.0 * np.log10(np.array([1.0, 2.0, 5.0]) / 0.01) * (1 / np.log10(10 / 0.01)),
-        atol=1e-6,
-    )
+    # Array inputs test
+    va_array = [3.0, 6.0]
+    h_array = [1.0, 2.0]
+    expected = np.array(va_array) * np.log10(np.array(h_array) / z0) / np.log10(10 / z0)
+    result = scale_windspeed(va_array, h_array, z0)
+    assert np.allclose(result, expected, atol=1e-6)
 
-    # Test with both wind speed and height as arrays
-    assert np.allclose(
-        scale_windspeed([2.0, 4.0, 6.0], [1.0, 2.0, 5.0]),
-        np.array([2.0, 4.0, 6.0])
-        * np.log10(np.array([1.0, 2.0, 5.0]) / 0.01)
-        * (1 / np.log10(10 / 0.01)),
-        atol=1e-6,
-    )
+    # Mathematical correctness - wind speed increases with height
+    result_low = scale_windspeed(5.0, 0.5, 0.01)
+    result_high = scale_windspeed(5.0, 20.0, 0.01)
+    assert result_low < 5.0 < result_high
 
-    # Test case when scaling to reference height (10m)
-    result_10m = scale_windspeed(5.0, 10.0)
-    assert np.allclose(
-        result_10m, 5.0 * np.log10(10.0 / 0.01) * (1 / np.log10(10 / 0.01)), atol=1e-6
-    )
+    # Terrain influence - wind speed decreases with rougher terrain
+    z0_smooth, z0_open, z0_rough = 0.001, 0.01, 0.1
+    va_test, h_test = 5.0, 2.0
+    result_smooth = scale_windspeed(va_test, h_test, z0_smooth)
+    result_open = scale_windspeed(va_test, h_test, z0_open)
+    result_rough = scale_windspeed(va_test, h_test, z0_rough)
+    assert result_smooth > result_open > result_rough
 
-    # Test wind speed scaling to lower height
-    result_low = scale_windspeed(5.0, 0.5)
-    assert result_low < 5.0  # Wind speed should be lower at lower height
+    # Zero wind speed boundary condition
+    assert np.allclose(scale_windspeed(0.0, 2.0, 0.01), 0.0, atol=1e-6)
+    assert np.allclose(scale_windspeed([0.0, 2.0], 2.0, 0.01)[0], 0.0, atol=1e-6)
 
-    # Test wind speed scaling to higher height
-    result_high = scale_windspeed(5.0, 20.0)
-    assert result_high > 5.0  # Wind speed should be higher at greater height
+    # Input validation - va boundaries
+    with pytest.raises(ValueError, match="Wind speed \\(va\\) must be non-negative"):
+        scale_windspeed(-1.0, 2.0, 0.01)
+    with pytest.raises(ValueError, match="Wind speed \\(va\\) must be non-negative"):
+        scale_windspeed([1.0, -2.0], 2.0, 0.01)
 
-    # Test case with zero wind speed
-    assert np.allclose(scale_windspeed(0.0, 2.0), 0.0, atol=1e-6)
+    # Input validation - h boundaries
+    with pytest.raises(ValueError, match="Height \\(h\\) must be positive"):
+        scale_windspeed(5.0, 0.0, 0.01)
+    with pytest.raises(ValueError, match="Height \\(h\\) must be positive"):
+        scale_windspeed(5.0, -1.0, 0.01)
+    with pytest.raises(ValueError, match="Height \\(h\\) must be positive"):
+        scale_windspeed(5.0, [1.0, 0.0], 0.01)
+
+    # Input validation - z0 boundaries
+    with pytest.raises(
+        ValueError, match="Surface roughness length \\(z0\\) must be positive"
+    ):
+        scale_windspeed(5.0, 2.0, 0.0)
+    with pytest.raises(
+        ValueError, match="Surface roughness length \\(z0\\) must be positive"
+    ):
+        scale_windspeed(5.0, 2.0, -0.01)
+
+    # Input validation - h vs z0 relationship
+    with pytest.raises(
+        ValueError,
+        match="Height \\(h\\) must be greater than surface roughness length \\(z0\\)",
+    ):
+        scale_windspeed(5.0, 0.01, 0.01)  # h == z0
+    with pytest.raises(
+        ValueError,
+        match="Height \\(h\\) must be greater than surface roughness length \\(z0\\)",
+    ):
+        scale_windspeed(5.0, 0.005, 0.01)  # h < z0
+    with pytest.raises(
+        ValueError,
+        match="Height \\(h\\) must be greater than surface roughness length \\(z0\\)",
+    ):
+        scale_windspeed(5.0, [1.0, 0.01], 0.01)
+
+    # Input validation - data types
+    with pytest.raises(TypeError):
+        scale_windspeed("invalid", 2.0, 0.01)
+    with pytest.raises(TypeError):
+        scale_windspeed(5.0, "invalid", 0.01)
+    with pytest.raises(TypeError, match="z0 must be a numeric scalar"):
+        scale_windspeed(5.0, 2.0, "invalid")
+    with pytest.raises(TypeError, match="z0 must be a numeric scalar"):
+        scale_windspeed(5.0, 2.0, [0.01])

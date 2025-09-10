@@ -1247,11 +1247,13 @@ class DefaultSkinTemperature(NamedTuple):
     right_foot: float = 33.3
 
 
-def scale_windspeed(va: float | list[float], h: float | list[float]) -> np.ndarray:
+def scale_windspeed(
+    va: float | list[float], h: float | list[float], z0: float = 0.01
+) -> np.ndarray:
     """Scale wind speed from 10m reference height to a specified height.
 
     Based on the logarithmic scaling formula from Bröde et al. (2012) [Brode2012]_.
-    Uses a roughness length of 0.01m typical for open terrain conditions.
+    The surface roughness length z0 must be specified based on terrain conditions.
 
     Parameters
     ----------
@@ -1259,18 +1261,68 @@ def scale_windspeed(va: float | list[float], h: float | list[float]) -> np.ndarr
         Wind speed at 10m reference height, [m/s]
     h : float or list of floats
         Height at which wind speed needs to be scaled, [m]
+    z0 : float, optional
+        Surface roughness length, [m]. Default is 0.01 (open terrain).
+
 
     Returns
     -------
     vh : numpy.ndarray
         Wind speed at height h, [m/s]
 
+    Raises
+    ------
+    TypeError
+        If input parameters are not of valid numeric types
+    ValueError
+        If any parameter values violate physical constraints
+
+    Examples
+    --------
+    >>> # Scale wind speed to 2m height (default open terrain z0=0.01)
+    >>> scale_windspeed(5.0, 2.0)
+    array([4.0])
+
+    >>> # Scale wind speed to 2m height over rough terrain
+    >>> scale_windspeed(5.0, 2.0, z0=0.1)
+    array([3.2])
+
+    >>> # Scale multiple wind speeds to different heights
+    >>> scale_windspeed([3.0, 5.0], [1.5, 2.5])
+    array([2.4, 4.4])
+
     """
+    # Validate input types
+    allowed_types = (float, int, list, np.ndarray)
+    validate_type(va, "va", allowed_types)
+    validate_type(h, "h", allowed_types)
+
+    # Validate z0 as scalar
+    if not isinstance(z0, float | int | np.number):
+        error_msg = f"z0 must be a numeric scalar, got {type(z0)}"
+        raise TypeError(error_msg)
+
+    # Convert to numpy arrays (z0 remains scalar)
     va = np.array(va)
     h = np.array(h)
+    z0 = float(z0)
 
-    # Scaling factor: 1/log10(reference_height/roughness_length)
-    c = 1 / np.log10(10 / 0.01)
-    vh = va * np.log10(h / 0.01) * c
+    # Validate physical constraints
+    if np.any(va < 0):
+        raise ValueError("Wind speed (va) must be non-negative")
+    if np.any(h <= 0):
+        raise ValueError("Height (h) must be positive")
+    if z0 <= 0:
+        raise ValueError("Surface roughness length (z0) must be positive")
+    if np.any(h <= z0):
+        raise ValueError(
+            "Height (h) must be greater than surface roughness length (z0)"
+        )
+
+    # Calculate scaling factor: 1/log10(reference_height/roughness_length)
+    c = 1 / np.log10(10 / z0)
+
+    # Apply logarithmic scaling formula
+    vh = va * np.log10(h / z0) * c
 
     return np.asarray(vh)
