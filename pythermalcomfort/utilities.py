@@ -1316,10 +1316,10 @@ def scale_wind_speed(
         raise ValueError("Wind speed `va` must be non-negative.")
     if np.any(z0 <= 0.0) or np.any(z0 >= zref_10m):
         raise ValueError("Surface roughness length `z0` must satisfy 0 < z0 < 10.")
-    if np.any(h <= z0):
-        raise ValueError("Height `h` must be greater than `z0`.")
     if np.any(h <= 0.0):
         raise ValueError("Height `h` must be positive.")
+    if np.any(h <= z0):
+        raise ValueError("Height `h` must be greater than `z0`.")
 
     # Precompute the inverse of the denominator to optimize performance
     inv_denom = 1.0 / np.log10(zref_10m / z0)

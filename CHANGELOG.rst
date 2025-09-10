@@ -2,7 +2,7 @@ Changelog
 =========
 3.4.5 (2025-09-10)
 ------------------
-* Added the `scale_wind_speed` function to scale wind speed measurements to a standard height of 10 meters.
+* Added the `scale_wind_speed` function to scale wind speeds measured at 10 m to arbitrary heights using a logarithmic profile.
 
 3.4.3 (2025-07-31)
 ------------------

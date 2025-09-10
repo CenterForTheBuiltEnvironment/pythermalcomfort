@@ -65,3 +65,9 @@ def test_scale_wind_speed() -> None:
         scale_wind_speed(va=3.0, h=0.01, z0=0.01)
     with pytest.raises(ValueError):
         scale_wind_speed(va=[3.0, 4.0], h=[0.02, 0.01], z0=[0.02, 0.01])
+
+    # --- Invalid: h <= 0 ---
+    with pytest.raises(ValueError):
+        scale_wind_speed(va=3.0, h=0.0)
+    with pytest.raises(ValueError):
+        scale_wind_speed(va=3.0, h=-1.0)
