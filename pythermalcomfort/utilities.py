@@ -1303,10 +1303,13 @@ def scale_windspeed(
     validate_type(h, "h", allowed_types)
     validate_type(z0, "z0", allowed_types)
 
-    # Convert to numpy arrays
-    va = np.asarray(va, dtype=float)
-    h = np.asarray(h, dtype=float)
-    z0 = np.asarray(z0, dtype=float)
+    # Convert to numpy arrays (strict numeric casting)
+    try:
+        va = np.asarray(va, dtype=float)
+        h = np.asarray(h, dtype=float)
+        z0 = np.asarray(z0, dtype=float)
+    except (TypeError, ValueError) as e:
+        raise TypeError("va, h, and z0 must be numeric.") from e
 
     # Validate array shapes are compatible (numpy broadcasting rules)
     try:
