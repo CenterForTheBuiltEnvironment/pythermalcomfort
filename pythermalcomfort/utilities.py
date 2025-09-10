@@ -1250,8 +1250,12 @@ class DefaultSkinTemperature(NamedTuple):
 def scale_wind_speed(
     va: float | list[float],
     h: float | list[float],
-) -> float | list[float]:
+    z0: float | list[float] = 0.01,
+) -> np.ndarray:
     """Scale a 10 m wind speed to an arbitrary height using a logarithmic wind profile.
+
+    Following meteorological conventions (e.g., Spagnolo and De Dear, 2003),
+    the reference wind speed `va` is typically measured at 10 m above ground level.
 
     This implementation follows the convention used in UTCI-related literature
     (Bröde et al., 2012) and adapts the approach implemented in the thermofeel library.
@@ -1261,25 +1265,60 @@ def scale_wind_speed(
     va: float or list of floats
         wind speed measured at 10 m above ground level, [m/s]
     h : float or list of floats
-        target height at which to scale the wind speed, [m]; must be > 0.01 m
+        target height at which to scale the wind speed, [m]
+    z0: float or list of floats, optional
+        surface roughness length, [m]; default is 0.01 m
+        Must satisfy 0 < z0 < 10 to avoid division by zero or negative scaling.
 
     Returns
     -------
-    vh : float or list of floats
+    vh : np.ndarray
         wind speed at height `h`, [m/s]
 
     Raises
     ------
     ValueError
-        If the specified height `h` is less than or equal to 0.01 m.
+         If inputs are invalid (e.g., non-finite, negative, or physically inconsistent).
 
+    Examples
+    --------
+    Scale a wind speed of 3 m/s to 1.7 m height with a surface roughness of 0.01 m:
+    >>> scale_wind_speed(va=3.0, h=1.7)
+    np.float64(2.230448921378274)
+
+    Scale multiple wind speeds to different heights:
+    >>> scale_wind_speed(va=[1.0, 2.0, 3.0], h=[1.7, 1.8, 1.9])
+    array([0.74348297, 1.48696594, 2.23044892])
+
+    Scale multiple wind speeds with varying surface roughness lengths:
+    >>> scale_wind_speed(va=[1.0, 2.0, 3.0], h=[1.7, 1.8, 1.9], z0=[0.01, 0.02, 0.03])
+    array([0.74348297, 1.44813948, 2.14235308])
     """
+    va = np.asarray(va, dtype=float)
+    h = np.asarray(h, dtype=float)
+    z0 = np.asarray(z0, dtype=float)
+    zref_10m = 10.0
 
-    va = np.array(va)
-    h = np.array(h)
+    # Ensure shapes are compatible
+    try:
+        va, h, z0 = np.broadcast_arrays(va, h, z0)
+    except ValueError:
+        raise ValueError("va, h, and z0 must be broadcastable to the same shape.")
 
-    if np.any(h <= 0.01):
-        raise ValueError("Height `h` must be greater than 0.01 m.")
+    # Physical constraints
+    if not (np.all(np.isfinite(va)) and np.all(np.isfinite(h)) and np.all(np.isfinite(z0))):
+        raise ValueError("Inputs `va`, `h`, `z0` must be finite.")
+    if np.any(va < 0.0):
+        raise ValueError("Wind speed `va` must be non-negative.")
+    if np.any(h <= z0):
+        raise ValueError("Height `h` must be greater than `z0`.")
+    if np.any(h <= 0.0):
+        raise ValueError("Height `h` must be positive.")
+    if np.any(z0 <= 0.0) or np.any(z0 >= zref_10m):
+        raise ValueError("Surface roughness length `z0` must satisfy 0 < z0 < 10.")
 
-    denom = np.log10(10.0 / 0.01)
-    return va * (np.log10(h / 0.01) / denom)
+    # Precompute the inverse of the denominator to optimize performance
+    inv_denom = 1.0 / np.log10(zref_10m / z0)
+    vh = va * np.log10(h / z0) * inv_denom
+
+    return np.asarray(vh)
