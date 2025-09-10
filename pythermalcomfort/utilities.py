@@ -1340,4 +1340,5 @@ def scale_windspeed(
     # Apply logarithmic scaling formula
     vh = va * np.log10(h / z0) * c
 
-    return np.asarray(vh)
+    vh = va_valid * scale
+    return vh
