@@ -1248,7 +1248,7 @@ class DefaultSkinTemperature(NamedTuple):
 
 
 def scale_windspeed(
-    va: float | list[float], h: float | list[float], z0: float = 0.01
+    va: float | list[float], h: float | list[float], z0: float | list[float] = 0.01
 ) -> np.ndarray:
     """Scale wind speed from 10m reference height to a specified height.
 
@@ -1261,8 +1261,9 @@ def scale_windspeed(
         Wind speed at 10m reference height, [m/s]
     h : float or list of floats
         Height at which wind speed needs to be scaled, [m]
-    z0 : float, optional
-        Surface roughness length, [m]. Default is 0.01 (open terrain).
+    z0 : float or list of floats, optional
+        Surface roughness length, [m]. Can be a scalar for uniform terrain
+        or an array for variable terrain conditions. Default is 0.01 (open terrain).
 
 
     Returns
@@ -1291,28 +1292,38 @@ def scale_windspeed(
     >>> scale_windspeed([3.0, 5.0], [1.5, 2.5])
     array([2.4, 4.4])
 
+    >>> # Scale with different surface roughness for each measurement
+    >>> scale_windspeed([3.0, 5.0], [1.5, 2.5], [0.01, 0.1])
+    array([2.4, 3.9])
     """
     # Validate input types
-    allowed_types = (float, int, list, np.ndarray)
+    allowed_types = (float, int, list, tuple, np.ndarray)
     validate_type(va, "va", allowed_types)
     validate_type(h, "h", allowed_types)
+    validate_type(z0, "z0", allowed_types)
 
-    # Validate z0 as scalar
-    if not isinstance(z0, (float, int, np.number)):
-        error_msg = f"z0 must be a numeric scalar, got {type(z0)}"
-        raise TypeError(error_msg)
+    # Convert to numpy arrays
+    va = np.asarray(va, dtype=float)
+    h = np.asarray(h, dtype=float)
+    z0 = np.asarray(z0, dtype=float)
 
-    # Convert to numpy arrays (z0 remains scalar)
-    va = np.array(va)
-    h = np.array(h)
-    z0 = float(z0)
+    # Validate array shapes are compatible (numpy broadcasting rules)
+    try:
+        # Test broadcasting compatibility
+        np.broadcast_arrays(va, h, z0)
+    except ValueError as e:
+        error_msg = (
+            f"Array shapes are incompatible for broadcasting: "
+            f"va.shape={va.shape}, h.shape={h.shape}, z0.shape={z0.shape}"
+        )
+        raise ValueError(error_msg) from e
 
     # Validate physical constraints
     if np.any(va < 0):
         raise ValueError("Wind speed (va) must be non-negative")
     if np.any(h <= 0):
         raise ValueError("Height (h) must be positive")
-    if z0 <= 0:
+    if np.any(z0 <= 0):
         raise ValueError("Surface roughness length (z0) must be positive")
     if np.any(h <= z0):
         raise ValueError(
