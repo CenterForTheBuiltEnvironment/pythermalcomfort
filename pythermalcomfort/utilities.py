@@ -1298,7 +1298,7 @@ def scale_windspeed(
     validate_type(h, "h", allowed_types)
 
     # Validate z0 as scalar
-    if not isinstance(z0, float | int | np.number):
+    if not isinstance(z0, (float, int, np.number)):
         error_msg = f"z0 must be a numeric scalar, got {type(z0)}"
         raise TypeError(error_msg)
 
