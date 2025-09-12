@@ -54,7 +54,7 @@ def test_scale_winds_peed_array() -> None:
     assert np.allclose(result, expected, rtol=1e-5)
 
 
-def test_scale_winds_peed_broadcasting() -> None:
+def test_scale_wind_speed_broadcasting() -> None:
     """Test broadcasting with different z0 for each measurement."""
     v10 = [3.0, 5.0]
     z2 = [1.5, 2.5]
@@ -67,7 +67,6 @@ def test_scale_winds_peed_broadcasting() -> None:
     )
     result = scale_wind_speed_log(v10, z2, z0=z0, round_output=False)
     assert np.allclose(result, expected, rtol=1e-5)
-
 
 def test_scale_winds_peed_with_displacement() -> None:
     """Test with nonzero displacement height d."""
