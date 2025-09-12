@@ -93,15 +93,26 @@ For more examples and detailed usage, check out models and indices in the models
 
 .. _embedded-content:
 
-Sponsor the Maintainer of pythermalcomfort
-==========================================
+Sponsor the Maintainers of pythermalcomfort
+===========================================
 
-.. container:: embedded-content
+If you find this project useful, please consider supporting the maintainers.
+Maintaining an open\-source scientific package requires substantial time and
+effort: developing and reviewing code, triaging issues, keeping CI and docs
+healthy, and helping users. Financial contributions directly help sustain
+that work.
 
-   .. raw:: html
+Ways to support
+---------------
 
-      <iframe src="https://github.com/sponsors/FedericoTartarini/card" title="Sponsor FedericoTartarini" height="225" width="600" style="border: 0;"></iframe>
+- Sponsor via GitHub: https://github.com/sponsors/FedericoTartarini
+- Contribute code, tests, or documentation: open a PR against `pythermalcomfort`
+- Report bugs or request features with a minimal reproduction in `issues`
+- Help with testing, translations, or reviewing pull requests
+- Star or share the project to increase visibility
 
+Any support—financial or contribution\-based—is greatly appreciated and helps
+keep the project healthy and maintained.
 
 Contribute
 ==========
