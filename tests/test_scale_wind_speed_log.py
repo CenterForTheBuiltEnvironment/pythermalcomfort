@@ -17,7 +17,7 @@ def test_compare_results_wind_profile_calculator() -> None:
     expected = 5  # m/s from Wind Profile Calculator
     result = scale_wind_speed_log(v_z1=v10, z2=z2, z1=z1, z0=z0, round_output=False)
     print(result)
-    assert np.allclose(result, expected, rtol=1e-2)
+    assert np.allclose(result.v_z2, expected, rtol=1e-2)
 
     v10 = 7.69  # m/s
     z2 = 2.0  # m
@@ -25,7 +25,7 @@ def test_compare_results_wind_profile_calculator() -> None:
     expected = 5  # m/s from Wind Profile Calculator
     result = scale_wind_speed_log(v_z1=v10, z2=z2, z1=10, z0=z0, round_output=False)
     print(result)
-    assert np.allclose(result, expected, rtol=1e-2)
+    assert np.allclose(result.v_z2, expected, rtol=1e-2)
 
     v_z1 = 5.0  # m/s
     z2 = 90.0  # m
@@ -33,7 +33,7 @@ def test_compare_results_wind_profile_calculator() -> None:
     expected = 7.39  # m/s from Wind Profile Calculator
     result = scale_wind_speed_log(v_z1=v_z1, z2=z2, z1=10, z0=z0, round_output=False)
     print(result)
-    assert np.allclose(result, expected, rtol=1e-2)
+    assert np.allclose(result.v_z2, expected, rtol=1e-2)
 
 
 def test_scale_winds_speed_scalar() -> None:
@@ -42,7 +42,7 @@ def test_scale_winds_speed_scalar() -> None:
     z2 = 2.0
     expected = v10 * np.log((z2 - 0.0) / 0.01) / np.log((10.0 - 0.0) / 0.01)
     result = scale_wind_speed_log(v10, z2, round_output=False)
-    assert np.allclose(result, expected, rtol=1e-5)
+    assert np.allclose(result.v_z2, expected, rtol=1e-5)
 
 
 def test_scale_winds_speed_array() -> None:
@@ -51,7 +51,7 @@ def test_scale_winds_speed_array() -> None:
     z2 = np.array([1.5, 2.5])
     expected = v10 * np.log((z2 - 0.0) / 0.01) / np.log((10.0 - 0.0) / 0.01)
     result = scale_wind_speed_log(v10, z2, round_output=False)
-    assert np.allclose(result, expected, rtol=1e-5)
+    assert np.allclose(result.v_z2, expected, rtol=1e-5)
 
 
 def test_scale_wind_speed_broadcasting() -> None:
@@ -66,7 +66,7 @@ def test_scale_wind_speed_broadcasting() -> None:
         ]
     )
     result = scale_wind_speed_log(v10, z2, z0=z0, round_output=False)
-    assert np.allclose(result, expected, rtol=1e-5)
+    assert np.allclose(result.v_z2, expected, rtol=1e-5)
 
 
 def test_scale_winds_speed_with_displacement() -> None:
@@ -78,7 +78,7 @@ def test_scale_winds_speed_with_displacement() -> None:
     d = 0.5
     expected = v10 * np.log((z2 - d) / z0) / np.log((z1 - d) / z0)
     result = scale_wind_speed_log(v10, z2, z1=z1, z0=z0, d=d, round_output=False)
-    assert np.allclose(result, expected, rtol=1e-5)
+    assert np.allclose(result.v_z2, expected, rtol=1e-5)
 
 
 def test_invalid_types() -> None:
@@ -124,7 +124,7 @@ def test_edge_case_z2_less_than_z1() -> None:
     z2 = 2.0
     z1 = 10.0
     result = scale_wind_speed_log(v10, z2, z1=z1, round_output=False)
-    assert result < v10
+    assert result.v_z2 < v10
 
 
 def test_large_and_small_z0() -> None:
@@ -133,7 +133,7 @@ def test_large_and_small_z0() -> None:
     z2 = 2.0
     # Very small z0
     result_small = scale_wind_speed_log(v10, z2, z0=1e-6, round_output=False)
-    assert result_small > 0
+    assert result_small.v_z2 > 0
     # Very large z0 (should be close to zero wind speed)
     result_large = scale_wind_speed_log(v10, z2, z0=1.0, round_output=False)
-    assert result_large > 0
+    assert result_large.v_z2 > 0
