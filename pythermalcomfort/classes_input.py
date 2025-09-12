@@ -1062,8 +1062,8 @@ class ScaleWindSpeedLogInputs(BaseInputs):
         except ValueError as e:
             msg = (
                 "Input shapes are incompatible for broadcasting: "
-                + f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
-                + f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
+                 f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
+                 f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
             )
             raise ValueError(msg) from e
 
@@ -1073,6 +1073,10 @@ class ScaleWindSpeedLogInputs(BaseInputs):
 
         if np.any(z0 <= 0):
             raise ValueError("Surface roughness length (z0) must be positive ( > 0 )")
+
+        # Displacement height cannot be negative
+        if np.any(d < 0):
+            raise ValueError("Zero-plane displacement height (d) must be >= 0")
 
         if np.any(z2 <= 0):
             raise ValueError("Target height (z2) must be positive ( > 0 )")
@@ -1090,17 +1094,14 @@ class ScaleWindSpeedLogInputs(BaseInputs):
                 "Reference height (z1) must be greater than surface roughness (z0)"
             )
 
-        # Ensure heights minus displacement are positive for log arguments
-        if np.any((z1 - d) <= 0):
-            raise ValueError("Reference height minus displacement (z1 - d) must be > 0")
-
-        if np.any((z2 - d) <= 0):
-            raise ValueError("Target height minus displacement (z2 - d) must be > 0")
-
-        # Ensure z0 is less than the reference height to avoid singular/invalid scaling
-        if np.any(z0 >= z1):
+        # Ensure log arguments are strictly > 1 i.e., (z - d) > z0
+        if np.any((z1 - d) <= z0):
             raise ValueError(
-                "Surface roughness length (z0) must be less than reference height (z1)"
+                "Reference height minus displacement (z1 - d) must be > z0"
+            )
+        if np.any((z2 - d) <= z0):
+            raise ValueError(
+                "Target height minus displacement (z2 - d) must be > z0"
             )
 
         # Prevent log denominator being zero or extremely close to zero
