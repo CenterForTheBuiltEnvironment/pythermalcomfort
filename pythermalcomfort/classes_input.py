@@ -1062,8 +1062,8 @@ class ScaleWindSpeedLogInputs(BaseInputs):
         except ValueError as e:
             msg = (
                 "Input shapes are incompatible for broadcasting: "
-                 f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
-                 f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
+                f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
+                f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
             )
             raise ValueError(msg) from e
 
@@ -1100,9 +1100,7 @@ class ScaleWindSpeedLogInputs(BaseInputs):
                 "Reference height minus displacement (z1 - d) must be > z0"
             )
         if np.any((z2 - d) <= z0):
-            raise ValueError(
-                "Target height minus displacement (z2 - d) must be > z0"
-            )
+            raise ValueError("Target height minus displacement (z2 - d) must be > z0")
 
         # Prevent log denominator being zero or extremely close to zero
         denom = np.log((z1 - d) / z0)

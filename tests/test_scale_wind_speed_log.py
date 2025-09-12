@@ -68,6 +68,7 @@ def test_scale_wind_speed_broadcasting() -> None:
     result = scale_wind_speed_log(v10, z2, z0=z0, round_output=False)
     assert np.allclose(result, expected, rtol=1e-5)
 
+
 def test_scale_winds_peed_with_displacement() -> None:
     """Test with nonzero displacement height d."""
     v10 = 5.0
