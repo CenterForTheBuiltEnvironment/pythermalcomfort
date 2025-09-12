@@ -227,16 +227,18 @@ class BaseInputs:
     # ----- helper methods -----
     @staticmethod
     def _is_pandas_series(obj: Any) -> bool:
-        return type(obj).__name__ == "Series"
+        return type(obj).__name__ in ("Series", "Index")
 
     def _convert_series_to_list(self, obj: Any) -> Any:
         return obj.tolist() if self._is_pandas_series(obj) else obj
 
     @staticmethod
     def _validate_str_values(name: str, value: Any, allowed: list[str]) -> None:
-        vals = np.atleast_1d(value).astype(str)
-        allowed_lower = {a.lower() for a in allowed}
-        for v in vals:
+        arr = np.atleast_1d(value)
+        # Coerce Enums to their .value, then to str
+        coerced = [v.value if isinstance(v, Enum) else str(v) for v in arr.tolist()]
+        allowed_lower = {str(a).lower() for a in allowed}
+        for v in coerced:
             if v.lower() not in allowed_lower:
                 msg = f"{name} must be one of {allowed!r}"
                 raise ValueError(msg)
@@ -1110,7 +1112,7 @@ class ScaleWindSpeedLogInputs(BaseInputs):
 
         # Prevent log denominator being zero or extremely close to zero
         denom = np.log((z1 - d) / z0)
-        if np.any(np.isclose(denom, 0.0)):
+        if np.any(denom <= 1e-12):
             raise ValueError(
                 "Logarithmic denominator log((z1 - d)/z0) is zero or numerically unstable"
             )
