@@ -36,7 +36,7 @@ def test_compare_results_wind_profile_calculator() -> None:
     assert np.allclose(result, expected, rtol=1e-2)
 
 
-def test_scale_winds_peed_scalar() -> None:
+def test_scale_winds_speed_scalar() -> None:
     """Test scaling wind speed from 10m to 2m (scalar inputs)."""
     v10 = 5.0
     z2 = 2.0
@@ -45,7 +45,7 @@ def test_scale_winds_peed_scalar() -> None:
     assert np.allclose(result, expected, rtol=1e-5)
 
 
-def test_scale_winds_peed_array() -> None:
+def test_scale_winds_speed_array() -> None:
     """Test scaling wind speed for array inputs."""
     v10 = np.array([3.0, 5.0])
     z2 = np.array([1.5, 2.5])
@@ -69,7 +69,7 @@ def test_scale_wind_speed_broadcasting() -> None:
     assert np.allclose(result, expected, rtol=1e-5)
 
 
-def test_scale_winds_peed_with_displacement() -> None:
+def test_scale_winds_speed_with_displacement() -> None:
     """Test with nonzero displacement height d."""
     v10 = 5.0
     z2 = 2.0

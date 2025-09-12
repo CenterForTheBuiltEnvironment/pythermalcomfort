@@ -19,7 +19,7 @@ References
 .. [Havenith2016] Havenith, G., Fiala, D., 2016. Thermal indices and thermophysiological modeling for heat stress. Compr. Physiol. 6, 255–302. DOI: doi.org/10.1002/cphy.c140051
 .. [Blazejczyk2012] Blazejczyk, K., Epstein, Y., Jendritzky, G., Staiger, H., Tinz, B., 2012. Comparison of UTCI to selected thermal indices. Int. J. Biometeorol. 56, 515–535. DOI: doi.org/10.1007/s00484-011-0453-2
 .. [Oke1987] Oke, T.R. (1987). Boundary Layer Climates (2nd ed.). Routledge. DOI: https://doi.org/10.4324/9780203407219
-.. [Sharples2023] Wendy Sharples, Stuart Baron-Hay (2023) Generating surface wind grids Bureau Research Report No. 088. URL: https://www.bom.gov.au/research/publications/researchreports/BRR-088.pdf
+.. [Sharples2023] Sharples, W., & Baron-Hay, S. (2023). Generating surface wind grids. Bureau Research Report No. 088. URL: https://www.bom.gov.au/research/publications/researchreports/BRR-088.pdf
 .. [Steadman1984] Steadman RG (1984) A universal scale of apparent temperature. J Appl Meteorol Climatol 23:1674–1687
 .. [ashrae2017] ASHRAE, 2017. 2017 ASHRAE Handbook Fundamentals. Atlanta.
 .. [Hoppe1999] Höppe P. The physiological equivalent temperature - a universal index for the biometeorological assessment of the thermal environment. Int J Biometeorol. 1999 Oct;43(2):71-5. doi: 10.1007/s004840050118. PMID: 10552310.

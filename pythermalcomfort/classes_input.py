@@ -178,9 +178,15 @@ class BaseInputs:
 
     def __post_init__(self) -> None:
         """Validate and normalize fields using metadata declared on each field."""
-        # Validate units quickly
-        if self.units.upper() not in [Units.SI.value, Units.IP.value]:
+        """Validate and normalize fields using metadata declared on each field."""
+        # Validate and normalise units
+        units_str = (
+            self.units.value if isinstance(self.units, Units) else str(self.units)
+        )
+        units_up = units_str.upper()
+        if units_up not in (Units.SI.value, Units.IP.value):
             raise ValueError("Units must be either 'SI' or 'IP'")
+        self.units = units_up
 
         # Validate booleans from metadata
         for f in dataclass_fields(self):

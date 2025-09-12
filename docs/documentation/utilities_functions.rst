@@ -38,11 +38,6 @@ Relative air speed
 
 .. autofunction:: pythermalcomfort.utilities.v_relative
 
-Scale wind speed
-----------------
-
-.. autofunction:: pythermalcomfort.utils.scale_wind_speed_log
-
 Running mean outdoor temperature
 --------------------------------
 
@@ -67,3 +62,11 @@ Wet bulb temperature
 --------------------
 
 .. autofunction:: pythermalcomfort.utilities.wet_bulb_tmp
+
+Utils functions
+===================
+
+Scale wind speed
+----------------
+
+.. autofunction:: pythermalcomfort.utils.scale_wind_speed_log
