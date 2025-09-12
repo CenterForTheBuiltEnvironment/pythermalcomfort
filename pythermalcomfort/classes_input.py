@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from dataclasses import fields as dataclass_fields
 from enum import Enum
+from typing import Any
 
 import numpy as np
 
@@ -18,262 +20,228 @@ class WorkIntensity(str, Enum):
 
 @dataclass
 class BaseInputs:
-    """Base class containing all possible input parameters."""
+    """Base inputs with metadata-driven validation."""
 
-    body_surface_area: float | int | np.ndarray | list = field(default=1.8258)
-    tdb: float | int | np.ndarray | list = field(default=None)
-    tr: float | int | np.ndarray | list = field(default=None)
-    twb: float | int | np.ndarray | list = field(default=None)
-    tg: float | int | np.ndarray | list = field(default=None)
-    vr: float | int | np.ndarray | list = field(default=None)
-    v: float | int | np.ndarray | list = field(default=None)
-    rh: float | int | np.ndarray | list = field(default=None)
-    met: float | int | np.ndarray | list = field(default=None)
-    clo: float | int | np.ndarray | list = field(default=None)
-    wme: float | int | np.ndarray | list = field(default=0)
-    round_output: bool = field(default=True)
-    limit_inputs: bool = field(default=True)
-    with_solar_load: bool = field(default=False)
-    airspeed_control: bool = field(default=True)
+    a_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
+    age: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    airspeed_control: bool = field(default=True, metadata={"is_bool": True})
+    asw: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    body_surface_area: float | int | np.ndarray | list = field(
+        default=1.8258, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    clo: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    d: float | int | np.ndarray | list = field(
+        default=0, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
+    f_bes: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    f_svv: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    floor_reflectance: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    height: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    limit_inputs: bool = field(default=True, metadata={"is_bool": True})
+    max_skin_blood_flow: float | int | np.ndarray | list = field(
+        default=80, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    max_sweating: float | int | np.ndarray | list = field(
+        default=500, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    met: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    p_atm: float | int | np.ndarray | list = field(
+        default=101325, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    position: str | np.ndarray | list = field(
+        default=None,
+        metadata={
+            "allowed": [
+                Postures.sitting.value,
+                Postures.standing.value,
+                "standing, forced convection",
+            ]
+        },
+    )
+    posture: str | np.ndarray | list = field(
+        default=None,
+        metadata={
+            "allowed": [
+                Postures.sitting.value,
+                Postures.standing.value,
+                Postures.crouching.value,
+            ]
+        },
+    )
+    q: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    rh: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    round_output: bool = field(default=True, metadata={"is_bool": True})
+    sex: str | np.ndarray | list = field(
+        default=None, metadata={"allowed": [Sex.male.value, Sex.female.value]}
+    )
+    sharp: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    sol_altitude: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    sol_radiation_dir: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    sol_radiation_global: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    sol_transmittance: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    t_running_mean: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    tdb: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    tg: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    thickness_quilt: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    tout: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    tr: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    twb: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
     units: str = field(default=Units.SI.value)
-    a_coefficient: float | int = field(default=None)
-    e_coefficient: float | int = field(default=None)
-    v_ankle: float | int | np.ndarray | list = field(default=None)
-    t_running_mean: float | int | np.ndarray | list = field(default=None)
-    q: float | int | np.ndarray | list = field(default=None)
-    tout: float | int | np.ndarray | list = field(default=None)
-    p_atm: float | int | np.ndarray | list = field(default=101325)
-    age: float | int | np.ndarray | list = field(default=None)
-    weight: float | int | np.ndarray | list = field(default=None)
-    height: float | int | np.ndarray | list = field(default=None)
-    sol_altitude: float | int | np.ndarray | list = field(default=None)
-    sharp: float | int | np.ndarray | list = field(default=None)
-    sol_radiation_dir: float | int | np.ndarray | list = field(default=None)
-    sol_radiation_global: float | int | np.ndarray | list = field(default=None)
-    sol_transmittance: float | int | np.ndarray | list = field(default=None)
-    f_svv: float | int | np.ndarray | list = field(default=None)
-    f_bes: float | int | np.ndarray | list = field(default=None)
-    asw: float | int | np.ndarray | list = field(default=None)
-    floor_reflectance: float | int | np.ndarray | list = field(default=None)
-    vertical_tmp_grad: float | int | np.ndarray | list = field(default=None)
-    position: str | np.ndarray | list = field(default=None)
-    sex: str | np.ndarray | list = field(default=None)
-    posture: str | np.ndarray | list = field(default=None)
-    max_skin_blood_flow: float | int | np.ndarray | list = field(default=80)
-    max_sweating: float | int | np.ndarray | list = field(default=500)
-    w_max: float | int | np.ndarray | list = field(default=None)
-    wbgt: float | int | np.ndarray | list = field(default=None)
-    work_intensity: str | WorkIntensity = field(default=None)
-    thickness_quilt: float | int | np.ndarray | list = field(default=None)
-    vapor_pressure: float | int | np.ndarray | list = field(default=None)
+    v: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    v_ankle: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    v_z1: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    vapor_pressure: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    vertical_tmp_grad: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    vr: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    w_max: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    wbgt: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    weight: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    with_solar_load: bool = field(default=False, metadata={"is_bool": True})
+    work_intensity: str | Enum = field(
+        default=None, metadata={"allowed": [i.value for i in WorkIntensity]}
+    )
+    z0: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    z1: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    z2: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    wme: float | int | np.ndarray | list = field(
+        default=0, metadata={"types": (float, int, np.ndarray, list)}
+    )
 
-    def __post_init__(self):
-        def is_pandas_series(obj):
-            return type(obj).__name__ == "Series"
-
-        def convert_series_to_list(obj):
-            return obj.tolist() if is_pandas_series(obj) else obj
-
-        def _validate_str_values(name: str, value, allowed):
-            values = np.atleast_1d(value)
-            for val in values.astype(str):
-                if val.lower() not in allowed:
-                    error_msg = f"{name} must be one of {allowed!r}, "
-                    raise ValueError(error_msg)
-
-        # Only validate attributes that are not None
-        if self.units.upper() not in [Units.SI.value, Units.IP.value]:
+    def __post_init__(self) -> None:
+        """Validate and normalize fields using metadata declared on each field."""
+        """Validate and normalize fields using metadata declared on each field."""
+        # Validate and normalise units
+        units_str = (
+            self.units.value if isinstance(self.units, Units) else str(self.units)
+        )
+        units_up = units_str.upper()
+        if units_up not in (Units.SI.value, Units.IP.value):
             raise ValueError("Units must be either 'SI' or 'IP'")
-        if self.position is not None:
-            _validate_str_values(
-                "position",
-                self.position,
-                [
-                    Postures.sitting.value,
-                    Postures.standing.value,
-                    "standing, forced convection",
-                ],
-            )
-        if self.posture is not None:
-            _validate_str_values(
-                "posture",
-                self.posture,
-                [
-                    Postures.sitting.value,
-                    Postures.standing.value,
-                    Postures.crouching.value,
-                ],
-            )
-        if self.sex is not None:
-            _validate_str_values("sex", self.sex, [Sex.male.value, Sex.female.value])
-        if self.tdb is not None:
-            self.tdb = convert_series_to_list(self.tdb)
-            validate_type(self.tdb, "tdb", (float, int, np.ndarray, list))
-        if self.tr is not None:
-            self.tr = convert_series_to_list(self.tr)
-            validate_type(self.tr, "tr", (float, int, np.ndarray, list))
-        if self.twb is not None:
-            self.twb = convert_series_to_list(self.twb)
-            validate_type(self.twb, "twb", (float, int, np.ndarray, list))
-        if self.tg is not None:
-            self.tg = convert_series_to_list(self.tg)
-            validate_type(self.tg, "tg", (float, int, np.ndarray, list))
-        if self.vr is not None:
-            self.vr = convert_series_to_list(self.vr)
-            validate_type(self.vr, "vr", (float, int, np.ndarray, list))
-        if self.v is not None:
-            self.v = convert_series_to_list(self.v)
-            validate_type(self.v, "v", (float, int, np.ndarray, list))
-        if self.rh is not None:
-            self.rh = convert_series_to_list(self.rh)
-            validate_type(self.rh, "rh", (float, int, np.ndarray, list))
-        if self.met is not None:
-            self.met = convert_series_to_list(self.met)
-            validate_type(self.met, "met", (float, int, np.ndarray, list))
-        if self.clo is not None:
-            self.clo = convert_series_to_list(self.clo)
-            validate_type(self.clo, "clo", (float, int, np.ndarray, list))
-        if self.a_coefficient is not None:
-            self.a_coefficient = convert_series_to_list(self.a_coefficient)
-            validate_type(self.a_coefficient, "a_coefficient", (float, int))
-        if self.e_coefficient is not None:
-            self.e_coefficient = convert_series_to_list(self.e_coefficient)
-            validate_type(self.e_coefficient, "e_coefficient", (float, int))
-        if self.wme is not None:
-            self.wme = convert_series_to_list(self.wme)
-            validate_type(self.wme, "wme", (float, int, np.ndarray, list))
-        if self.v_ankle is not None:
-            self.v_ankle = convert_series_to_list(self.v_ankle)
-            validate_type(self.v_ankle, "v_ankle", (float, int, np.ndarray, list))
-        if self.t_running_mean is not None:
-            self.t_running_mean = convert_series_to_list(self.t_running_mean)
-            validate_type(
-                self.t_running_mean,
-                "t_running_mean",
-                (float, int, np.ndarray, list),
-            )
-        if self.q is not None:
-            self.q = convert_series_to_list(self.q)
-            validate_type(self.q, "q", (float, int, np.ndarray, list))
-        if not isinstance(self.round_output, bool):
-            raise TypeError("round must be either True or False.")
-        if not isinstance(self.limit_inputs, bool):
-            raise TypeError("limit_inputs must be either True or False.")
-        if not isinstance(self.airspeed_control, bool):
-            raise TypeError("airspeed_control must be either True or False.")
-        if not isinstance(self.with_solar_load, bool):
-            raise TypeError("with_solar_load must be either True or False.")
-        if self.tout is not None:
-            self.tout = convert_series_to_list(self.tout)
-            validate_type(self.tout, "tout", (float, int, np.ndarray, list))
-        if self.p_atm is not None:
-            self.p_atm = convert_series_to_list(self.p_atm)
-            validate_type(self.p_atm, "p_atm", (float, int, np.ndarray, list))
-        if self.age is not None:
-            self.age = convert_series_to_list(self.age)
-            validate_type(self.age, "age", (float, int, np.ndarray, list))
-        if self.weight is not None:
-            self.weight = convert_series_to_list(self.weight)
-            validate_type(self.weight, "weight", (float, int, np.ndarray, list))
-        if self.height is not None:
-            self.height = convert_series_to_list(self.height)
-            validate_type(self.height, "height", (float, int, np.ndarray, list))
-        if self.sol_altitude is not None:
-            self.sol_altitude = convert_series_to_list(self.sol_altitude)
-            validate_type(
-                self.sol_altitude,
-                "sol_altitude",
-                (float, int, np.ndarray, list),
-            )
-        if self.sharp is not None:
-            self.sharp = convert_series_to_list(self.sharp)
-            validate_type(self.sharp, "sharp", (float, int, np.ndarray, list))
-        if self.sol_radiation_dir is not None:
-            self.sol_radiation_dir = convert_series_to_list(self.sol_radiation_dir)
-            validate_type(
-                self.sol_radiation_dir,
-                "sol_radiation_dir",
-                (float, int, np.ndarray, list),
-            )
-        if self.sol_radiation_global is not None:
-            self.sol_radiation_global = convert_series_to_list(
-                self.sol_radiation_global,
-            )
-            validate_type(
-                self.sol_radiation_global,
-                "sol_radiation_global",
-                (float, int, np.ndarray, list),
-            )
-        if self.sol_transmittance is not None:
-            self.sol_transmittance = convert_series_to_list(self.sol_transmittance)
-            validate_type(
-                self.sol_transmittance,
-                "sol_transmittance",
-                (float, int, np.ndarray, list),
-            )
-        if self.f_svv is not None:
-            self.f_svv = convert_series_to_list(self.f_svv)
-            validate_type(self.f_svv, "f_svv", (float, int, np.ndarray, list))
-        if self.f_bes is not None:
-            self.f_bes = convert_series_to_list(self.f_bes)
-            validate_type(self.f_bes, "f_bes", (float, int, np.ndarray, list))
-        if self.asw is not None:
-            self.asw = convert_series_to_list(self.asw)
-            validate_type(self.asw, "asw", (float, int, np.ndarray, list))
-        if self.floor_reflectance is not None:
-            self.floor_reflectance = convert_series_to_list(self.floor_reflectance)
-            validate_type(
-                self.floor_reflectance,
-                "floor_reflectance",
-                (float, int, np.ndarray, list),
-            )
-        if self.vertical_tmp_grad is not None:
-            self.vertical_tmp_grad = convert_series_to_list(self.vertical_tmp_grad)
-            validate_type(
-                self.vertical_tmp_grad,
-                "vertical_tmp_grad",
-                (float, int, np.ndarray, list),
-            )
-        if self.body_surface_area is not None:
-            self.body_surface_area = convert_series_to_list(self.body_surface_area)
-            validate_type(
-                self.body_surface_area,
-                "body_surface_area",
-                (float, int, np.ndarray, list),
-            )
-        if self.max_sweating is not None:
-            self.max_sweating = convert_series_to_list(self.max_sweating)
-            validate_type(self.max_sweating, "max_sweating", (float, int))
-        if self.max_skin_blood_flow is not None:
-            self.max_skin_blood_flow = convert_series_to_list(self.max_skin_blood_flow)
-            validate_type(self.max_skin_blood_flow, "max_skin_blood_flow", (float, int))
-        if self.w_max is not None:
-            self.w_max = convert_series_to_list(self.w_max)
-            validate_type(self.w_max, "w_max", (float, int, np.ndarray, list))
-        if self.wbgt is not None:
-            self.wbgt = convert_series_to_list(self.wbgt)
-            validate_type(self.wbgt, "wbgt", (float, int, np.ndarray, list))
-        if self.work_intensity is not None:
-            self.work_intensity = convert_series_to_list(self.work_intensity)
-            _validate_str_values(
-                "work_intensity",
-                self.work_intensity,
-                [i.value for i in WorkIntensity],
-            )
-        if self.thickness_quilt is not None:
-            self.thickness_quilt = convert_series_to_list(self.thickness_quilt)
-            validate_type(
-                self.thickness_quilt,
-                "thickness_quilt",
-                (float, int, np.ndarray, list),
-            )
-        if self.vapor_pressure is not None:
-            self.vapor_pressure = convert_series_to_list(self.vapor_pressure)
-            validate_type(
-                self.vapor_pressure,
-                "vapor_pressure",
-                (float, int, np.ndarray, list),
-            )
+        self.units = units_up
+
+        # Validate booleans from metadata
+        for f in dataclass_fields(self):
+            if f.metadata.get("is_bool"):
+                val = getattr(self, f.name)
+                if not isinstance(val, bool):
+                    msg = f"{f.name} must be a boolean (True or False)."
+                    raise TypeError(msg)
+
+        # Process fields with validation metadata (types / allowed)
+        for f in dataclass_fields(self):
+            meta = f.metadata
+            if not meta:
+                continue
+
+            value = getattr(self, f.name)
+            if value is None:
+                continue
+
+            # Convert pandas Series to list if needed
+            value = self._convert_series_to_list(value)
+
+            # Type validation
+            expected_types = meta.get("types")
+            if expected_types:
+                validate_type(value, f.name, expected_types)
+                # store possibly converted value back
+                setattr(self, f.name, value)
+                continue
+
+            # Allowed string values validation (supports arrays/lists)
+            allowed = meta.get("allowed")
+            if allowed:
+                self._validate_str_values(f.name, value, allowed)
+                setattr(self, f.name, value)
+                continue
+
+    # ----- helper methods -----
+    @staticmethod
+    def _is_pandas_series(obj: Any) -> bool:
+        return type(obj).__name__ in ("Series", "Index")
+
+    def _convert_series_to_list(self, obj: Any) -> Any:
+        return obj.tolist() if self._is_pandas_series(obj) else obj
+
+    @staticmethod
+    def _validate_str_values(name: str, value: Any, allowed: list[str]) -> None:
+        arr = np.atleast_1d(value)
+        # Coerce Enums to their .value, then to str
+        coerced = [v.value if isinstance(v, Enum) else str(v) for v in arr.tolist()]
+        allowed_lower = {str(a).lower() for a in allowed}
+        for v in coerced:
+            if v.lower() not in allowed_lower:
+                msg = f"{name} must be one of {allowed!r}"
+                raise ValueError(msg)
 
 
 @dataclass
@@ -1053,3 +1021,105 @@ class WorkCapacityStandardsInputs(BaseInputs):
         met = np.asarray(self.met, dtype=float)
         if np.any(met < 0) or np.any(met > 2500):
             raise ValueError("Metabolic rate out of plausible range")
+
+
+# New input class for the scale_wind_speed_log function
+@dataclass
+class ScaleWindSpeedLogInputs(BaseInputs):
+    """Inputs for scale_wind_speed_log (logarithmic wind profile).
+
+    Validates types and applicability limits:
+    - v_z1, z2, z1, z0, d must be numeric or array-like
+    - wind speed must be non-negative
+    - z0 > 0
+    - z2 > z0
+    - z1 > z0 (reference height must be above roughness length)
+    - (z1 - d) > 0 and (z2 - d) > 0 (log arguments must be positive)
+    - z0 must be less than reference height to avoid singular behavior
+    """
+
+    def __init__(
+        self,
+        v_z1,
+        z2,
+        z1: float | int | np.ndarray | list = 10.0,
+        z0: float | int | np.ndarray | list = 0.01,
+        d: float | int | np.ndarray | list = 0.0,
+    ):
+        super().__init__(
+            v_z1=v_z1,
+            z2=z2,
+            z1=z1,
+            z0=z0,
+            d=d,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # Convert to numpy arrays for numeric checks and broadcasting
+        v_z1 = np.asarray(self.v_z1, dtype=float)
+        z2 = np.asarray(self.z2, dtype=float)
+        z1 = np.asarray(self.z1, dtype=float)
+        z0 = np.asarray(self.z0, dtype=float)
+        d = np.asarray(self.d, dtype=float)
+
+        # Check broadcasting compatibility
+        try:
+            np.broadcast_arrays(v_z1, z2, z1, z0, d)
+        except ValueError as e:
+            msg = (
+                "Input shapes are incompatible for broadcasting: "
+                f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
+                f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
+            )
+            raise ValueError(msg) from e
+
+        # Physical/value constraints
+        if np.any(v_z1 < 0):
+            raise ValueError("Wind speed (v_z1) must be non-negative")
+
+        if np.any(z0 <= 0):
+            raise ValueError("Surface roughness length (z0) must be positive ( > 0 )")
+
+        # Displacement height cannot be negative
+        if np.any(d < 0):
+            raise ValueError("Zero-plane displacement height (d) must be >= 0")
+
+        if np.any(z2 <= 0):
+            raise ValueError("Target height (z2) must be positive ( > 0 )")
+
+        if np.any(z1 <= 0):
+            raise ValueError("Reference height (z1) must be positive ( > 0 )")
+
+        if np.any(z2 <= z0):
+            raise ValueError(
+                "Target height (z2) must be greater than surface roughness (z0)"
+            )
+
+        if np.any(z1 <= z0):
+            raise ValueError(
+                "Reference height (z1) must be greater than surface roughness (z0)"
+            )
+
+        # Ensure log arguments are strictly > 1 i.e., (z - d) > z0
+        if np.any((z1 - d) <= z0):
+            raise ValueError(
+                "Reference height minus displacement (z1 - d) must be > z0"
+            )
+        if np.any((z2 - d) <= z0):
+            raise ValueError("Target height minus displacement (z2 - d) must be > z0")
+
+        # Prevent log denominator being zero or extremely close to zero
+        denom = np.log((z1 - d) / z0)
+        if np.any(denom <= 1e-12):
+            raise ValueError(
+                "Logarithmic denominator log((z1 - d)/z0) is zero or numerically unstable"
+            )
+
+        # All checks passed: store the processed numpy arrays back on the instance
+        self.v_z1 = v_z1
+        self.z2 = z2
+        self.z1 = z1
+        self.z0 = z0
+        self.d = d

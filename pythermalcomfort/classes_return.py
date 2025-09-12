@@ -13,7 +13,7 @@ class AutoStrMixin:
             return super().__str__()
 
         # determine width by max variable name length
-        names = [f.name for f in fields(self)]
+        names = [f.name for f in fields(type(self))]
         width = max((len(n) for n in names), default=0)
         lines = [f"-------- {self.__class__.__name__} --------"]
         for n in names:
@@ -32,7 +32,7 @@ class AutoStrMixin:
         except AttributeError as exc:
             error_msg = (
                 f"{self.__class__.__name__} has no field '{item}'. "
-                f"Available fields: {[f.name for f in fields(self)]}"
+                f"Available fields: {[f.name for f in fields(type(self))]}"
             )
             raise KeyError(error_msg) from exc
 
@@ -976,3 +976,17 @@ class JOS3Output(AutoStrMixin):
     q_skin2env_latent: JOS3BodyParts | None = None
     q_res_sensible: float | None = None
     q_res_latent: float | None = None
+
+
+@dataclass(frozen=True, repr=False)
+class ScaleWindSpeedLog(AutoStrMixin):
+    """Dataclass to represent the output of scale_wind_speed_log.
+
+    Attributes
+    ----------
+    v_z2 : numpy.ndarray or float or list of floats
+        Wind speed at the target height z2, [m/s]. The type can be a scalar,
+        list or numpy array depending on the inputs provided to the function.
+    """
+
+    v_z2: npt.ArrayLike
