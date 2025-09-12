@@ -18,7 +18,7 @@ Install the latest release from PyPI:
 This will install the package and its runtime dependencies.
 
 From source (stable or development)
-==================================
+===================================
 
 Clone the repository and install from the local copy. This is useful if you
 want to inspect the code or install a development branch:

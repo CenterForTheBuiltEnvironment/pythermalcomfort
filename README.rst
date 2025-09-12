@@ -91,8 +91,6 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
 
 For more examples and detailed usage, check out models and indices in the models section of the documentation.
 
-.. _embedded-content:
-
 Sponsor the Maintainers of pythermalcomfort
 ===========================================
 

@@ -71,7 +71,7 @@ Now you can make your changes locally.
     autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
     ruff check --fix
     ruff format
-    docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
+    docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
 
 5. Commit your changes and push your branch to GitHub:
 

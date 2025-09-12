@@ -26,6 +26,7 @@ def scale_wind_speed_log(
 
     .. math::
         v(h) = v_{ref} \\times \\frac{\\ln((h - d)/z0)}{\\ln((h_{ref} - d)/z0)}
+
     where:
 
     - :math:`v(h)` is the wind speed at height :math:`h`
@@ -92,21 +93,19 @@ def scale_wind_speed_log(
 
     Examples
     --------
-    >>> # Scale wind speed to 2m height (default open terrain z0=0.01)
-    >>> scale_wind_speed_log(v_z1=5.0, z2=2.0)
-    array(3.84)
+    .. code-block:: python
 
-    >>> # Scale wind speed to 2m height over rough terrain
-    >>> scale_wind_speed_log(v_z1=5.0, z2=2.0, z0=0.1)
-    array(3.25)
+        # Scale wind speed to 2m height (default open terrain z0=0.01)
+        scale_wind_speed_log(v_z1=5.0, z2=2.0)
 
-    >>> # Scale multiple wind speeds to different heights
-    >>> scale_wind_speed_log(v_z1=[3.0, 5.0], z2=[1.5, 2.5])
-    array([2.18, 4.00])
+        # Scale wind speed to 2m height over rough terrain
+        scale_wind_speed_log(v_z1=5.0, z2=2.0, z0=0.1)
 
-    >>> # Scale with different surface roughness for each measurement
-    >>> scale_wind_speed_log(v_z1=[3.0, 5.0], z2=[1.5, 2.5], z0=[0.02, 0.1])
-    array([2.08, 3.49])
+        # Scale multiple wind speeds to different heights
+        scale_wind_speed_log(v_z1=[3.0, 5.0], z2=[1.5, 2.5])
+
+        # Scale with different surface roughness for each measurement
+        scale_wind_speed_log(v_z1=[3.0, 5.0], z2=[1.5, 2.5], z0=[0.02, 0.1])
 
     """
     ScaleWindSpeedLogInputs(
