@@ -125,7 +125,8 @@ def scale_wind_speed_log(
     z1 = np.asarray(z1, dtype=float)
 
     # Use numpy.log to support array inputs/broadcasting
-    v_z2 = v_z1 * np.log((z2 - d) / z0) / np.log((z1 - d) / z0)
+    with np.errstate(divide="raise", invalid="raise", over="raise", under="ignore"):
+        v_z2 = v_z1 * np.log((z2 - d) / z0) / np.log((z1 - d) / z0)
 
     if round_output:
         v_z2 = np.around(v_z2, 2)
