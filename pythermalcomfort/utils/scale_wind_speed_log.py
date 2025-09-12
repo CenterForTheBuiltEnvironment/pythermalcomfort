@@ -25,8 +25,7 @@ def scale_wind_speed_log(
     height. The formula is given by:
 
     .. math::
-        v(h) = v_{ref} * \\frac{\\ln((h - d )/z0)}{\\ln((h_{ref} - d)/z0)}
-
+        v(h) = v_{ref} \\times \\frac{\\ln((h - d)/z0)}{\\ln((h_{ref} - d)/z0)}
     where:
 
     - :math:`v(h)` is the wind speed at height :math:`h`
