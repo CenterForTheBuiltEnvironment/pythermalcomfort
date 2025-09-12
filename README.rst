@@ -91,8 +91,8 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
 
 For more examples and detailed usage, check out models and indices in the models section of the documentation.
 
-Sponsor the Maintainers of pythermalcomfort
-===========================================
+Support pythermalcomfort
+========================
 
 If you find this project useful, please consider supporting the maintainers.
 Maintaining an open\-source scientific package requires substantial time and
