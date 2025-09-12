@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.5.0 (2025-09-10)
+------------------
+
+* Added the `scale_winds_peed_log` function to scale wind speed.
+
 3.4.3 (2025-07-31)
 ------------------
 
