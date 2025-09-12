@@ -48,7 +48,7 @@ def scale_wind_speed_log(
     Parameters
     ----------
     v_z1 : float or list of floats
-        Wind speed at 10m reference height, [m/s]
+        Wind speed at the reference height z1 (default 10 m), [m/s]
     z2 : float or list of floats
         Height at which wind speed needs to be scaled, [m]
     z1 : float or list of floats, optional
