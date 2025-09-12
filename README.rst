@@ -87,21 +87,87 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
 
    # Calculate UTCI for heat stress assessment
    utci_value = utci(tdb=30, tr=30, v=0.5, rh=50)
-   print(f"UTCI: {utci_value} °C")
+   print(utci_value)
 
 For more examples and detailed usage, check out models and indices in the models section of the documentation.
+
+.. _embedded-content:
+
+Sponsor the Maintainer of pythermalcomfort
+==========================================
+
+.. container:: embedded-content
+
+   .. raw:: html
+
+      <iframe src="https://github.com/sponsors/FedericoTartarini/card" title="Sponsor FedericoTartarini" height="225" width="600" style="border: 0;"></iframe>
+
 
 Contribute
 ==========
 
-We welcome contributions!
-Whether you’re reporting a bug, suggesting a feature, or submitting a pull request, your input helps make ``pythermalcomfort`` better for everyone.
-Check out our contribution page in the documentation to get started.
+We welcome contributions! Whether you’re reporting a bug, suggesting a feature,
+or submitting a pull request, your input helps make ``pythermalcomfort`` better
+for everyone. Below is a short, actionable guide to get your changes ready and
+submitted quickly. For full details, see CONTRIBUTING.rst in the project root
+or the documentation contributing page.
+
+Quick checklist
+---------------
+
+* Open an issue first for larger features to discuss scope and design.
+* Fork the repo and create a feature branch for your work.
+* Add tests for new behavior and run the test suite locally.
+* Run linters and formatters and fix reported issues.
+* Update documentation and changelog entries for public API changes.
+* Submit a clear, focused pull request referencing any related issues.
+
+Common commands
+---------------
+
+.. code-block:: bash
+
+    # clone your fork and add upstream remote
+    git clone git@github.com:your-username/pythermalcomfort.git
+    cd pythermalcomfort
+    git remote add upstream git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
+    git fetch upstream
+
+    # create a branch and work on it
+    git checkout -b Feature/awesome-feature
+
+    # run the full test matrix (may be slow)
+    tox
+
+    # run a single test env locally (replace py312 with the env you want)
+    tox -e py312
+
+    # run a subset of pytest tests
+    pytest -k test_name_fragment
+
+    # fix linting/formatting
+    ruff check --fix
+    ruff format
+    docformatter --in-place --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
+
+    # commit and push
+    git add .
+    git commit -m "feat: short description of change"
+    git push origin Feature/awesome-feature
+
+Where to get help
+-----------------
+
+* Open an issue on GitHub with a minimal reproduction for bugs.
+* Ask questions in PR comments for implementation guidance.
+* See the CONTRIBUTING.rst file for detailed guidance on testing,
+  documentation, and changelog expectations.
 
 Documentation
-=============
+-------------
 
-For detailed documentation, tutorials, and examples, visit our `Documentation <https://pythermalcomfort.readthedocs.io/en/latest/documentation/index.html>`_.
+Detailed docs, examples and API references are available at:
+https://pythermalcomfort.readthedocs.io/en/latest/
 
 License
 =======
