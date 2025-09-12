@@ -20,52 +20,57 @@ class WorkIntensity(str, Enum):
 class BaseInputs:
     """Base class containing all possible input parameters."""
 
-    body_surface_area: float | int | np.ndarray | list = field(default=1.8258)
-    tdb: float | int | np.ndarray | list = field(default=None)
-    tr: float | int | np.ndarray | list = field(default=None)
-    twb: float | int | np.ndarray | list = field(default=None)
-    tg: float | int | np.ndarray | list = field(default=None)
-    vr: float | int | np.ndarray | list = field(default=None)
-    v: float | int | np.ndarray | list = field(default=None)
-    rh: float | int | np.ndarray | list = field(default=None)
-    met: float | int | np.ndarray | list = field(default=None)
-    clo: float | int | np.ndarray | list = field(default=None)
-    wme: float | int | np.ndarray | list = field(default=0)
-    round_output: bool = field(default=True)
-    limit_inputs: bool = field(default=True)
-    with_solar_load: bool = field(default=False)
-    airspeed_control: bool = field(default=True)
-    units: str = field(default=Units.SI.value)
     a_coefficient: float | int = field(default=None)
-    e_coefficient: float | int = field(default=None)
-    v_ankle: float | int | np.ndarray | list = field(default=None)
-    t_running_mean: float | int | np.ndarray | list = field(default=None)
-    q: float | int | np.ndarray | list = field(default=None)
-    tout: float | int | np.ndarray | list = field(default=None)
-    p_atm: float | int | np.ndarray | list = field(default=101325)
     age: float | int | np.ndarray | list = field(default=None)
-    weight: float | int | np.ndarray | list = field(default=None)
+    airspeed_control: bool = field(default=True)
+    asw: float | int | np.ndarray | list = field(default=None)
+    body_surface_area: float | int | np.ndarray | list = field(default=1.8258)
+    clo: float | int | np.ndarray | list = field(default=None)
+    d: float | int | np.ndarray | list = field(default=0)
+    e_coefficient: float | int = field(default=None)
+    f_bes: float | int | np.ndarray | list = field(default=None)
+    f_svv: float | int | np.ndarray | list = field(default=None)
+    floor_reflectance: float | int | np.ndarray | list = field(default=None)
     height: float | int | np.ndarray | list = field(default=None)
-    sol_altitude: float | int | np.ndarray | list = field(default=None)
+    limit_inputs: bool = field(default=True)
+    max_skin_blood_flow: float | int | np.ndarray | list = field(default=80)
+    max_sweating: float | int | np.ndarray | list = field(default=500)
+    met: float | int | np.ndarray | list = field(default=None)
+    p_atm: float | int | np.ndarray | list = field(default=101325)
+    position: str | np.ndarray | list = field(default=None)
+    posture: str | np.ndarray | list = field(default=None)
+    q: float | int | np.ndarray | list = field(default=None)
+    rh: float | int | np.ndarray | list = field(default=None)
+    round_output: bool = field(default=True)
+    sex: str | np.ndarray | list = field(default=None)
     sharp: float | int | np.ndarray | list = field(default=None)
+    sol_altitude: float | int | np.ndarray | list = field(default=None)
     sol_radiation_dir: float | int | np.ndarray | list = field(default=None)
     sol_radiation_global: float | int | np.ndarray | list = field(default=None)
     sol_transmittance: float | int | np.ndarray | list = field(default=None)
-    f_svv: float | int | np.ndarray | list = field(default=None)
-    f_bes: float | int | np.ndarray | list = field(default=None)
-    asw: float | int | np.ndarray | list = field(default=None)
-    floor_reflectance: float | int | np.ndarray | list = field(default=None)
+    t_running_mean: float | int | np.ndarray | list = field(default=None)
+    tdb: float | int | np.ndarray | list = field(default=None)
+    tg: float | int | np.ndarray | list = field(default=None)
+    thickness_quilt: float | int | np.ndarray | list = field(default=None)
+    tout: float | int | np.ndarray | list = field(default=None)
+    tr: float | int | np.ndarray | list = field(default=None)
+    twb: float | int | np.ndarray | list = field(default=None)
+    units: str = field(default=Units.SI.value)
+    v: float | int | np.ndarray | list = field(default=None)
+    v_ankle: float | int | np.ndarray | list = field(default=None)
+    v_z1: float | int | np.ndarray | list = field(default=None)
+    vapor_pressure: float | int | np.ndarray | list = field(default=None)
     vertical_tmp_grad: float | int | np.ndarray | list = field(default=None)
-    position: str | np.ndarray | list = field(default=None)
-    sex: str | np.ndarray | list = field(default=None)
-    posture: str | np.ndarray | list = field(default=None)
-    max_skin_blood_flow: float | int | np.ndarray | list = field(default=80)
-    max_sweating: float | int | np.ndarray | list = field(default=500)
+    vr: float | int | np.ndarray | list = field(default=None)
     w_max: float | int | np.ndarray | list = field(default=None)
     wbgt: float | int | np.ndarray | list = field(default=None)
+    weight: float | int | np.ndarray | list = field(default=None)
+    with_solar_load: bool = field(default=False)
     work_intensity: str | WorkIntensity = field(default=None)
-    thickness_quilt: float | int | np.ndarray | list = field(default=None)
-    vapor_pressure: float | int | np.ndarray | list = field(default=None)
+    z0: float | int | np.ndarray | list = field(default=None)
+    z1: float | int | np.ndarray | list = field(default=None)
+    z2: float | int | np.ndarray | list = field(default=None)
+    wme: float | int | np.ndarray | list = field(default=0)
 
     def __post_init__(self):
         def is_pandas_series(obj):
@@ -274,6 +279,21 @@ class BaseInputs:
                 "vapor_pressure",
                 (float, int, np.ndarray, list),
             )
+        if self.z0 is not None:
+            self.z0 = convert_series_to_list(self.z0)
+            validate_type(self.z0, "z0", (float, int, np.ndarray, list))
+        if self.z1 is not None:
+            self.z1 = convert_series_to_list(self.z1)
+            validate_type(self.z1, "z1", (float, int, np.ndarray, list))
+        if self.z2 is not None:
+            self.z2 = convert_series_to_list(self.z2)
+            validate_type(self.z2, "z2", (float, int, np.ndarray, list))
+        if self.v_z1 is not None:
+            self.v_z1 = convert_series_to_list(self.v_z1)
+            validate_type(self.v_z1, "v_z1", (float, int, np.ndarray, list))
+        if self.d is not None:
+            self.d = convert_series_to_list(self.d)
+            validate_type(self.d, "d", (float, int, np.ndarray, list))
 
 
 @dataclass
@@ -1053,3 +1073,106 @@ class WorkCapacityStandardsInputs(BaseInputs):
         met = np.asarray(self.met, dtype=float)
         if np.any(met < 0) or np.any(met > 2500):
             raise ValueError("Metabolic rate out of plausible range")
+
+
+# New input class for the scale_wind_speed_log function
+@dataclass
+class ScaleWindSpeedLogInputs(BaseInputs):
+    """Inputs for scale_wind_speed_log (logarithmic wind profile).
+
+    Validates types and applicability limits:
+    - v_z1, z2, z1, z0, d must be numeric or array-like
+    - wind speed must be non-negative
+    - z0 > 0
+    - z2 > z0
+    - z1 > z0 (reference height must be above roughness length)
+    - (z1 - d) > 0 and (z2 - d) > 0 (log arguments must be positive)
+    - z0 must be less than reference height to avoid singular behavior
+    """
+
+    def __init__(
+        self,
+        v_z1,
+        z2,
+        z1: float | int | np.ndarray | list = 10.0,
+        z0: float | int | np.ndarray | list = 0.01,
+        d: float | int | np.ndarray | list = 0.0,
+    ):
+        super().__init__(
+            v_z1=v_z1,
+            z2=z2,
+            z1=z1,
+            z0=z0,
+            d=d,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # Convert to numpy arrays for numeric checks and broadcasting
+        v_z1 = np.asarray(self.v_z1, dtype=float)
+        z2 = np.asarray(self.z2, dtype=float)
+        z1 = np.asarray(self.z1, dtype=float)
+        z0 = np.asarray(self.z0, dtype=float)
+        d = np.asarray(self.d, dtype=float)
+
+        # Check broadcasting compatibility
+        try:
+            np.broadcast_arrays(v_z1, z2, z1, z0, d)
+        except ValueError as e:
+            msg = (
+                "Input shapes are incompatible for broadcasting: "
+                + f"v_z1.shape={v_z1.shape}, z2.shape={z2.shape}, "
+                + f"z1.shape={z1.shape}, z0.shape={z0.shape}, d.shape={d.shape}"
+            )
+            raise ValueError(msg) from e
+
+        # Physical/value constraints
+        if np.any(v_z1 < 0):
+            raise ValueError("Wind speed (v_z1) must be non-negative")
+
+        if np.any(z0 <= 0):
+            raise ValueError("Surface roughness length (z0) must be positive ( > 0 )")
+
+        if np.any(z2 <= 0):
+            raise ValueError("Target height (z2) must be positive ( > 0 )")
+
+        if np.any(z1 <= 0):
+            raise ValueError("Reference height (z1) must be positive ( > 0 )")
+
+        if np.any(z2 <= z0):
+            raise ValueError(
+                "Target height (z2) must be greater than surface roughness (z0)"
+            )
+
+        if np.any(z1 <= z0):
+            raise ValueError(
+                "Reference height (z1) must be greater than surface roughness (z0)"
+            )
+
+        # Ensure heights minus displacement are positive for log arguments
+        if np.any((z1 - d) <= 0):
+            raise ValueError("Reference height minus displacement (z1 - d) must be > 0")
+
+        if np.any((z2 - d) <= 0):
+            raise ValueError("Target height minus displacement (z2 - d) must be > 0")
+
+        # Ensure z0 is less than the reference height to avoid singular/invalid scaling
+        if np.any(z0 >= z1):
+            raise ValueError(
+                "Surface roughness length (z0) must be less than reference height (z1)"
+            )
+
+        # Prevent log denominator being zero or extremely close to zero
+        denom = np.log((z1 - d) / z0)
+        if np.any(np.isclose(denom, 0.0)):
+            raise ValueError(
+                "Logarithmic denominator log((z1 - d)/z0) is zero or numerically unstable"
+            )
+
+        # All checks passed: store the processed numpy arrays back on the instance
+        self.v_z1 = v_z1
+        self.z2 = z2
+        self.z1 = z1
+        self.z0 = z0
+        self.d = d

@@ -41,7 +41,7 @@ Relative air speed
 Scale wind speed
 ----------------
 
-.. autofunction:: pythermalcomfort.utilities.scale_windspeed
+.. autofunction:: pythermalcomfort.utils.scale_wind_speed_log
 
 Running mean outdoor temperature
 --------------------------------

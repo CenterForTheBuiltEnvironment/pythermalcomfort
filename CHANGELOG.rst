@@ -4,7 +4,7 @@ Changelog
 3.4.5 (2025-09-10)
 ------------------
 
-* Added the `scale_windspeed` function to scale wind speed from 10m to specified height.
+* Added the `scale_winds_peed_log` function to scale wind speed from 10m to specified height.
 
 3.4.3 (2025-07-31)
 ------------------
