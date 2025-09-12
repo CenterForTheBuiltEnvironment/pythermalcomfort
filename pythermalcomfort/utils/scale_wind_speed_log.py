@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 from pythermalcomfort.classes_input import ScaleWindSpeedLogInputs
+from pythermalcomfort.classes_return import ScaleWindSpeedLog
 
 
 def scale_wind_speed_log(
@@ -12,7 +13,7 @@ def scale_wind_speed_log(
     z0: float | list[float] = 0.01,
     d: float | list[float] = 0.0,
     round_output: bool = True,
-) -> np.ndarray:
+) -> ScaleWindSpeedLog:
     """Scale wind speed from the reference height to a user specified height
     using the logarithmic wind profile based on surface roughness length [Oke1987]_.
 
@@ -81,8 +82,9 @@ def scale_wind_speed_log(
 
     Returns
     -------
-    v_z2 : numpy.ndarray
-        Wind speed at height h, [m/s]
+    ScaleWindSpeedLog
+        Dataclass with attribute ``v_z2`` containing the scaled wind speed(s)
+        at the target height z2, [m/s].
 
     Raises
     ------
@@ -126,6 +128,7 @@ def scale_wind_speed_log(
     v_z2 = v_z1 * np.log((z2 - d) / z0) / np.log((z1 - d) / z0)
 
     if round_output:
-        return np.around(v_z2, 2)
+        v_z2 = np.around(v_z2, 2)
 
-    return v_z2
+    # Return a dataclass instance for consistent API
+    return ScaleWindSpeedLog(v_z2=v_z2)
