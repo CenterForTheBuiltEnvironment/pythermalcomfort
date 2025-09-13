@@ -117,8 +117,76 @@ To run all the test environments in *parallel*:
 To Add a Function
 ^^^^^^^^^^^^^^^^^
 
-1. Add the function to the Python file `pythermalcomfort/models/` and document it.
-2. Add any related functions that are used by your function either in `pythermalcomfort/utilities.py`. See existing code as examples.
-3. Ensure that all new functions accept arrays as input and return a dataclass. You can use the code in `pmv_ppd_iso.py` as a template.
-4. Test your function by writing a test in `tests/test_XXXX.py`. Test it by running `tox -e pyXX` where `XX` is the Python version you want to use, e.g., `312`.
-5. Add `autofunction` to `doc.reference.pythermalcomfort.py`.
+Use this comprehensive checklist when adding a new thermal comfort function to pythermalcomfort:
+
+**Function Development:**
+
+1. **Create function in new file**: Add your function to a new Python file in `pythermalcomfort/models/` with a meaningful, descriptive name that follows the existing naming conventions.
+
+2. **Ensure meaningful naming**: Use clear, descriptive names for the function and all variables that are consistent with existing functions in the codebase.
+
+3. **Variable naming consistency**: Follow the established variable naming patterns used throughout the project (e.g., `tdb` for dry-bulb temperature, `tr` for mean radiant temperature, `rh` for relative humidity).
+
+4. **Add comprehensive docstring**: Include a complete docstring with:
+   
+   - Clear function description explaining what the model calculates
+   - **Parameters** section with type hints, units, and detailed descriptions
+   - **Returns** section describing the output dataclass
+   - **Examples** section with practical usage examples showing both single values and arrays
+   - References to relevant standards or research papers
+
+5. **Add input validation**: Include input validation like other functions:
+   
+   - `limit_inputs: bool = True` parameter for standard applicability limits
+   - `round_output: bool = True` parameter for output rounding
+   - Use appropriate input validation classes (see `classes_input.py`)
+
+6. **Add type annotations**: Provide complete type annotations for all parameters and return values, supporting both single values and arrays (e.g., `float | list[float]`).
+
+7. **Ensure array support**: Make sure your function accepts and properly handles numpy arrays and lists as inputs, following the pattern in existing functions.
+
+8. **Must return a dataclass**: Create and return a dataclass that inherits from `AutoStrMixin` (see `classes_return.py` for examples).
+
+**Validation and Quality:**
+
+9. **Check applicability limits**: Implement proper checking for the standard applicability limits of your model and return `nan` values when inputs are outside valid ranges.
+
+10. **Handle edge cases**: Test and handle edge cases appropriately, ensuring robust behavior with various input combinations.
+
+**Documentation and Integration:**
+
+11. **Add to documentation**: Add your function to the documentation in `docs/documentation/models.rst` using the `autofunction` directive.
+
+12. **Update version**: Bump the minor version number in the appropriate configuration files.
+
+13. **Add to changelog**: Add an entry to `CHANGELOG.rst` describing the new function.
+
+**Testing:**
+
+14. **Test the function**: Write comprehensive tests in `tests/test_XXXX.py` that cover:
+    
+    - Basic functionality with reference values
+    - Array input handling
+    - Edge cases and error conditions
+    - Input validation behavior
+    - Output format and dataclass structure
+
+15. **Test edge cases**: Ensure your tests cover boundary conditions, invalid inputs, and various combinations of parameters.
+
+**Before Submission:**
+
+16. Run the full test suite: `tox -e pyXX` where `XX` is your Python version (e.g., `312`)
+17. Format and lint your code:
+
+.. code-block:: bash
+
+    autopep8 --in-place --max-line-length 88 --select E501 --aggressive pythermalcomfort/*.py
+    ruff check --fix
+    ruff format
+    docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
+
+18. Build documentation to ensure it renders correctly: `tox -e docs`
+
+**Reference Template:**
+
+Use existing functions like `pmv_ppd_iso.py` as a template to ensure your function follows all established patterns for input validation, array handling, output formatting, and documentation style.
