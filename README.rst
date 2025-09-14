@@ -6,28 +6,35 @@
 pythermalcomfort
 ================
 
-The ``pythermalcomfort`` Python package is a comprehensive toolkit for calculating **thermal comfort indices**, **heat/cold stress metrics**, and **thermophysiological responses** based on international standards and peer-reviewed research.
-Designed for researchers, engineers, and building science professionals, it simplifies complex calculations while ensuring accuracy and compliance with industry standards.
+The ``pythermalcomfort`` Python package is a comprehensive toolkit for calculating
+thermal comfort indices, heat/cold stress metrics, and thermophysiological
+responses based on international standards and peer-reviewed research. Designed
+for researchers, engineers, and building-science professionals, it simplifies
+complex calculations while promoting accuracy and standards compliance.
 
 Key Features
 ============
 
 - **Thermal Comfort Calculations**:
-  Supports multiple models, including **PMV**, **PPD**, **adaptive comfort**, and **SET**.
+  Supports multiple models, including **PMV**, **PPD**, **adaptive comfort**, and
+  **SET**.
 - **Heat and Cold Stress Indices**:
-  Calculate **UTCI**, **Heat Index**, **Wind Chill Index**, and **Humidex** for assessing environmental stress.
+  Calculate **UTCI**, **Heat Index**, **Wind Chill Index**, and **Humidex**.
 - **Thermophysiological Models**:
-  Includes the **two-node (Gagge)** and **multinode (JOS-3)** models to estimate physiological responses like **core temperature**, **skin temperature**, and **skin wettedness**.
+  Includes the **two-node (Gagge)** and **multinode (JOS-3)** models to estimate
+  physiological responses such as core temperature, skin temperature, and skin
+  wettedness.
 - **Standards Compliance**:
-  Implements calculations based on **ASHRAE 55**, **ISO 7730**, **EN 16798**, and more.
+  Implements calculations based on **ASHRAE 55**, **ISO 7730**, **EN 16798**, and
+  more.
 - **Ease of Use**:
-  Intuitive API for seamless integration into your projects.
+  Intuitive API for seamless integration into Python projects.
 - **Extensive Documentation**:
-  Detailed guides, examples, and tutorials to help you get started quickly.
+  Detailed guides, examples, and tutorials.
 - **Active Development**:
   Regularly updated with new features, improvements, and bug fixes.
 - **Open Source**:
-  Licensed under the MIT License for maximum flexibility and transparency.
+  Licensed under the MIT License.
 
 Why Use pythermalcomfort?
 =========================
@@ -35,11 +42,13 @@ Why Use pythermalcomfort?
 - **Accurate Assessments**:
   Reliable thermal comfort and stress evaluations for diverse environments.
 - **Time-Saving**:
-  Automates complex calculations, saving you time and effort.
+  Automates complex calculations, saving time and effort.
 - **Versatility**:
-  Ideal for researchers, engineers, and professionals in **building science**, **HVAC design**, **environmental design**, **thermal physiology**, **sport science**, and **biometeorology**.
+  Useful for building science, HVAC design, environmental design, thermal
+  physiology, sports science, and biometeorology.
 - **Enhanced Decision-Making**:
-  Empowers you to make data-driven decisions for **HVAC systems**, **building performance**, and **occupant comfort**.
+  Supports data-driven decisions for HVAC systems, building performance, and
+  occupant comfort.
 
 Cite pythermalcomfort
 =====================
@@ -62,7 +71,17 @@ Install ``pythermalcomfort`` via pip:
 
    pip install pythermalcomfort
 
-For advanced installation options, refer to the `Installation Instructions <https://pythermalcomfort.readthedocs.io/en/latest/installation.html>`_.
+For advanced installation options, refer to the
+`Installation Instructions <https://pythermalcomfort.readthedocs.io/en/latest/installation.html>`_.
+
+Requirements
+============
+
+A typical environment includes:
+
+- Python 3.9+ (or the minimum version used in CI)
+- NumPy, SciPy, pandas (installed automatically as package dependencies)
+- Optional: Matplotlib / other plotting libraries for examples and visualizations
 
 Quick Start
 ===========
@@ -91,14 +110,12 @@ Get started with ``pythermalcomfort`` in just a few lines of code:
 
 For more examples and detailed usage, check out models and indices in the models section of the documentation.
 
-Sponsor the Maintainers of pythermalcomfort
-===========================================
+Support pythermalcomfort
+========================
 
-If you find this project useful, please consider supporting the maintainers.
-Maintaining an open\-source scientific package requires substantial time and
-effort: developing and reviewing code, triaging issues, keeping CI and docs
-healthy, and helping users. Financial contributions directly help sustain
-that work.
+If you find this project useful, consider supporting the maintainers. Maintaining
+an open-source scientific package requires time for development, review, CI,
+and user support.
 
 Ways to support
 ---------------
@@ -109,17 +126,15 @@ Ways to support
 - Help with testing, translations, or reviewing pull requests
 - Star or share the project to increase visibility
 
-Any support—financial or contribution\-based—is greatly appreciated and helps
-keep the project healthy and maintained.
+Any support—financial or contribution-based—is appreciated and helps keep the
+project healthy.
 
 Contribute
 ==========
 
-We welcome contributions! Whether you’re reporting a bug, suggesting a feature,
-or submitting a pull request, your input helps make ``pythermalcomfort`` better
-for everyone. Below is a short, actionable guide to get your changes ready and
-submitted quickly. For full details, see CONTRIBUTING.rst in the project root
-or the documentation contributing page.
+We welcome contributions! Whether reporting a bug, suggesting a feature, or
+submitting a pull request, your input helps make ``pythermalcomfort`` better for
+everyone. See CONTRIBUTING.rst for full contribution guidelines.
 
 Quick checklist
 ---------------
@@ -171,6 +186,8 @@ Where to get help
 * Ask questions in PR comments for implementation guidance.
 * See the CONTRIBUTING.rst file for detailed guidance on testing,
   documentation, and changelog expectations.
+* For API reference and examples, consult the online docs:
+  https://pythermalcomfort.readthedocs.io/en/latest/
 
 Documentation
 -------------
@@ -182,7 +199,6 @@ License
 =======
 
 ``pythermalcomfort`` is released under the MIT License.
-
 
 =====
 Stats
@@ -235,7 +251,7 @@ Stats
     :target: https://pypi.org/project/pythermalcomfort
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/pythermalcomfort.svg
-    :alt: PyPI Wheel
+    :alt: pythermalcomfort wheel
     :target: https://pypi.org/project/pythermalcomfort
 
 .. |supported-ver| image:: https://img.shields.io/pypi/pyversions/pythermalcomfort.svg
