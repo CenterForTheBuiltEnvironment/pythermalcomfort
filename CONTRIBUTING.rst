@@ -178,7 +178,7 @@ Where to get help
 * Ask questions in PR comments for implementation guidance.
 * See the CONTRIBUTING.rst file for development and testing guidelines.
 * For API reference and examples, consult the online docs:
-  https://pythermalcomfort.readthedocs.io/en/latest/
+  `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
 
 Tips
 ----

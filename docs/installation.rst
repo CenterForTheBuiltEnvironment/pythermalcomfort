@@ -124,8 +124,8 @@ Troubleshooting
 Further resources
 =================
 
-* Full documentation and examples: https://pythermalcomfort.readthedocs.io
-* Contribution guidelines: see ``CONTRIBUTING.rst`` in the project root
+* Full documentation and examples: `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
+* Contribution guidelines: see `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ in the project root
 
 .. _using-from-r:
 
@@ -216,5 +216,5 @@ Notes and tips
 Further resources
 =================
 
-* Full documentation and examples: https://pythermalcomfort.readthedocs.io
+* Full documentation and examples: `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
 * reticulate documentation: https://rstudio.github.io/reticulate/
