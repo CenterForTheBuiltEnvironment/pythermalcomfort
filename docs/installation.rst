@@ -124,5 +124,97 @@ Troubleshooting
 Further resources
 =================
 
-* Full documentation and examples: https://pythermalcomfort.readthedocs.io
-* Contribution guidelines: see ``CONTRIBUTING.rst`` in the project root
+* Full documentation and examples: `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
+* Contribution guidelines: see `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ in the project root
+
+.. _using-from-r:
+
+Using pythermalcomfort from R
+=============================
+
+You can call the Python package from R using the reticulate package.
+Two common workflows are shown below: using a virtualenv or a conda environment.
+Adjust commands to your OS and Python installation.
+
+Virtualenv (recommended when using virtualenv)
+----------------------------------------------
+
+.. code-block:: r
+
+    # install reticulate if needed
+    install.packages("reticulate")
+
+    library(reticulate)
+
+    # create and install pythermalcomfort into a virtualenv
+    virtualenv_create("r-pythermal")
+    virtualenv_install("r-pythermal", packages = c("pythermalcomfort"))
+
+    # activate the virtualenv for this R session
+    use_virtualenv("r-pythermal", required = TRUE)
+
+    # import the package and call functions
+    ptc <- import("pythermalcomfort")
+    pmv_ppd_iso <- ptc$models$pmv_ppd_iso
+    res <- pmv_ppd_iso(tdb = 25, tr = 25, vr = 0.1, rh = 50,
+                      met = 1.4, clo = 0.5)
+    # access results (attributes of the Python return object)
+    res$pmv
+    res$ppd
+
+Conda environment
+-----------------
+
+.. code-block:: r
+
+    library(reticulate)
+
+    # create a conda env and install pythermalcomfort
+    conda_create("r-pythermal")
+    conda_install("r-pythermal", packages = c("pythermalcomfort"), channel = "defaults")
+
+    # use the conda env in this session
+    use_condaenv("r-pythermal", required = TRUE)
+
+    # import and use as above
+    ptc <- import("pythermalcomfort")
+    pmv_ppd_iso <- ptc$models$pmv_ppd_iso
+
+Vectorized inputs and conversions
+---------------------------------
+
+.. code-block:: r
+
+    library(reticulate)
+
+    # for vector inputs, convert R vectors to Python objects when needed
+    tdb <- c(20, 25, 30)
+    tr <- rep(25, 3)
+    vr <- rep(0.1, 3)
+    rh <- rep(50, 3)
+
+    # r_to_py is optional; reticulate will attempt automatic conversion
+    res <- pmv_ppd_iso(tdb = r_to_py(tdb), tr = r_to_py(tr),
+                      vr = r_to_py(vr), rh = r_to_py(rh),
+                      met = 1.2, clo = 0.5)
+
+    # extract scalar/vector results
+    pmv_vec <- py_to_r(res$pmv)
+    ppd_vec <- py_to_r(res$ppd)
+
+Notes and tips
+--------------
+
+- If you prefer installing from R directly into the active Python environment, reticulate offers py_install():
+  reticulate::py_install("pythermalcomfort", envname = "r-pythermal", pip = TRUE)
+- Access Python objects' attributes with the $ operator (e.g., res$pmv).
+- Use py_to_r() to convert numpy arrays or Python lists into R vectors or lists.
+- If reticulate cannot find the correct Python, set RETICULATE_PYTHON to a specific interpreter path before loading reticulate:
+  Sys.setenv(RETICULATE_PYTHON = "/path/to/python")
+- See the reticulate guide for details: https://rstudio.github.io/reticulate/
+
+Further resources
+=================
+
+* Full documentation and examples: `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
+* reticulate documentation: https://rstudio.github.io/reticulate/
