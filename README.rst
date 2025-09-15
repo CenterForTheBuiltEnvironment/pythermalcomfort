@@ -12,6 +12,18 @@ responses based on international standards and peer-reviewed research. Designed
 for researchers, engineers, and building-science professionals, it simplifies
 complex calculations while promoting accuracy and standards compliance.
 
+Cite pythermalcomfort
+=====================
+
+If you use ``pythermalcomfort`` in your research, please cite it as follows:
+
+.. code-block:: text
+
+   Tartarini, F., Schiavon, S., 2020.
+   pythermalcomfort: A Python package for thermal comfort research.
+   SoftwareX 12, 100578.
+   https://doi.org/10.1016/j.softx.2020.100578
+
 Key Features
 ============
 
@@ -49,18 +61,6 @@ Why Use pythermalcomfort?
 - **Enhanced Decision-Making**:
   Supports data-driven decisions for HVAC systems, building performance, and
   occupant comfort.
-
-Cite pythermalcomfort
-=====================
-
-If you use ``pythermalcomfort`` in your research, please cite it as follows:
-
-.. code-block:: text
-
-   Tartarini, F., Schiavon, S., 2020.
-   pythermalcomfort: A Python package for thermal comfort research.
-   SoftwareX 12, 100578.
-   https://doi.org/10.1016/j.softx.2020.100578
 
 Installation
 ============
@@ -134,7 +134,7 @@ Contribute
 
 We welcome contributions! Whether reporting a bug, suggesting a feature, or
 submitting a pull request, your input helps make ``pythermalcomfort`` better for
-everyone. See CONTRIBUTING.rst for full contribution guidelines.
+everyone. See `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_. for full contribution guidelines.
 
 Quick checklist
 ---------------
@@ -184,7 +184,7 @@ Where to get help
 
 * Open an issue on GitHub with a minimal reproduction for bugs.
 * Ask questions in PR comments for implementation guidance.
-* See the CONTRIBUTING.rst file for detailed guidance on testing,
+* See the `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ for detailed guidance on testing,
   documentation, and changelog expectations.
 * For API reference and examples, consult the online docs:
   https://pythermalcomfort.readthedocs.io/en/latest/
