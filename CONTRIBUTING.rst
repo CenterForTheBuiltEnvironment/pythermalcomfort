@@ -156,86 +156,92 @@ Step-by-step guide
 ^^^^^^^^^^^^^^^^^^
 
 1) Pick the module location
-   - If function is a domain model, add under:
-     ``pythermalcomfort/models/<module_name>.py``
-   - If generic utility, consider:
-     ``pythermalcomfort/utilities.py``
+   - If function is a domain model, add under: ``pythermalcomfort/models/<module_name>.py``
+   - If generic utility, consider: ``pythermalcomfort/utilities.py``
 
 2) Implement the function
    - Keep it small, pure and documented.
    - Use numpy for numeric ops (e.g., ``np.log``) rather than ``math``.
-   - Add a NumPy-style docstring including:
-     - Args (with units), Returns, Raises, Examples, References, Applicability.
+   - Add a NumPy-style docstring including: Parameters, Raises, Returns, Examples, References.
    - Example skeleton:
-     .. code-block:: python
 
-         # pythermalcomfort/models/my_func.py
-         from typing import Union
-         import numpy as np
+   .. code-block:: python
 
-         def my_func(x: float | np.ndarray) -> float | np.ndarray:
-             \"\"\"Short description.
+     # pythermalcomfort/models/my_func.py
+     from typing import Union
+     import numpy as np
 
-             Parameters
-             ----------
-                 x: value in meters.
+     def my_func(x: float | np.ndarray) -> float | np.ndarray:
+         """Short description.
 
-             Returns
-             -------
-                 Dataclass with fields
+         Parameters
+         ----------
+             x: value in meters.
 
-             Raises
-             ------
-                 ValueError: if x is negative.
+         Returns
+         -------
+             Dataclass with fields
 
-             Examples
-             --------
-                 >>> my_func(1.0)
-                 2.0
-             \"\"\"
-             x_arr = np.asarray(x)
-             if np.any(x_arr < 0):
-                 raise ValueError("x must be non-negative")
-             return x_arr * 2
+         Raises
+         ------
+             ValueError: if x is negative.
+
+         Examples
+         --------
+             >>> my_func(1.0)
+             2.0
+         """
+
+         x_arr = np.asarray(x)
+         if np.any(x_arr < 0):
+             raise ValueError("x must be non-negative")
+         return x_arr * 2
+
 
 3) Create / update an input dataclass (if applicable)
-   - Add input dataclasses to ``pythermalcomfort/classes_input.py`` or
-     next to the function module to centralize validation.
+
+   - Add input dataclasses to ``pythermalcomfort/classes_input.py`` or next to the function module to centralize validation.
    - Put type checks and physical/applicability checks in ``__post_init__``.
    - Convert pandas Series to lists/arrays before validation.
    - Use ``validate_type(name, allowed_types)`` for type validation.
    - Example pattern:
+
    .. code-block:: python
 
-       @dataclass
-       class MyFuncInputs(BaseInputs):
-           x: float | int | list | np.ndarray = None
+     @dataclass
+     class MyFuncInputs(BaseInputs):
+         x: float | int | list | np.ndarray = None
 
-           def __post_init__(self):
-               super().__post_init__()
-               # validate types (raises TypeError)
-               validate_type(self.x, "x", (float, int, list, np.ndarray))
-               # normalize to numpy array for vectorized ops
-               self.x = np.asarray(self.x)
-               # physical checks (raises ValueError)
-               if np.any(self.x < 0):
-                   raise ValueError("x must be non-negative")
-               # broadcasting checks if multiple array fields exist
+         def __post_init__(self):
+             super().__post_init__()
+             # validate types (raises TypeError)
+             validate_type(self.x, "x", (float, int, list, np.ndarray))
+             # normalize to numpy array for vectorized ops
+             self.x = np.asarray(self.x)
+             # physical checks (raises ValueError)
+             if np.any(self.x < 0):
+                 raise ValueError("x must be non-negative")
+             # broadcasting checks if multiple array fields exist
+
 
 4) Return types and classes_return
-   - When consistent with other functions, return a dataclass from
-     ``classes_return.py`` to provide structured outputs.
+
+   - When consistent with other functions, return a dataclass from ``classes_return.py`` to provide structured outputs.
    - Keep the public API clear and documented.
 
 5) Tests
+
    - Add tests under ``tests/test_<function>.py``.
    - Cover:
+
      - Scalar inputs (single values).
      - Vectorized inputs (lists, numpy arrays).
      - Broadcasting behavior and consistent output shapes.
      - Invalid inputs (TypeError and ValueError cases).
      - Edge cases (zeros, very small/large inputs that affect numeric stability).
+
    - Example pytest skeleton:
+
    .. code-block:: python
 
        import numpy as np
@@ -254,41 +260,45 @@ Step-by-step guide
            with pytest.raises(ValueError):
                my_func(-1.0)
 
+
    - Keep tests deterministic and small. Use numpy.testing where helpful.
 
 6) Documentation & autodoc
+
    - Add a short example to the function docstring.
-   - Add an ``.. autofunction:: pythermalcomfort.models.my_func.my_func``
-     entry in the relevant docs source file (e.g., ``docs/reference.rst`` or
-     the file that collects API references).
-   - If a larger example/tutorial is needed, add an rst under ``docs/`` and
-     include usage examples (scalar and vectorized).
+   - Add an ``.. autofunction:: pythermalcomfort.models.my_func.my_func`` entry in the relevant docs source file (e.g., ``docs/reference.rst`` or the file that collects API references).
+   - If a larger example/tutorial is needed, add an rst under ``docs/`` and include usage examples (scalar and vectorized).
 
 7) CHANGELOG and AUTHORS
+
    - Add a short line to the changelog describing the new function.
    - Optionally add yourself to AUTHORS.rst when contributing a new feature.
 
 8) Formatting, linting and tests locally
-   - Apply project formatters and linters:
-     .. code-block:: bash
 
-         ruff check --fix
-         ruff format
-         docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
+   - Apply project formatters and linters:
+
+   .. code-block:: bash
+
+      ruff check --fix
+      ruff format
+      docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
 
    - Run tests:
-     .. code-block:: bash
 
-         pytest -q
+   .. code-block:: bash
+
+      pytest -q
 
 9) Open a PR
-   - Title: short descriptive title (e.g., "feat: add my_func for X calculation")
-   - Include in PR description:
-     - What the function does and why.
-     - Applicability limits and physical constraints.
-     - How it was tested (mention key tests).
-     - Notes about numeric stability or edge cases.
-   - Ensure CI passes and add reviewers as appropriate.
+
+- Title: short descriptive title (e.g., "feat: add my_func for X calculation")
+- Include in PR description:
+   - What the function does and why.
+   - Applicability limits and physical constraints.
+   - How it was tested (mention key tests).
+   - Notes about numeric stability or edge cases.
+- Ensure CI passes and add reviewers as appropriate.
 
 Recommended validation rules (common to many functions)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -300,6 +310,7 @@ Recommended validation rules (common to many functions)
 - Error types: use TypeError for wrong types, ValueError for invalid values.
 
 PR checklist (add to your PR description)
+
 - [ ] New tests added and passing.
 - [ ] Docstring updated with examples and applicability limits.
 - [ ] Documentation (autofunction) updated if public API changed.
