@@ -168,7 +168,6 @@ Step-by-step guide
    .. code-block:: python
 
      # pythermalcomfort/models/my_func.py
-     from typing import Union
      import numpy as np
 
      def my_func(x: float | np.ndarray) -> float | np.ndarray:
@@ -196,7 +195,6 @@ Step-by-step guide
          if np.any(x_arr < 0):
              raise ValueError("x must be non-negative")
          return x_arr * 2
-
 
 3) Create / update an input dataclass (if applicable)
 
