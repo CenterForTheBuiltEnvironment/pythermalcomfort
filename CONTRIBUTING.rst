@@ -32,8 +32,8 @@ If you are proposing a feature:
 * Keep the scope narrow so it is easier to review and implement.
 * Consider opening a discussion issue first for larger changes.
 
-Development
-===========
+Contributing Code
+=================
 
 To set up `pythermalcomfort` for local development:
 
@@ -170,13 +170,6 @@ Reference Template
 
 Use existing functions (for example ``pmv_ppd_iso.py``) as templates for
 structure, validation, documentation, and tests.
-
-Contribute
-==========
-
-We welcome contributions of all kinds: bug reports, documentation, tests,
-translations, and code. See the repository CONTRIBUTING and docs for more
-details.
 
 Where to get help
 -----------------
