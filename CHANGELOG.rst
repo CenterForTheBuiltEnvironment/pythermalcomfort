@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.5.1 (2025-09-15)
+------------------
+
+* Improved documentation on how to contribute to the project
+
 3.5.0 (2025-09-10)
 ------------------
 
