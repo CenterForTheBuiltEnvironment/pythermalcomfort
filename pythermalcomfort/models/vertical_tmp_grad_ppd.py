@@ -96,12 +96,12 @@ def vertical_tmp_grad_ppd(
         vertical_tmp_grad=vertical_tmp_grad,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    clo = np.array(clo)
-    vertical_tmp_grad = np.array(vertical_tmp_grad)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    vertical_tmp_grad = np.asarray(vertical_tmp_grad)
 
     (
         tdb_valid,

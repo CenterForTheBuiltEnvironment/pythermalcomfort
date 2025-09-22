@@ -61,8 +61,8 @@ def discomfort_index(
         rh=rh,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     di = tdb - 0.55 * (1 - 0.01 * rh) * (tdb - 14.5)
 

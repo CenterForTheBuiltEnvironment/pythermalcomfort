@@ -81,10 +81,10 @@ def adaptive_en(
     # Validate inputs using the ENInputs class
     ENInputs(tdb=tdb, tr=tr, t_running_mean=t_running_mean, v=v, units=units)
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    t_running_mean = np.array(t_running_mean)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    t_running_mean = np.asarray(t_running_mean)
+    v = np.asarray(v)
     standard = "iso"
 
     if units.upper() == Units.IP.value:

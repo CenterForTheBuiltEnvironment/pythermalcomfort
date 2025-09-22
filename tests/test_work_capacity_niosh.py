@@ -7,8 +7,8 @@ from pythermalcomfort.models.work_capacity_niosh import work_capacity_niosh
 
 def _expected_capacity(wbgt, met) -> np.ndarray:
     """Calculate the expected work capacity based on WBGT and metabolic rate."""
-    wbgt_arr = np.array(wbgt)
-    met_arr = np.array(met)
+    wbgt_arr = np.asarray(wbgt)
+    met_arr = np.asarray(met)
     met_rest = 117.0
     wbgt_lim = 56.7 - 11.5 * np.log10(met_arr)
     wbgt_lim_rest = 56.7 - 11.5 * np.log10(met_rest)

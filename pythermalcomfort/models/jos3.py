@@ -276,7 +276,7 @@ class JOS3:
         model.tdb = 28  # Air temperature [°C]
         model.tr = 30  # Mean radiant temperature [°C]
         model.rh = 40  # Relative humidity [%]
-        model.v = np.array(  # Air velocity [m/s]
+        model.v = np.asarray(  # Air velocity [m/s]
             [
                 0.2,  # head
                 0.4,  # neck
@@ -1182,10 +1182,10 @@ class JOS3:
         for key, value in merged_data.items():
             if isinstance(value, defaultdict):
                 merged_data[key] = JOS3BodyParts(
-                    **{k: np.array(v) for k, v in value.items()},
+                    **{k: np.asarray(v) for k, v in value.items()},
                 )
             else:
-                merged_data[key] = np.array(value)
+                merged_data[key] = np.asarray(value)
 
         return JOS3Output(**merged_data)
 

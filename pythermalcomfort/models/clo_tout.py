@@ -67,7 +67,7 @@ def clo_tout(
     )
 
     # Convert tout to NumPy array for vectorized operations
-    tout = np.array(tout)
+    tout = np.asarray(tout)
 
     # Convert units if necessary
     if units.upper() == Units.IP.value:

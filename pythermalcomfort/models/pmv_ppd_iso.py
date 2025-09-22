@@ -146,13 +146,13 @@ def pmv_ppd_iso(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    rh = np.array(rh)
-    vr = np.array(vr)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    rh = np.asarray(rh)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)

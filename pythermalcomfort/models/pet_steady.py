@@ -479,7 +479,7 @@ def _pet_steady_vectorised(
         return round(optimize.fsolve(f, pet_guess)[0], 2)
 
     # initial guess
-    t_guess = np.array([36.7, 34, 0.5 * (tdb + tr)])
+    t_guess = np.asarray([36.7, 34, 0.5 * (tdb + tr)])
     # solve for Tc, Tsk, Tcl temperatures
     t_stable = optimize.fsolve(
         solve_pet,

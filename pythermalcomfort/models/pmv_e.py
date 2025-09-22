@@ -118,7 +118,7 @@ def pmv_e(
     )
 
     default_kwargs = {"units": units, "limit_inputs": limit_inputs}
-    met = np.array(met)
+    met = np.asarray(met)
     _pmv = pmv_ppd_iso(
         tdb=tdb,
         tr=tr,

@@ -39,8 +39,8 @@ def thi(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     _thi = 1.8 * tdb + 32 - 0.55 * (1 - 0.01 * rh) * (1.8 * tdb - 26)
 

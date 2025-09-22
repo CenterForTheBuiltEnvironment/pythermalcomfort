@@ -50,7 +50,7 @@ def work_capacity_dunne(
 
     # convert str to enum
     work_intensity = WorkIntensity(work_intensity.lower())
-    wbgt = np.array(wbgt)
+    wbgt = np.asarray(wbgt)
 
     capacity = np.clip((100 - (25 * (np.maximum(0, wbgt - 25)) ** (2 / 3))), 0, 100)
 

@@ -47,8 +47,8 @@ def test_scale_winds_speed_scalar() -> None:
 
 def test_scale_winds_speed_array() -> None:
     """Test scaling wind speed for array inputs."""
-    v10 = np.array([3.0, 5.0])
-    z2 = np.array([1.5, 2.5])
+    v10 = np.asarray([3.0, 5.0])
+    z2 = np.asarray([1.5, 2.5])
     expected = v10 * np.log((z2 - 0.0) / 0.01) / np.log((10.0 - 0.0) / 0.01)
     result = scale_wind_speed_log(v10, z2, round_output=False)
     assert np.allclose(result.v_z2, expected, rtol=1e-5)
@@ -59,7 +59,7 @@ def test_scale_wind_speed_broadcasting() -> None:
     v10 = [3.0, 5.0]
     z2 = [1.5, 2.5]
     z0 = [0.01, 0.1]
-    expected = np.array(
+    expected = np.asarray(
         [
             3.0 * np.log((1.5 - 0.0) / 0.01) / np.log((10.0 - 0.0) / 0.01),
             5.0 * np.log((2.5 - 0.0) / 0.1) / np.log((10.0 - 0.0) / 0.1),

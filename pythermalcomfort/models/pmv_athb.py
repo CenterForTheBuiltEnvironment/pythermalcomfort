@@ -86,12 +86,12 @@ def pmv_athb(
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    rh = np.array(rh)
-    t_running_mean = np.array(t_running_mean)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    rh = np.asarray(rh)
+    t_running_mean = np.asarray(t_running_mean)
 
     met_adapted = met - (0.234 * t_running_mean) / 58.2
 

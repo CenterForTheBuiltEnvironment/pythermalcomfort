@@ -77,9 +77,9 @@ def wbgt(
         round_output=round_output,
     )
 
-    twb = np.array(twb)
-    tg = np.array(tg)
-    tdb = np.array(tdb) if tdb is not None else None
+    twb = np.asarray(twb)
+    tg = np.asarray(tg)
+    tdb = np.asarray(tdb) if tdb is not None else None
 
     if with_solar_load and tdb is None:
         raise ValueError("Please enter the dry bulb air temperature")

@@ -48,8 +48,8 @@ def heat_index_lu(
         limit_inputs=False,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     hi = _lu_heat_index_vectorized(tdb + 273.15, rh / 100) - 273.15
 

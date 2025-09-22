@@ -115,14 +115,14 @@ def two_nodes_gagge(
         w_max=w_max,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
-    position = np.array(position)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
+    position = np.asarray(position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 

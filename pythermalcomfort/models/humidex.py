@@ -66,8 +66,8 @@ def humidex(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     if np.any(rh > 100) or np.any(rh < 0):
         raise ValueError("Relative humidity must be between 0 and 100%")

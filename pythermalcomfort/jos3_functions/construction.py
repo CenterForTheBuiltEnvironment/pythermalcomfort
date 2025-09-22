@@ -83,7 +83,7 @@ def to_array_body_parts(inp) -> np.ndarray:
     if isinstance(inp, int | float):
         return np.full(Default.num_body_parts, inp)
     if isinstance(inp, dict):
-        return np.array([inp[key] for key in JOS3BodyParts.get_attribute_names()])
+        return np.asarray([inp[key] for key in JOS3BodyParts.get_attribute_names()])
     if isinstance(inp, list | np.ndarray):
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
@@ -296,7 +296,7 @@ def conductance(
 
     """
     if fat < 12.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.341,
                 0.930,
@@ -318,7 +318,7 @@ def conductance(
             ],
         )
     elif fat < 17.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.311,
                 0.909,
@@ -340,7 +340,7 @@ def conductance(
             ],
         )
     elif fat < 22.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.282,
                 0.889,
@@ -362,7 +362,7 @@ def conductance(
             ],
         )
     elif fat < 27.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.255,
                 0.870,
@@ -384,7 +384,7 @@ def conductance(
             ],
         )
     else:  # fat >= 27.5
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.227,
                 0.852,
@@ -424,7 +424,7 @@ def conductance(
     # stolwijk's core radius.
     # The heat transfer coefficient of the core is assumed as the Michel's
     # counter-flow model 0.66816 [W/(m･K)].
-    cdt_ves_cr = np.array(
+    cdt_ves_cr = np.asarray(
         [
             0,
             0,
@@ -446,7 +446,7 @@ def conductance(
         ],
     )
     # superficial vein to skin
-    cdt_sfv_sk = np.array(
+    cdt_sfv_sk = np.asarray(
         [
             0,
             0,
@@ -471,7 +471,7 @@ def conductance(
     # art to vein (counter-flow) [W/K]
     # The data has been derived Mitchell's model.
     # The values = 15.869 [W/(m･K)] * the segment length [m]
-    cdt_art_vein = np.array(
+    cdt_art_vein = np.asarray(
         [
             0,
             0,
@@ -580,7 +580,7 @@ def capacity(
     # Define capacities [Wh/K]
 
     # artery [Wh/K]
-    cap_art = np.array(
+    cap_art = np.asarray(
         [
             0.096,
             0.025,
@@ -603,7 +603,7 @@ def capacity(
     )
 
     # vein [Wh/K]
-    cap_vein = np.array(
+    cap_vein = np.asarray(
         [
             0.321,
             0.085,
@@ -626,7 +626,7 @@ def capacity(
     )
 
     # superficial vein [Wh/K]
-    cap_sfv = np.array(
+    cap_sfv = np.asarray(
         [
             0,
             0,
@@ -652,7 +652,7 @@ def capacity(
     cap_cb = 1.999
 
     # core [Wh/K]
-    cap_cr = np.array(
+    cap_cr = np.asarray(
         [
             1.7229,
             0.564,
@@ -675,7 +675,7 @@ def capacity(
     )
 
     # muscle [Wh/K]
-    cap_ms = np.array(
+    cap_ms = np.asarray(
         [
             0.305,
             0.0,
@@ -698,7 +698,7 @@ def capacity(
     )
 
     # fat [Wh/K]
-    cap_fat = np.array(
+    cap_fat = np.asarray(
         [
             0.203,
             0.0,
@@ -721,7 +721,7 @@ def capacity(
     )
 
     # skin [Wh/K]
-    cap_sk = np.array(
+    cap_sk = np.asarray(
         [
             0.1885,
             0.058,

@@ -17,7 +17,7 @@ def test_heavy_array_and_clipping() -> None:
     wbgt = [20, 25, 28, 30, 35]
     wc = work_capacity_dunne(wbgt, "heavy")
     expected_base = np.clip(
-        100 - 25 * np.maximum(0, np.array(wbgt) - 25) ** (2 / 3),
+        100 - 25 * np.maximum(0, np.asarray(wbgt) - 25) ** (2 / 3),
         0,
         100,
     )

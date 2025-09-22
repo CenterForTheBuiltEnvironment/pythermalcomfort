@@ -82,10 +82,10 @@ def utci(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
 
     if units.upper() == Units.IP.value:
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)

@@ -111,13 +111,13 @@ def use_fans_heatwaves(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     output = two_nodes_gagge(
         tdb,
