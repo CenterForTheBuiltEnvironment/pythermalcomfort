@@ -116,7 +116,7 @@ def phs(
         Initial instantaneous regulatory sweat (evaporative) rate at the skin, per unit area,
         [W·m⁻²]. This is an instantaneous rate (W/m²) used at each simulation time step.
     evap_load_wm2_min : float, optional
-        Initial accumulated evaporative load per unit area.  Input value is expected as an
+        Initial accumulated evaporative load per unit area. Input value is expected as an
         instantaneous rate in [W·m⁻²]; during the simulation the value is updated by adding
         instantaneous rates each minute and therefore the accumulated quantity represents the
         sum over minutes (units W·min·m⁻²). It is intended for carry over between consecutive
@@ -282,6 +282,16 @@ def phs(
     sweat_rate_watt = kwargs[
         "sweat_rate_watt"
     ]  # instantaneous regulatory sweat rate at skin, [W·m⁻²]
+    # basic physical validation for carry-over state (supports scalar and array-like)
+    t_arr = np.asarray(t_sk_t_cr_wg)
+    sweat_arr = np.asarray(sweat_rate_watt)
+    evap_arr = np.asarray(evap_load_wm2_min)
+    if np.any(sweat_arr < 0):
+        raise ValueError("sweat_rate_watt must be >= 0")
+    if np.any(evap_arr < 0):
+        raise ValueError("evap_load_wm2_min must be >= 0")
+    if np.any((t_arr < 0.0) | (t_arr > 1.0)):
+        raise ValueError("t_sk_t_cr_wg must be within [0, 1]")
     limit_inputs = kwargs["limit_inputs"]
 
     if model == Models.iso_7933_2023.value:
@@ -357,7 +367,7 @@ def phs(
         "d_lim_loss_95": d_lim_loss_95,
         "d_lim_t_re": d_lim_t_re,
         "sweat_rate_watt": sweat_rate_watt,
-        "sweat_rate_gram": sw_tot_g,
+        "sweat_loss_g": sw_tot_g,
         "evap_load_wm2_min": evap_load_wm2_min,
     }
 
@@ -406,7 +416,7 @@ const_sw = math.exp(-1 / 10)
 
 
 @np.vectorize
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _phs_optimized(
     tdb,
     tr,
@@ -639,7 +649,10 @@ def _phs_optimized(
             e_p = 0  # predicted evaporative heat flow [W/m2]
             sweat_rate_watt = 0
         else:
-            k = e_max / sweat_rate_watt
+            # Use a small epsilon to avoid division by zero or tiny values
+            # This ensures k remains numerically stable
+            EPSILON = 1e-6
+            k = e_max / max(sweat_rate_watt, EPSILON)
             wp = 1
             if k >= 0.5:
                 wp = -k + math.sqrt(k * k + 2)

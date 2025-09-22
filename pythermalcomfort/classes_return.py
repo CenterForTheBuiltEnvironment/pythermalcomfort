@@ -325,24 +325,23 @@ class PHS(AutoStrMixin):
     t_sk_t_cr_wg : float or list of floats
         Fraction of the body mass at the skin temperature.
     d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time for sweat rate grams, mean subject, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for a mean worker (dehydration constraint), [minutes].
     d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time for sweat rate grams, 95% of the working population, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for 95% of the working population (dehydration constraint), [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    sweat_rate_gram : float or list of floats
+    sweat_loss_g : float or list of floats
         Cumulative evaporated sweat mass for the whole person over the simulated duration, [grams (g)].
         This is a total mass per person (not per unit area).
     sweat_rate_watt : float or list of floats
-        Instantaneous regulatory sweat (evaporative) rate at the skin, per unit area, [W·m⁻²].
-        This is an instantaneous rate used at each time step.
+        Instantaneous evaporative heat flux due to regulatory sweating at the skin,
+        per unit area, [W·m⁻²]. Used at each simulation time step.
     evap_load_wm2_min : float or list of floats
-        Accumulated evaporative load per unit area over the simulated duration.
-        Internally this is computed as the running sum of instantaneous rates (W·m⁻²) over
-        each minute of simulation and thus has units of W·min·m⁻² (i.e. W·m⁻² summed per minute).
-        Note: initial/returned instantaneous values (e.g. for restarting a simulation) are
-        expected/provided as W·m⁻²; the accumulated value represents total accumulated
-        evaporative load over time for carryover between simulation segments.
+        Accumulated evaporative load per unit area over the simulated duration, [W·min·m⁻²].
+        Computed as the running sum of the instantaneous evaporative heat flux (W·m⁻²)
+        at each 1 minute step. Intended for chaining simulation segments.
 
     """
 
@@ -354,7 +353,7 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    sweat_rate_gram: float | list[float]
+    sweat_loss_g: float | list[float]
     sweat_rate_watt: float | list[float]
     evap_load_wm2_min: float | list[float]
 
