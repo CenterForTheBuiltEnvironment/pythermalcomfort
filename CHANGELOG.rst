@@ -1,6 +1,13 @@
 Changelog
 =========
 
+3.6.0 (2025-09-22)
+------------------
+
+.. warning::
+    breaking change for the `phs` function:
+    - the `phs` function now returns all the outputs needed to use the outputs of a previous calculation as inputs for a new calculation.
+
 3.5.1 (2025-09-15)
 ------------------
 
