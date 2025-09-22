@@ -100,10 +100,10 @@ def adaptive_ashrae(
         units=units,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    t_running_mean = np.array(t_running_mean)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    t_running_mean = np.asarray(t_running_mean)
+    v = np.asarray(v)
     standard = "ashrae"
 
     if units.upper() == Units.IP.value:

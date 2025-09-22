@@ -38,7 +38,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_natural = np.array(
+        hc_natural = np.asarray(
             [
                 4.48,
                 4.48,
@@ -61,7 +61,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
         )
     elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hc_natural = np.array(
+        hc_natural = np.asarray(
             [
                 4.75,
                 4.75,
@@ -85,7 +85,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
     elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
         # The values are applied under cold environment.
-        hc_a = np.array(
+        hc_a = np.asarray(
             [
                 1.105,
                 1.105,
@@ -106,7 +106,7 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
                 0.200,
             ],
         )
-        hc_b = np.array(
+        hc_b = np.asarray(
             [
                 0.345,
                 0.345,
@@ -157,7 +157,7 @@ def forced_convection(v: float) -> np.ndarray:
         Forced convection heat transfer coefficient body segments.
 
     """
-    hc_a = np.array(
+    hc_a = np.asarray(
         [
             15.0,
             15.0,
@@ -178,7 +178,7 @@ def forced_convection(v: float) -> np.ndarray:
             15.1,
         ],
     )
-    hc_b = np.array(
+    hc_b = np.asarray(
         [
             0.62,
             0.62,
@@ -256,7 +256,7 @@ def rad_coef(posture: str) -> np.ndarray:
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hr = np.array(
+        hr = np.asarray(
             [
                 4.89,
                 4.89,
@@ -279,7 +279,7 @@ def rad_coef(posture: str) -> np.ndarray:
         )
     elif posture.lower() in [Postures.sitting.value, Postures.sedentary.value]:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
-        hr = np.array(
+        hr = np.asarray(
             [
                 4.96,
                 4.96,
@@ -302,7 +302,7 @@ def rad_coef(posture: str) -> np.ndarray:
         )
     elif posture.lower() in [Postures.lying.value, Postures.supine.value]:
         # Kurazumi et al., 2008, https://doi.org/10.20718/jjpa.13.1_17
-        hr = np.array(
+        hr = np.asarray(
             [
                 5.475,
                 5.475,
@@ -449,7 +449,7 @@ def dry_r(hc, hr, clo):
         If any of the input parameters are negative.
 
     """
-    if (np.array(hc) < 0).any() or (np.array(hr) < 0).any():
+    if (np.asarray(hc) < 0).any() or (np.asarray(hr) < 0).any():
         raise ValueError("Input parameters hc and hr must be non-negative.")
 
     fcl = clo_area_factor(clo)
@@ -490,7 +490,7 @@ def wet_r(
         If any of the input parameters are negative.
 
     """
-    if (np.array(hc) < 0).any():
+    if (np.asarray(hc) < 0).any():
         raise ValueError("Input parameters hc must be non-negative.")
 
     fcl = clo_area_factor(clo)
@@ -515,10 +515,10 @@ def error_signals(err_sk=0.0):
         Warm signal (WRMS) [°C] and Cold signal (CLDS) [°C].
 
     """
-    err_sk = np.array(err_sk, dtype=float)
+    err_sk = np.asarray(err_sk, dtype=float)
 
     # SKINR (Distribution coefficients of thermal receptor) [-]
-    receptor = np.array(
+    receptor = np.asarray(
         [
             0.0549,
             0.0146,
@@ -632,7 +632,7 @@ def evaporation(
     e_max = np.where(e_max == 0, 0.001, e_max)
 
     # SKINS
-    skin_sweat = np.array(
+    skin_sweat = np.asarray(
         [
             0.064,
             0.017,
@@ -662,7 +662,7 @@ def evaporation(
     if age < 60:
         sd_sweat = np.ones(Default.num_body_parts)
     else:  # age >= 60
-        sd_sweat = np.array(
+        sd_sweat = np.asarray(
             [
                 0.69,
                 0.69,
@@ -726,7 +726,7 @@ def skin_blood_flow(
     wrms, clds = error_signals(err_sk)
 
     # BFBsk
-    bfb_sk = np.array(
+    bfb_sk = np.asarray(
         [
             1.754,
             0.325,
@@ -748,7 +748,7 @@ def skin_blood_flow(
         ],
     )
     # SKIND
-    skin_dilat = np.array(
+    skin_dilat = np.asarray(
         [
             0.0692,
             0.0992,
@@ -770,7 +770,7 @@ def skin_blood_flow(
         ],
     )
     # SKINC
-    skin_stric = np.array(
+    skin_stric = np.asarray(
         [
             0.0213,
             0.0213,
@@ -802,7 +802,7 @@ def skin_blood_flow(
         sd_dilat = np.ones(Default.num_body_parts)
         sd_stric = np.ones(Default.num_body_parts)
     else:  # age >= 60
-        sd_dilat = np.array(
+        sd_dilat = np.asarray(
             [
                 0.91,
                 0.91,
@@ -1007,7 +1007,7 @@ def local_mbase(
     """
     mbase_all = basal_met(height, weight, age, sex, bmr_equation)
     # Distribution coefficient of basal metabolic rate
-    mbf_cr = np.array(
+    mbf_cr = np.asarray(
         [
             0.19551,
             0.00324,
@@ -1028,7 +1028,7 @@ def local_mbase(
             0.00250,
         ],
     )
-    mbf_ms = np.array(
+    mbf_ms = np.asarray(
         [
             0.00252,
             0.0,
@@ -1049,7 +1049,7 @@ def local_mbase(
             0.0,
         ],
     )
-    mbf_fat = np.array(
+    mbf_fat = np.asarray(
         [
             0.00127,
             0.0,
@@ -1070,7 +1070,7 @@ def local_mbase(
             0.0,
         ],
     )
-    mbf_sk = np.array(
+    mbf_sk = np.asarray(
         [
             0.00152,
             0.00033,
@@ -1126,7 +1126,7 @@ def local_q_work(bmr, par):
     q_work_all = (par - 1) * bmr
 
     # Distribution coefficient of thermogenesis by work
-    workf = np.array(
+    workf = np.asarray(
         [
             0,
             0,
@@ -1198,7 +1198,7 @@ def shivering(
     wrms, clds = error_signals(err_sk)
 
     # Distribution coefficient of thermogenesis by shivering
-    shivf = np.array(
+    shivf = np.asarray(
         [
             0.0339,
             0.0436,
@@ -1353,7 +1353,7 @@ def nonshivering(
     sig_nst = min(sig_nst, thres)
 
     # Distribution coefficient of thermogenesis by non-shivering
-    nstf = np.array(
+    nstf = np.asarray(
         [
             0.000,
             0.190,
@@ -1460,7 +1460,7 @@ def cr_ms_fat_blood_flow(
     """
     # Basal blood flow rate [L/h]
     # core, CBFB
-    bfb_core = np.array(
+    bfb_core = np.asarray(
         [
             35.251,
             15.240,
@@ -1482,7 +1482,7 @@ def cr_ms_fat_blood_flow(
         ],
     )
     # muscle, MSBFB
-    bfb_muscle = np.array(
+    bfb_muscle = np.asarray(
         [
             0.682,
             0.0,
@@ -1504,7 +1504,7 @@ def cr_ms_fat_blood_flow(
         ],
     )
     # fat, FTBFB
-    bfb_fat = np.array(
+    bfb_fat = np.asarray(
         [
             0.265,
             0.0,

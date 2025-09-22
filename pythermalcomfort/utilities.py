@@ -149,7 +149,7 @@ def antoine(tdb: float | np.ndarray) -> np.ndarray:
         Saturated vapor pressure [kPa].
 
     """
-    tdb = np.array(tdb)
+    tdb = np.asarray(tdb)
     return math.e ** (16.6536 - 4030.183 / (tdb + 235))
 
 
@@ -189,8 +189,8 @@ def psy_ta_rh(
         enthalpy_air [J/kg dry air]
 
     """
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     p_saturation = p_sat(tdb)
     p_vap = rh / 100 * p_saturation
@@ -258,8 +258,8 @@ def dew_point_tmp(
         dew point temperature, [°C]
 
     """
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     c = 257.14
     b = 18.678
@@ -312,10 +312,10 @@ def mean_radiant_tmp(
     """
     standard = standard.lower()
 
-    tdb = np.array(tdb)
-    tg = np.array(tg)
-    v = np.array(v)
-    d = np.array(d)
+    tdb = np.asarray(tdb)
+    tg = np.asarray(tg)
+    v = np.asarray(v)
+    d = np.asarray(d)
 
     if standard == "mixed convection":
         mu = 0.0000181  # Pa s
@@ -629,8 +629,8 @@ def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
         relative air speed, [m/s]
 
     """
-    v = np.array(v)
-    met = np.array(met)
+    v = np.asarray(v)
+    met = np.asarray(met)
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
@@ -666,8 +666,8 @@ def clo_dynamic_ashrae(
         dynamic clothing insulation (I :sub:`cl,r`), [clo]
 
     """
-    clo = np.array(clo)
-    met = np.array(met)
+    clo = np.asarray(clo)
+    met = np.asarray(met)
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
@@ -717,10 +717,10 @@ def clo_dynamic_iso(
         invalid_model_msg = f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
         raise ValueError(invalid_model_msg)
 
-    clo = np.array(clo)
-    met = np.array(met)
-    i_a = np.array(i_a)
-    v = np.array(v)
+    clo = np.asarray(clo)
+    met = np.asarray(met)
+    i_a = np.asarray(i_a)
+    v = np.asarray(v)
 
     f_cl = clo_area_factor(i_cl=clo)
     i_t = clo + i_a / f_cl
@@ -884,7 +884,7 @@ def clo_intrinsic_insulation_ensemble(
         intrinsic insulation of the clothing ensemble, [clo]
 
     """
-    clo_garments = np.array(clo_garments)
+    clo_garments = np.asarray(clo_garments)
     return np.sum(clo_garments) * 0.835 + 0.161
 
 
@@ -907,7 +907,7 @@ def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
         area factor of the clothing ensemble, [m2]
 
     """
-    i_cl = np.array(i_cl)
+    i_cl = np.asarray(i_cl)
     return 1 + 0.28 * i_cl
 
 
@@ -942,9 +942,9 @@ def clo_insulation_air_layer(
         boundary air layer insulation, [clo]
 
     """
-    vr = np.array(vr)
-    v_walk = np.array(v_walk)
-    i_a_static = np.array(i_a_static)
+    vr = np.asarray(vr)
+    v_walk = np.asarray(v_walk)
+    i_a_static = np.asarray(i_a_static)
 
     return (
         np.exp(
@@ -1001,11 +1001,11 @@ def clo_total_insulation(
         total insulation of the clothing ensemble, [clo]
 
     """
-    i_t = np.array(i_t)
-    vr = np.array(vr)
-    v_walk = np.array(v_walk)
-    i_a_static = np.array(i_a_static)
-    i_cl = np.array(i_cl)
+    i_t = np.asarray(i_t)
+    vr = np.asarray(vr)
+    v_walk = np.asarray(v_walk)
+    i_a_static = np.asarray(i_a_static)
+    i_cl = np.asarray(i_cl)
 
     def normal_clothing(_vr, _vw, _i_t) -> float:
         return _i_t * _correction_normal_clothing(_vw=_vw, _vr=_vr)
@@ -1058,9 +1058,9 @@ def clo_correction_factor_environment(
         (`I`:sub:`cl,r` / (`I`:sub:`cl`))
 
     """
-    vr = np.array(vr)
-    v_walk = np.array(v_walk)
-    i_cl = np.array(i_cl)
+    vr = np.asarray(vr)
+    v_walk = np.asarray(v_walk)
+    i_cl = np.asarray(i_cl)
 
     def correction_low_clothing(_vr, _vw, _i_cl) -> float:
         return (

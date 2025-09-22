@@ -252,14 +252,14 @@ def phs(
 
     kwargs = {**default_kwargs, **kwargs}
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    met = np.array(met) * met_to_w_m2
-    clo = np.array(clo)
-    wme = np.array(wme) * met_to_w_m2
-    posture = np.array(posture)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
+    met = np.asarray(met) * met_to_w_m2
+    clo = np.asarray(clo)
+    wme = np.asarray(wme) * met_to_w_m2
+    posture = np.asarray(posture)
 
     i_mst = kwargs["i_mst"]
     a_p = kwargs["a_p"]

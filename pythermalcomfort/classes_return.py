@@ -796,7 +796,7 @@ class JOS3BodyParts(AutoStrMixin):
 
 
 def get_attribute_values(cls):
-    return np.array([getattr(cls, field.name) for field in fields(cls)])
+    return np.asarray([getattr(cls, field.name) for field in fields(cls)])
 
 
 @dataclass(frozen=True, repr=False)

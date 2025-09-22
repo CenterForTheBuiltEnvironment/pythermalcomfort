@@ -118,13 +118,13 @@ def cooling_effect(
         units=units,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     if units.upper() == Units.IP.value:
         tdb, tr, vr = units_converter(tdb=tdb, tr=tr, v=vr)

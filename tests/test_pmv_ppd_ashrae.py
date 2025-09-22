@@ -86,7 +86,7 @@ class TestPmvPpd:
                 [0.5, 0.5, 0.5, 0.5, 2.1, 1.9],
                 model=Models.ashrae_55_2023.value,
             ).pmv,
-            np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
+            np.asarray([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         np.testing.assert_equal(

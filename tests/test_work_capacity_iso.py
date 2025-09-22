@@ -12,8 +12,8 @@ def _expected_capacity(
     met: float | list[float],
 ) -> np.ndarray:
     """Calculate the expected work capacity based on WBGT and metabolic rate."""
-    wbgt_arr = np.array(wbgt)
-    met_arr = np.array(met)
+    wbgt_arr = np.asarray(wbgt)
+    met_arr = np.asarray(met)
     met_rest = 117.0
     wbgt_lim = 34.9 - met_arr / 46.0
     wbgt_lim_rest = 34.9 - met_rest / 46.0

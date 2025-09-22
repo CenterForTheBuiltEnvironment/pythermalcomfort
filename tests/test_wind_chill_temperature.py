@@ -33,7 +33,7 @@ class TestWct:
         """Test that the function handles empty lists for tdb and v inputs."""
         # Test with empty lists
         assert np.allclose(
-            wind_chill_temperature(tdb=[], v=[]).wct, np.array([]), equal_nan=True
+            wind_chill_temperature(tdb=[], v=[]).wct, np.asarray([]), equal_nan=True
         )
 
     # Calculate WCT correctly for lists of temperature and wind speed values

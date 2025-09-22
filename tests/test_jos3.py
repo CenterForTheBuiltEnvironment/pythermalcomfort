@@ -632,7 +632,7 @@ def test_vessel_blood_flow() -> None:
 def test_conv_coef() -> None:
     """Test the conv_coef function for calculating convective coefficients based on posture."""
     # Test case 1: Default values
-    hc_expected = np.array(
+    hc_expected = np.asarray(
         [
             4.48,
             4.48,
@@ -659,7 +659,7 @@ def test_conv_coef() -> None:
     )
 
     # Test case 2: Sitting posture
-    hc_expected = np.array(
+    hc_expected = np.asarray(
         [
             4.75,
             4.75,
@@ -692,7 +692,7 @@ def test_conv_coef() -> None:
     # Test case 4: Lying posture with different tdb and t_skin values
     tdb = np.full(17, 28.8)
     t_skin = np.full(17, 34.0)
-    hc_expected = np.array(
+    hc_expected = np.asarray(
         [
             1.105,
             1.105,
@@ -714,7 +714,7 @@ def test_conv_coef() -> None:
         ],
     ) * (
         abs(tdb - t_skin)
-        ** np.array(
+        ** np.asarray(
             [
                 0.345,
                 0.345,
@@ -743,7 +743,7 @@ def test_conv_coef() -> None:
 
     # Test case 5: Forced convection (v > 0.2)
     v = np.full(17, 0.3)
-    hc_expected = np.array(
+    hc_expected = np.asarray(
         [
             15.0,
             15.0,
@@ -765,7 +765,7 @@ def test_conv_coef() -> None:
         ],
     ) * (
         v
-        ** np.array(
+        ** np.asarray(
             [
                 0.62,
                 0.62,
@@ -797,7 +797,7 @@ def test_rad_coef() -> None:
     """Test the rad_coef function for calculating radiative coefficients based on posture."""
     # Test with valid postures
     valid_postures = {
-        "standing": np.array(
+        "standing": np.asarray(
             [
                 4.89,
                 4.89,
@@ -818,7 +818,7 @@ def test_rad_coef() -> None:
                 6.14,
             ],
         ),
-        "sitting": np.array(
+        "sitting": np.asarray(
             [
                 4.96,
                 4.96,
@@ -839,7 +839,7 @@ def test_rad_coef() -> None:
                 6.36,
             ],
         ),
-        "lying": np.array(
+        "lying": np.asarray(
             [
                 5.475,
                 5.475,
@@ -860,7 +860,7 @@ def test_rad_coef() -> None:
                 6.085,
             ],
         ),
-        "sedentary": np.array(
+        "sedentary": np.asarray(
             [
                 4.96,
                 4.96,
@@ -881,7 +881,7 @@ def test_rad_coef() -> None:
                 6.36,
             ],
         ),
-        "supine": np.array(
+        "supine": np.asarray(
             [
                 5.475,
                 5.475,
@@ -968,19 +968,19 @@ def test_operative_temp() -> None:
     )  # Since tdb and tr are the same, to should also be the same
 
     # Test with array inputs
-    tdb = np.array([20.0, 22.0, 24.0])
-    tr = np.array([25.0, 27.0, 29.0])
-    hc = np.array([0.5, 0.6, 0.7])
-    hr = np.array([0.5, 0.4, 0.3])
+    tdb = np.asarray([20.0, 22.0, 24.0])
+    tr = np.asarray([25.0, 27.0, 29.0])
+    hc = np.asarray([0.5, 0.6, 0.7])
+    hr = np.asarray([0.5, 0.4, 0.3])
     to = operative_temp(tdb, tr, hc, hr)
     expected_to = (hc * tdb + hr * tr) / (hc + hr)
     assert np.allclose(to, expected_to)
 
     # Test with mixed scalar and array inputs
     tdb = 20.0
-    tr = np.array([25.0, 27.0, 29.0])
+    tr = np.asarray([25.0, 27.0, 29.0])
     hc = 0.5
-    hr = np.array([0.5, 0.4, 0.3])
+    hr = np.asarray([0.5, 0.4, 0.3])
     to = operative_temp(tdb, tr, hc, hr)
     expected_to = (hc * tdb + hr * tr) / (hc + hr)
     assert np.allclose(to, expected_to)
@@ -1004,8 +1004,8 @@ def test_clo_area_factor() -> None:
     assert clo_area_factor(clo) == pytest.approx(expected_result, rel=1e-3)
 
     # Test with array values
-    clo = np.array([0.4, 0.6, 0.2])
-    expected_result = np.array([1.08, 1.11, 1.04])
+    clo = np.asarray([0.4, 0.6, 0.2])
+    expected_result = np.asarray([1.08, 1.11, 1.04])
     np.testing.assert_allclose(clo_area_factor(clo), expected_result, rtol=1e-3)
 
 
@@ -1017,10 +1017,10 @@ def test_dry_r() -> None:
     assert dry_r(hc, hr, clo) == pytest.approx(expected_result, rel=1e-3)
 
     # Test with array values
-    hc = np.array([3, 3])
-    hr = np.array([5, 5])
-    clo = np.array([0.5, 0.5])
-    expected_result = np.array([0.191, 0.191])
+    hc = np.asarray([3, 3])
+    hr = np.asarray([5, 5])
+    clo = np.asarray([0.5, 0.5])
+    expected_result = np.asarray([0.191, 0.191])
     assert dry_r(hc, hr, clo) == pytest.approx(expected_result, rel=1e-3)
 
     # Test with zero values
@@ -1045,11 +1045,11 @@ def test_wet_r() -> None:
     assert wet_r(hc, clo, i_clo, lewis_rate) == pytest.approx(expected_result, rel=1e-3)
 
     # Test with array values
-    hc = np.array([10.0, 10.0])
-    clo = np.array([0.5, 0.5])
-    i_clo = np.array([0.45, 0.45])
+    hc = np.asarray([10.0, 10.0])
+    clo = np.asarray([0.5, 0.5])
+    i_clo = np.asarray([0.45, 0.45])
     lewis_rate = 16.5
-    expected_result = np.array(
+    expected_result = np.asarray(
         [0.01594, 0.01594],
     )  # Replace with actual expected result based on your function's logic
     np.testing.assert_allclose(
@@ -1087,7 +1087,7 @@ def test_error_signals() -> None:
     assert clds > 0
 
     # Test with array
-    err_sk = np.array(
+    err_sk = np.asarray(
         [-2, 2, -3, 3, -1, 1, 0, -0.5, 0.5, -2, 2, -1, 1, -0.5, 0.5, -1, 1],
     )
     wrms, clds = error_signals(err_sk)
@@ -1095,7 +1095,7 @@ def test_error_signals() -> None:
     assert clds > 0
 
     # Test with wrong length array
-    err_sk = np.array([-2, 2, -3])
+    err_sk = np.asarray([-2, 2, -3])
     with pytest.raises(ValueError):
         error_signals(err_sk)
 
@@ -1103,8 +1103,8 @@ def test_error_signals() -> None:
 def test_evaporation() -> None:
     """Test the evaporation function for calculating evaporation rate."""
     # Test with basic parameters
-    err_cr = np.array([0.5])
-    err_sk = np.array(
+    err_cr = np.asarray([0.5])
+    err_sk = np.asarray(
         [
             0.2,
             0.3,
@@ -1125,10 +1125,10 @@ def test_evaporation() -> None:
             1.8,
         ],
     )
-    t_skin = np.array([34.0] * 17)
-    tdb = np.array([25.0] * 17)
-    rh = np.array([50.0] * 17)
-    ret = np.array([0.01] * 17)
+    t_skin = np.asarray([34.0] * 17)
+    tdb = np.asarray([25.0] * 17)
+    rh = np.asarray([50.0] * 17)
+    ret = np.asarray([0.01] * 17)
 
     wet, e_sk, e_max, e_sweat = evaporation(
         err_cr,
@@ -1151,12 +1151,12 @@ def test_evaporation() -> None:
     assert np.all(wet <= 1)
 
     # Test age effects
-    err_cr = np.array([0.5])
-    err_sk = np.array([0.2] * 17)
-    t_skin = np.array([34.0] * 17)
-    tdb = np.array([25.0] * 17)
-    rh = np.array([50.0] * 17)
-    ret = np.array([0.01] * 17)
+    err_cr = np.asarray([0.5])
+    err_sk = np.asarray([0.2] * 17)
+    t_skin = np.asarray([34.0] * 17)
+    tdb = np.asarray([25.0] * 17)
+    rh = np.asarray([50.0] * 17)
+    ret = np.asarray([0.01] * 17)
 
     wet_young, e_sk_young, e_max_young, e_sweat_young = evaporation(
         err_cr,
@@ -1186,12 +1186,12 @@ def test_evaporation() -> None:
     assert np.all(e_sweat_old <= e_sweat_young)
 
     # Test with valid BSA equations
-    err_cr = np.array([0.5])
-    err_sk = np.array([0.2] * 17)
-    t_skin = np.array([34.0] * 17)
-    tdb = np.array([25.0] * 17)
-    rh = np.array([50.0] * 17)
-    ret = np.array([0.01] * 17)
+    err_cr = np.asarray([0.5])
+    err_sk = np.asarray([0.2] * 17)
+    t_skin = np.asarray([34.0] * 17)
+    tdb = np.asarray([25.0] * 17)
+    rh = np.asarray([50.0] * 17)
+    ret = np.asarray([0.01] * 17)
 
     valid_bsa_equations_list = ["dubois", "takahira", "fujimoto", "kurazumi"]
     for bsa_equation in valid_bsa_equations_list:
@@ -1230,9 +1230,9 @@ def test_evaporation() -> None:
         )
 
     # Test to ensure no errors occur when e_max is zero
-    t_skin = np.array([34.0] * 17)
-    tdb = np.array([34.0] * 17)
-    rh = np.array([100] * 17)
+    t_skin = np.asarray([34.0] * 17)
+    tdb = np.asarray([34.0] * 17)
+    rh = np.asarray([100] * 17)
 
     # Call the evaporation function
     wet, e_sk, e_max, e_sweat = evaporation(
@@ -1262,8 +1262,8 @@ def test_evaporation() -> None:
 def test_skin_blood_flow() -> None:
     """Test the skin_blood_flow function for calculating blood flow in the skin."""
     # Test with basic values
-    err_cr = np.array([0.5])
-    err_sk = np.array(
+    err_cr = np.asarray([0.5])
+    err_sk = np.asarray(
         [
             0.2,
             0.3,
@@ -1299,8 +1299,8 @@ def test_skin_blood_flow() -> None:
     assert np.all(bf_skin >= 0)
 
     # Test age effect
-    err_cr = np.array([0.5])
-    err_sk = np.array([0.2] * 17)
+    err_cr = np.asarray([0.5])
+    err_sk = np.asarray([0.2] * 17)
 
     bf_skin_young = skin_blood_flow(
         err_cr,
@@ -1326,8 +1326,8 @@ def test_skin_blood_flow() -> None:
     # Test valid BSA equation
     valid_bsa_equations_list = ["dubois", "takahira", "fujimoto", "kurazumi"]
     for bsa_equation in valid_bsa_equations_list:
-        err_cr = np.array([0.5])
-        err_sk = np.array([0.2] * 17)
+        err_cr = np.asarray([0.5])
+        err_sk = np.asarray([0.2] * 17)
 
         bf_skin: np.ndarray = skin_blood_flow(
             err_cr,
@@ -1359,8 +1359,8 @@ def test_skin_blood_flow() -> None:
 def test_ava_blood_flow() -> None:
     """Test the ava_blood_flow function for calculating blood flow in arteriovenous anastomoses (AVA)."""
     # Test with basic parameters
-    err_cr = np.array([0.5, 0.6, 0.7, 0.8, 0.9])
-    err_sk = np.array(
+    err_cr = np.asarray([0.5, 0.6, 0.7, 0.8, 0.9])
+    err_sk = np.asarray(
         [
             0.2,
             0.3,
@@ -1398,8 +1398,8 @@ def test_ava_blood_flow() -> None:
     assert bf_ava_foot >= 0
 
     # Test age effect
-    err_cr = np.array([0.5, 0.6, 0.7, 0.8, 0.9])
-    err_sk = np.array([0.2] * 17)
+    err_cr = np.asarray([0.5, 0.6, 0.7, 0.8, 0.9])
+    err_sk = np.asarray([0.2] * 17)
 
     bf_ava_hand_young, bf_ava_foot_young = ava_blood_flow(
         err_cr,
@@ -1424,8 +1424,8 @@ def test_ava_blood_flow() -> None:
     assert bf_ava_foot_old <= bf_ava_foot_young
 
     # Test with input length mismatch
-    err_cr = np.array([0.5, 0.6, 0.7])
-    err_sk = np.array([0.2, 0.3])
+    err_cr = np.asarray([0.5, 0.6, 0.7])
+    err_sk = np.asarray([0.2, 0.3])
     with pytest.raises(TypeError):
         ava_blood_flow(
             err_cr,
@@ -1438,8 +1438,8 @@ def test_ava_blood_flow() -> None:
         )
 
     # Test with zero signal
-    err_cr = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-    err_sk = np.array([0.0] * 17)
+    err_cr = np.asarray([0.0, 0.0, 0.0, 0.0, 0.0])
+    err_sk = np.asarray([0.0] * 17)
     bf_ava_hand, bf_ava_foot = ava_blood_flow(
         err_cr,
         err_sk,
@@ -1739,10 +1739,10 @@ def test_cold_acclimation_non_shivering() -> None:
 def test_sum_bf() -> None:
     """Test the sum_bf function for calculating body fat."""
     # Test to check output type
-    bf_core = np.array([1, 2, 3, 4])
-    bf_muscle = np.array([1, 2, 3, 4])
-    bf_fat = np.array([1, 2, 3, 4])
-    bf_skin = np.array([1, 2, 3, 4])
+    bf_core = np.asarray([1, 2, 3, 4])
+    bf_muscle = np.asarray([1, 2, 3, 4])
+    bf_fat = np.asarray([1, 2, 3, 4])
+    bf_skin = np.asarray([1, 2, 3, 4])
     bf_ava_hand = 1.0
     bf_ava_foot = 1.0
 
@@ -1750,10 +1750,10 @@ def test_sum_bf() -> None:
     assert isinstance(co, float)
 
     # Test with custom values 1
-    bf_core = np.array([1, 2, 3, 4])
-    bf_muscle = np.array([1, 2, 3, 4])
-    bf_fat = np.array([1, 2, 3, 4])
-    bf_skin = np.array([1, 2, 3, 4])
+    bf_core = np.asarray([1, 2, 3, 4])
+    bf_muscle = np.asarray([1, 2, 3, 4])
+    bf_fat = np.asarray([1, 2, 3, 4])
+    bf_skin = np.asarray([1, 2, 3, 4])
     bf_ava_hand = 1.0
     bf_ava_foot = 1.0
 
@@ -1769,10 +1769,10 @@ def test_sum_bf() -> None:
     assert co == expected_co
 
     # Test with custom values 2
-    bf_core = np.array([1, 2, 3, 4])
-    bf_muscle = np.array([1, 2, 3, 4])
-    bf_fat = np.array([1, 2, 3, 4])
-    bf_skin = np.array([1, 2, 3, 4])
+    bf_core = np.asarray([1, 2, 3, 4])
+    bf_muscle = np.asarray([1, 2, 3, 4])
+    bf_fat = np.asarray([1, 2, 3, 4])
+    bf_skin = np.asarray([1, 2, 3, 4])
     bf_ava_hand = 1.0
     bf_ava_foot = 1.0
 

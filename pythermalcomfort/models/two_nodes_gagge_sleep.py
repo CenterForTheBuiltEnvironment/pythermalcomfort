@@ -182,7 +182,7 @@ def two_nodes_gagge_sleep(
         for key in results[0]:
             vals = [d[key] for d in results]
             # only wrap in an array if there’s more than one element
-            output[key] = np.array(vals) if len(vals) > 1 else vals[0]
+            output[key] = np.asarray(vals) if len(vals) > 1 else vals[0]
 
     return GaggeTwoNodesSleep(**output)
 
