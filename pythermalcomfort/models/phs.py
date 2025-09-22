@@ -110,10 +110,17 @@ def phs(
     t_cr_eq : float, optional
         Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
         standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
+    t_sk_t_cr_wg : float, optional
+        Initial weighting fraction for skin/core temperature coupling, dimensionless.
     sweat_rate_watt : float, optional
-        Initial sweat rate, [W/m2]. Defaults to 0.
+        Initial instantaneous regulatory sweat (evaporative) rate at the skin, per unit area,
+        [W·m⁻²]. This is an instantaneous rate (W/m²) used at each simulation time step.
     sweat_rate_total_watt : float, optional
-        Initial total sweat rate, [W/m2]. Defaults to 0.
+        Initial accumulated evaporative load per unit area.  Input value is expected as an
+        instantaneous rate in [W·m⁻²]; during the simulation the value is updated by adding
+        instantaneous rates each minute and therefore the accumulated quantity represents the
+        sum over minutes (units W·min·m⁻²). It is intended for carry over between consecutive
+        simulation segments.
 
     Returns
     -------
@@ -153,10 +160,10 @@ def phs(
         )
         print(result.t_re)  # [37.5 42.5]
 
-        # example code simulation - we pass the previous results as initial values
+        # example: pass previous results as initial values to chain simulations
         from pythermalcomfort.models import phs
 
-        # firs simulation
+        # first simulation
         result = phs(
             tdb=40,
             tr=40,
@@ -169,10 +176,9 @@ def phs(
             round_output=False,
             duration=60,
         )
-
         print(result.t_re)  # 37.8
-
         # second simulation - using previous results as initial values
+        # NOTE: when chaining runs, prefer round_output=False to avoid rounding drift.
         result = phs(
             tdb=40,
             tr=40,
@@ -192,23 +198,6 @@ def phs(
             sweat_rate_watt=result.sweat_rate_watt,
             sweat_rate_total_watt=result.sweat_rate_total_watt,
         )
-
-        print(result.t_re)  # 38.5
-
-        # this is the same as doing a single 120 min simulation
-        result = phs(
-            tdb=40,
-            tr=40,
-            v=0.3,
-            rh=50,
-            met=2.5,
-            clo=0.5,
-            posture="standing",
-            wme=0,
-            round_output=False,
-            duration=120,
-        )
-
         print(result.t_re)  # 38.5
 
     """
@@ -287,8 +276,12 @@ def phs(
     t_re = kwargs["t_re"]
     t_cr_eq = kwargs["t_cr_eq"]
     t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
-    sweat_rate_total_watt = kwargs["sweat_rate_total_watt"]
-    sweat_rate_watt = kwargs["sweat_rate_watt"]
+    sweat_rate_total_watt = kwargs[
+        "sweat_rate_total_watt"
+    ]  # accumulated evaporative load per area (W·min·m⁻² when accumulated)
+    sweat_rate_watt = kwargs[
+        "sweat_rate_watt"
+    ]  # instantaneous regulatory sweat rate at skin, [W·m⁻²]
     limit_inputs = kwargs["limit_inputs"]
 
     if model == Models.iso_7933_2023.value:
@@ -448,9 +441,9 @@ def _phs_optimized(
     sp_heat = met_to_w_m2 * weight / a_dubois
 
     d_lim_t_re = 0  # maximum allowable exposure time for heat storage [min]
-    # maximum allowable exposure time for water loss, mean subject [min]
+    # maximum allowable exposure time for sweat rate grams, mean subject [min]
     d_lim_loss_50 = 0
-    # maximum allowable exposure time for water loss, 95 % of the working population [min]
+    # maximum allowable exposure time for sweat rate grams, 95 % of the working population [min]
     d_lim_loss_95 = 0
     # set the sweat rate in grams to zero
     sw_tot_g = 0
@@ -460,9 +453,9 @@ def _phs_optimized(
         d_max_50 = (0.03 if drink == 0 else 0.05) * weight * 1000
         d_max_95 = (0.03 if drink == 0 else 0.05) * weight * 1000
     else:  # model == Models.iso_7933_2004.value:
-        # maximum water loss to protect a mean subject [g]
+        # maximum sweat rate grams to protect a mean subject [g]
         d_max_50 = 0.075 * weight * 1000
-        # maximum water loss to protect 95 % of the working population [g]
+        # maximum sweat rate grams to protect 95 % of the working population [g]
         d_max_95 = 0.05 * weight * 1000
 
     # def_dir = 1 for unidirectional walking, def_dir = 0 for omni-directional walking
@@ -674,6 +667,9 @@ def _phs_optimized(
         if d_lim_t_re == 0 and t_re >= 38:
             d_lim_t_re = time
         sweat_rate_total_watt = sweat_rate_total_watt + sweat_rate_watt + e_res
+        # sw_tot_g: convert accumulated evaporative load per unit area into total
+        # evaporated sweat mass for the whole person (grams, g). This is a per-person
+        # cumulative mass over the simulated duration (not per m²).
         sw_tot_g = sweat_rate_total_watt * 2.67 * a_dubois / 1.8 / 60
         if d_lim_loss_50 == 0 and sw_tot_g >= d_max_50:
             d_lim_loss_50 = time
