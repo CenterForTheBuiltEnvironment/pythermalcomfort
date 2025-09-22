@@ -330,11 +330,11 @@ class PHS(AutoStrMixin):
         Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    water_loss_watt : float or list of floats
-        Maximum water loss in watts, [W].
-    water_loss : float or list of floats
+    sweat_rate_gram : float or list of floats
         Maximum water loss, [g].
-    sw_tot : float or list of floats
+    sweat_rate_watt : float or list of floats
+        Maximum water loss in watts, [W].
+    sweat_rate_total_watt : float or list of floats
         Total sweat rate, [W/m2].
 
     """
@@ -347,9 +347,9 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    water_loss_watt: float | list[float]
-    water_loss: float | list[float]
-    sw_tot: float | list[float]
+    sweat_rate_gram: float | list[float]
+    sweat_rate_watt: float | list[float]
+    sweat_rate_total_watt: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)

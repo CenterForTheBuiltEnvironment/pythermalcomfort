@@ -110,8 +110,10 @@ def phs(
     t_cr_eq : float, optional
         Mean core temperature as a function of met when worker starts working, [°C]. If False in the 2004
         standard, then t_cr_eq = t_cr, whereas in the 2023 standard t_cr_eq = 36.8 °C.
-    sweat_rate : float, optional
+    sweat_rate_watt : float, optional
         Initial sweat rate, [W/m2]. Defaults to 0.
+    sweat_rate_total_watt : float, optional
+        Initial total sweat rate, [W/m2]. Defaults to 0.
 
     Returns
     -------
@@ -134,6 +136,7 @@ def phs(
             clo=0.5,
             posture="standing",
             wme=0,
+            duration=480,
         )
         print(result.t_re)  # 37.5
 
@@ -146,8 +149,67 @@ def phs(
             clo=[0.5, 0.6],
             posture=["standing", "standing"],
             wme=[0, 0],
+            duration=480,
         )
-        print(result.t_re)  # [37.5 43.4]
+        print(result.t_re)  # [37.5 42.5]
+
+        # example code simulation - we pass the previous results as initial values
+        from pythermalcomfort.models import phs
+
+        # firs simulation
+        result = phs(
+            tdb=40,
+            tr=40,
+            v=0.3,
+            rh=50,
+            met=2.5,
+            clo=0.5,
+            posture="standing",
+            wme=0,
+            round_output=False,
+            duration=60,
+        )
+
+        print(result.t_re)  # 37.8
+
+        # second simulation - using previous results as initial values
+        result = phs(
+            tdb=40,
+            tr=40,
+            v=0.3,
+            rh=50,
+            met=2.5,
+            clo=0.5,
+            posture="standing",
+            wme=0,
+            round_output=False,
+            duration=60,
+            t_sk=result.t_sk,
+            t_cr=result.t_cr,
+            t_re=result.t_re,
+            t_cr_eq=result.t_cr_eq,
+            t_sk_t_cr_wg=result.t_sk_t_cr_wg,
+            sweat_rate_watt=result.sweat_rate_watt,
+            sweat_rate_total_watt=result.sweat_rate_total_watt,
+        )
+
+        print(result.t_re)  # 38.5
+
+        # this is the same as doing a single 120 min simulation
+        result = phs(
+            tdb=40,
+            tr=40,
+            v=0.3,
+            rh=50,
+            met=2.5,
+            clo=0.5,
+            posture="standing",
+            wme=0,
+            round_output=False,
+            duration=120,
+        )
+
+        print(result.t_re)  # 38.5
 
     """
     if model not in [Models.iso_7933_2004.value, Models.iso_7933_2023.value]:
@@ -185,9 +247,9 @@ def phs(
         "t_re": False,
         "t_cr_eq": False,
         "t_sk_t_cr_wg": 0.3,
-        "sweat_rate": 0,
+        "sweat_rate_watt": 0,
         "limit_inputs": True,
-        "sw_tot": 0,
+        "sweat_rate_total_watt": 0,
     }
 
     if model == Models.iso_7933_2023.value:
@@ -225,8 +287,8 @@ def phs(
     t_re = kwargs["t_re"]
     t_cr_eq = kwargs["t_cr_eq"]
     t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
-    sw_tot = kwargs["sw_tot"]
-    sweat_rate = kwargs["sweat_rate"]
+    sweat_rate_total_watt = kwargs["sweat_rate_total_watt"]
+    sweat_rate_watt = kwargs["sweat_rate_watt"]
     limit_inputs = kwargs["limit_inputs"]
 
     if model == Models.iso_7933_2023.value:
@@ -257,8 +319,8 @@ def phs(
         t_cr,
         t_cr_eq,
         t_sk_t_cr_wg,
-        sweat_rate,
-        sw_tot,
+        sweat_rate_watt,
+        sweat_rate_total_watt,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,
@@ -287,8 +349,8 @@ def phs(
         t_re=t_re,
         t_cr_eq=t_cr_eq,
         t_sk_t_cr_wg=t_sk_t_cr_wg,
-        sw_tot=sw_tot,
-        sweat_rate=sweat_rate,
+        sweat_rate_total_watt=sweat_rate_total_watt,
+        sweat_rate_watt=sweat_rate_watt,
         model=model,
     )
 
@@ -301,9 +363,9 @@ def phs(
         "d_lim_loss_50": d_lim_loss_50,
         "d_lim_loss_95": d_lim_loss_95,
         "d_lim_t_re": d_lim_t_re,
-        "water_loss_watt": sweat_rate,
-        "water_loss": sw_tot_g,
-        "sw_tot": sw_tot,
+        "sweat_rate_watt": sweat_rate_watt,
+        "sweat_rate_gram": sw_tot_g,
+        "sweat_rate_total_watt": sweat_rate_total_watt,
     }
 
     if limit_inputs:
@@ -351,7 +413,7 @@ const_sw = math.exp(-1 / 10)
 
 
 @np.vectorize
-@jit(nopython=True, cache=True)
+@jit(nopython=True)
 def _phs_optimized(
     tdb,
     tr,
@@ -376,8 +438,8 @@ def _phs_optimized(
     t_re,
     t_cr_eq,
     t_sk_t_cr_wg,
-    sw_tot,
-    sweat_rate,
+    sweat_rate_total_watt,
+    sweat_rate_watt,
     model,
 ):
     # DuBois body surface area [m2]
@@ -390,6 +452,8 @@ def _phs_optimized(
     d_lim_loss_50 = 0
     # maximum allowable exposure time for water loss, 95 % of the working population [min]
     d_lim_loss_95 = 0
+    # set the sweat rate in grams to zero
+    sw_tot_g = 0
 
     if model == Models.iso_7933_2023.value:
         # 2023 standard only has one d_max value
@@ -503,7 +567,14 @@ def _phs_optimized(
 
     # Pre-calculate constants
     t_cr_eq_m = 0.0036 * met + 36.6
-    t_sk_eq_cl_base = 12.165 + 0.02017 * tdb + 0.04361 * tr + 0.19354 * p_a - 0.25315 * v + 0.005346 * met
+    t_sk_eq_cl_base = (
+        12.165
+        + 0.02017 * tdb
+        + 0.04361 * tr
+        + 0.19354 * p_a
+        - 0.25315 * v
+        + 0.005346 * met
+    )
     t_sk_eq_nu_base = 7.191 + 0.064 * tdb + 0.061 * tr + 0.198 * p_a - 0.348 * v
 
     for time in range(1, duration + 1):
@@ -569,13 +640,13 @@ def _phs_optimized(
 
             sw_req = e_req / e_v_eff
             sw_req = min(sw_req, sw_max)
-        sweat_rate = sweat_rate * const_sw + sw_req * (1 - const_sw)
+        sweat_rate_watt = sweat_rate_watt * const_sw + sw_req * (1 - const_sw)
 
-        if sweat_rate <= 0:
+        if sweat_rate_watt <= 0:
             e_p = 0  # predicted evaporative heat flow [W/m2]
-            sweat_rate = 0
+            sweat_rate_watt = 0
         else:
-            k = e_max / sweat_rate
+            k = e_max / sweat_rate_watt
             wp = 1
             if k >= 0.5:
                 wp = -k + math.sqrt(k * k + 2)
@@ -602,8 +673,8 @@ def _phs_optimized(
         t_re = t_re0 + (2 * t_cr - 1.962 * t_re0 - 1.31) / 9
         if d_lim_t_re == 0 and t_re >= 38:
             d_lim_t_re = time
-        sw_tot = sw_tot + sweat_rate + e_res
-        sw_tot_g = sw_tot * 2.67 * a_dubois / 1.8 / 60
+        sweat_rate_total_watt = sweat_rate_total_watt + sweat_rate_watt + e_res
+        sw_tot_g = sweat_rate_total_watt * 2.67 * a_dubois / 1.8 / 60
         if d_lim_loss_50 == 0 and sw_tot_g >= d_max_50:
             d_lim_loss_50 = time
         if d_lim_loss_95 == 0 and sw_tot_g >= d_max_95:
@@ -626,8 +697,8 @@ def _phs_optimized(
         t_cr,
         t_cr_eq,
         t_sk_t_cr_wg,
-        sweat_rate,
-        sw_tot,
+        sweat_rate_watt,
+        sweat_rate_total_watt,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,
