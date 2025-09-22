@@ -334,6 +334,8 @@ class PHS(AutoStrMixin):
         Maximum water loss in watts, [W].
     water_loss : float or list of floats
         Maximum water loss, [g].
+    sw_tot : float or list of floats
+        Total sweat rate, [W/m2].
 
     """
 
@@ -347,6 +349,7 @@ class PHS(AutoStrMixin):
     d_lim_t_re: float | list[float]
     water_loss_watt: float | list[float]
     water_loss: float | list[float]
+    sw_tot: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)

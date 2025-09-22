@@ -187,6 +187,7 @@ def phs(
         "t_sk_t_cr_wg": 0.3,
         "sweat_rate": 0,
         "limit_inputs": True,
+        "sw_tot": 0,
     }
 
     if model == Models.iso_7933_2023.value:
@@ -224,6 +225,7 @@ def phs(
     t_re = kwargs["t_re"]
     t_cr_eq = kwargs["t_cr_eq"]
     t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
+    sw_tot = kwargs["sw_tot"]
     sweat_rate = kwargs["sweat_rate"]
     limit_inputs = kwargs["limit_inputs"]
 
@@ -256,6 +258,7 @@ def phs(
         t_cr_eq,
         t_sk_t_cr_wg,
         sweat_rate,
+        sw_tot,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,
@@ -284,7 +287,8 @@ def phs(
         t_re=t_re,
         t_cr_eq=t_cr_eq,
         t_sk_t_cr_wg=t_sk_t_cr_wg,
-        sw_tot=sweat_rate,
+        sw_tot=sw_tot,
+        sweat_rate=sweat_rate,
         model=model,
     )
 
@@ -299,6 +303,7 @@ def phs(
         "d_lim_t_re": d_lim_t_re,
         "water_loss_watt": sweat_rate,
         "water_loss": sw_tot_g,
+        "sw_tot": sw_tot,
     }
 
     if limit_inputs:
@@ -372,6 +377,7 @@ def _phs_optimized(
     t_cr_eq,
     t_sk_t_cr_wg,
     sw_tot,
+    sweat_rate,
     model,
 ):
     # DuBois body surface area [m2]
@@ -394,8 +400,6 @@ def _phs_optimized(
         d_max_50 = 0.075 * weight * 1000
         # maximum water loss to protect 95 % of the working population [g]
         d_max_95 = 0.05 * weight * 1000
-
-    sweat_rate = sw_tot
 
     # def_dir = 1 for unidirectional walking, def_dir = 0 for omni-directional walking
     def_dir = 1 if theta != 0 else 0
@@ -497,6 +501,11 @@ def _phs_optimized(
     else:  # model == Models.iso_7933_2004.value:
         f_cl_r = (1 - a_p) * 0.97 + a_p * f_r
 
+    # Pre-calculate constants
+    t_cr_eq_m = 0.0036 * met + 36.6
+    t_sk_eq_cl_base = 12.165 + 0.02017 * tdb + 0.04361 * tr + 0.19354 * p_a - 0.25315 * v + 0.005346 * met
+    t_sk_eq_nu_base = 7.191 + 0.064 * tdb + 0.061 * tr + 0.198 * p_a - 0.348 * v
+
     for time in range(1, duration + 1):
         t_sk0 = t_sk
         t_re0 = t_re
@@ -504,18 +513,14 @@ def _phs_optimized(
         t_cr_eq0 = t_cr_eq
         t_sk_t_cr_wg0 = t_sk_t_cr_wg
 
-        # equilibrium core temperature associated to the metabolic rate
-        t_cr_eq_m = 0.0036 * met + 36.6
         # Core temperature at this minute, by exponential averaging
         t_cr_eq = t_cr_eq0 * const_t_eq + t_cr_eq_m * (1 - const_t_eq)
         # Heat storage associated with this core temperature increase during the last minute
         d_stored_eq = sp_heat * (t_cr_eq - t_cr_eq0) * (1 - t_sk_t_cr_wg0)
         # skin temperature prediction -- clothed model
-        t_sk_eq_cl = 12.165 + 0.02017 * tdb + 0.04361 * tr + 0.19354 * p_a - 0.25315 * v
-        t_sk_eq_cl = t_sk_eq_cl + 0.005346 * met + 0.51274 * t_re
+        t_sk_eq_cl = t_sk_eq_cl_base + 0.51274 * t_re
         # nude model
-        t_sk_eq_nu = 7.191 + 0.064 * tdb + 0.061 * tr + 0.198 * p_a - 0.348 * v
-        t_sk_eq_nu = t_sk_eq_nu + 0.616 * t_re
+        t_sk_eq_nu = t_sk_eq_nu_base + 0.616 * t_re
         if clo >= 0.6:
             t_sk_eq = t_sk_eq_cl
         elif clo <= 0.2:
@@ -622,6 +627,7 @@ def _phs_optimized(
         t_cr_eq,
         t_sk_t_cr_wg,
         sweat_rate,
+        sw_tot,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,
