@@ -115,7 +115,7 @@ def phs(
     sweat_rate_watt : float, optional
         Initial instantaneous regulatory sweat (evaporative) rate at the skin, per unit area,
         [W·m⁻²]. This is an instantaneous rate (W/m²) used at each simulation time step.
-    sweat_rate_total_watt : float, optional
+    evap_load_wm2_min : float, optional
         Initial accumulated evaporative load per unit area.  Input value is expected as an
         instantaneous rate in [W·m⁻²]; during the simulation the value is updated by adding
         instantaneous rates each minute and therefore the accumulated quantity represents the
@@ -196,7 +196,7 @@ def phs(
             t_cr_eq=result.t_cr_eq,
             t_sk_t_cr_wg=result.t_sk_t_cr_wg,
             sweat_rate_watt=result.sweat_rate_watt,
-            sweat_rate_total_watt=result.sweat_rate_total_watt,
+            evap_load_wm2_min=result.evap_load_wm2_min,
         )
         print(result.t_re)  # 38.5
 
@@ -238,7 +238,7 @@ def phs(
         "t_sk_t_cr_wg": 0.3,
         "sweat_rate_watt": 0,
         "limit_inputs": True,
-        "sweat_rate_total_watt": 0,
+        "evap_load_wm2_min": 0,
     }
 
     if model == Models.iso_7933_2023.value:
@@ -276,8 +276,8 @@ def phs(
     t_re = kwargs["t_re"]
     t_cr_eq = kwargs["t_cr_eq"]
     t_sk_t_cr_wg = kwargs["t_sk_t_cr_wg"]
-    sweat_rate_total_watt = kwargs[
-        "sweat_rate_total_watt"
+    evap_load_wm2_min = kwargs[
+        "evap_load_wm2_min"
     ]  # accumulated evaporative load per area (W·min·m⁻² when accumulated)
     sweat_rate_watt = kwargs[
         "sweat_rate_watt"
@@ -313,7 +313,7 @@ def phs(
         t_cr_eq,
         t_sk_t_cr_wg,
         sweat_rate_watt,
-        sweat_rate_total_watt,
+        evap_load_wm2_min,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,
@@ -342,7 +342,7 @@ def phs(
         t_re=t_re,
         t_cr_eq=t_cr_eq,
         t_sk_t_cr_wg=t_sk_t_cr_wg,
-        sweat_rate_total_watt=sweat_rate_total_watt,
+        evap_load_wm2_min=evap_load_wm2_min,
         sweat_rate_watt=sweat_rate_watt,
         model=model,
     )
@@ -358,7 +358,7 @@ def phs(
         "d_lim_t_re": d_lim_t_re,
         "sweat_rate_watt": sweat_rate_watt,
         "sweat_rate_gram": sw_tot_g,
-        "sweat_rate_total_watt": sweat_rate_total_watt,
+        "evap_load_wm2_min": evap_load_wm2_min,
     }
 
     if limit_inputs:
@@ -431,7 +431,7 @@ def _phs_optimized(
     t_re,
     t_cr_eq,
     t_sk_t_cr_wg,
-    sweat_rate_total_watt,
+    evap_load_wm2_min,
     sweat_rate_watt,
     model,
 ):
@@ -666,11 +666,11 @@ def _phs_optimized(
         t_re = t_re0 + (2 * t_cr - 1.962 * t_re0 - 1.31) / 9
         if d_lim_t_re == 0 and t_re >= 38:
             d_lim_t_re = time
-        sweat_rate_total_watt = sweat_rate_total_watt + sweat_rate_watt + e_res
+        evap_load_wm2_min = evap_load_wm2_min + sweat_rate_watt + e_res
         # sw_tot_g: convert accumulated evaporative load per unit area into total
         # evaporated sweat mass for the whole person (grams, g). This is a per-person
         # cumulative mass over the simulated duration (not per m²).
-        sw_tot_g = sweat_rate_total_watt * 2.67 * a_dubois / 1.8 / 60
+        sw_tot_g = evap_load_wm2_min * 2.67 * a_dubois / 1.8 / 60
         if d_lim_loss_50 == 0 and sw_tot_g >= d_max_50:
             d_lim_loss_50 = time
         if d_lim_loss_95 == 0 and sw_tot_g >= d_max_95:
@@ -694,7 +694,7 @@ def _phs_optimized(
         t_cr_eq,
         t_sk_t_cr_wg,
         sweat_rate_watt,
-        sweat_rate_total_watt,
+        evap_load_wm2_min,
         sw_tot_g,
         d_lim_loss_50,
         d_lim_loss_95,

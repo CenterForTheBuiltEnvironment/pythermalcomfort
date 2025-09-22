@@ -336,7 +336,7 @@ class PHS(AutoStrMixin):
     sweat_rate_watt : float or list of floats
         Instantaneous regulatory sweat (evaporative) rate at the skin, per unit area, [W·m⁻²].
         This is an instantaneous rate used at each time step.
-    sweat_rate_total_watt : float or list of floats
+    evap_load_wm2_min : float or list of floats
         Accumulated evaporative load per unit area over the simulated duration.
         Internally this is computed as the running sum of instantaneous rates (W·m⁻²) over
         each minute of simulation and thus has units of W·min·m⁻² (i.e. W·m⁻² summed per minute).
@@ -356,7 +356,7 @@ class PHS(AutoStrMixin):
     d_lim_t_re: float | list[float]
     sweat_rate_gram: float | list[float]
     sweat_rate_watt: float | list[float]
-    sweat_rate_total_watt: float | list[float]
+    evap_load_wm2_min: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
