@@ -325,15 +325,23 @@ class PHS(AutoStrMixin):
     t_sk_t_cr_wg : float or list of floats
         Fraction of the body mass at the skin temperature.
     d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time for water loss, mean subject, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for a mean worker (dehydration constraint), [minutes].
     d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for 95% of the working population (dehydration constraint), [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    water_loss_watt : float or list of floats
-        Maximum water loss in watts, [W].
-    water_loss : float or list of floats
-        Maximum water loss, [g].
+    sweat_loss_g : float or list of floats
+        Cumulative evaporated sweat mass for the whole person over the simulated duration, [grams (g)].
+        This is a total mass per person (not per unit area).
+    sweat_rate_watt : float or list of floats
+        Instantaneous evaporative heat flux due to regulatory sweating at the skin,
+        per unit area, [W·m⁻²]. Used at each simulation time step.
+    evap_load_wm2_min : float or list of floats
+        Accumulated evaporative load per unit area over the simulated duration, [W·min·m⁻²].
+        Computed as the running sum of the instantaneous evaporative heat flux (W·m⁻²)
+        at each 1 minute step. Intended for chaining simulation segments.
 
     """
 
@@ -345,8 +353,9 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    water_loss_watt: float | list[float]
-    water_loss: float | list[float]
+    sweat_loss_g: float | list[float]
+    sweat_rate_watt: float | list[float]
+    evap_load_wm2_min: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)

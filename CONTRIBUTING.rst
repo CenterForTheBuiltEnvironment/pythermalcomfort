@@ -144,6 +144,7 @@ Use this checklist and follow the detailed steps to add a new, well-tested,
 documented function consistent with the project's conventions.
 
 Quick checklist (use before opening a PR)
+
 - [ ] Implementation added under an appropriate module.
 - [ ] Input dataclass created/updated with validation in __post_init__.
 - [ ] NumPy-style docstring with units, examples and applicability limits.
