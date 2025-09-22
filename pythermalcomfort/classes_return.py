@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import textwrap
 from dataclasses import dataclass, fields, is_dataclass
 
 import numpy as np
@@ -18,8 +19,19 @@ class AutoStrMixin:
         lines = [f"-------- {self.__class__.__name__} --------"]
         for n in names:
             v = getattr(self, n)
-            # Format multi-line values or very long values properly
-            v_str = str(v).replace("\n", "\n" + " " * (width + 3 + 3))
+            v_str = str(v)
+            
+            # Use textwrap to limit line length and handle long arrays
+            if len(v_str) > 80:  # Limit to 80 characters per line
+                # For numpy arrays, show first few and last few elements
+                if isinstance(v, np.ndarray) and v.size > 10:
+                    v_str = f"[{', '.join(map(str, v[:5]))} ... {', '.join(map(str, v[-5:]))}]"
+                else:
+                    # Use textwrap for other long strings
+                    v_str = textwrap.shorten(v_str, width=80, placeholder="...")
+            
+            # Format multi-line values properly
+            v_str = v_str.replace("\n", "\n" + " " * (width + 3 + 3))
             lines.append(f"{n.ljust(width)} : {v_str}")
         return "\n".join(lines)
 
