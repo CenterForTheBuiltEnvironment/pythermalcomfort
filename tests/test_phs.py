@@ -48,7 +48,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": 6538,
+                "sweat_rate_gram": 6538,
                 "t_cr": 37.6,
                 "d_lim_loss_95": 280,
             },
@@ -70,7 +70,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": 6345,
+                "sweat_rate_gram": 6345,
                 "t_cr": 40.8,
                 "d_lim_loss_95": 250,
                 "d_lim_t_re": 62,
@@ -95,7 +95,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": 6419,
+                "sweat_rate_gram": 6419,
                 "t_cr": 38.7,
                 "d_lim_loss_95": 280,
                 "d_lim_t_re": 149,
@@ -123,7 +123,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": 4593,
+                "sweat_rate_gram": 4593,
                 "t_cr": 38.0,
                 "d_lim_loss_95": 400,
             },
@@ -147,7 +147,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": 5813,
+                "sweat_rate_gram": 5813,
                 "t_cr": 37.5,
                 "d_lim_loss_95": 310,
             },
@@ -171,7 +171,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "round_output": False,
             },
             {
-                "water_loss": [5813, 5813],
+                "sweat_rate_gram": [5813, 5813],
                 "t_cr": [37.5, 37.5],
                 "d_lim_loss_95": [310, 310],
             },
@@ -182,7 +182,9 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
 def test_2023_standard(inputs, expected) -> None:
     """Test the 2023 PHS model with various inputs."""
     result = phs(**inputs)
-    assert result.water_loss == pytest.approx(expected["water_loss"], rel=0.025)
+    assert result.sweat_rate_gram == pytest.approx(
+        expected["sweat_rate_gram"], rel=0.025
+    )
     assert result.t_cr == pytest.approx(expected["t_cr"], abs=0.3)
     assert result.d_lim_loss_95 == pytest.approx(expected["d_lim_loss_95"], abs=10)
     if "d_lim_t_re" in expected:

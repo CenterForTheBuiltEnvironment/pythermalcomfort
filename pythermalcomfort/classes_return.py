@@ -325,15 +325,24 @@ class PHS(AutoStrMixin):
     t_sk_t_cr_wg : float or list of floats
         Fraction of the body mass at the skin temperature.
     d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time for water loss, mean subject, [minutes].
+        Maximum allowable exposure time for sweat rate grams, mean subject, [minutes].
     d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
+        Maximum allowable exposure time for sweat rate grams, 95% of the working population, [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    water_loss_watt : float or list of floats
-        Maximum water loss in watts, [W].
-    water_loss : float or list of floats
-        Maximum water loss, [g].
+    sweat_rate_gram : float or list of floats
+        Cumulative evaporated sweat mass for the whole person over the simulated duration, [grams (g)].
+        This is a total mass per person (not per unit area).
+    sweat_rate_watt : float or list of floats
+        Instantaneous regulatory sweat (evaporative) rate at the skin, per unit area, [W·m⁻²].
+        This is an instantaneous rate used at each time step.
+    evap_load_wm2_min : float or list of floats
+        Accumulated evaporative load per unit area over the simulated duration.
+        Internally this is computed as the running sum of instantaneous rates (W·m⁻²) over
+        each minute of simulation and thus has units of W·min·m⁻² (i.e. W·m⁻² summed per minute).
+        Note: initial/returned instantaneous values (e.g. for restarting a simulation) are
+        expected/provided as W·m⁻²; the accumulated value represents total accumulated
+        evaporative load over time for carryover between simulation segments.
 
     """
 
@@ -345,8 +354,9 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    water_loss_watt: float | list[float]
-    water_loss: float | list[float]
+    sweat_rate_gram: float | list[float]
+    sweat_rate_watt: float | list[float]
+    evap_load_wm2_min: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
