@@ -5,6 +5,7 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import Colormap
 
 from .utils import (
     make_metric_eval,
@@ -26,7 +27,7 @@ def plot_threshold_region(
     xlabel: str | None = None,
     ylabel: str | None = None,
     legend: bool = True,
-    cmap: str = "coolwarm",
+    cmap: Colormap | str = "coolwarm",
     band_alpha: float = 0.85,
     line_color: str = "black",
     line_width: float = 1.0,

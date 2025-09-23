@@ -26,6 +26,8 @@ def plot_t_rh(
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
+    # Forwarded plot customizations (visual + solver) to plot_threshold_region
+    plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
     """Plot comfort/risk region on a Temperature–Relative Humidity chart.
 
@@ -61,6 +63,11 @@ def plot_t_rh(
         Optional Matplotlib Axes. If None, a new figure/axes is created.
     legend:
         Whether to add a default legend for the filled bands.
+    plot_kwargs:
+        Optional dict of keyword overrides passed to ``plot_threshold_region``.
+        Use this to customize visual/solver defaults without expanding this API.
+        Examples: {'cmap': 'viridis', 'band_alpha': 0.6, 'line_color': 'k',
+        'x_scan_step': 0.5, 'smooth_sigma': 0.0}.
 
     Returns
     -------
@@ -86,22 +93,28 @@ def plot_t_rh(
     # Build y (RH) grid
     y_values = np.arange(rh_lo, rh_hi + 1e-9, float(rh_step))
 
+    # Prepare call with sane defaults then let plot_kwargs override
+    kwargs: dict[str, Any] = {
+        "model_func": model_func,
+        "xy_to_kwargs": mapper_tdb_rh,
+        "fixed_params": fixed_params,
+        "thresholds": thresholds,
+        "x_bounds": (t_lo, t_hi),
+        "y_values": y_values,
+        "metric_attr": None,
+        "ax": ax,
+        "xlabel": "Air temperature [°C]",
+        "ylabel": "Relative humidity [%]",
+        "legend": legend,
+        "x_scan_step": float(x_scan_step),
+        "smooth_sigma": float(smooth_sigma),
+    }
+    if plot_kwargs:
+        # Let user-provided overrides take precedence (e.g., cmap/band_alpha/etc.)
+        kwargs.update(plot_kwargs)
+
     # Delegate to generic plotter
-    ax, artists = plot_threshold_region(
-        model_func=model_func,
-        xy_to_kwargs=mapper_tdb_rh,
-        fixed_params=fixed_params,
-        thresholds=thresholds,
-        x_bounds=(t_lo, t_hi),
-        y_values=y_values,
-        metric_attr=None,
-        ax=ax,
-        xlabel="Air temperature [°C]",
-        ylabel="Relative humidity [%]",
-        legend=legend,
-        x_scan_step=float(x_scan_step),
-        smooth_sigma=float(smooth_sigma),
-    )
+    ax, artists = plot_threshold_region(**kwargs)
 
     return ax, artists
 
@@ -116,5 +129,8 @@ if __name__ == "__main__":
         thresholds=[-0.5, 0.5],
         t_range=(10, 36),
         rh_range=(0, 100),
+        # plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
     )
+    # ax.set(xlim=(10, 36), ylim=(0, 100), title="PMV Comfort Zones")
+    # ax.legend()
     plt.show()
