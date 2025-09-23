@@ -66,23 +66,21 @@ def plot_psychrometric_regions(
         _, ax = plt.subplots(figsize=(8, 5.5), dpi=300, constrained_layout=True)
 
     # Background chart (saturation curve and RH isolines)
+    p_pa = float(fixed_params.get("p_atm", 101325.0))
+    t_grid_bg = np.linspace(t_lo, t_hi, 300)
     if draw_background:
-        p_pa = float(fixed_params.get("p_atm", 101325.0))
-        t_grid = np.linspace(t_lo, t_hi, 300)
-
         # RH isolines (10..100%)
         for rh in rh_isolines:
             w_curve = np.array(
-                [humidity_ratio_from_t_rh(t, rh, p_pa=p_pa) for t in t_grid]
+                [humidity_ratio_from_t_rh(t, rh, p_pa=p_pa) for t in t_grid_bg]
             )
             if int(rh) == 100:
                 ax.plot(
-                    t_grid, w_curve, color="dimgray", lw=1.2, label="100% RH (sat.)"
+                    t_grid_bg, w_curve, color="dimgray", lw=1.2, label="100% RH (sat.)"
                 )
             else:
-                ax.plot(t_grid, w_curve, color="lightgray", lw=0.6, ls="--")
+                ax.plot(t_grid_bg, w_curve, color="lightgray", lw=0.6, ls="--")
 
-        # Move legend for background if present
         handles, labels = ax.get_legend_handles_labels()
         if handles:
             ax.legend(
@@ -95,6 +93,22 @@ def plot_psychrometric_regions(
 
     # Build y (humidity ratio) grid for solver
     y_values = np.arange(w_lo, w_hi + 1e-12, float(w_step))
+
+    # Compute left clip per y to enforce RH <= 100% (to the right of saturation)
+    # For each W=y, find the minimum T where W_sat(T) >= y
+    t_grid_clip = np.linspace(t_lo, t_hi, 600)
+    w_sat_clip = np.array(
+        [humidity_ratio_from_t_rh(t, 100.0, p_pa=p_pa) for t in t_grid_clip]
+    )
+    x_left_clip = np.full_like(y_values, t_hi, dtype=float)
+    for i, w in enumerate(y_values):
+        mask = w_sat_clip >= float(w)
+        if mask.any():
+            # first temperature where saturation curve is above this W
+            x_left_clip[i] = float(t_grid_clip[np.argmax(mask)])
+        else:
+            # if never achievable within [t_lo, t_hi], leave at t_hi (no area)
+            x_left_clip[i] = t_hi
 
     # Delegate region plotting (mapper converts W->RH internally)
     kwargs: dict[str, Any] = {
@@ -111,13 +125,13 @@ def plot_psychrometric_regions(
         "legend": legend,
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
+        "x_left_clip": x_left_clip,
     }
     if plot_kwargs:
         kwargs.update(plot_kwargs)
 
     ax, artists = plot_threshold_region(**kwargs)
 
-    # Set limits explicitly for consistent chart framing
     ax.set_xlim(t_lo, t_hi)
     ax.set_ylim(w_lo, w_hi)
 
@@ -141,7 +155,6 @@ if __name__ == "__main__":
         t_range=(10, 36),
         w_range=(0.0, 0.03),
         w_step=5e-4,
-        plot_kwargs={"band_alpha": 0.35, "line_color": "k"},
+        plot_kwargs={"band_alpha": 0.35, "line_color": "k", "cmap": "viridis"},
     )
     plt.show()
-

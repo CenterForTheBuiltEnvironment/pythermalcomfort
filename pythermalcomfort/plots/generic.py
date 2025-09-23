@@ -34,6 +34,8 @@ def plot_threshold_region(
     # Solver controls
     x_scan_step: float = 1.0,
     smooth_sigma: float = 0.8,
+    # Optional per-y left boundary (e.g., psychrometric saturation clip)
+    x_left_clip: Sequence[float] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
     """Plot threshold regions for a generic (x,y) mapping to a model.
 
@@ -76,6 +78,13 @@ def plot_threshold_region(
     cmap_obj = plt.get_cmap(cmap)
     band_colors = [cmap_obj(i / (needed - 1)) for i in range(needed)]
 
+    # Optional left clip per y (same length as y_arr)
+    clip_arr = None
+    if x_left_clip is not None:
+        clip_arr = np.asarray(list(x_left_clip), dtype=float)
+        if clip_arr.shape != y_arr.shape:
+            raise ValueError("x_left_clip must have same shape as y_values")
+
     # Constant x boundaries
     x_lo, x_hi = float(x_bounds[0]), float(x_bounds[1])
     left_const = np.full_like(y_arr, x_lo, dtype=float)
@@ -90,22 +99,30 @@ def plot_threshold_region(
 
     band_artists = []
     for i, (left, right) in enumerate(regions):
-        m = np.isfinite(left) & np.isfinite(right)
+        # Apply left clip if provided to ensure valid domain (e.g., RH <= 100%)
+        left_plot = np.maximum(left, clip_arr) if clip_arr is not None else left
+        m = np.isfinite(left_plot) & np.isfinite(right)
         if m.any():
-            coll = ax.fill_betweenx(
-                y_arr[m],
-                left[m],
-                right[m],
-                color=band_colors[i],
-                alpha=band_alpha,
-                linewidth=0,
-            )
-            band_artists.append(coll)
+            # Only fill where the band has positive width after clipping
+            width_mask = (right - left_plot) > 1e-12
+            m = m & width_mask
+            if m.any():
+                coll = ax.fill_betweenx(
+                    y_arr[m],
+                    left_plot[m],
+                    right[m],
+                    color=band_colors[i],
+                    alpha=band_alpha,
+                    linewidth=0,
+                )
+                band_artists.append(coll)
 
-    # Draw threshold curves
+    # Draw threshold curves (clip to valid domain if clip_arr provided)
     curve_artists = []
     for curve in curves:
         m = np.isfinite(curve)
+        if clip_arr is not None:
+            m = m & (curve >= clip_arr)
         if m.any():
             (ln,) = ax.plot(curve[m], y_arr[m], color=line_color, linewidth=line_width)
             curve_artists.append(ln)
