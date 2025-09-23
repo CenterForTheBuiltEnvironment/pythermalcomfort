@@ -61,6 +61,41 @@ def get_default_thresholds(model_func: Callable[..., Any]) -> list[float] | None
     return DEFAULT_THRESHOLDS.get(getattr(model_func, "__name__", ""))
 
 
+# ---------------------- Psychrometric conversions -------------------------
+
+
+def _svp_water_pa(t_c: float) -> float:
+    """Compute saturation vapor pressure over liquid water (Pa).
+
+    Uses Magnus-Tetens approximation; adequate for plotting purposes.
+    """
+    t = float(t_c)
+    return 610.94 * np.exp((17.625 * t) / (t + 243.04))
+
+
+def humidity_ratio_from_t_rh(
+    t_c: float,
+    rh_percent: float,
+    p_pa: float = 101325.0,
+) -> float:
+    """Convert (T, RH) to humidity ratio W (kg/kg dry air)."""
+    psat = _svp_water_pa(t_c)
+    pv = max(0.0, min(1.0, float(rh_percent) / 100.0)) * psat
+    denom = float(p_pa) - pv
+    if denom <= 0:
+        denom = np.finfo(float).tiny
+    return 0.62198 * pv / denom
+
+
+def rh_from_t_w(t_c: float, w: float, p_pa: float = 101325.0) -> float:
+    """Convert (T, W) to RH (%)."""
+    w = max(0.0, float(w))
+    pv = (w * float(p_pa)) / (0.62198 + w)
+    psat = _svp_water_pa(t_c)
+    rh = 100.0 * pv / psat if psat > 0 else 0.0
+    return float(np.clip(rh, 0.0, 100.0))
+
+
 # ------------------------ Metric extraction helpers -----------------------
 
 
@@ -135,7 +170,7 @@ def make_metric_eval(
 
     def metric_xy(x: float, y: float) -> float:
         kwargs = xy_to_kwargs(float(x), float(y), fixed)
-        res = model_func(**kwargs)
+        res = model_func(**kwargs, limit_inputs=False)
         return extract_metric(res, metric_attr=metric_attr)
 
     return metric_xy
@@ -322,6 +357,21 @@ def mapper_top_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
     """
     kwargs = {"tdb": float(x), "tr": float(x), "rh": float(y)}
     kwargs.update(fixed)
+    return kwargs
+
+
+def mapper_tdb_w(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
+    """Map psychrometric chart inputs where y is humidity ratio (kg/kg).
+
+    Compute rh from (tdb=x, W=y) at pressure p_atm (Pa) in fixed; default 101325.
+    Pass tdb and rh to model. Other params are forwarded unchanged.
+    """
+    p_pa = float(fixed.get("p_atm", 101325.0))
+    rh = rh_from_t_w(float(x), float(y), p_pa=p_pa)
+    kwargs = {"tdb": float(x), "rh": float(rh)}
+    kwargs.update(fixed)
+    # Ensure mapper-controlled rh overrides any provided in fixed
+    kwargs["rh"] = float(rh)
     return kwargs
 
 
