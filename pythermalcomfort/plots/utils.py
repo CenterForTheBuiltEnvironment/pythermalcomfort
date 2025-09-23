@@ -83,9 +83,8 @@ def extract_metric(result: Any, metric_attr: str | None = None) -> float:
         try:
             return float(getattr(result, metric_attr))
         except Exception as exc:  # noqa: BLE001
-            raise ValueError(
-                f"Result object has no readable attribute {metric_attr!r}"
-            ) from exc
+            msg = f"Result object has no readable attribute {metric_attr!r}"
+            raise ValueError(msg) from exc
 
     # Fallback inference for common names
     for name in ("pmv", "set", "hi", "utci"):
@@ -96,9 +95,8 @@ def extract_metric(result: Any, metric_attr: str | None = None) -> float:
     try:
         return float(result)
     except Exception as exc:  # noqa: BLE001
-        raise ValueError(
-            f"Cannot extract metric from result of type {type(result)}"
-        ) from exc
+        msg = f"Cannot extract metric from result of type {type(result)}"
+        raise ValueError(msg) from exc
 
 
 # ------------------------ Mapper & evaluator builder ----------------------
@@ -236,9 +234,13 @@ def solve_threshold_curves(
         xs = np.full_like(y_arr, np.nan, dtype=float)
         unsolved = 0
         for i, y in enumerate(y_arr):
-            # Define root function f(x) = metric(x, y) - thr
-            def f(x: float) -> float:
-                return metric_xy(float(x), float(y)) - float(thr)
+            # bind loop variables to locals so closure does not capture loop vars
+            y_local = float(y)
+            thr_local = float(thr)
+
+            # Define root function f(x) = metric(x, y_local) - thr_local
+            def f(x: float, y_local=y_local, thr_local=thr_local) -> float:
+                return metric_xy(float(x), float(y_local)) - thr_local
 
             # Scan to find first sign change
             vals = np.array([f(x) for x in x_scan])
@@ -291,10 +293,10 @@ def solve_threshold_curves(
 
 
 def mapper_tdb_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
-    """Default mapper for T–RH charts.
+    """Map T-RH chart inputs to model kwargs.
 
-    Maps x→tdb (air temperature in °C), y→rh (%). Other model params must be
-    supplied via "fixed".
+    Map x -> tdb (air temperature in °C) and y -> rh (%). Other model params
+    must be supplied via "fixed".
     """
     kwargs = {"tdb": float(x), "rh": float(y)}
     kwargs.update(fixed)
@@ -303,8 +305,10 @@ def mapper_tdb_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
 
 def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
     if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
-        raise ValueError(f"{name} must be a (min, max) tuple")
+        msg = f"{name} must be a (min, max) tuple"
+        raise ValueError(msg)
     lo, hi = float(rng[0]), float(rng[1])
     if lo >= hi:
-        raise ValueError(f"{name} must be strictly increasing (min < max)")
+        msg = f"{name} must be strictly increasing (min < max)"
+        raise ValueError(msg)
     return lo, hi

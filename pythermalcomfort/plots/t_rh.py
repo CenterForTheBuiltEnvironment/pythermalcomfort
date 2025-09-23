@@ -7,7 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pythermalcomfort.plots.generic import plot_threshold_region
-from pythermalcomfort.plots.utils import get_default_thresholds, mapper_tdb_rh, _validate_range
+from pythermalcomfort.plots.utils import (
+    _validate_range,
+    get_default_thresholds,
+    mapper_tdb_rh,
+)
 
 __all__ = ["plot_t_rh"]
 
@@ -29,7 +33,7 @@ def plot_t_rh(
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot comfort/risk region on a Temperature–Relative Humidity chart.
+    """Plot comfort/risk region on a Temperature Relative Humidity chart.
 
     Minimal formatting is applied; the function returns the Matplotlib Axes
     so callers can further customize. It can also return the created artists
@@ -120,7 +124,6 @@ def plot_t_rh(
 
 
 if __name__ == "__main__":
-    # Tiny smoke example (requires user to supply parameters as needed)
     from pythermalcomfort.models import pmv_ppd_iso
 
     ax, _ = plot_t_rh(

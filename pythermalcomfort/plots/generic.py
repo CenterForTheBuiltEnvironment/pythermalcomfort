@@ -141,7 +141,8 @@ def plot_threshold_region(
             )
         legend_artist = ax.legend(
             handles=legend_elements,
-            loc='lower center', bbox_to_anchor=(0.5, 1),
+            loc="lower center",
+            bbox_to_anchor=(0.5, 1),
             ncol=min(6, len(legend_elements)),
             framealpha=0.8,
             markerscale=0.6,
