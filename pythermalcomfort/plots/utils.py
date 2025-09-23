@@ -315,6 +315,16 @@ def mapper_tdb_vr(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
     return kwargs
 
 
+def mapper_top_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
+    """Map operative temperature vs RH to model kwargs with tr == tdb.
+
+    Map x -> tdb and tr (both set to operative temperature) and y -> rh.
+    """
+    kwargs = {"tdb": float(x), "tr": float(x), "rh": float(y)}
+    kwargs.update(fixed)
+    return kwargs
+
+
 def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
     if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
         msg = f"{name} must be a (min, max) tuple"
