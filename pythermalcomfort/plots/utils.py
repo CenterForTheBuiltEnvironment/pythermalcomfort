@@ -303,6 +303,18 @@ def mapper_tdb_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
     return kwargs
 
 
+# Add mapper for temperature vs air-speed (vr)
+def mapper_tdb_vr(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
+    """Map T-v (air speed) chart inputs to model kwargs.
+
+    Map x -> tdb (air temperature in °C) and y -> vr (air speed in m/s).
+    Other model params must be supplied via "fixed".
+    """
+    kwargs = {"tdb": float(x), "vr": float(y)}
+    kwargs.update(fixed)
+    return kwargs
+
+
 def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
     if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
         msg = f"{name} must be a (min, max) tuple"
