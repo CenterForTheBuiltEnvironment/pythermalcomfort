@@ -50,7 +50,7 @@ def plot_top_rh(
         thresholds = get_default_thresholds(model_func)
         if thresholds is None:
             raise ValueError(
-        "No thresholds provided and no defaults registered for this model."
+                "No thresholds provided and no defaults registered for this model."
             )
 
     # Build y (RH) grid
@@ -92,4 +92,3 @@ if __name__ == "__main__":
         # plot_kwargs={"cmap": "viridis", "band_alpha": 0.6},
     )
     plt.show()
-
