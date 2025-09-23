@@ -46,7 +46,8 @@ def plot_threshold_region(
         The Matplotlib Axes and a dict with 'bands', 'curves', 'legend'.
     """
     if ax is None:
-        _, ax = plt.subplots(figsize=(7, 5), dpi=150)
+        plt.style.use("seaborn-v0_8-whitegrid")
+        _, ax = plt.subplots(figsize=(7, 5), dpi=300, constrained_layout=True)
 
     # Build evaluator and compute curves
     metric_xy = make_metric_eval(
@@ -81,11 +82,9 @@ def plot_threshold_region(
 
     # Fill regions between curves
     regions = (
-        [(left_const, curves[0])] if curves else []
-    ) + [
-        (curves[i], curves[i + 1]) for i in range(len(curves) - 1)
-    ] + (
-        [(curves[-1], right_const)] if curves else [(left_const, right_const)]
+        ([(left_const, curves[0])] if curves else [])
+        + [(curves[i], curves[i + 1]) for i in range(len(curves) - 1)]
+        + ([(curves[-1], right_const)] if curves else [(left_const, right_const)])
     )
 
     band_artists = []
@@ -93,7 +92,12 @@ def plot_threshold_region(
         m = np.isfinite(left) & np.isfinite(right)
         if m.any():
             coll = ax.fill_betweenx(
-                y_arr[m], left[m], right[m], color=band_colors[i], alpha=band_alpha, linewidth=0
+                y_arr[m],
+                left[m],
+                right[m],
+                color=band_colors[i],
+                alpha=band_alpha,
+                linewidth=0,
             )
             band_artists.append(coll)
 
@@ -125,17 +129,22 @@ def plot_threshold_region(
             else:
                 label = f"{thr_list[i - 1]:.1f} to {thr_list[i]:.1f}"
             legend_elements.append(
-                plt.Rectangle((0, 0), 1, 1, facecolor=band_colors[i], alpha=band_alpha, label=label)
+                plt.Rectangle(
+                    (0, 0),
+                    1,
+                    1,
+                    facecolor=band_colors[i],
+                    alpha=band_alpha,
+                    label=label,
+                )
             )
         legend_artist = ax.legend(
             handles=legend_elements,
-            loc="upper right",
-            bbox_to_anchor=(0.98, 0.98),
-            fontsize=6,
+            loc='lower center', bbox_to_anchor=(0.5, 1),
+            ncol=min(6, len(legend_elements)),
             framealpha=0.8,
             markerscale=0.6,
         )
 
     artists = {"bands": band_artists, "curves": curve_artists, "legend": legend_artist}
     return ax, artists
-

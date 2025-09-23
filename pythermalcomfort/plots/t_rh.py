@@ -7,18 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pythermalcomfort.plots.generic import plot_threshold_region
-from pythermalcomfort.plots.utils import get_default_thresholds, mapper_tdb_rh
+from pythermalcomfort.plots.utils import get_default_thresholds, mapper_tdb_rh, _validate_range
 
 __all__ = ["plot_t_rh"]
-
-
-def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
-    if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
-        raise ValueError(f"{name} must be a (min, max) tuple")
-    lo, hi = float(rng[0]), float(rng[1])
-    if lo >= hi:
-        raise ValueError(f"{name} must be strictly increasing (min < max)")
-    return lo, hi
 
 
 def plot_t_rh(
@@ -126,18 +117,4 @@ if __name__ == "__main__":
         t_range=(10, 36),
         rh_range=(0, 100),
     )
-    ax.set_title("PMV comfort region (example)")
-    plt.show()
-
-    # Tiny smoke example (requires user to supply parameters as needed)
-    from pythermalcomfort.models import set_tmp
-
-    ax, _ = plot_t_rh(
-        model_func=set_tmp,
-        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "v": 0.1, "wme": 0.0},
-        thresholds=[26, 28, 30],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-    )
-    ax.set_title("PMV comfort region (example)")
     plt.show()

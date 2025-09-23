@@ -26,10 +26,9 @@ Notes
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
-from types import SimpleNamespace
-from typing import Any
 import warnings
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
@@ -271,7 +270,8 @@ def solve_threshold_curves(
 
     if warn_on_unsolved and any(c > 0 for c in unsolved_counts):
         msg = ", ".join(
-            f"thr={thr}: {cnt} point(s) unsolved" for thr, cnt in zip(thresholds, unsolved_counts)
+            f"thr={thr}: {cnt} point(s) unsolved"
+            for thr, cnt in zip(thresholds, unsolved_counts, strict=False)
         )
         warnings.warn(
             f"Threshold solver: some y-values had no bracket within x_bounds ({msg}).",
@@ -300,3 +300,11 @@ def mapper_tdb_rh(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
     kwargs.update(fixed)
     return kwargs
 
+
+def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
+    if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
+        raise ValueError(f"{name} must be a (min, max) tuple")
+    lo, hi = float(rng[0]), float(rng[1])
+    if lo >= hi:
+        raise ValueError(f"{name} must be strictly increasing (min < max)")
+    return lo, hi
