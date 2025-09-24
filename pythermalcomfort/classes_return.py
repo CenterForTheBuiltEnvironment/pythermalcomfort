@@ -27,9 +27,9 @@ class AutoStrMixin:
                 if isinstance(v, np.ndarray) and v.size > 10:
                     v_str = np.array2string(
                         v,
-                        max_line_width=80,
+                        max_line_width=100,
                         threshold=10,
-                        edgeitems=20,
+                        edgeitems=3,
                     )
                 else:
                     # Use textwrap for other long strings
