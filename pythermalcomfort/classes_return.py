@@ -20,16 +20,21 @@ class AutoStrMixin:
         for n in names:
             v = getattr(self, n)
             v_str = str(v)
-            
+
             # Use textwrap to limit line length and handle long arrays
             if len(v_str) > 80:  # Limit to 80 characters per line
-                # For numpy arrays, show first few and last few elements
+                # For numpy arrays, use np.array2string for proper formatting
                 if isinstance(v, np.ndarray) and v.size > 10:
-                    v_str = f"[{', '.join(map(str, v[:5]))} ... {', '.join(map(str, v[-5:]))}]"
+                    v_str = np.array2string(
+                        v,
+                        max_line_width=80,
+                        threshold=10,
+                        edgeitems=20,
+                    )
                 else:
                     # Use textwrap for other long strings
                     v_str = textwrap.shorten(v_str, width=80, placeholder="...")
-            
+
             # Format multi-line values properly
             v_str = v_str.replace("\n", "\n" + " " * (width + 3 + 3))
             lines.append(f"{n.ljust(width)} : {v_str}")
