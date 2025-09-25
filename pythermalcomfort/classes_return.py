@@ -10,11 +10,11 @@ import numpy.typing as npt
 
 class AutoStrMixin:
     def __str__(self) -> str:
-        """Pretty-print dataclass fields with dynamic header and formatting.
+        """Pretty-print dataclass fields as aligned single-line 'name : value'.
 
-        - Header dashes match the longest line (including class name).
-        - Results are comma-separated, colons aligned.
-        - Each line is shortened to 80 chars if needed.
+        - One line per field, no header/title.
+        - NumPy arrays with >10 elements show first 5 and last 5.
+        - Other long strings are shortened to 80 chars with an ellipsis.
         """
         if not is_dataclass(self):
             return super().__str__()
@@ -32,17 +32,20 @@ class AutoStrMixin:
                     max_line_width=MAX_STR_WIDTH,
                     precision=2,
                     threshold=10,
-                    edgeitems=3,
+                    edgeitems=5,
                     formatter={"float_kind": lambda x: f"{x:.2f}"},
                 )
-            elif isinstance(val, (list | tuple)) and len(val) > 5:
-                v = str(val[:3])[:-1] + ", ...]"
             elif isinstance(val, (list | tuple)):
-                v = ", ".join(str(x) for x in val)
+                if len(val) > 10:
+                    head = ", ".join(str(x) for x in val[:5])
+                    tail = ", ".join(str(x) for x in val[-5:])
+                    v = f"[{head}, ..., {tail}]"
+                else:
+                    v = f"[{', '.join(str(x) for x in val)}]"
             else:
                 v = str(val)
-            # # Shorten if needed
-            if len(v) > MAX_STR_WIDTH:
+            # Shorten if needed
+            if isinstance(val, str) and len(v) > MAX_STR_WIDTH:
                 v = textwrap.shorten(v, width=MAX_STR_WIDTH, placeholder="...")
             return v
 
@@ -52,14 +55,15 @@ class AutoStrMixin:
         # Compose lines with aligned colons
         lines = [
             f"{n.ljust(max_name_len)} : {v}"
-            for n, v in zip(names, value_strs, strict=False)
+            for n, v in zip(names, value_strs, strict=True)
         ]
-        # # Shorten each line to MAX_STR_WIDTH
-        # lines = [
-        #     textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
-        #     if len(line) > MAX_STR_WIDTH else line
-        #     for line in lines
-        # ]
+        # Shorten each line to MAX_STR_WIDTH
+        lines = [
+            textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
+            if len(line) > MAX_STR_WIDTH
+            else line
+            for line in lines
+        ]
 
         # Compute header length
         header_base = f"{self.__class__.__name__}"
