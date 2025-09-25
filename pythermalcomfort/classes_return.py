@@ -35,9 +35,9 @@ class AutoStrMixin:
                     edgeitems=3,
                     formatter={"float_kind": lambda x: f"{x:.2f}"},
                 )
-            elif isinstance(val, (list, tuple)) and len(val) > 5:
+            elif isinstance(val, (list | tuple)) and len(val) > 5:
                 v = str(val[:3])[:-1] + ", ...]"
-            elif isinstance(val, (list, tuple)):
+            elif isinstance(val, (list | tuple)):
                 v = ", ".join(str(x) for x in val)
             else:
                 v = str(val)
