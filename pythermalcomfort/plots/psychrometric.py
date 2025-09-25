@@ -155,6 +155,6 @@ if __name__ == "__main__":
         t_range=(10, 36),
         w_range=(0.0, 0.03),
         w_step=5e-4,
-        plot_kwargs={"band_alpha": 0.35, "line_color": "k", "cmap": "viridis"},
+        # plot_kwargs={"band_alpha": 0.35, "line_color": "k", "cmap": "viridis"},
     )
     plt.show()

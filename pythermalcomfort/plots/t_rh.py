@@ -125,34 +125,45 @@ def plot_t_rh(
 
 if __name__ == "__main__":
     from pythermalcomfort.models import pmv_ppd_iso
-    #
-    # ax, _ = plot_t_rh(
-    #     model_func=pmv_ppd_iso,
-    #     fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-    #     thresholds=[-0.5, 0.5],
-    #     t_range=(10, 36),
-    #     rh_range=(0, 100),
-    #     # plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
-    # )
-    # # ax.set(xlim=(10, 36), ylim=(0, 100), title="PMV Comfort Zones")
-    # # ax.legend()
-    # plt.show()
-    #
-    # # create some synthetic data to plot as a scatter plot
-    # ax, _ = plot_t_rh(
-    #     model_func=pmv_ppd_iso,
-    #     fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-    #     thresholds=[-0.5, 0.5],
-    #     t_range=(10, 36),
-    #     rh_range=(0, 100),
-    #     # plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
-    # )
-    # np.random.seed(0)
-    # t_data = np.random.uniform(10, 36, size=100)
-    # rh_data = np.random.uniform(0, 100, size=100)
-    # sc = ax.scatter(t_data, rh_data, c='black', s=10, label='Data Points')
+
+    ax, _ = plot_t_rh(
+        model_func=pmv_ppd_iso,
+        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
+        thresholds=[-0.5, 0.5],
+        t_range=(10, 36),
+        rh_range=(0, 100),
+    )
+    plt.show()
+
+    ax, _ = plot_t_rh(
+        model_func=pmv_ppd_iso,
+        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
+        thresholds=[-0.5, 0.5],
+        t_range=(10, 36),
+        rh_range=(0, 100),
+        plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
+    )
+    ax.set(xlim=(10, 36), ylim=(0, 100))
+    plt.show()
     # ax.legend()
-    # plt.show()
+
+    plt.show()
+
+    # create some synthetic data to plot as a scatter plot
+    ax, _ = plot_t_rh(
+        model_func=pmv_ppd_iso,
+        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
+        thresholds=[-0.5, 0.5],
+        t_range=(10, 36),
+        rh_range=(0, 100),
+        # plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
+    )
+    np.random.seed(0)
+    t_data = np.random.uniform(10, 36, size=100)
+    rh_data = np.random.uniform(0, 100, size=100)
+    sc = ax.scatter(t_data, rh_data, c='black', s=10, label='Data Points')
+    ax.legend()
+    plt.show()
 
     from matplotlib.gridspec import GridSpec
     import matplotlib as mpl
