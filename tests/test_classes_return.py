@@ -19,11 +19,10 @@ def test_autostr_with_dataclass() -> None:
     """Test that the AutoStrMixin generates a string representation for a dataclass."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     expected_output = (
-        '----------------\n TestDataClass  \n----------------\n'
-        'field1 : 42\n'
-        'field2 : test\n'
-        'field3 : 1, 2, 3'
-
+        "----------------\n TestDataClass  \n----------------\n"
+        "field1 : 42\n"
+        "field2 : test\n"
+        "field3 : 1, 2, 3"
     )
     assert str(obj) == expected_output
 
@@ -32,11 +31,10 @@ def test_autostr_with_multiline_field() -> None:
     """Test that the AutoStrMixin handles multiline fields correctly."""
     obj = TestDataClass(field1=42, field2="test", field3=["line1", "line2"])
     expected_output = (
-        '---------------------\n    TestDataClass    \n---------------------\n'
-        'field1 : 42\n'
-        'field2 : test\n'
-        'field3 : line1, line2'
-
+        "---------------------\n    TestDataClass    \n---------------------\n"
+        "field1 : 42\n"
+        "field2 : test\n"
+        "field3 : line1, line2"
     )
     assert str(obj) == expected_output
 
@@ -49,7 +47,7 @@ def test_autostr_empty_dataclass() -> None:
         pass
 
     obj = EmptyDataClass()
-    expected_output = '--------------\nEmptyDataClass\n--------------'
+    expected_output = "--------------\nEmptyDataClass\n--------------"
     assert str(obj) == expected_output
 
 
@@ -57,11 +55,10 @@ def test_autostr_repr_method() -> None:
     """Test that the __repr__ method returns the same as __str__."""
     obj = TestDataClass(field1=42, field2="test", field3=[1, 2, 3])
     expected_output = (
-        '----------------\n TestDataClass  \n----------------\n'
-        'field1 : 42\n'
-        'field2 : test\n'
-        'field3 : 1, 2, 3'
-
+        "----------------\n TestDataClass  \n----------------\n"
+        "field1 : 42\n"
+        "field2 : test\n"
+        "field3 : 1, 2, 3"
     )
     assert repr(obj) == expected_output
     # Verify that __repr__ returns the same as __str__
