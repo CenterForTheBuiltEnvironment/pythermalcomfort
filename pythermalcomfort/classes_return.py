@@ -33,7 +33,7 @@ class AutoStrMixin:
                     precision=2,
                     threshold=10,
                     edgeitems=3,
-                    formatter={"float_kind": lambda x: "%.2f" % x},
+                    formatter={"float_kind": lambda x: f"{x:.2f}"},
                 )
             elif isinstance(val, (list, tuple)) and len(val) > 5:
                 v = str(val[:3])[:-1] + ", ...]"
@@ -50,9 +50,7 @@ class AutoStrMixin:
         # Find max name length for alignment
         max_name_len = max(len(n) for n in names) if names else 0
         # Compose lines with aligned colons
-        lines = [
-            f"{n.ljust(max_name_len)} : {v}" for n, v in zip(names, value_strs)
-        ]
+        lines = [f"{n.ljust(max_name_len)} : {v}" for n, v in zip(names, value_strs, strict=False)]
         # # Shorten each line to MAX_STR_WIDTH
         # lines = [
         #     textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
