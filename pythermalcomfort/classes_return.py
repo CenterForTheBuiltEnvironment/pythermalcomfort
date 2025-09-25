@@ -10,35 +10,63 @@ import numpy.typing as npt
 
 class AutoStrMixin:
     def __str__(self) -> str:
+        """Pretty-print dataclass fields with dynamic header and formatting.
+
+        - Header dashes match the longest line (including class name).
+        - Results are comma-separated, colons aligned.
+        - Each line is shortened to 80 chars if needed.
+        """
         if not is_dataclass(self):
             return super().__str__()
 
-        # determine width by max variable name length
+        MAX_STR_WIDTH = 80
         names = [f.name for f in fields(type(self))]
-        width = max((len(n) for n in names), default=0)
-        lines = [f"-------- {self.__class__.__name__} --------"]
-        for n in names:
-            v = getattr(self, n)
-            v_str = str(v)
+        values = [getattr(self, n) for n in names]
 
-            # Use textwrap to limit line length and handle long arrays
-            if len(v_str) > 80:  # Limit to 80 characters per line
-                # For numpy arrays, use np.array2string for proper formatting
-                if isinstance(v, np.ndarray) and v.size > 10:
-                    v_str = np.array2string(
-                        v,
-                        max_line_width=100,
-                        threshold=10,
-                        edgeitems=3,
-                    )
-                else:
-                    # Use textwrap for other long strings
-                    v_str = textwrap.shorten(v_str, width=80, placeholder="...")
+        # Format values as strings, using comma separation for arrays/lists
+        def value_to_str(val):
+            if isinstance(val, np.ndarray):
+                v = np.array2string(
+                    val,
+                    separator=", ",
+                    max_line_width=MAX_STR_WIDTH,
+                    precision=2,
+                    threshold=10,
+                    edgeitems=3,
+                    formatter={"float_kind": lambda x: "%.2f" % x},
+                )
+            elif isinstance(val, (list, tuple)) and len(val) > 5:
+                v = str(val[:3])[:-1] + ", ...]"
+            elif isinstance(val, (list, tuple)):
+                v = ", ".join(str(x) for x in val)
+            else:
+                v = str(val)
+            # # Shorten if needed
+            if len(v) > MAX_STR_WIDTH:
+                v = textwrap.shorten(v, width=MAX_STR_WIDTH, placeholder="...")
+            return v
 
-            # Format multi-line values properly
-            v_str = v_str.replace("\n", "\n" + " " * (width + 3 + 3))
-            lines.append(f"{n.ljust(width)} : {v_str}")
-        return "\n".join(lines)
+        value_strs = [value_to_str(v) for v in values]
+        # Find max name length for alignment
+        max_name_len = max(len(n) for n in names) if names else 0
+        # Compose lines with aligned colons
+        lines = [
+            f"{n.ljust(max_name_len)} : {v}" for n, v in zip(names, value_strs)
+        ]
+        # # Shorten each line to MAX_STR_WIDTH
+        # lines = [
+        #     textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
+        #     if len(line) > MAX_STR_WIDTH else line
+        #     for line in lines
+        # ]
+
+        # Compute header length
+        header_base = f"{self.__class__.__name__}"
+        max_line_len = max([len(header_base)] + [len(line) for line in lines])
+        header = f"{'-' * (max_line_len)}"
+        title = f"{header_base}".center(max_line_len)
+        result = [header, title, header] + lines
+        return "\n".join(result)
 
     def __repr__(self) -> str:
         return self.__str__()
