@@ -50,7 +50,10 @@ class AutoStrMixin:
         # Find max name length for alignment
         max_name_len = max(len(n) for n in names) if names else 0
         # Compose lines with aligned colons
-        lines = [f"{n.ljust(max_name_len)} : {v}" for n, v in zip(names, value_strs, strict=False)]
+        lines = [
+            f"{n.ljust(max_name_len)} : {v}"
+            for n, v in zip(names, value_strs, strict=False)
+        ]
         # # Shorten each line to MAX_STR_WIDTH
         # lines = [
         #     textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
