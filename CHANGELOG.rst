@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.6.1 (2025-XX-XX)
+------------------
+
+* Fixed issue with `disc` calculation in the two_nodes_gagge model.
+
 3.6.0 (2025-09-22)
 ------------------
 
