@@ -161,12 +161,12 @@ if __name__ == "__main__":
     np.random.seed(0)
     t_data = np.random.uniform(10, 36, size=100)
     rh_data = np.random.uniform(0, 100, size=100)
-    sc = ax.scatter(t_data, rh_data, c='black', s=10, label='Data Points')
+    sc = ax.scatter(t_data, rh_data, c="black", s=10, label="Data Points")
     ax.legend()
     plt.show()
 
-    from matplotlib.gridspec import GridSpec
     import matplotlib as mpl
+    from matplotlib.gridspec import GridSpec
 
     # Generate synthetic data
     np.random.seed(0)
@@ -174,23 +174,25 @@ if __name__ == "__main__":
     rh_data = np.random.uniform(0, 100, size=100)
 
     # Compute PMV for each point
-    pmv_values = np.array([
-        pmv_ppd_iso(
-            tdb=t,
-            tr=30,
-            rh=rh,
-            met=1.2,
-            clo=0.5,
-            vr=0.1,
-            wme=0.0,
-            limit_inputs=False,
-        )['pmv']
-        for t, rh in zip(t_data, rh_data)
-    ])
+    pmv_values = np.array(
+        [
+            pmv_ppd_iso(
+                tdb=t,
+                tr=30,
+                rh=rh,
+                met=1.2,
+                clo=0.5,
+                vr=0.1,
+                wme=0.0,
+                limit_inputs=False,
+            )["pmv"]
+            for t, rh in zip(t_data, rh_data, strict=False)
+        ]
+    )
 
     # Bin PMV values
     bins = [-np.inf, -0.5, 0.5, np.inf]
-    labels = ['PMV < -0.5', '-0.5 ≤ PMV ≤ 0.5', 'PMV > 0.5']
+    labels = ["PMV < -0.5", "-0.5 ≤ PMV ≤ 0.5", "PMV > 0.5"]
     pmv_bin_indices = np.digitize(pmv_values, bins) - 1
     counts = np.bincount(pmv_bin_indices, minlength=3)
     percentages = 100 * counts / counts.sum()
@@ -210,8 +212,8 @@ if __name__ == "__main__":
         ax=ax0,
         plot_kwargs={"band_alpha": 0.5},
     )
-    sc = ax0.scatter(t_data, rh_data, c='black', s=10, label='Data Points')
-    ax0.grid(axis='both', linestyle=':', alpha=0.5)
+    sc = ax0.scatter(t_data, rh_data, c="black", s=10, label="Data Points")
+    ax0.grid(axis="both", linestyle=":", alpha=0.5)
     ax0.set(xlim=(10, 36), ylim=(0, 100))
 
     # Number of bins (bands)
@@ -224,16 +226,16 @@ if __name__ == "__main__":
     ax1 = fig.add_subplot(gs[0, 1])
     # y_pos = np.arange(len(labels))
     bottom = 0
-    for percentage, color in zip(percentages, band_colors):
+    for percentage, color in zip(percentages, band_colors, strict=False):
         ax1.bar("count", percentage, bottom=bottom, alpha=0.5, color=color)
         bottom += percentage
     # ax1.set_yticks(y_pos)
     # ax1.set_yticklabels(labels)
     ax1.set_ylim(0, 100)
-    ax1.set_ylabel('PMV distribution (%)')
+    ax1.set_ylabel("PMV distribution (%)")
     ax1.yaxis.tick_right()
     ax1.yaxis.set_label_position("right")
-    ax1.grid(axis='x', linestyle=':', alpha=0.5)
+    ax1.grid(axis="x", linestyle=":", alpha=0.5)
     # for i, v in enumerate(percentages):
     #     ax1.text(v + 1, i, f"{v:.1f}%", va='center', fontsize=8)
     # ax1.tick_params(left=False, labelleft=True, labelsize=8)

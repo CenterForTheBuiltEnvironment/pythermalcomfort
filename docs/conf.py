@@ -14,6 +14,10 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
+    "myst_nb",  # render/execute notebooks
+    "nbsphinx",  # render/execute notebooks inline
+    # "myst_parser",     # optional if you use MyST markdown elsewhere
+    # "sphinx_gallery.gen_gallery",  # convert example .py -> gallery with plots
 ]
 source_suffix = ".rst"
 master_doc = "index"
@@ -91,3 +95,16 @@ html_theme_options = {
     "secondary_sidebar_items": ["page-toc", "edit-this-page"],
     "content_footer_items": ["last-updated"],
 }
+
+# # sphinx-gallery config (example .py -> gallery)
+# sphinx_gallery_conf = {
+#     "examples_dirs": "../examples",   # where your example .py scripts live
+#     "gallery_dirs": "auto_examples",  # output dir inside docs build
+# }
+
+# MyST-NB config (executing notebooks and embedding outputs)
+nb_execution_mode = (
+    "auto"  # "force" to always execute, "auto" to execute if outputs missing
+)
+nb_execution_timeout = 180
+myst_enable_extensions = ["dollarmath", "amsmath"]

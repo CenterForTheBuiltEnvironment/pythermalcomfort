@@ -14,10 +14,10 @@ from pythermalcomfort.plots.utils import (
     mapper_tdb_w,
 )
 
-__all__ = ["plot_psychrometric_regions"]
+__all__ = ["ranges_psychrometric"]
 
 
-def plot_psychrometric_regions(
+def ranges_psychrometric(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
@@ -136,25 +136,3 @@ def plot_psychrometric_regions(
     ax.set_ylim(w_lo, w_hi)
 
     return ax, artists
-
-
-if __name__ == "__main__":
-    # Minimal example (ensure model_func can accept tdb/rh and other params)
-    from pythermalcomfort.models import pmv_ppd_iso  # type: ignore
-
-    ax, _ = plot_psychrometric_regions(
-        pmv_ppd_iso,
-        fixed_params={
-            "tr": 25.0,
-            "met": 1.0,
-            "clo": 0.61,
-            "vr": 0.1,
-            "wme": 0.0,
-        },
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        w_range=(0.0, 0.03),
-        w_step=5e-4,
-        # plot_kwargs={"band_alpha": 0.35, "line_color": "k", "cmap": "viridis"},
-    )
-    plt.show()

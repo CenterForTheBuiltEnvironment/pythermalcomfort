@@ -3,3 +3,8 @@ sphinx-rtd-theme
 docutils<0.18
 urllib3<2.0
 pydata-sphinx-theme
+matplotlib
+pandas
+seaborn
+nbsphinx
+myst_nb

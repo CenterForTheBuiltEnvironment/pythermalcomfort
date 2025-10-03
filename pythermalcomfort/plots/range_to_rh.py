@@ -3,7 +3,13 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import Any
 
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError as exc:
+    raise ImportError(
+        "Plotting requires the optional 'plots' extra. "
+        "Install with: pip install pythermalcomfort[plots]"
+    ) from exc
 import numpy as np
 
 from pythermalcomfort.plots.generic import plot_threshold_region
@@ -13,10 +19,10 @@ from pythermalcomfort.plots.utils import (
     mapper_top_rh,
 )
 
-__all__ = ["plot_top_rh"]
+__all__ = ["range_to_rh"]
 
 
-def plot_top_rh(
+def range_to_rh(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
@@ -35,7 +41,7 @@ def plot_top_rh(
 ) -> tuple[plt.Axes, dict[str, Any]]:
     """Plot regions on an operative temperature vs relative humidity chart.
 
-    Enforces tr == tdb by construction. Use plot_kwargs to override visuals.
+    todo write the rest of the docstring
     """
     # Validate ranges and steps
     t_lo, t_hi = _validate_range("t_range", t_range)
@@ -77,18 +83,3 @@ def plot_top_rh(
 
     ax, artists = plot_threshold_region(**kwargs)
     return ax, artists
-
-
-if __name__ == "__main__":
-    # Example (user must pass appropriate fixed params for their model)
-    from pythermalcomfort.models import pmv_ppd_iso  # type: ignore
-
-    ax, _ = plot_top_rh(
-        model_func=pmv_ppd_iso,
-        fixed_params={"met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-        # plot_kwargs={"cmap": "viridis", "band_alpha": 0.6},
-    )
-    plt.show()
