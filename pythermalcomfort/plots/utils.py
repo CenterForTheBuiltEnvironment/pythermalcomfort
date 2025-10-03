@@ -376,7 +376,7 @@ def mapper_tdb_w(x: float, y: float, fixed: dict[str, Any]) -> dict[str, Any]:
 
 
 def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
-    if not (isinstance(rng, (tuple, list)) and len(rng) == 2):
+    if not (isinstance(rng, tuple | list) and len(rng) == 2):
         msg = f"{name} must be a (min, max) tuple"
         raise ValueError(msg)
     lo, hi = float(rng[0]), float(rng[1])
