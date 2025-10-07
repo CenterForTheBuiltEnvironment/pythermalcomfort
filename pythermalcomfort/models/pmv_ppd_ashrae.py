@@ -102,8 +102,8 @@ def pmv_ppd_ashrae(
     PMVPPD
         A dataclass containing the Predicted Mean Vote and Predicted Percentage of
         Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for
-        more details. To access the `pmv`, `ppd`, `tsv` values, use the corresponding
-        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
+        more details. To access the `pmv`, `ppd`, `tsv`, and `compliance` values, use the corresponding
+        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`, `result.compliance`.
 
     Examples
     --------
@@ -127,6 +127,7 @@ def pmv_ppd_ashrae(
         )
         print(results.pmv)  # 0.0
         print(results.ppd)  # 5.0
+        print(results.compliance)  # True
 
         result = pmv_ppd_ashrae(
             tdb=[22, 25],
@@ -139,7 +140,6 @@ def pmv_ppd_ashrae(
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
-
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -233,8 +233,12 @@ def pmv_ppd_ashrae(
         10: "Hot",
     }
 
+    # Calculate compliance: True if -0.5 < PMV < 0.5
+    compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
+
     return PMVPPD(
         pmv=pmv_array,
         ppd=ppd_array,
         tsv=mapping(pmv_array, thermal_sensation, right=False),
+        compliance=compliance_array,
     )
