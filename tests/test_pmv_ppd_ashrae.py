@@ -120,7 +120,7 @@ class TestPmvPpd:
             clo=0.5,
             model=Models.ashrae_55_2023.value,
         )
-        assert result.compliance is True or result.compliance == np.bool_(True)
+        assert result.compliance is True
 
         # Test scalar values - non-compliant case (PMV outside -0.5 to 0.5)
         result = pmv_ppd_ashrae(
@@ -132,7 +132,7 @@ class TestPmvPpd:
             clo=0.5,
             model=Models.ashrae_55_2023.value,
         )
-        assert result.compliance is False or result.compliance == np.bool_(False)
+        assert result.compliance is False
 
         # Test array values with known PMV results
         result = pmv_ppd_ashrae(
@@ -149,8 +149,6 @@ class TestPmvPpd:
         expected_compliance = np.array([False, True, False])
         np.testing.assert_array_equal(result.compliance, expected_compliance)
 
-        # Test edge cases: PMV exactly at -0.5 and 0.5 should not be compliant (exclusive bounds)
-        # PMV = -0.5 should return False
         result = pmv_ppd_ashrae(
             tdb=22.5,
             tr=22.5,
@@ -160,9 +158,22 @@ class TestPmvPpd:
             clo=0.5,
             model=Models.ashrae_55_2023.value,
         )
-        # The PMV should be around -0.5, so compliance should be False
-        if abs(result.pmv + 0.5) < 0.01:  # if PMV is close to -0.5
-            assert result.compliance is False or result.compliance == np.bool_(False)
+        # For these inputs, PMV is outside (-0.5, 0.5), so should be non-compliant
+        assert result.pmv < -0.5 or result.pmv > 0.5
+        assert result.compliance is False
+
+        # Also test inputs that produce PMV close to upper bound
+        result = pmv_ppd_ashrae(
+            tdb=27.45,
+            tr=27.45,
+            vr=0.1,
+            rh=50,
+            met=1.0,
+            clo=0.5,
+            model=Models.ashrae_55_2023.value,
+        )
+        assert result.pmv < -0.5 or result.pmv > 0.5
+        assert result.compliance is False or result.compliance == np.bool_(False)
 
     def test_wrong_standard(self) -> None:
         """Test that the function raises a ValueError for an unsupported model."""
