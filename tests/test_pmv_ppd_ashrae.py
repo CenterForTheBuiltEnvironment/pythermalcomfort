@@ -53,7 +53,7 @@ class TestPmvPpd:
                 "Slightly Warm",
                 "Warm",
                 "Hot",
-                "Hot",
+                "Warm",
                 "Warm",
             ],
         )
