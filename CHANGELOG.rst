@@ -5,7 +5,6 @@ Changelog
 ------------------
 
 * Fix issue with `disc` calculation in the two_nodes_gagge model and limiting its value to 6. Close #251
-* Improve naming sweat related outputs in the `gagge` model.
 * Improve documentation for the `disc` function.
 * PMV ASHRAE model returns the `compliance` boolean value with the ASHRAE 55:2023 standard. Close #253
 * Improve formatting of models outputs to the console.
@@ -18,11 +17,15 @@ Changelog
     - the `phs` function now returns all the outputs needed to use the outputs of a previous calculation as inputs for a new calculation.
     - removed outputs: ``water_loss``, ``water_loss_watt``
     - added outputs (with units):
-      * ``sweat_loss_g`` [g] — cumulative sweat mass per person (not area‑normalised)
-      * ``sweat_rate_watt`` [W·m⁻²] — instantaneous evaporative heat flux at skin
-      * ``evap_load_wm2_min`` [W·min·m⁻²] — accumulated evaporative load for chaining
+
+        * ``sweat_loss_g`` [g] — cumulative sweat mass per person (not area‑normalised)
+        * ``sweat_rate_watt`` [W·m⁻²] — instantaneous evaporative heat flux at skin
+        * ``evap_load_wm2_min`` [W·min·m⁻²] — accumulated evaporative load for chaining
+
     Migration:
+
     .. code-block:: python
+
         # <= 3.5.x
         grams = res.water_loss
         w_m2 = res.water_loss_watt
@@ -30,6 +33,7 @@ Changelog
         grams = res.sweat_loss_g
         w_m2 = res.sweat_rate_watt
         carry = res.evap_load_wm2_min  # for multi‑segment runs
+
 
 3.5.1 (2025-09-15)
 ------------------
