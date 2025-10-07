@@ -9,6 +9,36 @@ def valid_range(x, valid) -> np.ndarray:
     return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
 
 
+def _finalize_scalar_or_array(arr: Any) -> Any:
+    """Convert 0d arrays to Python scalars, preserve np.nan, return arrays as-is.
+
+    Args:
+        arr: np.ndarray, scalar, or array-like.
+
+    Returns:
+        Python scalar (with np.nan preserved) if input is scalar, else array.
+
+    Examples
+    --------
+    >>> _finalize_scalar_or_array(np.array(True, dtype=object))
+    True
+    >>> _finalize_scalar_or_array(np.array(np.nan, dtype=object))
+    nan
+    >>> _finalize_scalar_or_array(np.array([True, False, np.nan], dtype=object))
+    array([True, False, nan], dtype=object)
+    """
+    arr = np.asarray(arr, dtype=object)
+    if arr.shape == ():
+        val = arr.item()
+        if isinstance(val, float) and np.isnan(val):
+            return np.nan
+        # Convert np.bool_ to Python bool
+        if isinstance(val, (np.bool_ | bool)):
+            return bool(val)
+        return val
+    return arr
+
+
 def mapping(
     value: float | np.ndarray, map_dictionary: Mapping[float, Any], right: bool = True
 ) -> np.ndarray:
