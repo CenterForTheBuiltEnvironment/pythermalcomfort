@@ -31,7 +31,7 @@ def test_intrinsic_insulation_ensemble() -> None:
 def test_clo_area_factor() -> None:
     """Test the clothing area factor function."""
     assert clo_area_factor(1) == 1.28
-    assert np.allclose(clo_area_factor(i_cl=[1, 2]), np.array([1.28, 1.56]))
+    assert np.allclose(clo_area_factor(i_cl=[1, 2]), np.asarray([1.28, 1.56]))
 
 
 def test_clo_air_layer_insulation() -> None:
@@ -293,9 +293,9 @@ def test_clo_dynamic_ashrae() -> None:
     assert clo_dynamic_ashrae(clo=1, met=1) == 1
     assert clo_dynamic_ashrae(clo=1, met=0.5) == 1
     assert clo_dynamic_ashrae(clo=2, met=0.5) == 2
-    assert np.allclose(clo_dynamic_ashrae(1.0, 1.0), np.array(1))
-    assert np.allclose(clo_dynamic_ashrae(1.0, 1.2), np.array(1))
-    assert np.allclose(clo_dynamic_ashrae(1.0, 2.0), np.array(0.8))
+    assert np.allclose(clo_dynamic_ashrae(1.0, 1.0), np.asarray(1))
+    assert np.allclose(clo_dynamic_ashrae(1.0, 1.2), np.asarray(1))
+    assert np.allclose(clo_dynamic_ashrae(1.0, 2.0), np.asarray(0.8))
 
     # Test invalid standard input
     with pytest.raises(ValueError):
@@ -350,9 +350,9 @@ def test_v_relative() -> None:
     assert np.allclose(v_relative(v, met), expected_result)
 
     # Test case when met is greater than 1
-    v = np.array([1.0, 2.0, 3.0])
+    v = np.asarray([1.0, 2.0, 3.0])
     met = 2.0
-    expected_result = np.array([1.3, 2.3, 3.3])
+    expected_result = np.asarray([1.3, 2.3, 3.3])
     assert np.allclose(v_relative(v, met), expected_result, atol=1e-6)
 
     # Test case with negative values for v
@@ -371,7 +371,7 @@ def test_validate_type() -> None:
     validate_type(1, "int_value", allowed)
     validate_type(3.1415, "float_value", allowed)
     validate_type([1, 2, 3], "list_value", allowed)
-    validate_type(np.array([1, 2, 3]), "array_value", allowed)
+    validate_type(np.asarray([1, 2, 3]), "array_value", allowed)
 
     # np scalars should be converted to native types via .item()
     validate_type(np.float32(40.0), "np_float32", allowed)
@@ -379,11 +379,11 @@ def test_validate_type() -> None:
     validate_type(np.int64(200), "np_int64", allowed)
 
     # np array of floats and ints should be allowed
-    arr_numeric = np.array([np.float32(1.0), np.int32(2), 3, 3.52])
+    arr_numeric = np.asarray([np.float32(1.0), np.int32(2), 3, 3.52])
     validate_type(arr_numeric, "arr_numeric", allowed)
 
     # empty NumPy array should also pass
-    validate_type(np.array([]), "empty_array", allowed)
+    validate_type(np.asarray([]), "empty_array", allowed)
 
     # empty list should pass
     validate_type([], "empty_list", allowed)

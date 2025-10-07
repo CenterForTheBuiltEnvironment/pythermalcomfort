@@ -11,16 +11,16 @@ def test_two_nodes_gagge_sleep_single_input() -> None:
 
     # expected outputs
     expected = {
-        "set": np.array([24.28]),
-        "t_core": np.array([37.03]),
-        "t_skin": np.array([33.67]),
-        "wet": np.array([0.27]),
-        "t_sens": np.array([1.12]),
-        "disc": np.array([1.47]),
-        "e_skin": np.array([28.75]),
-        "met_shivering": np.array([0.0]),
-        "alfa": np.array([0.13]),
-        "skin_blood_flow": np.array([7.11]),
+        "set": np.asarray([24.28]),
+        "t_core": np.asarray([37.03]),
+        "t_skin": np.asarray([33.67]),
+        "wet": np.asarray([0.27]),
+        "t_sens": np.asarray([1.12]),
+        "disc": np.asarray([1.47]),
+        "e_skin": np.asarray([28.75]),
+        "met_shivering": np.asarray([0.0]),
+        "alfa": np.asarray([0.13]),
+        "skin_blood_flow": np.asarray([7.11]),
     }
 
     # compare each field with a reasonable tolerance

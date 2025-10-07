@@ -78,7 +78,7 @@ def detailed_simulation():
     model.tdb = 28  # Air temperature [°C]
     model.tr = 30  # Mean radiant temperature [°C]
     model.rh = 40  # Relative humidity [%]
-    model.v = np.array(  # Air velocity [m/s]
+    model.v = np.asarray(  # Air velocity [m/s]
         [
             0.2,  # head
             0.4,  # neck
@@ -235,7 +235,7 @@ def validation_simulation():
     def sim_stolwijk_hardy(models, tolist, rhlist):
         result = []
         for model in models:
-            model.icl = np.array(
+            model.icl = np.asarray(
                 [
                     0,
                     0,

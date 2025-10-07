@@ -62,8 +62,8 @@ def wci(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    v = np.asarray(v)
 
     _wci = (10.45 + 10 * v**0.5 - v) * (33 - tdb)
 

@@ -101,13 +101,13 @@ def ankle_draft(
     )
 
     # Convert lists to numpy arrays
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    v_ankle = np.array(v_ankle)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    v_ankle = np.asarray(v_ankle)
 
     if units.upper() == Units.IP.value:
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)

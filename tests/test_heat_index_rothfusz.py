@@ -34,7 +34,7 @@ def test_below_threshold_produces_nan() -> None:
     """Test that the function returns NaN for heat index below threshold."""
     result = heat_index_rothfusz(tdb=25, rh=80)
     assert np.isnan(result.hi).item()
-    assert isinstance(result.stress_category, np.str_)
+    assert np.isnan(result.stress_category)
 
 
 def test_vector_input_no_rounding() -> None:

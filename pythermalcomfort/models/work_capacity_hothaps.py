@@ -69,7 +69,7 @@ def work_capacity_hothaps(
 
     # convert str to enum
     work_intensity = WorkIntensity(work_intensity.lower())
-    wbgt = np.array(wbgt)
+    wbgt = np.asarray(wbgt)
 
     params = {
         WorkIntensity.HEAVY: {"divisor": 30.94, "exponent": 16.64},

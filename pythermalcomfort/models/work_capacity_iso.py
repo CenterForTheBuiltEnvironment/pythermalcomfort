@@ -46,8 +46,8 @@ def work_capacity_iso(
     # Validate inputs
     WorkCapacityStandardsInputs(wbgt=wbgt, met=met)
 
-    wbgt = np.array(wbgt)
-    met = np.array(met)
+    wbgt = np.asarray(wbgt)
+    met = np.asarray(met)
 
     met_rest = 117  # assumed resting metabolic rate
 

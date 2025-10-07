@@ -97,7 +97,7 @@ def is_equal(a, b, tolerance=1e-6) -> bool:
     """Compare two values for equality with a specified tolerance."""
     if isinstance(a, np.ndarray):
         if not isinstance(b, np.ndarray):
-            b = np.array(b, dtype=a.dtype)
+            b = np.asarray(b, dtype=a.dtype)
         if a.dtype.kind in "UOS":  # U = unicode, O = objects, S = string
             return np.array_equal(a, b)
         b = np.where(b is None, np.nan, b)  # Replace None with np.nan

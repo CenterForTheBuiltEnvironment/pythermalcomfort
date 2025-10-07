@@ -34,6 +34,6 @@ def test_solar_gain_array() -> None:
             asw=0.7,
             posture="sitting",
         ).erf,
-        np.array([46.4, 52.8]),
+        np.asarray([46.4, 52.8]),
         atol=0.1,
     )

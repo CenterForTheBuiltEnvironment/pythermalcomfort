@@ -104,7 +104,7 @@ class TestPmvPpd:
                 [0.5, 0.5, 0.5, 0.5, 2.1, 0.1],
                 model=Models.iso_7730_2005.value,
             ).pmv,
-            np.array([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
+            np.asarray([np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]),
         )
 
         # check results with limit_inputs disabled

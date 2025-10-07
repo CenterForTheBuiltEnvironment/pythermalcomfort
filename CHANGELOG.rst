@@ -1,6 +1,15 @@
 Changelog
 =========
 
+3.6.1 (2025-10-07)
+------------------
+
+* Fix issue with `disc` calculation in the two_nodes_gagge model and limiting its value to 6. Close #251
+* Improve naming sweat related outputs in the `gagge` model.
+* Improve documentation for the `disc` function.
+* PMV ASHRAE model returns the `compliance` boolean value with the ASHRAE 55:2023 standard. Close #253
+* Improve formatting of models outputs to the console.
+
 3.6.0 (2025-09-22)
 ------------------
 

@@ -60,16 +60,16 @@ def at(
     ATInputs(tdb=tdb, rh=rh, v=v, q=q, round_output=round_output)
 
     # Convert lists to numpy arrays if necessary
-    tdb = np.array(tdb)
-    rh = np.array(rh)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
+    v = np.asarray(v)
 
     # Calculate vapor pressure
     p_vap = psy_ta_rh(tdb, rh).p_vap / 100
 
     # Calculate apparent temperature
     if q is not None:
-        q = np.array(q)
+        q = np.asarray(q)
         t_at = tdb + 0.348 * p_vap - 0.7 * v + 0.7 * q / (v + 10) - 4.25
     else:
         t_at = tdb + 0.33 * p_vap - 0.7 * v - 4.00
