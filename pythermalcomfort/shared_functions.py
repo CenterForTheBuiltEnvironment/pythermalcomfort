@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 import numpy as np
 
 
@@ -6,23 +9,41 @@ def valid_range(x, valid) -> np.ndarray:
     return np.where((x >= valid[0]) & (x <= valid[1]), x, np.nan)
 
 
-def mapping(value, map_dictionary, right=True):
+def mapping(
+    value: float | np.ndarray, map_dictionary: Mapping[float, Any], right: bool = True
+) -> np.ndarray:
     """Map a temperature array to stress categories.
 
     Parameters
     ----------
-    value : float, array-like
-        Temperature to map.
-    map_dictionary: dict
-        Dictionary used to map the values
-    right: bool, optional
-        Indicating whether the intervals include the right or the left bin edge.
+    value : float or array-like
+        Temperature(s) to map.
+    map_dictionary : dict
+        Dictionary mapping bin edges to categories.
+    right : bool, optional
+        If True, intervals include the right bin edge.
 
     Returns
     -------
-    Stress category for each input temperature.
+    np.ndarray
+        Stress category for each input temperature. np.nan for unmapped.
 
+    Raises
+    ------
+    TypeError
+        If input types are invalid.
+
+    Examples
+    --------
+    >>> mapping([20, 25, 30], {15: "low", 25: "medium", 35: "high"})
+    array(['low', 'medium', 'high'], dtype=object)
     """
+    if not isinstance(map_dictionary, dict):
+        raise TypeError("map_dictionary must be a dict")
+    value_arr = np.asarray(value)
     bins = np.asarray(list(map_dictionary.keys()))
-    words = np.append(np.asarray(list(map_dictionary.values())), "unknown")
-    return words[np.digitize(value, bins, right=right)]
+    categories = np.array(list(map_dictionary.values()), dtype=object)
+    # Append np.nan for out-of-range values
+    categories = np.append(categories, np.nan)
+    idx = np.digitize(value_arr, bins, right=right)
+    return categories[idx]
