@@ -6,7 +6,7 @@ from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.models.cooling_effect import cooling_effect
-from pythermalcomfort.shared_functions import mapping
+from pythermalcomfort.shared_functions import _finalize_scalar_or_array, mapping
 from pythermalcomfort.utilities import (
     Models,
     Units,
@@ -80,7 +80,7 @@ def pmv_ppd_ashrae(
         If True, limits the inputs to the standard applicability limits. Defaults to True.
 
         .. note::
-            By default, if the inputs are outside the standard applicability limits the
+            By default, if the inputs are outside the standard applicability limits, the
             function returns nan. If False returns pmv and ppd values even if input values are
             outside the applicability limits of the model.
 
@@ -102,8 +102,8 @@ def pmv_ppd_ashrae(
     PMVPPD
         A dataclass containing the Predicted Mean Vote and Predicted Percentage of
         Dissatisfied. See :py:class:`~pythermalcomfort.classes_return.PMVPPD` for
-        more details. To access the `pmv`, `ppd`, `tsv` values, use the corresponding
-        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`.
+        more details. To access the `pmv`, `ppd`, `tsv`, and `compliance` values, use the corresponding
+        attributes of the returned `PMVPPD` instance, e.g., `result.pmv`, `result.compliance`.
 
     Examples
     --------
@@ -127,9 +127,10 @@ def pmv_ppd_ashrae(
         )
         print(results.pmv)  # 0.0
         print(results.ppd)  # 5.0
+        print(results.compliance)  # True
 
         result = pmv_ppd_ashrae(
-            tdb=[22, 25],
+            tdb=[22, 25, 28],
             tr=25,
             vr=0.1,
             rh=50,
@@ -137,9 +138,7 @@ def pmv_ppd_ashrae(
             clo=0.5,
             model="55-2023",
         )
-        print(result.pmv)  # [-0.  0.41]
-        print(result.ppd)  # [5.  8.5]
-
+        print(result)
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -207,6 +206,11 @@ def pmv_ppd_ashrae(
         -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0,
     )
 
+    # Calculate compliance: True if -0.5 < PMV < 0.5
+    compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
+    # Ensure object dtype for compliance array
+    compliance_array = np.asarray(compliance_array, dtype=object)
+
     # Checks that inputs are within the bounds accepted by the model if not return nan
     if limit_inputs:
         all_valid = ~(
@@ -218,6 +222,8 @@ def pmv_ppd_ashrae(
         )
         pmv_array = np.where(all_valid, pmv_array, np.nan)
         ppd_array = np.where(all_valid, ppd_array, np.nan)
+        compliance_array = np.where(all_valid, compliance_array, np.nan)
+        compliance_array = _finalize_scalar_or_array(compliance_array)
 
     if round_output:
         pmv_array = np.round(pmv_array, 2)
@@ -236,5 +242,6 @@ def pmv_ppd_ashrae(
     return PMVPPD(
         pmv=pmv_array,
         ppd=ppd_array,
-        tsv=mapping(pmv_array, thermal_sensation, right=False),
+        tsv=mapping(pmv_array, thermal_sensation),
+        compliance=compliance_array,
     )
