@@ -80,7 +80,7 @@ def pmv_ppd_ashrae(
         If True, limits the inputs to the standard applicability limits. Defaults to True.
 
         .. note::
-            By default, if the inputs are outside the standard applicability limits the
+            By default, if the inputs are outside the standard applicability limits, the
             function returns nan. If False returns pmv and ppd values even if input values are
             outside the applicability limits of the model.
 
@@ -130,7 +130,7 @@ def pmv_ppd_ashrae(
         print(results.compliance)  # True
 
         result = pmv_ppd_ashrae(
-            tdb=[22, 25],
+            tdb=[22, 25, 28],
             tr=25,
             vr=0.1,
             rh=50,
@@ -138,8 +138,7 @@ def pmv_ppd_ashrae(
             clo=0.5,
             model="55-2023",
         )
-        print(result.pmv)  # [-0.  0.41]
-        print(result.ppd)  # [5.  8.5]
+        print(result)
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(
@@ -207,6 +206,9 @@ def pmv_ppd_ashrae(
         -0.03353 * pmv_array**4.0 - 0.2179 * pmv_array**2.0,
     )
 
+    # Calculate compliance: True if -0.5 < PMV < 0.5
+    compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
+
     # Checks that inputs are within the bounds accepted by the model if not return nan
     if limit_inputs:
         all_valid = ~(
@@ -218,6 +220,7 @@ def pmv_ppd_ashrae(
         )
         pmv_array = np.where(all_valid, pmv_array, np.nan)
         ppd_array = np.where(all_valid, ppd_array, np.nan)
+        compliance_array = np.where(all_valid, compliance_array, np.nan)
 
     if round_output:
         pmv_array = np.round(pmv_array, 2)
@@ -232,13 +235,11 @@ def pmv_ppd_ashrae(
         2.5: "Warm",
         10: "Hot",
     }
-
-    # Calculate compliance: True if -0.5 < PMV < 0.5
-    compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
+    tsv = mapping(pmv_array, thermal_sensation)
 
     return PMVPPD(
         pmv=pmv_array,
         ppd=ppd_array,
-        tsv=mapping(pmv_array, thermal_sensation, right=False),
+        tsv=tsv,
         compliance=compliance_array,
     )
