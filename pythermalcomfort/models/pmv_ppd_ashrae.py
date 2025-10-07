@@ -6,7 +6,7 @@ from pythermalcomfort.classes_input import PMVPPDInputs
 from pythermalcomfort.classes_return import PMVPPD
 from pythermalcomfort.models._pmv_ppd_optimized import _pmv_ppd_optimized
 from pythermalcomfort.models.cooling_effect import cooling_effect
-from pythermalcomfort.shared_functions import mapping
+from pythermalcomfort.shared_functions import _finalize_scalar_or_array, mapping
 from pythermalcomfort.utilities import (
     Models,
     Units,
@@ -209,7 +209,7 @@ def pmv_ppd_ashrae(
     # Calculate compliance: True if -0.5 < PMV < 0.5
     compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
     # Ensure object dtype for compliance array
-    compliance_array = compliance_array.astype(object)
+    compliance_array = np.asarray(compliance_array, dtype=object)
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
     if limit_inputs:
@@ -223,6 +223,7 @@ def pmv_ppd_ashrae(
         pmv_array = np.where(all_valid, pmv_array, np.nan)
         ppd_array = np.where(all_valid, ppd_array, np.nan)
         compliance_array = np.where(all_valid, compliance_array, np.nan)
+        compliance_array = _finalize_scalar_or_array(compliance_array)
 
     if round_output:
         pmv_array = np.round(pmv_array, 2)
@@ -237,11 +238,10 @@ def pmv_ppd_ashrae(
         2.5: "Warm",
         10: "Hot",
     }
-    tsv = mapping(pmv_array, thermal_sensation)
 
     return PMVPPD(
         pmv=pmv_array,
         ppd=ppd_array,
-        tsv=tsv,
+        tsv=mapping(pmv_array, thermal_sensation),
         compliance=compliance_array,
     )
