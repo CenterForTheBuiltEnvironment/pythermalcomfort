@@ -208,6 +208,8 @@ def pmv_ppd_ashrae(
 
     # Calculate compliance: True if -0.5 < PMV < 0.5
     compliance_array = (pmv_array > -0.5) & (pmv_array < 0.5)
+    # Ensure object dtype for compliance array
+    compliance_array = compliance_array.astype(object)
 
     # Checks that inputs are within the bounds accepted by the model if not return nan
     if limit_inputs:
