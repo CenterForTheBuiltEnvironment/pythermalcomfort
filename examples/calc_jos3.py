@@ -531,7 +531,7 @@ def validation_simulation():
         ncols=2,
         sharex=True,
         sharey=True,
-        figsize=(8, 12),
+        figsize=(7, 3),
     )
 
     for i, dn in enumerate(

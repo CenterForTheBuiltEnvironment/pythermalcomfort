@@ -129,7 +129,7 @@ def calc_plot_ranges(
     """
     if ax is None:
         plt.style.use("seaborn-v0_8-whitegrid")
-        _, ax = plt.subplots(figsize=(7, 5), dpi=300, constrained_layout=True)
+        _, ax = plt.subplots(figsize=(7, 3), dpi=300, constrained_layout=True)
 
     # Build evaluator and compute curves
     metric_xy = make_metric_eval(
