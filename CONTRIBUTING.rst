@@ -79,6 +79,7 @@ Run these checks before committing and opening a PR:
     ruff format
     docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
     # optional: black or other formatters if preferred by maintainers
+    # optional; install pre-commit hooks (pre-commit install)
 
 Pull request checklist
 ----------------------

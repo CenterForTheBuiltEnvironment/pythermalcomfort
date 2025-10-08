@@ -134,7 +134,7 @@ Contribute
 
 We welcome contributions! Whether reporting a bug, suggesting a feature, or
 submitting a pull request, your input helps make ``pythermalcomfort`` better for
-everyone. See `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_. for full contribution guidelines.
+everyone. See the `contributing guide <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ for full contribution instructions.
 
 Quick checklist
 ---------------
@@ -184,7 +184,7 @@ Where to get help
 
 * Open an issue on GitHub with a minimal reproduction for bugs.
 * Ask questions in PR comments for implementation guidance.
-* See the `Contributing Instructions <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ for detailed guidance on testing,
+* See the `contribution guidelines <https://pythermalcomfort.readthedocs.io/en/latest/contributing.html>`_ for detailed guidance on testing,
   documentation, and changelog expectations.
 * For API reference and examples, consult the online docs:
   https://pythermalcomfort.readthedocs.io/en/latest/

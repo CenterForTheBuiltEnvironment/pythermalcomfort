@@ -516,11 +516,16 @@ def _gagge_two_nodes_optimized(
     elif t_body >= tbm_h:
         t_sens = w_max * 4.7 + 0.4685 * (t_body - tbm_h)
 
-    disc = (
-        4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
-    )  # predicted thermal discomfort
+    if t_sens > 0 > e_max * w_max - e_comfort - e_diff:
+        disc = 6.0
+    else:
+        disc = (
+            4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
+        )  # predicted thermal discomfort
     if disc <= 0:
         disc = t_sens
+    if disc > 6:
+        disc = 6.0
 
     # PMV Gagge
     pmv_gagge = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req - e_comfort - e_diff)
