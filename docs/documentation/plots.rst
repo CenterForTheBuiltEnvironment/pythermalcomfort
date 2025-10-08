@@ -23,8 +23,8 @@ Typical Use Cases
     - results from building simulation software.
     - results from sensor data.
 
-pythermalcomfort - Plotting Functions
--------------------------------------
+Plotting Functions Examples
+---------------------------
 
 The `plot` module in pythermalcomfort includes several built-in functions to create plots.
 These function can be used to compare the results of different models or to visualize how various parameters affect their outcomes.
@@ -32,17 +32,19 @@ These function can be used to compare the results of different models or to visu
 The `plot` module has a sub-module for different backends, currently supporting Matplotlib only, but we plan to add support for other libraries in the future (e.g., Plotly, Bokeh, Seaborn).
 
 All plotting functions return a figure object, which can be further customized if needed.
+This allows users to create more complex visualizations by adding additional elements or modifying existing ones.
 The full list of customizable parameters is available in the function docstrings and in the `calc_plot_ranges` function documentation.
 Use the search functionality in the top-right corner to find specific functions.
 
-This allows users to create more complex visualizations by adding additional elements or modifying existing ones.
+Click on the links below to show some examples of the plotting functions available in pythermalcomfort.
+The full list of functions is available in the "Plotting Functions Reference" section at the end of this page.
 
 .. toctree::
 
     plots/matplotlib/plots.ipynb
 
-Plotting Examples
------------------
+Examples Clear and Effective Visualizations
+-------------------------------------------
 
 In addition to the built-in plotting functions, the library provides several examples demonstrating how to create custom plots using Matplotlib and Seaborn.
 These examples cover a range of scenarios, from simple plots to more complex visualizations like heatmaps.
@@ -50,7 +52,7 @@ Users can adapt these examples to suit their specific needs and create visually 
 
 .. toctree::
 
-    plots/matplotlib/utci.ipynb
+    plots/matplotlib/example_plots.ipynb
 
 Plotting Functions Reference
 ----------------------------
