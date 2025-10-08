@@ -95,7 +95,26 @@ html_theme_options = {
     ],
     "secondary_sidebar_items": ["page-toc", "edit-this-page"],
     "content_footer_items": ["last-updated"],
+    "show_nav_level": 1,
+    "show_toc_level": 2,
+    "use_edit_page_button": True,
+    "analytics": {
+        "google_analytics_id": "G-KJZF1452YT",
+    },
 }
+
+html_context = {
+    "github_user": "CenterForTheBuiltEnvironment",
+    "github_repo": "pythermalcomfort",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+
+html_static_path = ["_static"]
+
+html_css_files = [
+    "css/custom.css",
+]
 
 # # sphinx-gallery config (example .py -> gallery)
 # sphinx_gallery_conf = {
