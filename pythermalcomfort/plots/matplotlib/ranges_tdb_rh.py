@@ -13,10 +13,10 @@ from pythermalcomfort.plots.utils import (
     mapper_tdb_rh,
 )
 
-__all__ = ["plot_t_rh"]
+__all__ = ["ranges_tdb_rh"]
 
 
-def plot_t_rh(
+def ranges_tdb_rh(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
@@ -121,125 +121,3 @@ def plot_t_rh(
     ax, artists = plot_threshold_region(**kwargs)
 
     return ax, artists
-
-
-if __name__ == "__main__":
-    from pythermalcomfort.models import pmv_ppd_iso
-
-    ax, _ = plot_t_rh(
-        model_func=pmv_ppd_iso,
-        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-    )
-    plt.show()
-
-    ax, _ = plot_t_rh(
-        model_func=pmv_ppd_iso,
-        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-        plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
-    )
-    ax.set(xlim=(10, 36), ylim=(0, 100))
-    plt.show()
-    # ax.legend()
-
-    plt.show()
-
-    # create some synthetic data to plot as a scatter plot
-    ax, _ = plot_t_rh(
-        model_func=pmv_ppd_iso,
-        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-        # plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"},
-    )
-    np.random.seed(0)
-    t_data = np.random.uniform(10, 36, size=100)
-    rh_data = np.random.uniform(0, 100, size=100)
-    sc = ax.scatter(t_data, rh_data, c="black", s=10, label="Data Points")
-    ax.legend()
-    plt.show()
-
-    import matplotlib as mpl
-    from matplotlib.gridspec import GridSpec
-
-    # Generate synthetic data
-    np.random.seed(0)
-    t_data = np.random.uniform(10, 36, size=100)
-    rh_data = np.random.uniform(0, 100, size=100)
-
-    # Compute PMV for each point
-    pmv_values = np.array(
-        [
-            pmv_ppd_iso(
-                tdb=t,
-                tr=30,
-                rh=rh,
-                met=1.2,
-                clo=0.5,
-                vr=0.1,
-                wme=0.0,
-                limit_inputs=False,
-            )["pmv"]
-            for t, rh in zip(t_data, rh_data, strict=False)
-        ]
-    )
-
-    # Bin PMV values
-    bins = [-np.inf, -0.5, 0.5, np.inf]
-    labels = ["PMV < -0.5", "-0.5 ≤ PMV ≤ 0.5", "PMV > 0.5"]
-    pmv_bin_indices = np.digitize(pmv_values, bins) - 1
-    counts = np.bincount(pmv_bin_indices, minlength=3)
-    percentages = 100 * counts / counts.sum()
-
-    # Create figure with custom width ratios
-    fig = plt.figure(figsize=(5, 5))
-    gs = GridSpec(1, 2, width_ratios=[9, 1], wspace=0.05)
-
-    # Left: Comfort region + scatter
-    ax0 = fig.add_subplot(gs[0, 0])
-    plot_t_rh(
-        model_func=pmv_ppd_iso,
-        fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
-        thresholds=[-0.5, 0.5],
-        t_range=(10, 36),
-        rh_range=(0, 100),
-        ax=ax0,
-        plot_kwargs={"band_alpha": 0.5},
-    )
-    sc = ax0.scatter(t_data, rh_data, c="black", s=10, label="Data Points")
-    ax0.grid(axis="both", linestyle=":", alpha=0.5)
-    ax0.set(xlim=(10, 36), ylim=(0, 100))
-
-    # Number of bins (bands)
-    n_bands = 3
-    # Use the same colormap as plot_t_rh (default is often 'RdYlBu')
-    cmap = mpl.colormaps["coolwarm"].resampled(n_bands)
-    band_colors = [cmap(i) for i in range(n_bands)]
-
-    # Right: Cumulative bar plot
-    ax1 = fig.add_subplot(gs[0, 1])
-    # y_pos = np.arange(len(labels))
-    bottom = 0
-    for percentage, color in zip(percentages, band_colors, strict=False):
-        ax1.bar("count", percentage, bottom=bottom, alpha=0.5, color=color)
-        bottom += percentage
-    # ax1.set_yticks(y_pos)
-    # ax1.set_yticklabels(labels)
-    ax1.set_ylim(0, 100)
-    ax1.set_ylabel("PMV distribution (%)")
-    ax1.yaxis.tick_right()
-    ax1.yaxis.set_label_position("right")
-    ax1.grid(axis="x", linestyle=":", alpha=0.5)
-    # for i, v in enumerate(percentages):
-    #     ax1.text(v + 1, i, f"{v:.1f}%", va='center', fontsize=8)
-    # ax1.tick_params(left=False, labelleft=True, labelsize=8)
-    for spine in ax1.spines.values():
-        spine.set_visible(False)
-
-    plt.show()

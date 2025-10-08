@@ -1,6 +1,6 @@
 # Summary
 A set of new plotting utilities for visualizing comfort and risk regions is available under pythermalcomfort.plots (branch: `plots/first_attempt`).
-These provide reusable plotters such as `plot_t_rh`, `plot_t_vr`, and a `psychrometric` helper.
+These provide reusable plotters such as `ranges_tdb_rh`, `ranges_tdb_v`, and a `psychrometric` helper.
 The functions return Matplotlib Axes and artists so plots are composable and customizable.
 It is a long message but I would really appreciate if you could read it and provide feedback, if possible answering the questions below.
 
@@ -11,7 +11,7 @@ More examples and customization options are provided below.
 ```python
     from pythermalcomfort.models import pmv_ppd_iso
 
-    ax, _ = plot_t_rh(
+    ax, _ = ranges_tdb_rh(
         model_func=pmv_ppd_iso,
         fixed_params={"tr": 30, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0.0},
         thresholds=[-0.5, 0.5],
@@ -34,11 +34,11 @@ More examples and customization options are provided below.
 
 If possible I would really appreciate if each of you who are reading this could answer in a separate comments all the following questions using numbering for clarity:
 1. Is the API (functions) clear and easy to use? Any suggestions for improvement?
-2. API: keep per-axis plotters (plot_t_rh) or move to one flexible plot_axes(x_var, y_var, model_func, ...)?
+2. API: keep per-axis plotters (ranges_tdb_rh) or move to one flexible plot_axes(x_var, y_var, model_func, ...)?
 3. Are the plots visually appealing and informative? Any suggestions for improving aesthetics or clarity?
 4. Are there any additional plot types or features that would be useful to include? Aside from the ones already implemented (t_rh, t_vr, psychrometric chart). I can add the adaptive comfort models as well, which is very simple to do.
 5. Shall we add the plotting functions that are available in `Clima`? Those are different from the ones implemented here since focus more on time series and external weather data rather than plotting comfort zones calculated from a model.
-6. How should we name the plotting functions? Currently they are named based on the x and y axes (e.g., plot_t_rh, plot_t_vr, plot_psychrometric). Is this clear or would you suggest a different naming convention?
+6. How should we name the plotting functions? Currently they are named based on the x and y axes (e.g., ranges_tdb_rh, ranges_tdb_v, plot_psychrometric). Is this clear or would you suggest a different naming convention?
 7. Should be the plotting functions be in a separate module (e.g., pythermalcomfort.plots) as I have done here?
 8. Documentation: add a dedicated plots gallery in docs or keep README + discussion examples?
 9. Do you know how we could add tests for the plotting functions? I am not sure how to do that.
@@ -54,7 +54,7 @@ If possible I would really appreciate if each of you who are reading this could 
 ## Customisation
 Change colorbar, line color, set different x axis limits.
 ```python
-    ax, _ = plot_t_rh(
+    ax, _ = ranges_tdb_rh(
         ...
         plot_kwargs={"cmap": "viridis", "band_alpha": 0.3, "line_color": "k"}, # we can modify the plot style
     )

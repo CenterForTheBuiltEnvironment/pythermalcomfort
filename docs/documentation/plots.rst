@@ -1,9 +1,11 @@
 Plots
 =====
 
-This section provides an overview of the plotting capabilities available in pythermalcomfort. The library offers a variety of functions to visualize the results of the model calculations. We also provide examples of how to create visually compelling and informative plots using popular Python libraries such as Matplotlib and Seaborn.
+This section provides an overview of the plotting capabilities available in pythermalcomfort.
+The library offers a variety of functions to visualize the results of the model calculations.
+We also provide examples of how to create visually compelling and informative plots using popular Python libraries such as Matplotlib and Seaborn.
 
-To use the plotting functions, please install the optional dependencies using:
+To use the plotting functions we included in pythermalcomfort, please install the optional dependencies using:
 
 .. code-block:: bash
 
@@ -21,19 +23,18 @@ Typical Use Cases
     - results from building simulation software.
     - results from sensor data.
 
-Plotting Functions
-------------------
+pythermalcomfort - Plotting Functions
+-------------------------------------
 
-The library includes several built-in functions to create basic plots for thermal comfort analysis.
+The `plot` module in pythermalcomfort includes several built-in functions to create plots.
 These function can be used to compare the results of different models or to visualize how various parameters affect their outcomes.
-All plotting functions return a Matplotlib figure object, which can be further customized if needed.
+We the `plot` module has a sub-module for different backends, currently supporting Matplotlib only, but we plan to add support for other libraries in the future (e.g., Plotly, Bokeh, Seaborn).
+All plotting functions return a figure object, which can be further customized if needed.
 This allows users to create more complex visualizations by adding additional elements or modifying existing ones.
 
 .. toctree::
-    :maxdepth: 2
 
-    plots/range_to_rh.ipynb
-    plots/ranges_psychrometric.ipynb
+    plots/matplotlib/plots.ipynb
 
 Plotting Examples
 -----------------
@@ -43,6 +44,5 @@ These examples cover a range of scenarios, from simple plots to more complex vis
 Users can adapt these examples to suit their specific needs and create visually appealing representations.
 
 .. toctree::
-    :maxdepth: 2
 
-    plots/utci.ipynb
+    plots/matplotlib/utci.ipynb

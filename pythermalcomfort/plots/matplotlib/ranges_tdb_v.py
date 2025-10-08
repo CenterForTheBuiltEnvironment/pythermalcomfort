@@ -13,10 +13,10 @@ from pythermalcomfort.plots.utils import (
     mapper_tdb_vr,
 )
 
-__all__ = ["plot_t_vr"]
+__all__ = ["ranges_tdb_v"]
 
 
-def plot_t_vr(
+def ranges_tdb_v(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # Small smoke test (user must supply appropriate fixed params)
     from pythermalcomfort.models import pmv_ppd_iso  # type: ignore
 
-    ax, _ = plot_t_vr(
+    ax, _ = ranges_tdb_v(
         model_func=pmv_ppd_iso,
         fixed_params={"tr": 30, "rh": 50, "met": 1.2, "clo": 0.5, "wme": 0.0},
         thresholds=[-0.5, 0.5],

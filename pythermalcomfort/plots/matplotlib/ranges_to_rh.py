@@ -19,10 +19,10 @@ from pythermalcomfort.plots.utils import (
     mapper_top_rh,
 )
 
-__all__ = ["range_to_rh"]
+__all__ = ["ranges_to_rh"]
 
 
-def range_to_rh(
+def ranges_to_rh(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
