@@ -14,6 +14,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
+    "sphinx_copybutton",
     "myst_nb",  # render/execute notebooks
     "nbsphinx",  # render/execute notebooks inline
     # "myst_parser",     # optional if you use MyST markdown elsewhere
