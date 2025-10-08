@@ -33,10 +33,73 @@ def ranges_tdb_v(
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot metric regions on a Temperature vs air-speed (vr) chart.
+    """Plot comfort metric regions on an air temperature vs air speed (vr) chart.
 
-    Use plot_kwargs to override plotting defaults (cmap, band_alpha, etc.)
-    without expanding the API (e.g., plot_kwargs={'cmap': 'viridis'}).
+    This function visualizes regions defined by one or more threshold values for a
+    comfort metric (e.g., PMV, SET) as a function of air temperature (x-axis)
+    and air speed (y-axis). It is a convenience wrapper around ``calc_plot_ranges``
+    with sensible defaults for temperature and air speed, and is suitable for most
+    comfort models in pythermalcomfort.
+
+    Parameters
+    ----------
+    model_func : Callable[..., Any]
+        The comfort model function to evaluate. Must accept keyword arguments for all
+        required variables and return a result with the desired metric.
+    fixed_params : dict[str, Any] or None, optional
+        Dictionary of model parameters to keep fixed for all evaluations (e.g.,
+        tr, met, clo, rh, wme). If None, all non-x/y model arguments must be
+        provided by the user.
+    thresholds : Sequence[float] or None, optional
+        List of threshold values to define the region boundaries. If None, uses
+        the default thresholds registered for the model.
+    t_range : tuple[float, float], default (10.0, 36.0)
+        The (min, max) range for air temperature [°C] on the x-axis.
+    v_range : tuple[float, float], default (0.0, 1.5)
+        The (min, max) range for air speed [m/s] on the y-axis.
+    v_step : float, default 0.05
+        Step size for the air speed grid.
+    x_scan_step : float, default 1.0
+        Step size for scanning the temperature axis when solving for thresholds.
+    smooth_sigma : float, default 0.8
+        Sigma for optional smoothing of the threshold curves.
+    ax : matplotlib.axes.Axes or None, optional
+        Axes to plot on. If None, a new figure and axes are created.
+    legend : bool, default True
+        Whether to add a default legend for the regions.
+    plot_kwargs : dict[str, Any] or None, optional
+        Additional keyword arguments forwarded to ``calc_plot_ranges`` for further
+        customization (e.g., cmap, band_colors, xlabel, ylabel, etc.).
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The matplotlib Axes with the plot.
+    artists : dict[str, Any]
+        Dictionary with keys 'bands', 'curves', and 'legend' containing the
+        corresponding matplotlib artists for further customization.
+
+    Raises
+    ------
+    ValueError
+        If v_step or x_scan_step is not positive, or if no thresholds are provided
+        and no defaults are registered for the model.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.models import pmv_ppd_iso
+    >>> from pythermalcomfort.plots.matplotlib import ranges_tdb_v
+    >>> ax, artists = ranges_tdb_v(
+    ...     model_func=pmv_ppd_iso,
+    ...     fixed_params={"tr": 25, "rh": 50, "met": 1.2, "clo": 0.5},
+    ...     thresholds=[-0.5, 0.5],
+    ...     t_range=(18, 30),
+    ...     v_range=(0.0, 1.0),
+    ...     v_step=0.05,
+    ...     plot_kwargs={"cmap": "viridis"},
+    ... )
+    >>> import matplotlib.pyplot as plt
+    >>> plt.show()
     """
     # Validate ranges and steps
     t_lo, t_hi = _validate_range("t_range", t_range)

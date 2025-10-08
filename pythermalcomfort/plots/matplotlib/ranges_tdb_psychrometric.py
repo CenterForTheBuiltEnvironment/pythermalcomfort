@@ -36,12 +36,78 @@ def ranges_tdb_psychrometric(
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot comfort regions over a simple psychrometric chart.
+    """Plot comfort metric regions over a psychrometric chart (Tdb vs humidity ratio).
 
-    The x-axis is dry-bulb temperature (°C). The y-axis is humidity ratio
-    (kg water/kg dry air). Background shows saturation and RH isolines.
-    Pressure is taken from fixed_params['p_atm'] if provided (Pa), else
-    101325 Pa. Use plot_kwargs to customize colors/lines like other wrappers.
+    This function visualizes regions defined by one or more threshold values for a
+    comfort metric (e.g., PMV, SET) as a function of dry-bulb temperature (x-axis)
+    and humidity ratio (y-axis). The background shows the saturation curve and
+    relative humidity isolines. This is a convenience wrapper around
+    ``calc_plot_ranges`` with sensible defaults for psychrometric charts, and is
+    suitable for most comfort models in pythermalcomfort.
+
+    Parameters
+    ----------
+    model_func : Callable[..., Any]
+        The comfort model function to evaluate. Must accept keyword arguments for all
+        required variables and return a result with the desired metric.
+    fixed_params : dict[str, Any] or None, optional
+        Dictionary of model parameters to keep fixed for all evaluations (e.g.,
+        tr, met, clo, vr, wme, p_atm). If None, all non-x/y model arguments must be
+        provided by the user.
+    thresholds : Sequence[float] or None, optional
+        List of threshold values to define the region boundaries. If None, uses
+        the default thresholds registered for the model.
+    t_range : tuple[float, float], default (10.0, 36.0)
+        The (min, max) range for dry-bulb temperature [°C] on the x-axis.
+    w_range : tuple[float, float], default (0.0, 0.03)
+        The (min, max) range for humidity ratio [kg/kg] on the y-axis.
+    w_step : float, default 5e-4
+        Step size for the humidity ratio grid.
+    rh_isolines : Sequence[float], default (10, 20, ..., 100)
+        Relative humidity values (%) for background isolines.
+    draw_background : bool, default True
+        Whether to draw the saturation curve and RH isolines in the background.
+    x_scan_step : float, default 1.0
+        Step size for scanning the temperature axis when solving for thresholds.
+    smooth_sigma : float, default 0.8
+        Sigma for optional smoothing of the threshold curves.
+    ax : matplotlib.axes.Axes or None, optional
+        Axes to plot on. If None, a new figure and axes are created.
+    legend : bool, default True
+        Whether to add a default legend for the regions.
+    plot_kwargs : dict[str, Any] or None, optional
+        Additional keyword arguments forwarded to ``calc_plot_ranges`` for further
+        customization (e.g., cmap, band_colors, xlabel, ylabel, etc.).
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The matplotlib Axes with the plot.
+    artists : dict[str, Any]
+        Dictionary with keys 'bands', 'curves', and 'legend' containing the
+        corresponding matplotlib artists for further customization.
+
+    Raises
+    ------
+    ValueError
+        If w_step or x_scan_step is not positive, or if no thresholds are provided
+        and no defaults are registered for the model.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.models import pmv_ppd_iso
+    >>> from pythermalcomfort.plots.matplotlib import ranges_tdb_psychrometric
+    >>> ax, artists = ranges_tdb_psychrometric(
+    ...     model_func=pmv_ppd_iso,
+    ...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
+    ...     thresholds=[-0.5, 0.5],
+    ...     t_range=(18, 30),
+    ...     w_range=(0.002, 0.018),
+    ...     w_step=0.001,
+    ...     plot_kwargs={"cmap": "coolwarm"},
+    ... )
+    >>> import matplotlib.pyplot as plt
+    >>> plt.show()
     """
     fixed_params = dict(fixed_params or {})
     # Validate ranges and steps
