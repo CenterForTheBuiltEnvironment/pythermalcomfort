@@ -60,6 +60,21 @@ Plot Operative Temperature vs Relative Humidity
 
 .. autofunction:: pythermalcomfort.plots.matplotlib.ranges_to_rh
 
+Plot Dry Bulb Temperature vs Relative Humidity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.plots.matplotlib.ranges_tdb_rh
+
+Plot Dry Bulb Temperature vs Air Speed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.plots.matplotlib.ranges_tdb_v
+
+Plot Psychrometric Chart (Dry Bulb Temperature)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.plots.matplotlib.ranges_tdb_psychrometric
+
 Calculate and Plot Ranges
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
