@@ -12,7 +12,7 @@ except ImportError as exc:
     ) from exc
 import numpy as np
 
-from pythermalcomfort.plots.generic import plot_threshold_region
+from pythermalcomfort.plots.generic import calc_plot_ranges
 from pythermalcomfort.plots.utils import (
     _validate_range,
     get_default_thresholds,
@@ -39,9 +39,73 @@ def ranges_to_rh(
     # Forwarded plot customizations to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot regions on an operative temperature vs relative humidity chart.
+    """Plot comfort metric regions on an operative temperature vs relative humidity chart.
 
-    todo write the rest of the docstring
+    This function visualizes regions defined by one or more threshold values for a
+    comfort metric (e.g., PMV, SET) as a function of operative temperature (x-axis)
+    and relative humidity (y-axis). It is a convenience wrapper around
+    ``calc_plot_ranges`` with sensible defaults for temperature and RH, and is
+    suitable for most comfort models in pythermalcomfort.
+
+    Parameters
+    ----------
+    model_func : Callable[..., Any]
+        The comfort model function to evaluate. Must accept keyword arguments for all
+        required variables and return a result with the desired metric.
+    fixed_params : dict[str, Any] or None, optional
+        Dictionary of model parameters to keep fixed for all evaluations (e.g.,
+        tr, met, clo, vr, wme). If None, all non-x/y model arguments must be
+        provided by the user.
+    thresholds : Sequence[float] or None, optional
+        List of threshold values to define the region boundaries. If None, uses
+        the default thresholds registered for the model.
+    t_range : tuple[float, float], default (10.0, 36.0)
+        The (min, max) range for operative temperature [°C] on the x-axis.
+    rh_range : tuple[float, float], default (0.0, 100.0)
+        The (min, max) range for relative humidity [%] on the y-axis.
+    rh_step : float, default 2.0
+        Step size for the relative humidity grid.
+    x_scan_step : float, default 1.0
+        Step size for scanning the temperature axis when solving for thresholds.
+    smooth_sigma : float, default 0.8
+        Sigma for optional smoothing of the threshold curves.
+    ax : matplotlib.axes.Axes or None, optional
+        Axes to plot on. If None, a new figure and axes are created.
+    legend : bool, default True
+        Whether to add a default legend for the regions.
+    plot_kwargs : dict[str, Any] or None, optional
+        Additional keyword arguments forwarded to ``calc_plot_ranges`` for further
+        customization (e.g., cmap, band_colors, xlabel, ylabel, etc.).
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The matplotlib Axes with the plot.
+    artists : dict[str, Any]
+        Dictionary with keys 'bands', 'curves', and 'legend' containing the
+        corresponding matplotlib artists for further customization.
+
+    Raises
+    ------
+    ValueError
+        If rh_step or x_scan_step is not positive, or if no thresholds are provided
+        and no defaults are registered for the model.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.models import pmv_ppd_iso
+    >>> from pythermalcomfort.plots.matplotlib import ranges_to_rh
+    >>> ax, artists = ranges_to_rh(
+    ...     model_func=pmv_ppd_iso,
+    ...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
+    ...     thresholds=[-0.5, 0.5],
+    ...     t_range=(18, 30),
+    ...     rh_range=(10, 90),
+    ...     rh_step=2.0,
+    ...     plot_kwargs={"cmap": "coolwarm"},
+    ... )
+    >>> import matplotlib.pyplot as plt
+    >>> plt.show()
     """
     # Validate ranges and steps
     t_lo, t_hi = _validate_range("t_range", t_range)
@@ -81,5 +145,5 @@ def ranges_to_rh(
     if plot_kwargs:
         kwargs.update(plot_kwargs)
 
-    ax, artists = plot_threshold_region(**kwargs)
+    ax, artists = calc_plot_ranges(**kwargs)
     return ax, artists

@@ -6,7 +6,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pythermalcomfort.plots.generic import plot_threshold_region
+from pythermalcomfort.plots.generic import calc_plot_ranges
 from pythermalcomfort.plots.utils import (
     _validate_range,
     get_default_thresholds,
@@ -118,6 +118,6 @@ def ranges_tdb_rh(
         kwargs.update(plot_kwargs)
 
     # Delegate to generic plotter
-    ax, artists = plot_threshold_region(**kwargs)
+    ax, artists = calc_plot_ranges(**kwargs)
 
     return ax, artists
