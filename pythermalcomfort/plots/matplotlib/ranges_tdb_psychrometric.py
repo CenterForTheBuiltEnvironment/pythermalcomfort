@@ -14,10 +14,10 @@ from pythermalcomfort.plots.utils import (
     mapper_tdb_w,
 )
 
-__all__ = ["ranges_psychrometric"]
+__all__ = ["ranges_tdb_psychrometric"]
 
 
-def ranges_psychrometric(
+def ranges_tdb_psychrometric(
     model_func: Callable[..., Any],
     *,
     fixed_params: dict[str, Any] | None = None,
@@ -60,10 +60,9 @@ def ranges_psychrometric(
                 "No thresholds provided and no defaults registered for this model."
             )
 
-    # Init axes
     if ax is None:
         plt.style.use("seaborn-v0_8-whitegrid")
-        _, ax = plt.subplots(figsize=(8, 5.5), dpi=300, constrained_layout=True)
+        _, ax = plt.subplots(figsize=(7, 3), dpi=300, constrained_layout=True)
 
     # Background chart (saturation curve and RH isolines)
     p_pa = float(fixed_params.get("p_atm", 101325.0))
