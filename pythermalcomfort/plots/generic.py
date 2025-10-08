@@ -13,7 +13,7 @@ from .utils import (
 )
 
 
-def plot_threshold_region(
+def calc_plot_ranges(
     *,
     model_func: Callable[..., Any],
     xy_to_kwargs: Callable[[float, float, dict[str, Any]], dict[str, Any]],
@@ -28,6 +28,7 @@ def plot_threshold_region(
     ylabel: str | None = None,
     legend: bool = True,
     cmap: Colormap | str = "coolwarm",
+    band_colors: Sequence[str] | None = None,
     band_alpha: float = 0.85,
     line_color: str = "black",
     line_width: float = 1.0,
@@ -74,9 +75,17 @@ def plot_threshold_region(
     thr_list: list[float] = res["thresholds"]
 
     # Prepare color bands
-    needed = len(thr_list) + 1
-    cmap_obj = plt.get_cmap(cmap)
-    band_colors = [cmap_obj(i / (needed - 1)) for i in range(needed)]
+    if band_colors is not None and cmap != "coolwarm":
+        raise ValueError("Provide only one of cmap or band_colors, not both.")
+
+    needed = len(thresholds) + 1
+    if band_colors is not None:
+        if len(band_colors) != needed:
+            raise ValueError("band_colors must have length equal to number of regions")
+        band_colors = band_colors
+    else:
+        cmap_obj = plt.get_cmap(cmap)
+        band_colors = [cmap_obj(i / (needed - 1)) for i in range(needed)]
 
     # Optional left clip per y (same length as y_arr)
     clip_arr = None
