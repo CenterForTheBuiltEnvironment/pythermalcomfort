@@ -28,8 +28,13 @@ pythermalcomfort - Plotting Functions
 
 The `plot` module in pythermalcomfort includes several built-in functions to create plots.
 These function can be used to compare the results of different models or to visualize how various parameters affect their outcomes.
-We the `plot` module has a sub-module for different backends, currently supporting Matplotlib only, but we plan to add support for other libraries in the future (e.g., Plotly, Bokeh, Seaborn).
+
+The `plot` module has a sub-module for different backends, currently supporting Matplotlib only, but we plan to add support for other libraries in the future (e.g., Plotly, Bokeh, Seaborn).
+
 All plotting functions return a figure object, which can be further customized if needed.
+The full list of customizable parameters is available in the function docstrings and in the `calc_plot_ranges` function documentation.
+Use the search functionality in the top-right corner to find specific functions.
+
 This allows users to create more complex visualizations by adding additional elements or modifying existing ones.
 
 .. toctree::
@@ -46,3 +51,16 @@ Users can adapt these examples to suit their specific needs and create visually 
 .. toctree::
 
     plots/matplotlib/utci.ipynb
+
+Plotting Functions Reference
+----------------------------
+
+Plot Operative Temperature vs Relative Humidity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.plots.matplotlib.ranges_to_rh
+
+Calculate and Plot Ranges
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: pythermalcomfort.plots.generic.calc_plot_ranges
