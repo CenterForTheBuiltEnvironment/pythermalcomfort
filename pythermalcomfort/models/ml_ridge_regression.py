@@ -151,7 +151,8 @@ def ridge_regression_predictor(
     environmental conditions for `duration_minutes`. If a `baseline_tre` and
     `baseline_mtsk` are provided, then the initial 120 min simulation is skipped.
     Coefficients are taken from fold one from the study [Forbes2025]_
-    (https://doi.org/10.1016/j.jtherbio.2025.104078).
+    (https://doi.org/10.1016/j.jtherbio.2025.104078). See notes documentation
+    for limitations with this model.
 
     Parameters
     ----------
@@ -191,6 +192,9 @@ def ridge_regression_predictor(
 
     Notes
     -----
+    This model was trained on adults over 60 years therefore may not give accurate
+    predictions for people under 60 years old.
+
     The model does not have inputs such as: air velocity, radiative heat transfer,
     clothing level and an individual's activity level due to there being little
     variation in the dataset.
@@ -211,7 +215,7 @@ def ridge_regression_predictor(
     >>> # Scalar example for a single person
     >>> results = ridge_regression_predictor(
     ...     sex=Sex.MALE.value,
-    ...     age=30,
+    ...     age=60,
     ...     height_cm=180,
     ...     mass_kg=75,
     ...     ambient_temp=35,
@@ -219,14 +223,14 @@ def ridge_regression_predictor(
     ...     duration_minutes=540,
     ... )
     >>> print(f"Rectal temp: {results.rectal_temp:.2f}°C")
-    Rectal temp: 37.15°C
+    Rectal temp: 37.98°C
     >>> print(f"Skin temp: {results.skin_temp:.2f}°C")
-    Skin temp: 32.15°C
+    Skin temp: 37.02°C
 
     >>> # Vectorized example for multiple scenarios
     >>> results_vec = ridge_regression_predictor(
     ...     sex=[Sex.MALE.value, Sex.FEMALE.value],
-    ...     age=[30, 45],
+    ...     age=[60, 65],
     ...     height_cm=[180, 165],
     ...     mass_kg=[75, 60],
     ...     ambient_temp=[35, 40],
@@ -234,12 +238,12 @@ def ridge_regression_predictor(
     ...     duration_minutes=540,
     ... )
     >>> print(results_vec.rectal_temp)
-    [37.15... 37.29...]
+    [37.98... 38.42...]
 
     >>> # Example with provided baseline temperatures
     >>> results_baseline = ridge_regression_predictor(
     ...     sex=Sex.MALE.value,
-    ...     age=30,
+    ...     age=70,
     ...     height_cm=180,
     ...     mass_kg=75,
     ...     ambient_temp=35,
@@ -248,8 +252,8 @@ def ridge_regression_predictor(
     ...     baseline_tre=37.0,
     ...     baseline_mtsk=32.0,
     ... )
-    >>> print(f"Rectal temp (from baseline): {results_baseline.rectal_temp:.2f}°C")
-    Rectal temp (from baseline): 37.10°C
+    >>> print(f"Rectal temp: {results_baseline.rectal_temp:.2f}°C")
+    Rectal temp (from baseline): 37.33°C
     """
     # Convert inputs to numpy arrays for vectorization
     inputs = np.broadcast_arrays(sex, age, height_cm, mass_kg, ambient_temp, humidity)

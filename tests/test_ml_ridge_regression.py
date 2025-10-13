@@ -48,7 +48,7 @@ def test_ridge_regression_predictor_scalar():
     """Test the model with scalar inputs."""
     result = ridge_regression_predictor(
         sex=Sex.MALE.value,
-        age=30,
+        age=60,
         height_cm=180,
         mass_kg=75,
         ambient_temp=35,
@@ -58,14 +58,14 @@ def test_ridge_regression_predictor_scalar():
     assert isinstance(result.rectal_temp, float)
     assert isinstance(result.skin_temp, float)
     # Check against known values from the docstring example
-    assert result.rectal_temp == pytest.approx(37.98, abs=1e-2)
+    assert result.rectal_temp == pytest.approx(38.15, abs=1e-2)
     assert result.skin_temp == pytest.approx(37.02, abs=1e-2)
 
 
 def test_ridge_regression_predictor_vectorized():
     """Test the model with array inputs for vectorization."""
     sex = [Sex.MALE.value, Sex.FEMALE.value]
-    age = [30, 45]
+    age = [60, 65]
     height_cm = [180, 165]
     mass_kg = [75, 60]
     ambient_temp = [35, 40]
@@ -86,16 +86,16 @@ def test_ridge_regression_predictor_vectorized():
     assert result.skin_temp.shape == (2,)
 
     # Check results for each case against docstring examples
-    assert result.rectal_temp[0] == pytest.approx(37.98, abs=1e-2)
+    assert result.rectal_temp[0] == pytest.approx(38.15, abs=1e-2)
     assert result.skin_temp[0] == pytest.approx(37.02, abs=1e-2)
-    assert result.rectal_temp[1] == pytest.approx(38.42, abs=1e-2)
+    assert result.rectal_temp[1] == pytest.approx(38.53, abs=1e-2)
     assert result.skin_temp[1] == pytest.approx(38.04, abs=1e-2)
 
 
 def test_ridge_regression_broadcasting():
     """Test NumPy broadcasting with mixed scalar and array inputs."""
     sex = [Sex.MALE.value, Sex.FEMALE.value]
-    age = 35  # scalar
+    age = 75  # scalar
     height_cm = 170  # scalar
     mass_kg = 70  # scalar
     ambient_temp = [30, 35]
@@ -114,9 +114,9 @@ def test_ridge_regression_broadcasting():
     assert result.skin_temp.shape == (2,)
 
     # Check against pre-calculated values for this specific broadcast scenario
-    assert result.rectal_temp[0] == pytest.approx(37.61, abs=1e-2)
+    assert result.rectal_temp[0] == pytest.approx(37.84, abs=1e-2)
     assert result.skin_temp[0] == pytest.approx(35.92, abs=1e-2)
-    assert result.rectal_temp[1] == pytest.approx(38.04, abs=1e-2)
+    assert result.rectal_temp[1] == pytest.approx(38.26, abs=1e-2)
     assert result.skin_temp[1] == pytest.approx(37.02, abs=1e-2)
 
     # Ensure it raises error for incompatible shapes
@@ -130,3 +130,22 @@ def test_ridge_regression_broadcasting():
             humidity=50,
             duration_minutes=540,
         )
+
+def test_ridge_regression_predictor_initial_body_temp():
+    """Test the model with scalar inputs."""
+    result = ridge_regression_predictor(
+        sex=Sex.MALE.value,
+        age=70,
+        height_cm=180,
+        mass_kg=75,
+        ambient_temp=35,
+        humidity=60,
+        duration_minutes=60,
+        baseline_tre=37.0,
+        baseline_mtsk=32.0,
+    )
+    assert isinstance(result.rectal_temp, float)
+    assert isinstance(result.skin_temp, float)
+    # Check against known values from the docstring example
+    assert result.rectal_temp == pytest.approx(37.33, abs=1e-2)
+    assert result.skin_temp == pytest.approx(37.00, abs=1e-2)
