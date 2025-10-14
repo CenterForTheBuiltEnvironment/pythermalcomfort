@@ -1,15 +1,15 @@
 import numpy as np
 import pytest
 
+from pythermalcomfort.utilities import Sex
 from pythermalcomfort.models.ml_ridge_regression import (
-    Sex,
     _inverse_scale_output,
     _scale_features,
-    ridge_regression_predictor,
+    ml_ridge_regression,
 )
 
 
-def test_ridge_regression_scale_features():
+def test_ml_ridge_regression_scale_features():
     """Test the feature scaling function."""
     # Create a sample feature array: [sex, age, height, mass, temp, humidity, tre, mtsk]
     features = np.array([[0, 30, 180, 75, 25, 50, 37.0, 34.0]])
@@ -33,7 +33,7 @@ def test_ridge_regression_scale_features():
     np.testing.assert_allclose(scaled, expected, rtol=1e-6)
 
 
-def test_ridge_regression_inverse_scale_output():
+def test_ml_ridge_regression_inverse_scale_output():
     """Test the inverse output scaling function."""
     # Create a sample scaled output array: [scaled_tre, scaled_mtsk]
     scaled_output = np.array([[0.54714297, 0.51841453]])
@@ -44,108 +44,108 @@ def test_ridge_regression_inverse_scale_output():
     np.testing.assert_allclose(inversed, expected, rtol=1e-6)
 
 
-def test_ridge_regression_predictor_scalar():
+def test_ml_ridge_regression_scalar():
     """Test the model with scalar inputs."""
-    result = ridge_regression_predictor(
-        sex=Sex.MALE.value,
+    result = ml_ridge_regression(
+        sex=Sex.male.value,
         age=60,
-        height_cm=180,
-        mass_kg=75,
-        ambient_temp=35,
-        humidity=60,
-        duration_minutes=540,
+        height=1.80,
+        weight=75,
+        tdb=35,
+        rh=60,
+        duration=540,
     )
-    assert isinstance(result.rectal_temp, float)
-    assert isinstance(result.skin_temp, float)
+    assert isinstance(result.t_re, float)
+    assert isinstance(result.t_sk, float)
     # Check against known values from the docstring example
-    assert result.rectal_temp == pytest.approx(38.15, abs=1e-2)
-    assert result.skin_temp == pytest.approx(37.02, abs=1e-2)
+    assert result.t_re == pytest.approx(38.15, abs=1e-2)
+    assert result.t_sk == pytest.approx(37.02, abs=1e-2)
 
 
-def test_ridge_regression_predictor_vectorized():
+def test_ml_ridge_regression_vectorized():
     """Test the model with array inputs for vectorization."""
-    sex = [Sex.MALE.value, Sex.FEMALE.value]
+    sex = [Sex.male.value, Sex.female.value]
     age = [60, 65]
-    height_cm = [180, 165]
-    mass_kg = [75, 60]
-    ambient_temp = [35, 40]
-    humidity = [60, 50]
+    height = [1.80, 1.65]
+    weight = [75, 60]
+    tdb = [35, 40]
+    rh = [60, 50]
 
-    result = ridge_regression_predictor(
+    result = ml_ridge_regression(
         sex=sex,
         age=age,
-        height_cm=height_cm,
-        mass_kg=mass_kg,
-        ambient_temp=ambient_temp,
-        humidity=humidity,
-        duration_minutes=540,
+        height=height,
+        weight=weight,
+        tdb=tdb,
+        rh=rh,
+        duration=540,
     )
-    assert isinstance(result.rectal_temp, np.ndarray)
-    assert result.rectal_temp.shape == (2,)
-    assert isinstance(result.skin_temp, np.ndarray)
-    assert result.skin_temp.shape == (2,)
+    assert isinstance(result.t_re, np.ndarray)
+    assert result.t_re.shape == (2,)
+    assert isinstance(result.t_sk, np.ndarray)
+    assert result.t_sk.shape == (2,)
 
     # Check results for each case against docstring examples
-    assert result.rectal_temp[0] == pytest.approx(38.15, abs=1e-2)
-    assert result.skin_temp[0] == pytest.approx(37.02, abs=1e-2)
-    assert result.rectal_temp[1] == pytest.approx(38.53, abs=1e-2)
-    assert result.skin_temp[1] == pytest.approx(38.04, abs=1e-2)
+    assert result.t_re[0] == pytest.approx(38.15, abs=1e-2)
+    assert result.t_sk[0] == pytest.approx(37.02, abs=1e-2)
+    assert result.t_re[1] == pytest.approx(38.53, abs=1e-2)
+    assert result.t_sk[1] == pytest.approx(38.04, abs=1e-2)
 
 
-def test_ridge_regression_broadcasting():
+def test_ml_ridge_regression_broadcasting():
     """Test NumPy broadcasting with mixed scalar and array inputs."""
-    sex = [Sex.MALE.value, Sex.FEMALE.value]
+    sex = [Sex.male.value, Sex.female.value]
     age = 75  # scalar
-    height_cm = 170  # scalar
-    mass_kg = 70  # scalar
-    ambient_temp = [30, 35]
-    humidity = 50  # scalar
+    height = 1.70  # scalar
+    weight = 70  # scalar
+    tdb = [30, 35]
+    rh = 50  # scalar
 
-    result = ridge_regression_predictor(
+    result = ml_ridge_regression(
         sex=sex,
         age=age,
-        height_cm=height_cm,
-        mass_kg=mass_kg,
-        ambient_temp=ambient_temp,
-        humidity=humidity,
-        duration_minutes=540,
+        height=height,
+        weight=weight,
+        tdb=tdb,
+        rh=rh,
+        duration=540,
     )
-    assert result.rectal_temp.shape == (2,)
-    assert result.skin_temp.shape == (2,)
+    assert result.t_re.shape == (2,)
+    assert result.t_sk.shape == (2,)
 
     # Check against pre-calculated values for this specific broadcast scenario
-    assert result.rectal_temp[0] == pytest.approx(37.84, abs=1e-2)
-    assert result.skin_temp[0] == pytest.approx(35.92, abs=1e-2)
-    assert result.rectal_temp[1] == pytest.approx(38.26, abs=1e-2)
-    assert result.skin_temp[1] == pytest.approx(37.02, abs=1e-2)
+    assert result.t_re[0] == pytest.approx(37.84, abs=1e-2)
+    assert result.t_sk[0] == pytest.approx(35.92, abs=1e-2)
+    assert result.t_re[1] == pytest.approx(38.26, abs=1e-2)
+    assert result.t_sk[1] == pytest.approx(37.02, abs=1e-2)
 
     # Ensure it raises error for incompatible shapes
     with pytest.raises(ValueError):
-        ridge_regression_predictor(
-            sex=[0, 1],
+        ml_ridge_regression(
+            sex=[Sex.male.value, Sex.female.value],
             age=[30, 40, 50],  # Incompatible shape
-            height_cm=170,
-            mass_kg=70,
-            ambient_temp=30,
-            humidity=50,
-            duration_minutes=540,
+            height=1.70,
+            weight=70,
+            tdb=30,
+            rh=50,
+            duration=540,
         )
 
-def test_ridge_regression_predictor_initial_body_temp():
+def test_ml_ridge_regression_initial_body_temp():
     """Test the model with scalar inputs."""
-    result = ridge_regression_predictor(
-        sex=Sex.MALE.value,
+    result = ml_ridge_regression(
+        sex=Sex.male.value,
         age=70,
-        height_cm=180,
-        mass_kg=75,
-        ambient_temp=35,
-        humidity=60,
-        duration_minutes=60,
-        baseline_tre=37.0,
-        baseline_mtsk=32.0,
+        height=1.80,
+        weight=75,
+        tdb=35,
+        rh=60,
+        duration=60,
+        initial_t_re=37.0,
+        initial_t_sk=32.0,
     )
-    assert isinstance(result.rectal_temp, float)
-    assert isinstance(result.skin_temp, float)
+    assert isinstance(result.t_re, float)
+    assert isinstance(result.t_sk, float)
     # Check against known values from the docstring example
-    assert result.rectal_temp == pytest.approx(37.33, abs=1e-2)
-    assert result.skin_temp == pytest.approx(37.00, abs=1e-2)
+    assert result.t_re == pytest.approx(37.33, abs=1e-2)
+    assert result.t_sk == pytest.approx(37.00, abs=1e-2)

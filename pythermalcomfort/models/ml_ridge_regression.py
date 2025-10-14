@@ -1,10 +1,15 @@
-from dataclasses import dataclass
-from enum import Enum
+from pythermalcomfort.utilities import Sex
+from pythermalcomfort.shared_functions import valid_range
+
+from pythermalcomfort.classes_input import RidgeRegressionInputs
+from pythermalcomfort.classes_return import PredictedBodyTemperatures
 
 import numpy as np
 
 # --- Model Constants ---
 
+# Minimum values for each of the 8 input features, used for Min-Max scaling.
+# The features are: Sex, Age, Height, Mass, Ambient Temp, Humidity, Rectal Temp (t_re), Mean Skin Temp (t_sk).
 _FEATURES_SCALER_MIN = np.array(
     [
         0.0,
@@ -18,6 +23,7 @@ _FEATURES_SCALER_MIN = np.array(
     ]
 )
 
+# Scaling factors (1 / (max - min)) for each of the 8 input features, used for Min-Max scaling.
 _FEATURES_SCALER_SCALE = np.array(
     [
         1.0,
@@ -31,6 +37,7 @@ _FEATURES_SCALER_SCALE = np.array(
     ]
 )
 
+# Minimum values for the 2 output variables (Rectal Temp, Mean Skin Temp), used for inverse scaling.
 _OUTPUT_SCALER_MIN = np.array(
     [
         -11.197107405358395,
@@ -38,6 +45,7 @@ _OUTPUT_SCALER_MIN = np.array(
     ]
 )
 
+# Scaling factors (1 / (max - min)) for the 2 output variables, used for inverse scaling.
 _OUTPUT_SCALER_SCALE = np.array(
     [
         0.31613056192207334,
@@ -45,7 +53,9 @@ _OUTPUT_SCALER_SCALE = np.array(
     ]
 )
 
-_TRE_COEFFS = np.array(
+# Coefficients for the Rectal Temperature (t_re) ridge regression model.
+# Corresponds to the 8 input features in order.
+_T_RE_COEFFS = np.array(
     [
         0.00016261586852849347,
         0.0007368142143779594,
@@ -57,9 +67,12 @@ _TRE_COEFFS = np.array(
         0.006016233208250791,
     ]
 )
-_TRE_INTERCEPT = -0.0013528489525256315
+# Intercept term for the Rectal Temperature (t_re) ridge regression model.
+_T_RE_INTERCEPT = -0.0013528489525256315
 
-_MTSK_COEFFS = np.array(
+# Coefficients for the Mean Skin Temperature (t_sk) ridge regression model.
+# Corresponds to the 8 input features in order.
+_T_SK_COEFFS = np.array(
     [
         0.0006157845452869151,
         0.00014854705372386215,
@@ -71,28 +84,8 @@ _MTSK_COEFFS = np.array(
         0.933918210580563,
     ]
 )
-_MTSK_INTERCEPT = 0.04356328728329839
-
-
-class Sex(Enum):
-    MALE = 0
-    FEMALE = 1
-
-
-@dataclass
-class PredictedTemperatures:
-    """Dataclass for returning predicted temperature.
-
-    Attributes
-    ----------
-    rectal_temp : float or numpy.ndarray
-        Predicted rectal temperature (°C).
-    skin_temp : float or numpy.ndarray
-        Predicted mean skin temperature (°C).
-    """
-
-    rectal_temp: float | np.ndarray
-    skin_temp: float | np.ndarray
+# Intercept term for the Mean Skin Temperature (t_sk) ridge regression model.
+_T_SK_INTERCEPT = 0.04356328728329839
 
 
 def _scale_features(features: np.ndarray) -> np.ndarray:
@@ -105,85 +98,118 @@ def _inverse_scale_output(scaled_output: np.ndarray) -> np.ndarray:
     return (scaled_output - _OUTPUT_SCALER_MIN) / _OUTPUT_SCALER_SCALE
 
 
-def _predict_temperature_simulation(features, duration_minutes):
+def _predict_temperature_simulation(features, duration):
     """Core simulation loop for temperature prediction."""
     # Scale input features
     scaled_features = _scale_features(features)
 
     # Precompute static components of the regression
-    static_tre = np.dot(scaled_features[:, :6], _TRE_COEFFS[:6]) + _TRE_INTERCEPT
-    static_mtsk = np.dot(scaled_features[:, :6], _MTSK_COEFFS[:6]) + _MTSK_INTERCEPT
+    static_t_re = np.dot(scaled_features[:, :6], _T_RE_COEFFS[:6]) + _T_RE_INTERCEPT
+    static_t_sk = np.dot(scaled_features[:, :6], _T_SK_COEFFS[:6]) + _T_SK_INTERCEPT
 
     # Initialize temperatures from scaled features
-    prev_tre = scaled_features[:, 6]
-    prev_mtsk = scaled_features[:, 7]
+    prev_t_re = scaled_features[:, 6]
+    prev_t_sk = scaled_features[:, 7]
 
     # Run simulation
-    for _ in range(duration_minutes):
-        new_tre = static_tre + _TRE_COEFFS[6] * prev_tre + _TRE_COEFFS[7] * prev_mtsk
-        new_mtsk = (
-            static_mtsk + _MTSK_COEFFS[6] * prev_tre + _MTSK_COEFFS[7] * prev_mtsk
+    for _ in range(duration):
+        new_t_re = static_t_re + _T_RE_COEFFS[6] * prev_t_re + _T_RE_COEFFS[7] * prev_t_sk
+        new_t_sk = (
+            static_t_sk + _T_SK_COEFFS[6] * prev_t_re + _T_SK_COEFFS[7] * prev_t_sk
         )
-        prev_tre, prev_mtsk = new_tre, new_mtsk
+        prev_t_re, prev_t_sk = new_t_re, new_t_sk
 
     # Scale back the final output and return
-    scaled_output = np.stack([prev_tre, prev_mtsk], axis=1)
+    scaled_output = np.stack([prev_t_re, prev_t_sk], axis=1)
     final_temps = _inverse_scale_output(scaled_output)
     return final_temps[:, 0], final_temps[:, 1]
 
 
-def ridge_regression_predictor(
-    sex: int | list | np.ndarray,
-    age: float | list | np.ndarray,
-    height_cm: float | list | np.ndarray,
-    mass_kg: float | list | np.ndarray,
-    ambient_temp: float | list | np.ndarray,
-    humidity: float | list | np.ndarray,
-    duration_minutes: int,
-    baseline_tre: float | list | np.ndarray | None = None,
-    baseline_mtsk: float | list | np.ndarray | None = None,
-) -> PredictedTemperatures:
+def _check_ridge_regression_compliance(
+    age, height, weight, tdb, rh
+):
+    """Check if the inputs are within the model's applicability limits."""
+    age_valid = valid_range(age, (60, 100))
+    height_valid = valid_range(height, (130, 230))
+    mass_valid = valid_range(weight, (40, 140))
+    temp_valid = valid_range(tdb, (0, 60))
+    rh_valid = valid_range(rh, (0, 100))
+    return age_valid, height_valid, mass_valid, temp_valid, rh_valid
+
+
+def ml_ridge_regression(
+    sex: Sex | list[Sex],
+    age: float | list[float],
+    height: float | list[float],
+    weight: float | list[float],
+    tdb: float | list[float],
+    rh: float | list[float],
+    duration: int,
+    initial_t_re: float | list[float] | None = None,
+    initial_t_sk: float | list[float] | None = None,
+    limit_inputs: bool = True,
+    round_output: bool = True,
+) -> PredictedBodyTemperatures:
     """Predicts core and skin temperature changes based on a ridge regression model.
 
-    This model simulates the rectal (tre) and mean skin (mtsk)
+    This model simulates the rectal (t_re) and mean skin (t_sk)
     temperatures by first establishing a baseline in a thermoneutral environment
     (23°C, 50% RH for 120 mins) and then simulating exposure to the specified
-    environmental conditions for `duration_minutes`. If a `baseline_tre` and
-    `baseline_mtsk` are provided, then the initial 120 min simulation is skipped.
+    environmental conditions for `duration`. If a `initial_t_re` and
+    `initial_t_sk` are provided, then the initial 120 min simulation is skipped.
     Coefficients are taken from fold one from the study [Forbes2025]_
     (https://doi.org/10.1016/j.jtherbio.2025.104078). See notes documentation
     for limitations with this model.
 
     Parameters
     ----------
-    sex : int, list, or numpy.ndarray
-        Biological sex, where 0 for Male, 1 for Female.
-    age : float, list, or numpy.ndarray
+    sex : Sex or list
+        Biological sex. Pass the string value from the enum, e.g.,
+        `Sex.male.value` for "male" or `Sex.female.value` for "female".
+    age : float or list
         Age, in years.
-    height_cm : float, list, or numpy.ndarray
-        Height, in centimeters.
-    mass_kg : float, list, or numpy.ndarray
-        Body mass, in kilograms.
-    ambient_temp : float, list, or numpy.ndarray
-        Ambient air temperature, in °C.
-    humidity : float, list, or numpy.ndarray
+    height : float
+        Body height [m].
+    weight : float
+        Body weight [kg].
+    tdb : float or list
+        Ambient (dry bulb) air temperature, in °C.
+    rh : float or list
         Relative humidity, in %.
-    duration_minutes : int, optional
+    duration : int, optional
         Duration of the simulation in the specified environment, in minutes.
-    baseline_tre : float, list, or numpy.ndarray, optional
+    initial_t_re : float or list, optional
         Initial rectal temperature (°C). If provided, the baseline simulation
         at 23°C, 50% RH for 120 minutes is skipped, and this value is used
         as the starting rectal temperature for the main simulation.
-    baseline_mtsk : float, list, or numpy.ndarray, optional
+    initial_t_sk : float or list, optional
         Initial mean skin temperature (°C). If provided, the baseline simulation
         at 23°C, 50% RH for 120 minutes is skipped, and this value is used
         as the starting mean skin temperature for the main simulation.
+    limit_inputs : bool, optional
+        If True, limits the inputs to the standard applicability limits. Defaults to True.
+    round_output : bool, optional
+        If True, rounds output value. If False, it does not round it. Defaults to True.
+
+    Applicability
+    -------------
+    The model is applicable for adults aged between 60 and 100 years. The ranges for
+    the input parameters are:
+    - **Age**: 60 to 100 years
+    - **Height**: 1.30 to 2.30 m
+    - **Weight**: 40 to 140 kg
+    - **Ambient Temperature**: 0 to 60 °C
+    - **Relative Humidity**: 0 to 100 %
+
+    The `limit_inputs` parameter, by default, is set to `True`, which means that
+    if the inputs are outside the model's applicability limits, the function will
+    return `nan`.
 
     Returns
     -------
-    PredictedTemperatures
-        A dataclass containing the predicted rectal (`rectal_temp`)
-        and skin (`skin_temp`) temperatures in °C.
+    PredictedBodyTemperatures
+        A dataclass containing the predicted rectal (`t_re`)
+        and skin (`t_sk`) temperatures in °C.
 
     Raises
     ------
@@ -208,83 +234,126 @@ def ridge_regression_predictor(
 
     Examples
     --------
+    >>> from pythermalcomfort.utilities import Sex
     >>> from pythermalcomfort.models.ml_ridge_regression import (
-    ...     ridge_regression_predictor,
+    ...     ml_ridge_regression,
     ...     Sex,
     ... )
     >>> # Scalar example for a single person
-    >>> results = ridge_regression_predictor(
-    ...     sex=Sex.MALE.value,
+    >>> results = ml_ridge_regression(
+    ...     sex=Sex.male.value,
     ...     age=60,
-    ...     height_cm=180,
-    ...     mass_kg=75,
-    ...     ambient_temp=35,
-    ...     humidity=60,
-    ...     duration_minutes=540,
+    ...     height=180,
+    ...     weight=75,
+    ...     tdb=35,
+    ...     rh=60,
+    ...     duration=540,
     ... )
-    >>> print(f"Rectal temp: {results.rectal_temp:.2f}°C")
+    >>> print(f"Rectal temp: {results.t_re:.2f}°C")
     Rectal temp: 37.98°C
-    >>> print(f"Skin temp: {results.skin_temp:.2f}°C")
+    >>> print(f"Skin temp: {results.t_sk:.2f}°C")
     Skin temp: 37.02°C
 
     >>> # Vectorized example for multiple scenarios
-    >>> results_vec = ridge_regression_predictor(
-    ...     sex=[Sex.MALE.value, Sex.FEMALE.value],
+    >>> results_vec = ml_ridge_regression(
+    ...     sex=[Sex.male.value, Sex.female.value],
     ...     age=[60, 65],
-    ...     height_cm=[180, 165],
-    ...     mass_kg=[75, 60],
-    ...     ambient_temp=[35, 40],
-    ...     humidity=[60, 50],
-    ...     duration_minutes=540,
+    ...     height=[180, 165],
+    ...     weight=[75, 60],
+    ...     tdb=[35, 40],
+    ...     rh=[60, 50],
+    ...     duration=540,
     ... )
-    >>> print(results_vec.rectal_temp)
+    >>> print(results_vec.t_re)
     [37.98... 38.42...]
 
     >>> # Example with provided baseline temperatures
-    >>> results_baseline = ridge_regression_predictor(
-    ...     sex=Sex.MALE.value,
+    >>> results_baseline = ml_ridge_regression(
+    ...     sex=Sex.male.value,
     ...     age=70,
-    ...     height_cm=180,
-    ...     mass_kg=75,
-    ...     ambient_temp=35,
-    ...     humidity=60,
-    ...     duration_minutes=60,
-    ...     baseline_tre=37.0,
-    ...     baseline_mtsk=32.0,
+    ...     height=180,
+    ...     weight=75,
+    ...     tdb=35,
+    ...     rh=60,
+    ...     duration=60,
+    ...     initial_t_re=37.0,
+    ...     initial_t_sk=32.0,
     ... )
-    >>> print(f"Rectal temp: {results_baseline.rectal_temp:.2f}°C")
+    >>> print(f"Rectal temp: {results_baseline.t_re:.2f}°C")
     Rectal temp (from baseline): 37.33°C
     """
+    # Validate inputs
+    RidgeRegressionInputs(
+        sex=sex,
+        age=age,
+        height=height,
+        weight=weight,
+        tdb=tdb,
+        rh=rh,
+        duration=duration,
+        initial_t_re=initial_t_re,
+        initial_t_sk=initial_t_sk,
+        limit_inputs=limit_inputs,
+        round_output=round_output,
+    )
+
+    # Convert height from m to cm, handling both scalar and list-like inputs
+    height_cm = np.asarray(height) * 100
+
+    # Convert sex to 0 or 1 representation
+    sex_array = np.array(sex)
+    valid_sex_values = [Sex.male.value, Sex.female.value]
+    if not np.all(np.isin(sex_array, valid_sex_values)):
+        raise ValueError(f"Invalid input for sex. Must be one of {valid_sex_values}")
+
+    # Vectorize sex input: 1 for female, 0 for male
+    sex_value = np.where(sex_array == Sex.female.value, 1, 0)
+
     # Convert inputs to numpy arrays for vectorization
-    inputs = np.broadcast_arrays(sex, age, height_cm, mass_kg, ambient_temp, humidity)
+    inputs = np.broadcast_arrays(sex_value, age, height_cm, weight, tdb, rh)
     original_shape = inputs[0].shape
     flat_inputs = [np.ravel(i) for i in inputs]
 
-    if baseline_tre is not None and baseline_mtsk is not None:
+    if limit_inputs:
+        (
+            age_valid,
+            height_valid,
+            mass_valid,
+            temp_valid,
+            rh_valid,
+        ) = _check_ridge_regression_compliance(
+            flat_inputs[1],
+            flat_inputs[2],
+            flat_inputs[3],
+            flat_inputs[4],
+            flat_inputs[5],
+        )
+
+    if initial_t_re is not None and initial_t_sk is not None:
         # Use provided baseline temperatures
-        current_tre = np.broadcast_to(baseline_tre, original_shape).ravel()
-        current_mtsk = np.broadcast_to(baseline_mtsk, original_shape).ravel()
+        current_t_re = np.broadcast_to(initial_t_re, original_shape).ravel()
+        current_t_sk = np.broadcast_to(initial_t_sk, original_shape).ravel()
     else:
         # Baseline simulation (120 mins in a neutral environment)
-        initial_tre = np.full_like(flat_inputs[0], 37.0, dtype=float)
-        initial_mtsk = np.full_like(flat_inputs[0], 32.0, dtype=float)
+        initial_t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
+        initial_t_sk = np.full_like(flat_inputs[0], 32.0, dtype=float)
 
         baseline_features = np.stack(
             [
                 flat_inputs[0],  # sex
                 flat_inputs[1],  # age
-                flat_inputs[2],  # height_cm
-                flat_inputs[3],  # mass_kg
-                np.full_like(flat_inputs[0], 23.0),  # ambient_temp = 23°C
+                flat_inputs[2],  # height
+                flat_inputs[3],  # weight
+                np.full_like(flat_inputs[0], 23.0),  # tdb = 23°C
                 np.full_like(flat_inputs[0], 50.0),  # humidity = 50%
-                initial_tre,
-                initial_mtsk,
+                initial_t_re,
+                initial_t_sk,
             ],
             axis=1,
         )
 
-        current_tre, current_mtsk = _predict_temperature_simulation(
-            baseline_features, duration_minutes=120
+        current_t_re, current_t_sk = _predict_temperature_simulation(
+            baseline_features, duration=120
         )
 
     # Final simulation in specified environment
@@ -292,27 +361,42 @@ def ridge_regression_predictor(
         [
             flat_inputs[0],  # sex
             flat_inputs[1],  # age
-            flat_inputs[2],  # height_cm
-            flat_inputs[3],  # mass_kg
-            flat_inputs[4],  # ambient_temp
+            flat_inputs[2],  # height
+            flat_inputs[3],  # weight
+            flat_inputs[4],  # tdb
             flat_inputs[5],  # humidity
-            current_tre,
-            current_mtsk,
+            current_t_re,
+            current_t_sk,
         ],
         axis=1,
     )
 
-    final_tre, final_mtsk = _predict_temperature_simulation(
+    final_t_re, final_t_sk = _predict_temperature_simulation(
         final_features,
-        duration_minutes=duration_minutes,
+        duration=duration,
     )
+
+    if limit_inputs:
+        all_valid = ~(
+            np.isnan(age_valid)
+            | np.isnan(height_valid)
+            | np.isnan(mass_valid)
+            | np.isnan(temp_valid)
+            | np.isnan(rh_valid)
+        )
+        final_t_re = np.where(all_valid, final_t_re, np.nan)
+        final_t_sk = np.where(all_valid, final_t_sk, np.nan)
+
+    if round_output:
+        final_t_re = np.round(final_t_re, 2)
+        final_t_sk = np.round(final_t_sk, 2)
 
     # Reshape results to match original input shape
     if original_shape:
-        final_tre = final_tre.reshape(original_shape)
-        final_mtsk = final_mtsk.reshape(original_shape)
+        final_t_re = final_t_re.reshape(original_shape)
+        final_t_sk = final_t_sk.reshape(original_shape)
     else:  # Handle scalar case
-        final_tre = final_tre.item()
-        final_mtsk = final_mtsk.item()
+        final_t_re = final_t_re.item()
+        final_t_sk = final_t_sk.item()
 
-    return PredictedTemperatures(rectal_temp=final_tre, skin_temp=final_mtsk)
+    return PredictedBodyTemperatures(t_re=final_t_re, t_sk=final_t_sk)

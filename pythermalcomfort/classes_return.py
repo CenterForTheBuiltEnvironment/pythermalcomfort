@@ -1008,6 +1008,21 @@ class JOS3Output(AutoStrMixin):
     q_res_latent: float | None = None
 
 
+@dataclass(frozen=True)
+class PredictedBodyTemperatures:
+    """Dataclass for returning predicted temperature.
+
+    Attributes
+    ----------
+    t_re : float or numpy.ndarray
+        Predicted rectal temperature (°C).
+    t_sk : float or numpy.ndarray
+        Predicted mean skin temperature (°C).
+    """
+
+    t_re: float | np.ndarray
+    t_sk: float | np.ndarray
+
 @dataclass(frozen=True, repr=False)
 class ScaleWindSpeedLog(AutoStrMixin):
     """Dataclass to represent the output of scale_wind_speed_log.

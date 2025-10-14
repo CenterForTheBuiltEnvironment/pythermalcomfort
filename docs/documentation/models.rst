@@ -177,7 +177,10 @@ Joint system thermoregulation model (JOS-3)
 Machine Learning (ML) ridge regression model
 --------------------------------------------
 
-.. autofunction:: pythermalcomfort.models.ml_ridge_regression.ridge_regression_predictor
+.. autofunction:: pythermalcomfort.models.ml_ridge_regression.ml_ridge_regression
+
+.. autoclass:: pythermalcomfort.classes_return.PredictedBodyTemperatures
+    :members:
 
 Normal Effective Temperature (NET)
 ----------------------------------

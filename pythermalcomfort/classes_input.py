@@ -30,6 +30,12 @@ class BaseInputs:
     asw: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
+    initial_t_re: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    initial_t_sk: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
     body_surface_area: float | int | np.ndarray | list = field(
         default=1.8258, metadata={"types": (float, int, np.ndarray, list)}
     )
@@ -39,6 +45,7 @@ class BaseInputs:
     d: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
+    duration: int = field(default=None, metadata={"types": (int,)})
     e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     f_bes: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
@@ -834,6 +841,63 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
         if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
             raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
+
+
+@dataclass
+class RidgeRegressionInputs(BaseInputs):
+    """Input validation for the ml_ridge_regression model."""
+
+    def __init__(
+        self,
+        sex,
+        age,
+        height,
+        weight,
+        tdb,
+        rh,
+        duration,
+        initial_t_re=None,
+        initial_t_sk=None,
+        limit_inputs=True,
+        round_output=True,
+    ):
+        super().__init__(
+            sex=sex,
+            age=age,
+            height=height,
+            weight=weight,
+            tdb=tdb,
+            rh=rh,
+            duration=duration,
+            initial_t_re=initial_t_re,
+            initial_t_sk=initial_t_sk,
+            limit_inputs=limit_inputs,
+            round_output=round_output,
+        )
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        if self.duration is not None:
+            if not isinstance(self.duration, int) or self.duration <= 0:
+                raise ValueError("Duration must be a positive integer.")
+
+        if (self.initial_t_re is None) != (self.initial_t_sk is None):
+            raise ValueError(
+                "Both initial_t_re and initial_t_sk must be provided, or neither."
+            )
+
+        # Basic plausibility checks
+        rh_arr = np.asarray(self.rh)
+        if np.any(rh_arr < 0) or np.any(rh_arr > 100):
+            raise ValueError("Relative humidity (rh) must be between 0 and 100%.")
+
+        for param_name in ["age", "height", "weight"]:
+            value = getattr(self, param_name)
+            if value is not None:
+                arr = np.asarray(value)
+                if np.any(arr <= 0):
+                    raise ValueError(f"{param_name} must be a positive value.")
 
 
 @dataclass
