@@ -46,6 +46,7 @@ def test_ml_ridge_regression_inverse_scale_output():
 
 def test_ml_ridge_regression_scalar():
     """Test the model with scalar inputs."""
+    duration = 540
     result = ml_ridge_regression(
         sex=Sex.male.value,
         age=60,
@@ -53,17 +54,22 @@ def test_ml_ridge_regression_scalar():
         weight=75,
         tdb=35,
         rh=60,
-        duration=540,
+        duration=duration,
     )
-    assert isinstance(result.t_re, float)
-    assert isinstance(result.t_sk, float)
-    # Check against known values from the docstring example
-    assert result.t_re == pytest.approx(38.15, abs=1e-2)
-    assert result.t_sk == pytest.approx(37.02, abs=1e-2)
+    # Check that the output is a numpy array with the correct shape
+    assert isinstance(result.t_re, np.ndarray)
+    assert result.t_re.shape == (duration,)
+    assert isinstance(result.t_sk, np.ndarray)
+    assert result.t_sk.shape == (duration,)
+
+    # Check the final value of the history against known values
+    assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
+    assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
 
 
 def test_ml_ridge_regression_vectorized():
     """Test the model with array inputs for vectorization."""
+    duration = 540
     sex = [Sex.male.value, Sex.female.value]
     age = [60, 65]
     height = [1.80, 1.65]
@@ -78,22 +84,27 @@ def test_ml_ridge_regression_vectorized():
         weight=weight,
         tdb=tdb,
         rh=rh,
-        duration=540,
+        duration=duration,
     )
+    # Check that the output is a numpy array with the correct shape
     assert isinstance(result.t_re, np.ndarray)
-    assert result.t_re.shape == (2,)
+    assert result.t_re.shape == (2, duration)
     assert isinstance(result.t_sk, np.ndarray)
-    assert result.t_sk.shape == (2,)
+    assert result.t_sk.shape == (2, duration)
 
-    # Check results for each case against docstring examples
-    assert result.t_re[0] == pytest.approx(38.15, abs=1e-2)
-    assert result.t_sk[0] == pytest.approx(37.02, abs=1e-2)
-    assert result.t_re[1] == pytest.approx(38.53, abs=1e-2)
-    assert result.t_sk[1] == pytest.approx(38.04, abs=1e-2)
+    # Check the final values of the history for each case
+    final_t_re = result.t_re[:, -1]
+    final_t_sk = result.t_sk[:, -1]
+
+    assert final_t_re[0] == pytest.approx(38.15, abs=1e-2)
+    assert final_t_sk[0] == pytest.approx(37.02, abs=1e-2)
+    assert final_t_re[1] == pytest.approx(38.53, abs=1e-2)
+    assert final_t_sk[1] == pytest.approx(38.04, abs=1e-2)
 
 
 def test_ml_ridge_regression_broadcasting():
     """Test NumPy broadcasting with mixed scalar and array inputs."""
+    duration = 540
     sex = [Sex.male.value, Sex.female.value]
     age = 75  # scalar
     height = 1.70  # scalar
@@ -108,16 +119,20 @@ def test_ml_ridge_regression_broadcasting():
         weight=weight,
         tdb=tdb,
         rh=rh,
-        duration=540,
+        duration=duration,
     )
-    assert result.t_re.shape == (2,)
-    assert result.t_sk.shape == (2,)
+    # Check that the output is a numpy array with the correct shape
+    assert result.t_re.shape == (2, duration)
+    assert result.t_sk.shape == (2, duration)
 
-    # Check against pre-calculated values for this specific broadcast scenario
-    assert result.t_re[0] == pytest.approx(37.84, abs=1e-2)
-    assert result.t_sk[0] == pytest.approx(35.92, abs=1e-2)
-    assert result.t_re[1] == pytest.approx(38.26, abs=1e-2)
-    assert result.t_sk[1] == pytest.approx(37.02, abs=1e-2)
+    # Check the final values of the history for each broadcasted case
+    final_t_re = result.t_re[:, -1]
+    final_t_sk = result.t_sk[:, -1]
+
+    assert final_t_re[0] == pytest.approx(37.84, abs=1e-2)
+    assert final_t_sk[0] == pytest.approx(35.92, abs=1e-2)
+    assert final_t_re[1] == pytest.approx(38.26, abs=1e-2)
+    assert final_t_sk[1] == pytest.approx(37.02, abs=1e-2)
 
     # Ensure it raises error for incompatible shapes
     with pytest.raises(ValueError):
@@ -128,11 +143,13 @@ def test_ml_ridge_regression_broadcasting():
             weight=70,
             tdb=30,
             rh=50,
-            duration=540,
+            duration=duration,
         )
 
+
 def test_ml_ridge_regression_initial_body_temp():
-    """Test the model with scalar inputs."""
+    """Test the model with initial body temperatures provided."""
+    duration = 60
     result = ml_ridge_regression(
         sex=Sex.male.value,
         age=70,
@@ -140,12 +157,16 @@ def test_ml_ridge_regression_initial_body_temp():
         weight=75,
         tdb=35,
         rh=60,
-        duration=60,
+        duration=duration,
         initial_t_re=37.0,
         initial_t_sk=32.0,
     )
-    assert isinstance(result.t_re, float)
-    assert isinstance(result.t_sk, float)
-    # Check against known values from the docstring example
-    assert result.t_re == pytest.approx(37.33, abs=1e-2)
-    assert result.t_sk == pytest.approx(37.00, abs=1e-2)
+    # Check that the output is a numpy array with the correct shape
+    assert isinstance(result.t_re, np.ndarray)
+    assert result.t_re.shape == (duration,)
+    assert isinstance(result.t_sk, np.ndarray)
+    assert result.t_sk.shape == (duration,)
+
+    # Check the final value of the history against known values from the docstring example
+    assert result.t_re[-1] == pytest.approx(37.33, abs=1e-2)
+    assert result.t_sk[-1] == pytest.approx(37.00, abs=1e-2)

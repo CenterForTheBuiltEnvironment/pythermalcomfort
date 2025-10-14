@@ -1,10 +1,10 @@
+import numpy as np
+
 from pythermalcomfort.utilities import Sex
 from pythermalcomfort.shared_functions import valid_range
 
 from pythermalcomfort.classes_input import RidgeRegressionInputs
 from pythermalcomfort.classes_return import PredictedBodyTemperatures
-
-import numpy as np
 
 # --- Model Constants ---
 
@@ -111,23 +111,41 @@ def _predict_temperature_simulation(features, duration):
     prev_t_re = scaled_features[:, 6]
     prev_t_sk = scaled_features[:, 7]
 
+    # Store history of temperatures
+    t_re_history_scaled = []
+    t_sk_history_scaled = []
+
     # Run simulation
     for _ in range(duration):
         new_t_re = static_t_re + _T_RE_COEFFS[6] * prev_t_re + _T_RE_COEFFS[7] * prev_t_sk
-        new_t_sk = (
-            static_t_sk + _T_SK_COEFFS[6] * prev_t_re + _T_SK_COEFFS[7] * prev_t_sk
-        )
+        new_t_sk = static_t_sk + _T_SK_COEFFS[6] * prev_t_re + _T_SK_COEFFS[7] * prev_t_sk
         prev_t_re, prev_t_sk = new_t_re, new_t_sk
 
-    # Scale back the final output and return
-    scaled_output = np.stack([prev_t_re, prev_t_sk], axis=1)
-    final_temps = _inverse_scale_output(scaled_output)
-    return final_temps[:, 0], final_temps[:, 1]
+        t_re_history_scaled.append(new_t_re)
+        t_sk_history_scaled.append(new_t_sk)
+
+    # Convert history lists to numpy arrays and transpose for easier processing
+    # Shape becomes (n_scenarios, duration)
+    t_re_history_scaled = np.array(t_re_history_scaled).T
+    t_sk_history_scaled = np.array(t_sk_history_scaled).T
+
+    # Flatten histories for scaling, then stack
+    scaled_output = np.stack(
+        [t_re_history_scaled.ravel(), t_sk_history_scaled.ravel()], axis=1
+    )
+
+    # Scale back the output
+    final_temps_history_flat = _inverse_scale_output(scaled_output)
+
+    # Reshape back to (n_scenarios, duration)
+    n_scenarios = features.shape[0]
+    t_re_history = final_temps_history_flat[:, 0].reshape(n_scenarios, duration)
+    t_sk_history = final_temps_history_flat[:, 1].reshape(n_scenarios, duration)
+
+    return t_re_history, t_sk_history
 
 
-def _check_ridge_regression_compliance(
-    age, height, weight, tdb, rh
-):
+def _check_ridge_regression_compliance(age, height, weight, tdb, rh):
     """Check if the inputs are within the model's applicability limits."""
     age_valid = valid_range(age, (60, 100))
     height_valid = valid_range(height, (130, 230))
@@ -150,7 +168,7 @@ def ml_ridge_regression(
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PredictedBodyTemperatures:
-    """Predicts core and skin temperature changes based on a ridge regression model.
+    """Predicts the full history of core and skin temperature changes based on a ridge regression model.
 
     This model simulates the rectal (t_re) and mean skin (t_sk)
     temperatures by first establishing a baseline in a thermoneutral environment
@@ -208,8 +226,10 @@ def ml_ridge_regression(
     Returns
     -------
     PredictedBodyTemperatures
-        A dataclass containing the predicted rectal (`t_re`)
-        and skin (`t_sk`) temperatures in °C.
+        A dataclass containing the predicted rectal (`t_re`) and skin (`t_sk`)
+        temperature history in °C. The outputs are numpy arrays. For scalar
+        inputs, the shape is (`duration`,). For vector inputs, the shape is
+        (`n_inputs`, `duration`).
 
     Raises
     ------
@@ -237,50 +257,38 @@ def ml_ridge_regression(
     >>> from pythermalcomfort.utilities import Sex
     >>> from pythermalcomfort.models.ml_ridge_regression import (
     ...     ml_ridge_regression,
-    ...     Sex,
     ... )
     >>> # Scalar example for a single person
     >>> results = ml_ridge_regression(
     ...     sex=Sex.male.value,
     ...     age=60,
-    ...     height=180,
+    ...     height=1.8,
     ...     weight=75,
     ...     tdb=35,
     ...     rh=60,
     ...     duration=540,
     ... )
-    >>> print(f"Rectal temp: {results.t_re:.2f}°C")
-    Rectal temp: 37.98°C
-    >>> print(f"Skin temp: {results.t_sk:.2f}°C")
-    Skin temp: 37.02°C
+    >>> print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
+    Final rectal temp: 37.98°C
+    >>> print(f"Final Skin temp: {results.t_sk[-1]:.2f}°C")
+    Final Skin temp: 37.02°C
+    >>> print(f"Rectal temp history shape: {results.t_re.shape}")
+    Rectal temp history shape: (540,)
 
     >>> # Vectorized example for multiple scenarios
     >>> results_vec = ml_ridge_regression(
     ...     sex=[Sex.male.value, Sex.female.value],
     ...     age=[60, 65],
-    ...     height=[180, 165],
+    ...     height=[1.8, 1.65],
     ...     weight=[75, 60],
     ...     tdb=[35, 40],
     ...     rh=[60, 50],
     ...     duration=540,
     ... )
-    >>> print(results_vec.t_re)
-    [37.98... 38.42...]
-
-    >>> # Example with provided baseline temperatures
-    >>> results_baseline = ml_ridge_regression(
-    ...     sex=Sex.male.value,
-    ...     age=70,
-    ...     height=180,
-    ...     weight=75,
-    ...     tdb=35,
-    ...     rh=60,
-    ...     duration=60,
-    ...     initial_t_re=37.0,
-    ...     initial_t_sk=32.0,
-    ... )
-    >>> print(f"Rectal temp: {results_baseline.t_re:.2f}°C")
-    Rectal temp (from baseline): 37.33°C
+    >>> print(f"Final rectal temps: {results_vec.t_re[:, -1]}")
+    Final rectal temps: [37.98, 38.42]
+    >>> print(f"Rectal temp history shape: {results_vec.t_re.shape}")
+    Rectal temp history shape: (2, 540)
     """
     # Validate inputs
     RidgeRegressionInputs(
@@ -352,9 +360,11 @@ def ml_ridge_regression(
             axis=1,
         )
 
-        current_t_re, current_t_sk = _predict_temperature_simulation(
+        baseline_t_re_hist, baseline_t_sk_hist = _predict_temperature_simulation(
             baseline_features, duration=120
         )
+        current_t_re = baseline_t_re_hist[:, -1]
+        current_t_sk = baseline_t_sk_hist[:, -1]
 
     # Final simulation in specified environment
     final_features = np.stack(
@@ -371,7 +381,7 @@ def ml_ridge_regression(
         axis=1,
     )
 
-    final_t_re, final_t_sk = _predict_temperature_simulation(
+    final_t_re_hist, final_t_sk_hist = _predict_temperature_simulation(
         final_features,
         duration=duration,
     )
@@ -384,19 +394,21 @@ def ml_ridge_regression(
             | np.isnan(temp_valid)
             | np.isnan(rh_valid)
         )
-        final_t_re = np.where(all_valid, final_t_re, np.nan)
-        final_t_sk = np.where(all_valid, final_t_sk, np.nan)
+        # Apply validity mask across the time dimension
+        validity_mask = all_valid[:, np.newaxis]
+        final_t_re_hist = np.where(validity_mask, final_t_re_hist, np.nan)
+        final_t_sk_hist = np.where(validity_mask, final_t_sk_hist, np.nan)
 
     if round_output:
-        final_t_re = np.round(final_t_re, 2)
-        final_t_sk = np.round(final_t_sk, 2)
+        final_t_re_hist = np.round(final_t_re_hist, 2)
+        final_t_sk_hist = np.round(final_t_sk_hist, 2)
 
-    # Reshape results to match original input shape
-    if original_shape:
-        final_t_re = final_t_re.reshape(original_shape)
-        final_t_sk = final_t_sk.reshape(original_shape)
-    else:  # Handle scalar case
-        final_t_re = final_t_re.item()
-        final_t_sk = final_t_sk.item()
+    # If original input was scalar, return 1D array instead of 2D
+    if not original_shape:
+        final_t_re = final_t_re_hist.squeeze()
+        final_t_sk = final_t_sk_hist.squeeze()
+    else:
+        final_t_re = final_t_re_hist
+        final_t_sk = final_t_sk_hist
 
     return PredictedBodyTemperatures(t_re=final_t_re, t_sk=final_t_sk)
