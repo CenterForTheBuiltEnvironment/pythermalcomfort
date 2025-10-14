@@ -174,14 +174,6 @@ Joint system thermoregulation model (JOS-3)
     :special-members: __init__
     :exclude-members: tdb, tr, to, rh, v, posture, clo, par, t_body, bsa, r_t, r_et, w, w_mean, t_skin_mean, t_skin, t_core, t_cb, t_artery, t_vein, t_superficial_vein, t_muscle, t_fat, body_names, bmr
 
-Machine Learning (ML) ridge regression model
---------------------------------------------
-
-.. autofunction:: pythermalcomfort.models.ml_ridge_regression.ml_ridge_regression
-
-.. autoclass:: pythermalcomfort.classes_return.PredictedBodyTemperatures
-    :members:
-
 Normal Effective Temperature (NET)
 ----------------------------------
 

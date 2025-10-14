@@ -845,7 +845,7 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
 @dataclass
 class RidgeRegressionInputs(BaseInputs):
-    """Input validation for the ml_ridge_regression model."""
+    """Input validation for the ridge_regression_body_temperature_predictor model."""
 
     def __init__(
         self,
@@ -897,7 +897,8 @@ class RidgeRegressionInputs(BaseInputs):
             if value is not None:
                 arr = np.asarray(value)
                 if np.any(arr <= 0):
-                    raise ValueError(f"{param_name} must be a positive value.")
+                    message = f"{param_name} must be a positive value."
+                    raise ValueError(message)
 
 
 @dataclass

@@ -1027,6 +1027,7 @@ class PredictedBodyTemperatures:
     t_re: np.ndarray
     t_sk: np.ndarray
 
+
 @dataclass(frozen=True, repr=False)
 class ScaleWindSpeedLog(AutoStrMixin):
     """Dataclass to represent the output of scale_wind_speed_log.

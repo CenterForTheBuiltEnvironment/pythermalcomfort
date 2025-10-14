@@ -1,10 +1,9 @@
 import numpy as np
 
-from pythermalcomfort.utilities import Sex
-from pythermalcomfort.shared_functions import valid_range
-
 from pythermalcomfort.classes_input import RidgeRegressionInputs
 from pythermalcomfort.classes_return import PredictedBodyTemperatures
+from pythermalcomfort.shared_functions import valid_range
+from pythermalcomfort.utilities import Sex
 
 # --- Model Constants ---
 
@@ -117,8 +116,12 @@ def _predict_temperature_simulation(features, duration):
 
     # Run simulation
     for _ in range(duration):
-        new_t_re = static_t_re + _T_RE_COEFFS[6] * prev_t_re + _T_RE_COEFFS[7] * prev_t_sk
-        new_t_sk = static_t_sk + _T_SK_COEFFS[6] * prev_t_re + _T_SK_COEFFS[7] * prev_t_sk
+        new_t_re = (
+            static_t_re + _T_RE_COEFFS[6] * prev_t_re + _T_RE_COEFFS[7] * prev_t_sk
+        )
+        new_t_sk = (
+            static_t_sk + _T_SK_COEFFS[6] * prev_t_re + _T_SK_COEFFS[7] * prev_t_sk
+        )
         prev_t_re, prev_t_sk = new_t_re, new_t_sk
 
         t_re_history_scaled.append(new_t_re)
@@ -155,7 +158,7 @@ def _check_ridge_regression_compliance(age, height, weight, tdb, rh):
     return age_valid, height_valid, mass_valid, temp_valid, rh_valid
 
 
-def ml_ridge_regression(
+def ridge_regression_body_temperature_predictor(
     sex: Sex | list[Sex],
     age: float | list[float],
     height: float | list[float],
@@ -209,10 +212,25 @@ def ml_ridge_regression(
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.
 
-    Applicability
-    -------------
+    Returns
+    -------
+    PredictedBodyTemperatures
+        A dataclass containing the predicted rectal (`t_re`) and skin (`t_sk`)
+        temperature history in °C. See
+        :py:class:`~pythermalcomfort.classes_return.PredictedBodyTemperatures`
+        for more details. The outputs are numpy arrays. For scalar inputs, the shape
+        is (`duration`,). For vector inputs, the shape is (`n_inputs`, `duration`).
+
+    Raises
+    ------
+    ValueError
+        If input arrays have inconsistent shapes after broadcasting.
+
+    Notes
+    -----
     The model is applicable for adults aged between 60 and 100 years. The ranges for
     the input parameters are:
+
     - **Age**: 60 to 100 years
     - **Height**: 1.30 to 2.30 m
     - **Weight**: 40 to 140 kg
@@ -222,24 +240,6 @@ def ml_ridge_regression(
     The `limit_inputs` parameter, by default, is set to `True`, which means that
     if the inputs are outside the model's applicability limits, the function will
     return `nan`.
-
-    Returns
-    -------
-    PredictedBodyTemperatures
-        A dataclass containing the predicted rectal (`t_re`) and skin (`t_sk`)
-        temperature history in °C. The outputs are numpy arrays. For scalar
-        inputs, the shape is (`duration`,). For vector inputs, the shape is
-        (`n_inputs`, `duration`).
-
-    Raises
-    ------
-    ValueError
-        If input arrays have inconsistent shapes after broadcasting.
-
-    Notes
-    -----
-    This model was trained on adults over 60 years therefore may not give accurate
-    predictions for people under 60 years old.
 
     The model does not have inputs such as: air velocity, radiative heat transfer,
     clothing level and an individual's activity level due to there being little
@@ -255,11 +255,11 @@ def ml_ridge_regression(
     Examples
     --------
     >>> from pythermalcomfort.utilities import Sex
-    >>> from pythermalcomfort.models.ml_ridge_regression import (
-    ...     ml_ridge_regression,
+    >>> from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
+    ...     ridge_regression_body_temperature_predictor,
     ... )
     >>> # Scalar example for a single person
-    >>> results = ml_ridge_regression(
+    >>> results = ridge_regression_body_temperature_predictor(
     ...     sex=Sex.male.value,
     ...     age=60,
     ...     height=1.8,
@@ -276,7 +276,7 @@ def ml_ridge_regression(
     Rectal temp history shape: (540,)
 
     >>> # Vectorized example for multiple scenarios
-    >>> results_vec = ml_ridge_regression(
+    >>> results_vec = ridge_regression_body_temperature_predictor(
     ...     sex=[Sex.male.value, Sex.female.value],
     ...     age=[60, 65],
     ...     height=[1.8, 1.65],
@@ -312,7 +312,8 @@ def ml_ridge_regression(
     sex_array = np.array(sex)
     valid_sex_values = [Sex.male.value, Sex.female.value]
     if not np.all(np.isin(sex_array, valid_sex_values)):
-        raise ValueError(f"Invalid input for sex. Must be one of {valid_sex_values}")
+        message = f"Invalid input for sex. Must be one of {valid_sex_values}"
+        raise ValueError(message)
 
     # Vectorize sex input: 1 for female, 0 for male
     sex_value = np.where(sex_array == Sex.female.value, 1, 0)

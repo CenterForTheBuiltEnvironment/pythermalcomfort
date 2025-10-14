@@ -1,15 +1,15 @@
 import numpy as np
 import pytest
 
-from pythermalcomfort.utilities import Sex
-from pythermalcomfort.models.ml_ridge_regression import (
+from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
     _inverse_scale_output,
     _scale_features,
-    ml_ridge_regression,
+    ridge_regression_body_temperature_predictor,
 )
+from pythermalcomfort.utilities import Sex
 
 
-def test_ml_ridge_regression_scale_features():
+def test_ridge_regression_scale_features():
     """Test the feature scaling function."""
     # Create a sample feature array: [sex, age, height, mass, temp, humidity, tre, mtsk]
     features = np.array([[0, 30, 180, 75, 25, 50, 37.0, 34.0]])
@@ -33,7 +33,7 @@ def test_ml_ridge_regression_scale_features():
     np.testing.assert_allclose(scaled, expected, rtol=1e-6)
 
 
-def test_ml_ridge_regression_inverse_scale_output():
+def test_ridge_regression_inverse_scale_output():
     """Test the inverse output scaling function."""
     # Create a sample scaled output array: [scaled_tre, scaled_mtsk]
     scaled_output = np.array([[0.54714297, 0.51841453]])
@@ -44,10 +44,10 @@ def test_ml_ridge_regression_inverse_scale_output():
     np.testing.assert_allclose(inversed, expected, rtol=1e-6)
 
 
-def test_ml_ridge_regression_scalar():
+def test_ridge_regression_scalar():
     """Test the model with scalar inputs."""
     duration = 540
-    result = ml_ridge_regression(
+    result = ridge_regression_body_temperature_predictor(
         sex=Sex.male.value,
         age=60,
         height=1.80,
@@ -67,7 +67,7 @@ def test_ml_ridge_regression_scalar():
     assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
 
 
-def test_ml_ridge_regression_vectorized():
+def test_ridge_regression_vectorized():
     """Test the model with array inputs for vectorization."""
     duration = 540
     sex = [Sex.male.value, Sex.female.value]
@@ -77,7 +77,7 @@ def test_ml_ridge_regression_vectorized():
     tdb = [35, 40]
     rh = [60, 50]
 
-    result = ml_ridge_regression(
+    result = ridge_regression_body_temperature_predictor(
         sex=sex,
         age=age,
         height=height,
@@ -102,7 +102,7 @@ def test_ml_ridge_regression_vectorized():
     assert final_t_sk[1] == pytest.approx(38.04, abs=1e-2)
 
 
-def test_ml_ridge_regression_broadcasting():
+def test_ridge_regression_broadcasting():
     """Test NumPy broadcasting with mixed scalar and array inputs."""
     duration = 540
     sex = [Sex.male.value, Sex.female.value]
@@ -112,7 +112,7 @@ def test_ml_ridge_regression_broadcasting():
     tdb = [30, 35]
     rh = 50  # scalar
 
-    result = ml_ridge_regression(
+    result = ridge_regression_body_temperature_predictor(
         sex=sex,
         age=age,
         height=height,
@@ -136,7 +136,7 @@ def test_ml_ridge_regression_broadcasting():
 
     # Ensure it raises error for incompatible shapes
     with pytest.raises(ValueError):
-        ml_ridge_regression(
+        ridge_regression_body_temperature_predictor(
             sex=[Sex.male.value, Sex.female.value],
             age=[30, 40, 50],  # Incompatible shape
             height=1.70,
@@ -147,10 +147,10 @@ def test_ml_ridge_regression_broadcasting():
         )
 
 
-def test_ml_ridge_regression_initial_body_temp():
+def test_ridge_regression_initial_body_temp():
     """Test the model with initial body temperatures provided."""
     duration = 60
-    result = ml_ridge_regression(
+    result = ridge_regression_body_temperature_predictor(
         sex=Sex.male.value,
         age=70,
         height=1.80,
