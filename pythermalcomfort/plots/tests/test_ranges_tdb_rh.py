@@ -185,8 +185,8 @@ class TestRangesTdbRhVisualProperties:
         else:
             assert artists["legend"] is None
 
-    def test_custom_plot_kwargs(self, fixed_params_pmv):
-        """Test that plot_kwargs are forwarded.
+    def test_custom_visual_parameters(self, fixed_params_pmv):
+        """Test that visual parameters work correctly.
         
         Property-level assertion like seaborn.
         """
@@ -194,12 +194,10 @@ class TestRangesTdbRhVisualProperties:
             model_func=pmv_ppd_iso,
             fixed_params=fixed_params_pmv,
             thresholds=[-0.5, 0.5],
-            plot_kwargs={
-                "cmap": "viridis",
-                "band_alpha": 0.5,
-                "line_color": "red",
-                "line_width": 2.0,
-            },
+            cmap="viridis",
+            band_alpha=0.5,
+            line_color="red",
+            line_width=2.0,
         )
         curves = artists["curves"]
         assert len(curves) > 0, "Should have at least one curve"
@@ -207,16 +205,14 @@ class TestRangesTdbRhVisualProperties:
             assert curve.get_linewidth() == 2.0
             assert same_color(curve.get_color(), "red")
 
-    def test_plot_kwargs_override_defaults(self, fixed_params_pmv):
-        """Test that plot_kwargs can override default labels."""
+    def test_kwargs_override_defaults(self, fixed_params_pmv):
+        """Test that **kwargs can override default labels."""
         ax, _ = ranges_tdb_rh(
             model_func=pmv_ppd_iso,
             fixed_params=fixed_params_pmv,
             thresholds=[-0.5, 0.5],
-            plot_kwargs={
-                "xlabel": "Custom Temperature Label",
-                "ylabel": "Custom Humidity Label",
-            },
+            xlabel="Custom Temperature Label",
+            ylabel="Custom Humidity Label",
         )
         assert ax.get_xlabel() == "Custom Temperature Label"
         assert ax.get_ylabel() == "Custom Humidity Label"

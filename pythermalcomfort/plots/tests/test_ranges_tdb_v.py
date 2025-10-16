@@ -90,13 +90,14 @@ class TestRangesTdbVValidation:
 class TestRangesTdbVVisualProperties:
     """Test visual customization."""
 
-    def test_custom_plot_kwargs(self, params_for_v):
+    def test_custom_visual_parameters(self, params_for_v):
         """Test plot customization."""
         _, artists = ranges_tdb_v(
             model_func=pmv_ppd_iso,
             fixed_params=params_for_v,
             thresholds=[-0.5, 0.5],
-            plot_kwargs={"line_width": 3.0, "line_color": "blue"},
+            line_width=3.0,
+            line_color="blue",
         )
         assert len(artists["curves"]) > 0, "Should have at least one curve"
         for curve in artists["curves"]:

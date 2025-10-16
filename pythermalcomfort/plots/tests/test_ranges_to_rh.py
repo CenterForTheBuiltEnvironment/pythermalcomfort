@@ -96,7 +96,8 @@ class TestRangesToRhVisualProperties:
             model_func=pmv_ppd_iso,
             fixed_params=params_for_to,
             thresholds=[-0.5, 0.5],
-            plot_kwargs={"xlabel": "Custom T", "ylabel": "Custom RH"},
+            xlabel="Custom T",
+            ylabel="Custom RH",
         )
         assert ax.get_xlabel() == "Custom T"
         assert ax.get_ylabel() == "Custom RH"

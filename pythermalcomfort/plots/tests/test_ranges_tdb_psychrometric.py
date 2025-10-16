@@ -107,12 +107,14 @@ class TestRangesTdbPsychrometricVisualProperties:
     """Test visual customization."""
 
     def test_visual_customization(self, fixed_params_pmv):
-        """Test plot_kwargs and labels."""
+        """Test **kwargs and labels."""
         ax, artists = ranges_tdb_psychrometric(
             model_func=pmv_ppd_iso,
             fixed_params=fixed_params_pmv,
             thresholds=[-0.5, 0.5],
-            plot_kwargs={"line_width": 2.5, "xlabel": "Custom T", "ylabel": "Custom W"},
+            line_width=2.5,
+            xlabel="Custom T",
+            ylabel="Custom W",
         )
         assert ax.get_xlabel() == "Custom T"
         assert ax.get_ylabel() == "Custom W"
