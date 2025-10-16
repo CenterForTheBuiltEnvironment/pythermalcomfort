@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime as dt
-import textwrap
 from dataclasses import dataclass, fields, is_dataclass
 
 import numpy as np
@@ -10,68 +9,19 @@ import numpy.typing as npt
 
 class AutoStrMixin:
     def __str__(self) -> str:
-        """Pretty-print dataclass fields as aligned single-line 'name : value'.
-
-        - One line per field, no header/title.
-        - NumPy arrays with >10 elements show first 5 and last 5.
-        - Other long strings are shortened to 80 chars with an ellipsis.
-        """
         if not is_dataclass(self):
             return super().__str__()
 
-        MAX_STR_WIDTH = 80
-        names = [f.name for f in fields(type(self))]
-        values = [getattr(self, n) for n in names]
-
-        # Format values as strings, using comma separation for arrays/lists
-        def value_to_str(val):
-            if isinstance(val, np.ndarray):
-                v = np.array2string(
-                    val,
-                    separator=", ",
-                    max_line_width=MAX_STR_WIDTH,
-                    precision=2,
-                    threshold=10,
-                    edgeitems=5,
-                    formatter={"float_kind": lambda x: f"{x:.2f}"},
-                )
-            elif isinstance(val, (list | tuple)):
-                if len(val) > 10:
-                    head = ", ".join(str(x) for x in val[:5])
-                    tail = ", ".join(str(x) for x in val[-5:])
-                    v = f"[{head}, ..., {tail}]"
-                else:
-                    v = f"[{', '.join(str(x) for x in val)}]"
-            else:
-                v = str(val)
-            # Shorten if needed
-            if isinstance(val, str) and len(v) > MAX_STR_WIDTH:
-                v = textwrap.shorten(v, width=MAX_STR_WIDTH, placeholder="...")
-            return v
-
-        value_strs = [value_to_str(v) for v in values]
-        # Find max name length for alignment
-        max_name_len = max(len(n) for n in names) if names else 0
-        # Compose lines with aligned colons
-        lines = [
-            f"{n.ljust(max_name_len)} : {v}"
-            for n, v in zip(names, value_strs, strict=True)
-        ]
-        # Shorten each line to MAX_STR_WIDTH
-        lines = [
-            textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
-            if len(line) > MAX_STR_WIDTH
-            else line
-            for line in lines
-        ]
-
-        # Compute header length
-        header_base = f"{self.__class__.__name__}"
-        max_line_len = max([len(header_base)] + [len(line) for line in lines])
-        header = f"{'-' * (max_line_len)}"
-        title = f"{header_base}".center(max_line_len)
-        result = [header, title, header] + lines
-        return "\n".join(result)
+        # determine width by max variable name length
+        names = [f.name for f in fields(self)]
+        width = max((len(n) for n in names), default=0)
+        lines = [f"-------- {self.__class__.__name__} --------"]
+        for n in names:
+            v = getattr(self, n)
+            # Format multi-line values or very long values properly
+            v_str = str(v).replace("\n", "\n" + " " * (width + 3 + 3))
+            lines.append(f"{n.ljust(width)} : {v_str}")
+        return "\n".join(lines)
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -82,7 +32,7 @@ class AutoStrMixin:
         except AttributeError as exc:
             error_msg = (
                 f"{self.__class__.__name__} has no field '{item}'. "
-                f"Available fields: {[f.name for f in fields(type(self))]}"
+                f"Available fields: {[f.name for f in fields(self)]}"
             )
             raise KeyError(error_msg) from exc
 
@@ -360,23 +310,15 @@ class PHS(AutoStrMixin):
     t_sk_t_cr_wg : float or list of floats
         Fraction of the body mass at the skin temperature.
     d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time limited by cumulative sweat mass loss
-        for a mean worker (dehydration constraint), [minutes].
+        Maximum allowable exposure time for water loss, mean subject, [minutes].
     d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time limited by cumulative sweat mass loss
-        for 95% of the working population (dehydration constraint), [minutes].
+        Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    sweat_loss_g : float or list of floats
-        Cumulative evaporated sweat mass for the whole person over the simulated duration, [grams (g)].
-        This is a total mass per person (not per unit area).
-    sweat_rate_watt : float or list of floats
-        Instantaneous evaporative heat flux due to regulatory sweating at the skin,
-        per unit area, [W·m⁻²]. Used at each simulation time step.
-    evap_load_wm2_min : float or list of floats
-        Accumulated evaporative load per unit area over the simulated duration, [W·min·m⁻²].
-        Computed as the running sum of the instantaneous evaporative heat flux (W·m⁻²)
-        at each 1 minute step. Intended for chaining simulation segments.
+    water_loss_watt : float or list of floats
+        Maximum water loss in watts, [W].
+    water_loss : float or list of floats
+        Maximum water loss, [g].
     """
 
     t_re: float | list[float]
@@ -387,9 +329,8 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    sweat_loss_g: float | list[float]
-    sweat_rate_watt: float | list[float]
-    evap_load_wm2_min: float | list[float]
+    water_loss_watt: float | list[float]
+    water_loss: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -418,15 +359,11 @@ class PMVPPD(AutoStrMixin):
         Predicted Percentage of Dissatisfied.
     tsv : str or list of strings
         Predicted thermal sensation vote.
-    compliance : bool or list of bools, optional
-        True if PMV is within the acceptable range (-0.5 < PMV < 0.5) according to
-        ASHRAE Standard 55-2023. Only returned by pmv_ppd_ashrae function.
     """
 
     pmv: float | list[float]
     ppd: float | list[float]
     tsv: float | list[float]
-    compliance: bool | list[bool] | None = None
 
 
 @dataclass(frozen=True, repr=False)
@@ -818,7 +755,7 @@ class JOS3BodyParts(AutoStrMixin):
 
 
 def get_attribute_values(cls):
-    return np.asarray([getattr(cls, field.name) for field in fields(cls)])
+    return np.array([getattr(cls, field.name) for field in fields(cls)])
 
 
 @dataclass(frozen=True, repr=False)
@@ -1009,37 +946,29 @@ class JOS3Output(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
-class PredictedBodyTemperatures(AutoStrMixin):
-    """Dataclass for returning predicted temperature history.
-
-    The `duration` mentioned in the shapes below is the `duration` parameter
-    passed to the prediction function.
+class IREQ(AutoStrMixin):
+    """Dataclass to represent the Required Clothing Insulation (IREQ) and Duration
+    Limited Exposure (DLE) according to ISO 11079.
 
     Attributes
     ----------
-    t_re : numpy.ndarray of float, in °C
-        Predicted rectal temperature history.
-        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
-        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
-    t_sk : numpy.ndarray of float, in °C
-        Predicted mean skin temperature history.
-        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
-        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
+    ireq_min : float or list of floats
+        Lower bound of required insulation [clo].
+    ireq_neutral : float or list of floats
+        Upper bound of required insulation [clo].
+    icl_min : float or list of floats
+        Lower bound of required basic clothing insulation (ISO 9920) [clo].
+    icl_neutral : float or list of floats
+        Upper bound of required basic clothing insulation (ISO 9920) [clo].
+    dle_min : float or list of floats or str
+        Lower bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
+    dle_neutral : float or list of floats or str
+        Upper bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
     """
 
-    t_re: np.ndarray
-    t_sk: np.ndarray
-
-
-@dataclass(frozen=True, repr=False)
-class ScaleWindSpeedLog(AutoStrMixin):
-    """Dataclass to represent the output of scale_wind_speed_log.
-
-    Attributes
-    ----------
-    v_z2 : numpy.ndarray or float or list of floats
-        Wind speed at the target height z2, [m/s]. The type can be a scalar,
-        list or numpy array depending on the inputs provided to the function.
-    """
-
-    v_z2: npt.ArrayLike
+    ireq_min: float | list[float]
+    ireq_neutral: float | list[float]
+    icl_min: float | list[float]
+    icl_neutral: float | list[float]
+    dle_min: float | list[float] | str
+    dle_neutral: float | list[float] | str
