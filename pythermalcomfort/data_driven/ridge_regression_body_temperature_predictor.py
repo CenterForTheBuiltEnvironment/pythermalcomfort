@@ -169,7 +169,7 @@ def _check_ridge_regression_compliance(
 
 
 def ridge_regression_body_temperature_predictor(
-    sex: Sex | list[Sex],
+    sex: Sex | str | list[Sex | str],
     age: float | list[float],
     height: float | list[float],
     weight: float | list[float],
@@ -195,9 +195,9 @@ def ridge_regression_body_temperature_predictor(
     Parameters
     ----------
     sex : Sex or list
-        Biological sex. Pass the string value from the enum, e.g.,
-        `Sex.male` or `Sex.male.value` for "male", or `Sex.female`
-        or `Sex.female.value` for "female".
+        Biological sex. Pass the enum instance (e.g., `Sex.male`),
+        its string value (e.g., `Sex.male.value` or `"male"`),
+        or a list of either for vectorized inputs.
     age : float or list
         Age, in years.
     height : float
