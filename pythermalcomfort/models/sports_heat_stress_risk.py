@@ -1,6 +1,9 @@
 import warnings
 from itertools import product
 
+# todo not implemented yet in the docs nor in the __init__.py
+# todo add references to the function docstring
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
