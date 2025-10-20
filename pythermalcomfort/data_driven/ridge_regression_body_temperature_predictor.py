@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numpy as np
 
 from pythermalcomfort.classes_input import RidgeRegressionInputs
@@ -9,7 +11,7 @@ from pythermalcomfort.utilities import Sex
 
 # Minimum values for each of the 8 input features, used for Min-Max scaling.
 # The features are: Sex, Age, Height, Mass, Ambient Temp, Humidity, Rectal Temp (t_re), Mean Skin Temp (t_sk).
-_FEATURES_SCALER_MIN = np.array(
+_FEATURES_SCALER_OFFSET = np.array(
     [
         0.0,
         -0.3114754098360656,
@@ -37,7 +39,7 @@ _FEATURES_SCALER_SCALE = np.array(
 )
 
 # Minimum values for the 2 output variables (Rectal Temp, Mean Skin Temp), used for inverse scaling.
-_OUTPUT_SCALER_MIN = np.array(
+_OUTPUT_SCALER_OFFSET = np.array(
     [
         -11.197107405358395,
         -2.0197777680408033,
@@ -89,15 +91,17 @@ _T_SK_INTERCEPT = 0.04356328728329839
 
 def _scale_features(features: np.ndarray) -> np.ndarray:
     """Scales input features using predefined scaling constants."""
-    return features * _FEATURES_SCALER_SCALE + _FEATURES_SCALER_MIN
+    return features * _FEATURES_SCALER_SCALE + _FEATURES_SCALER_OFFSET
 
 
 def _inverse_scale_output(scaled_output: np.ndarray) -> np.ndarray:
     """Apply inverse scaling to the model output."""
-    return (scaled_output - _OUTPUT_SCALER_MIN) / _OUTPUT_SCALER_SCALE
+    return (scaled_output - _OUTPUT_SCALER_OFFSET) / _OUTPUT_SCALER_SCALE
 
 
-def _predict_temperature_simulation(features, duration):
+def _predict_temperature_simulation(
+    features: np.ndarray, duration: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """Core simulation loop for temperature prediction."""
     # Scale input features
     scaled_features = _scale_features(features)
@@ -148,7 +152,13 @@ def _predict_temperature_simulation(features, duration):
     return t_re_history, t_sk_history
 
 
-def _check_ridge_regression_compliance(age, height, weight, tdb, rh):
+def _check_ridge_regression_compliance(
+    age: np.ndarray,
+    height: np.ndarray,
+    weight: np.ndarray,
+    tdb: np.ndarray,
+    rh: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Check if the inputs are within the model's applicability limits."""
     age_valid = valid_range(age, (60, 100))
     height_valid = valid_range(height, (130, 230))
@@ -186,18 +196,19 @@ def ridge_regression_body_temperature_predictor(
     ----------
     sex : Sex or list
         Biological sex. Pass the string value from the enum, e.g.,
-        `Sex.male.value` for "male" or `Sex.female.value` for "female".
+        `Sex.male` or `Sex.male.value` for "male", or `Sex.female`
+        or `Sex.female.value` for "female".
     age : float or list
         Age, in years.
     height : float
-        Body height [m].
+        Body height in meters [m].
     weight : float
-        Body weight [kg].
+        Body weight in kilograms [kg].
     tdb : float or list
         Ambient (dry bulb) air temperature, in °C.
     rh : float or list
         Relative humidity, in %.
-    duration : int, optional
+    duration : int
         Duration of the simulation in the specified environment, in minutes.
     initial_t_re : float or list, optional
         Initial rectal temperature (°C). If provided, the baseline simulation
@@ -269,7 +280,7 @@ def ridge_regression_body_temperature_predictor(
     ...     duration=540,
     ... )
     >>> print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
-    Final rectal temp: 37.98°C
+    Final rectal temp: 38.15°C
     >>> print(f"Final Skin temp: {results.t_sk[-1]:.2f}°C")
     Final Skin temp: 37.02°C
     >>> print(f"Rectal temp history shape: {results.t_re.shape}")
@@ -286,7 +297,7 @@ def ridge_regression_body_temperature_predictor(
     ...     duration=540,
     ... )
     >>> print(f"Final rectal temps: {results_vec.t_re[:, -1]}")
-    Final rectal temps: [37.98, 38.42]
+    Final rectal temps: [38.15, 38.53]
     >>> print(f"Rectal temp history shape: {results_vec.t_re.shape}")
     Rectal temp history shape: (2, 540)
     """
@@ -310,13 +321,13 @@ def ridge_regression_body_temperature_predictor(
 
     # Convert sex to 0 or 1 representation
     sex_array = np.array(sex)
-    valid_sex_values = [Sex.male.value, Sex.female.value]
+    valid_sex_values = [Sex.male, Sex.male.value, Sex.female, Sex.female.value]
     if not np.all(np.isin(sex_array, valid_sex_values)):
         message = f"Invalid input for sex. Must be one of {valid_sex_values}"
         raise ValueError(message)
 
     # Vectorize sex input: 1 for female, 0 for male
-    sex_value = np.where(sex_array == Sex.female.value, 1, 0)
+    sex_value = np.where((sex_array == Sex.female) | (sex_array == Sex.female.value), 1, 0)
 
     # Convert inputs to numpy arrays for vectorization
     inputs = np.broadcast_arrays(sex_value, age, height_cm, weight, tdb, rh)

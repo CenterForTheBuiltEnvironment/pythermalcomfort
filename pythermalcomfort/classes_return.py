@@ -1008,8 +1008,8 @@ class JOS3Output(AutoStrMixin):
     q_res_latent: float | None = None
 
 
-@dataclass(frozen=True)
-class PredictedBodyTemperatures:
+@dataclass(frozen=True, repr=False)
+class PredictedBodyTemperatures(AutoStrMixin):
     """Dataclass for returning predicted temperature history.
 
     Attributes
