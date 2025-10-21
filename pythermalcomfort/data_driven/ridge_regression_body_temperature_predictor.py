@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 
 from pythermalcomfort.classes_input import RidgeRegressionInputs
@@ -101,7 +99,7 @@ def _inverse_scale_output(scaled_output: np.ndarray) -> np.ndarray:
 
 def _predict_temperature_simulation(
     features: np.ndarray, duration: int
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Core simulation loop for temperature prediction."""
     # Scale input features
     scaled_features = _scale_features(features)
@@ -158,7 +156,7 @@ def _check_ridge_regression_compliance(
     weight: np.ndarray,
     tdb: np.ndarray,
     rh: np.ndarray,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Check if the inputs are within the model's applicability limits."""
     age_valid = valid_range(age, (60, 100))
     height_valid = valid_range(height, (130, 230))
@@ -327,7 +325,9 @@ def ridge_regression_body_temperature_predictor(
         raise ValueError(message)
 
     # Vectorize sex input: 1 for female, 0 for male
-    sex_value = np.where((sex_array == Sex.female) | (sex_array == Sex.female.value), 1, 0)
+    sex_value = np.where(
+        (sex_array == Sex.female) | (sex_array == Sex.female.value), 1, 0
+    )
 
     # Convert inputs to numpy arrays for vectorization
     inputs = np.broadcast_arrays(sex_value, age, height_cm, weight, tdb, rh)

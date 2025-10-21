@@ -875,13 +875,46 @@ class RidgeRegressionInputs(BaseInputs):
             round_output=round_output,
         )
 
+    def _validate_finite(self, param_name):
+        """Validate that a numeric input is finite."""
+        value = getattr(self, param_name)
+        if value is not None:
+            arr = np.asarray(value)
+            if not np.all(np.isfinite(arr)):
+                message = f"{param_name} must contain only finite values."
+                raise ValueError(message)
+
     def __post_init__(self):
         super().__post_init__()
 
-        if self.duration is not None:
-            if not isinstance(self.duration, int) or self.duration <= 0:
-                raise ValueError("Duration must be a positive integer.")
+        # Validate duration is positive integer
+        if not isinstance(self.duration, int) or self.duration <= 0:
+            raise ValueError("Duration must be a positive integer.")
 
+        # Validate that all numeric inputs are finite
+        for param_name in [
+            "age",
+            "height",
+            "weight",
+            "tdb",
+            "rh",
+            "duration",
+            "initial_t_re",
+            "initial_t_sk",
+        ]:
+            self._validate_finite(param_name)
+
+        # Validate that all array-like inputs are broadcastable
+        try:
+            np.broadcast_arrays(
+                self.sex, self.age, self.height, self.weight, self.tdb, self.rh
+            )
+        except ValueError as err:
+            raise ValueError(
+                "Input arrays are not broadcastable to a common shape."
+            ) from err
+
+        # Validate either both initial body temp values are provided or neither
         if (self.initial_t_re is None) != (self.initial_t_sk is None):
             raise ValueError(
                 "Both initial_t_re and initial_t_sk must be provided, or neither."

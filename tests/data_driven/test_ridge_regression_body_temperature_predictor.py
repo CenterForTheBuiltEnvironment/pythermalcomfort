@@ -66,6 +66,7 @@ def test_ridge_regression_scalar():
     assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
     assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
 
+
 def test_ridge_regression_enum():
     """Test the model with enum + scalar inputs."""
     duration = 540
@@ -88,11 +89,12 @@ def test_ridge_regression_enum():
     assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
     assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
 
+
 def test_ridge_regression_string():
     """Test the model with string + scalar inputs."""
     duration = 540
     result = ridge_regression_body_temperature_predictor(
-        sex='male',
+        sex="male",
         age=60,
         height=1.80,
         weight=75,
@@ -109,6 +111,7 @@ def test_ridge_regression_string():
     # Check the final value of the history against known values
     assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
     assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
+
 
 def test_ridge_regression_vectorized():
     """Test the model with array inputs for vectorization."""
