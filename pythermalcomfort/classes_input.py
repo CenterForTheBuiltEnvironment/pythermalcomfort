@@ -888,7 +888,7 @@ class RidgeRegressionInputs(BaseInputs):
         super().__post_init__()
 
         # Validate duration is positive integer
-        if not isinstance(self.duration, int) or self.duration <= 0:
+        if isinstance(self.duration, bool) or not isinstance(self.duration, int) or self.duration <= 0:
             raise ValueError("Duration must be a positive integer.")
 
         # Validate that all numeric inputs are finite
@@ -919,6 +919,18 @@ class RidgeRegressionInputs(BaseInputs):
             raise ValueError(
                 "Both initial_t_re and initial_t_sk must be provided, or neither."
             )
+
+        # If provided, ensure initial_t_* can broadcast to the same shape
+        if self.initial_t_re is not None and self.initial_t_sk is not None:
+            try:
+                # Derive the target shape from a successful broadcast of core inputs
+                target = np.broadcast(self.sex, self.age, self.height, self.weight, self.tdb, self.rh).shape
+                np.broadcast_to(np.asarray(self.initial_t_re), target)
+                np.broadcast_to(np.asarray(self.initial_t_sk), target)
+            except ValueError as err:
+                raise ValueError(
+                    "initial_t_re and initial_t_sk must be broadcastable to the core input shape."
+                ) from err
 
         # Basic plausibility checks
         rh_arr = np.asarray(self.rh)

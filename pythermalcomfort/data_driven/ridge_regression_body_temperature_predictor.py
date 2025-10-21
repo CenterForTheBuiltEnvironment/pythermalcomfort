@@ -113,11 +113,12 @@ def _predict_temperature_simulation(
     prev_t_sk = scaled_features[:, 7]
 
     # Store history of temperatures
-    t_re_history_scaled = []
-    t_sk_history_scaled = []
+    n_scenarios = features.shape[0]
+    t_re_history_scaled = np.empty((n_scenarios, duration), dtype=float)
+    t_sk_history_scaled = np.empty((n_scenarios, duration), dtype=float)
 
     # Run simulation
-    for _ in range(duration):
+    for i in range(duration):
         new_t_re = (
             static_t_re + _T_RE_COEFFS[6] * prev_t_re + _T_RE_COEFFS[7] * prev_t_sk
         )
@@ -126,26 +127,14 @@ def _predict_temperature_simulation(
         )
         prev_t_re, prev_t_sk = new_t_re, new_t_sk
 
-        t_re_history_scaled.append(new_t_re)
-        t_sk_history_scaled.append(new_t_sk)
+        t_re_history_scaled[:, i] = new_t_re
+        t_sk_history_scaled[:, i] = new_t_sk
 
-    # Convert history lists to numpy arrays and transpose for easier processing
-    # Shape becomes (n_scenarios, duration)
-    t_re_history_scaled = np.array(t_re_history_scaled).T
-    t_sk_history_scaled = np.array(t_sk_history_scaled).T
-
-    # Flatten histories for scaling, then stack
-    scaled_output = np.stack(
-        [t_re_history_scaled.ravel(), t_sk_history_scaled.ravel()], axis=1
-    )
-
-    # Scale back the output
-    final_temps_history_flat = _inverse_scale_output(scaled_output)
-
-    # Reshape back to (n_scenarios, duration)
-    n_scenarios = features.shape[0]
-    t_re_history = final_temps_history_flat[:, 0].reshape(n_scenarios, duration)
-    t_sk_history = final_temps_history_flat[:, 1].reshape(n_scenarios, duration)
+    # Stack as (n_scenarios, duration, 2) and inverse-scale via broadcasting
+    stacked = np.stack([t_re_history_scaled, t_sk_history_scaled], axis=-1)
+    inv = (stacked - _OUTPUT_SCALER_OFFSET) / _OUTPUT_SCALER_SCALE
+    t_re_history = inv[..., 0]
+    t_sk_history = inv[..., 1]
 
     return t_re_history, t_sk_history
 
@@ -246,9 +235,8 @@ def ridge_regression_body_temperature_predictor(
     - **Ambient Temperature**: 0 to 60 °C
     - **Relative Humidity**: 0 to 100 %
 
-    The `limit_inputs` parameter, by default, is set to `True`, which means that
-    if the inputs are outside the model's applicability limits, the function will
-    return `nan`.
+    If inputs fall outside applicability limits and `limit_inputs=True`, the
+    corresponding output time series are filled with NaN for all time steps.
 
     The model does not have inputs such as: air velocity, radiative heat transfer,
     clothing level and an individual's activity level due to there being little
@@ -350,9 +338,15 @@ def ridge_regression_body_temperature_predictor(
         )
 
     if initial_t_re is not None and initial_t_sk is not None:
-        # Use provided baseline temperatures
-        current_t_re = np.broadcast_to(initial_t_re, original_shape).ravel()
-        current_t_sk = np.broadcast_to(initial_t_sk, original_shape).ravel()
+        try:
+            # Use provided baseline temperatures
+            current_t_re = np.broadcast_to(np.asarray(initial_t_re), original_shape).ravel()
+            current_t_sk = np.broadcast_to(np.asarray(initial_t_sk), original_shape).ravel()
+        except ValueError as err:
+            raise ValueError(
+                "initial_t_re and initial_t_sk must be broadcastable to the input shape "
+                f"{original_shape}."
+            ) from err
     else:
         # Baseline simulation (120 mins in a neutral environment)
         initial_t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)

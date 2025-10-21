@@ -44,57 +44,12 @@ def test_ridge_regression_inverse_scale_output():
     np.testing.assert_allclose(inversed, expected, rtol=1e-6)
 
 
-def test_ridge_regression_scalar():
+@pytest.mark.parametrize("sex_in", [Sex.male, Sex.male.value, "male"])
+def test_ridge_regression_scalar_parametrised(sex_in):
     """Test the model with scalar inputs."""
     duration = 540
     result = ridge_regression_body_temperature_predictor(
-        sex=Sex.male.value,
-        age=60,
-        height=1.80,
-        weight=75,
-        tdb=35,
-        rh=60,
-        duration=duration,
-    )
-    # Check that the output is a numpy array with the correct shape
-    assert isinstance(result.t_re, np.ndarray)
-    assert result.t_re.shape == (duration,)
-    assert isinstance(result.t_sk, np.ndarray)
-    assert result.t_sk.shape == (duration,)
-
-    # Check the final value of the history against known values
-    assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
-    assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
-
-
-def test_ridge_regression_enum():
-    """Test the model with enum + scalar inputs."""
-    duration = 540
-    result = ridge_regression_body_temperature_predictor(
-        sex=Sex.male,
-        age=60,
-        height=1.80,
-        weight=75,
-        tdb=35,
-        rh=60,
-        duration=duration,
-    )
-    # Check that the output is a numpy array with the correct shape
-    assert isinstance(result.t_re, np.ndarray)
-    assert result.t_re.shape == (duration,)
-    assert isinstance(result.t_sk, np.ndarray)
-    assert result.t_sk.shape == (duration,)
-
-    # Check the final value of the history against known values
-    assert result.t_re[-1] == pytest.approx(38.15, abs=1e-2)
-    assert result.t_sk[-1] == pytest.approx(37.02, abs=1e-2)
-
-
-def test_ridge_regression_string():
-    """Test the model with string + scalar inputs."""
-    duration = 540
-    result = ridge_regression_body_temperature_predictor(
-        sex="male",
+        sex=sex_in,
         age=60,
         height=1.80,
         weight=75,
@@ -216,3 +171,37 @@ def test_ridge_regression_initial_body_temp():
     # Check the final value of the history against known values from the docstring example
     assert result.t_re[-1] == pytest.approx(37.33, abs=1e-2)
     assert result.t_sk[-1] == pytest.approx(37.00, abs=1e-2)
+
+def test_ridge_regression_initial_t_broadcast_error():
+    with pytest.raises(ValueError, match="broadcastable"):
+        ridge_regression_body_temperature_predictor(
+            sex=[Sex.male.value, Sex.female.value],
+            age=[70, 75],
+            height=[1.80, 1.70],
+            weight=[75, 70],
+            tdb=[35, 35],
+            rh=[60, 60],
+            duration=60,
+            initial_t_re=[37.0, 37.1, 37.2],  # bad shape
+            initial_t_sk=32.0,
+        )
+
+def test_invalid_sex():
+    with pytest.raises(ValueError):
+        ridge_regression_body_temperature_predictor(
+            sex="unknown", age=70, height=1.8, weight=75, tdb=35, rh=60, duration=60
+        )
+
+@pytest.mark.parametrize("bad", [np.nan, np.inf, -np.inf])
+def test_non_finite_inputs(bad):
+    with pytest.raises(ValueError):
+        ridge_regression_body_temperature_predictor(
+            sex=Sex.male, age=70, height=1.8, weight=75, tdb=bad, rh=60, duration=60
+        )
+
+@pytest.mark.parametrize("bad_dur", [0, -5])
+def test_invalid_duration(bad_dur):
+    with pytest.raises(ValueError, match="positive integer"):
+        ridge_regression_body_temperature_predictor(
+            sex=Sex.male, age=70, height=1.8, weight=75, tdb=35, rh=60, duration=bad_dur
+        )
