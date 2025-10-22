@@ -2,8 +2,8 @@
 Contributing
 ============
 
+Pythermalcomfort provides models for thermal comfort analysis.
 Contributions are welcome and greatly appreciated!
-Every bit helps, and credit will always be given.
 
 Bug Reports
 ===========
@@ -14,12 +14,14 @@ When `reporting a bug <https://github.com/CenterForTheBuiltEnvironment/pythermal
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug (minimal reproducible example preferred).
 * Relevant error messages and a shortened traceback.
-
+* Pythermalcomfort version (`python -m pip show pythermalcomfort`)
 Documentation Improvements
 ==========================
 
 pythermalcomfort can always use more documentation: docs, docstrings, examples,
 and tutorials are all valuable.
+Follow NumPy-style docstrings for consistency.
+Docs are located in `docs/`.
 
 Issues, Features and Feedback
 =============================
@@ -347,3 +349,4 @@ License
 =======
 
 pythermalcomfort is released under the MIT License.
+See 'add link'
