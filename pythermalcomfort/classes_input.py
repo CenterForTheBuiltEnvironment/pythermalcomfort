@@ -32,6 +32,8 @@ class BaseInputs:
         Sky emissivity, physically constrained between 0 and 1.
     tdp : float
         Dew point temperature in degrees Celsius (°C).
+    fcn : float
+        Fraction
     """
 
     a_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
@@ -191,7 +193,10 @@ class BaseInputs:
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
     eps_sky: float | int | np.ndarray |list = field(
-        default=0, metadata={"types": (float, int, np.ndarray, list)}
+        default=0.7, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    fcn: float | int | np.ndarray |list = field(
+        default=1, metadata={"types": (float, int, np.ndarray, list)}
     )
 
     def __post_init__(self) -> None:
@@ -745,6 +750,20 @@ class SkyEmissivitySwinbankInputs(BaseInputs):
         super().__init__(
             tdb=tdb,
         )
+
+@dataclass
+class SkyEmissivityClarkAllenInputs(BaseInputs):
+    def __init__(
+        self,
+        tdb,
+        fcn
+    ):
+        super().__init__(
+            tdb=tdb,
+            fcn = fcn
+        )
+
+
 
 
 @dataclass

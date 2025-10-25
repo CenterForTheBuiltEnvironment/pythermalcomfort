@@ -3,45 +3,37 @@ from dataclasses import dataclass
 import numpy as np
 from typing import Literal, Union, List
 
-from pythermalcomfort.classes_input import SkyEmissivityBruntInputs, SkyEmissivitySwinbankInputs
+from pythermalcomfort.classes_input import SkyEmissivityBruntInputs, SkyEmissivitySwinbankInputs, SkyEmissivityClarkAllenInputs
 from pythermalcomfort.utilities import Units, units_converter
-from pythermalcomfort.classes_return import AutoStrMixin
+from pythermalcomfort.classes_return import AutoStrMixin, Eps_Sky
 
 
 
+@dataclass(frozen=True, repr=False)
+class SkyEmissivityResult(AutoStrMixin):
+    """Represents sky emissivity (ε_sky)."""
+    eps_sky: Union[float, np.ndarray]
+
+    def __post_init__(self):
+        if np.any(np.asarray(self.eps_sky) < 0) or np.any(np.asarray(self.eps_sky) > 1):
+            raise ValueError("eps_sky must be in the range [0, 1]")
+
+    def apply_dilley(self) -> EpsSky:
+        """Apply Dilley correction (max 1.0)."""
+        corrected = np.minimum(1.0, np.asarray(self.eps_sky) * 1.05)
+        return Eps_Sky(eps_sky=corrected)
+
+    # Add Kimball, Unsworth and Crawford
 
 @dataclass
 class SkyEmissivity:
     """Collection of empirical sky emissivity models."""
 
-    # is it reallty useful that this is nested??
-
-    @dataclass(frozen=True, repr=False)
-    class EpsSky(AutoStrMixin):
-        """Dataclass to represent sky emissivity.
-
-        Attributes
-        ----------
-        eps_sky : float or list of floats
-            Sky emissivity, ranges from 0.0 to 1.0
-        """
-        eps_sky: Union[float, np.ndarray]
-
-        def apply_dilley(self) -> "SkyEmissivity.EpsSky":
-            """Apply Dilley correction (max 1.0)."""
-            if isinstance(self.eps_sky, np.ndarray):
-                corrected = np.minimum(1.0, self.eps_sky * 1.05)
-            else:
-                corrected = min(1.0, self.eps_sky * 1.05)
-            return SkyEmissivity.EpsSky(eps_sky=corrected)
-
-
-
     @staticmethod
     def brunt(
         tdp: float | list[float],
         units: Literal["SI", "IP"] = Units.SI.value,
-        ) -> SkyEmissivity.EpsSky:
+        ) -> SkyEmissivityCorrection:
         """
         Calculate sky emissivity using the Brunt (1975) empirical model.
 
@@ -68,14 +60,14 @@ class SkyEmissivity:
         epsilon = 0.741 + 0.0062 * tdp_arr
         eps = np.clip(epsilon, 0.0, 1.0)
 
-        return SkyEmissivity.EpsSky(eps_sky=eps)
+        return SkyEmissivityCorrection(eps_sky=eps)
 
-    # Revisit: Should we than even include this if it inaccurate?
+    # Revisit: Should we than even include this, if it inaccurate?
     @staticmethod
     def swinbank(
         tdb: float | list[float],
         units: Literal["SI", "IP"] = Units.SI.value,
-        ) -> SkyEmissivity.EpsSky:
+        ) -> SkyEmissivityResult:
         """
         Calculate sky emissivity using the Swinbank (1963) empirical formula.
 
@@ -96,6 +88,11 @@ class SkyEmissivity:
         EpsSky
             A dataclass containing `eps_sky` (clipped to [0, 1]).
         """
+
+        # Notes BG: Read here: https://doi.org/10.26868/25222708.2017.569 who cited:
+        # https://doi.org/10.1029/2009JD011800 and
+        # https://doi.org/10.1029/2008WR007394
+
         SkyEmissivitySwinbankInputs(tdb=tdb)
 
         tdb_arr = np.array(tdb, dtype=float)
@@ -108,5 +105,52 @@ class SkyEmissivity:
         eps_sky = np.clip(eps_sky, 0.0, 1.0)
 
         # Return a typed dataclass
-        return SkyEmissivity.EpsSky(eps_sky=eps_sky)   
+        return SkyEmissivityResult(eps_sky=eps_sky)   
+
+    def clark_allen(
+        tdb: float | list[float],
+        fcn: float | list[float],
+        units: str = Units.SI.value,
+        ) -> SkyEmissivityResult:
+        """
+        Calculate sky emissivity using the Clark & Allen (1978) model.
+        
+        Parameters
+        ----------
+        tdp : float or list of floats
+            Dew point temperature in °C (SI) or °F (IP)
+        cloud_fraction : float or list of floats, default=0.0
+            Fraction of cloud cover [0, 1]
+        units : str, default "SI"
+            Units system, "SI" = °C, "IP" = °F
+
+        Returns
+        -------
+        SkyEmissivityResult
+            Object containing `eps_sky` with emissivity values (clipped to [0,1])
+
+        """
+
+        # Notes BG: Read here: https://doi.org/10.26868/25222708.2017.569 
+        # https://www.proquest.com/openview/4763607fbd21956404a6329a060ae2b4/1?pq-origsite=gscholar&cbl=18750&diss=y
+
+        SkyEmissivityClarkAllenInputs(tdp=tdp, fcn=cloud_fraction)
+
+        tdp_arr = np.array(tdp, dtype=float)
+        cloud_arr = np.array(cloud_fraction, dtype=float)
+
+        if units.upper() == Units.IP.value:
+            tdp_arr = units_converter(from_units=Units.IP.value, tdp=tdp_arr)[0]
+
+        T_k = tdp_arr + 273.15
+        epsilon_clear = 0.787 + 0.764 * np.log(T_k)
+        Ca = 0.23
+        epsilon_sky = epsilon_clear * (1 + Ca * cloud_arr)
+        epsilon_sky = np.clip(epsilon_sky, 0.0, 1.0)
+
+        return SkyEmissivityResult(eps_sky=epsilon_sky)
+
+
+        # add Dilly, Prata and Angstrom
+
 

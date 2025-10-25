@@ -362,6 +362,20 @@ class PMV(AutoStrMixin):
 
     pmv: float | list[float]
 
+@dataclass(frozen=True, repr=False)
+class Eps_Sky(AutoStrMixin):
+    """Dataclass to represent the Sky Emissivity value.
+
+    Attributes
+    ----------
+    eps_sky : float or list of floats
+        Sky Emissivity
+
+    """
+
+    eps_sky: float | list[float]
+
+
 
 @dataclass(frozen=True, repr=False)
 class PMVPPD(AutoStrMixin):
