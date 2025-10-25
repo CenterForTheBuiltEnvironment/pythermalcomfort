@@ -8,6 +8,15 @@ from pythermalcomfort.utilities import Units, units_converter
 from pythermalcomfort.classes_return import AutoStrMixin, Eps_Sky
 
 
+# Is chaining really a useful approach here?
+# For example it might be better to just optionall apply correction? sky = SkyEmissivity.brunt(tdp=10, correction=EpsSky.apply_dilley) instead of
+# eps_sky = SkyEmissivity.brunt(tdp=10).apply_billy()
+
+# Variant 01: 
+# Example:
+# eps_sky = SkyEmissivity.brunt(tdp=10)
+# eps_sky = SkyEmissivity.brunt(tdp=10).apply_billy()
+# ...
 
 @dataclass(frozen=True, repr=False)
 class SkyEmissivityResult(AutoStrMixin):
@@ -33,7 +42,7 @@ class SkyEmissivity:
     def brunt(
         tdp: float | list[float],
         units: Literal["SI", "IP"] = Units.SI.value,
-        ) -> SkyEmissivityCorrection:
+        ) -> SkyEmissivityResult:
         """
         Calculate sky emissivity using the Brunt (1975) empirical model.
 
@@ -60,7 +69,7 @@ class SkyEmissivity:
         epsilon = 0.741 + 0.0062 * tdp_arr
         eps = np.clip(epsilon, 0.0, 1.0)
 
-        return SkyEmissivityCorrection(eps_sky=eps)
+        return SkyEmissivityResult(eps_sky=eps)
 
     # Revisit: Should we than even include this, if it inaccurate?
     @staticmethod
