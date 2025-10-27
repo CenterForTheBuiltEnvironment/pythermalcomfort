@@ -8,47 +8,46 @@ from pythermalcomfort.utilities import Sex
 # --- Model Constants ---
 
 # Minimum values for each of the 8 input features, used for Min-Max scaling.
-# The features are: Sex, Age, Height, Mass, Ambient Temp, Humidity, Rectal Temp (t_re), Mean Skin Temp (t_sk).
 _FEATURES_SCALER_OFFSET = np.array(
     [
-        0.0,
-        -0.3114754098360656,
-        -3.020833333333333,
-        -0.6183587248751761,
-        -1.222222222222222,
-        -0.21951219512195122,
-        -11.197107405358395,
-        -2.105553500973682,
+        0.0,  # sex
+        -0.3114754098360656,  # age
+        -3.020833333333333,  # height
+        -0.6183587248751761,  # weight
+        -1.222222222222222,  # tdb
+        -0.21951219512195122,  # rh
+        -11.197107405358395,  # t_re
+        -2.105553500973682,  # t_sk
     ]
 )
 
 # Scaling factors (1 / (max - min)) for each of the 8 input features, used for Min-Max scaling.
 _FEATURES_SCALER_SCALE = np.array(
     [
-        1.0,
-        0.01639344262295082,
-        0.020833333333333332,
-        0.012802458071949815,
-        0.05555555555555555,
-        0.024390243902439025,
-        0.31613056192207334,
-        0.08119094120192633,
+        1.0,  # sex
+        0.01639344262295082,  # age
+        0.020833333333333332,  # height
+        0.012802458071949815,  # weight
+        0.05555555555555555,  # tdb
+        0.024390243902439025,  # rh
+        0.31613056192207334,  # t_re
+        0.08119094120192633,  # t_sk
     ]
 )
 
 # Minimum values for the 2 output variables (Rectal Temp, Mean Skin Temp), used for inverse scaling.
 _OUTPUT_SCALER_OFFSET = np.array(
     [
-        -11.197107405358395,
-        -2.0197777680408033,
+        -11.197107405358395,  # t_re
+        -2.0197777680408033,  # t_sk
     ]
 )
 
 # Scaling factors (1 / (max - min)) for the 2 output variables, used for inverse scaling.
 _OUTPUT_SCALER_SCALE = np.array(
     [
-        0.31613056192207334,
-        0.07894843838015173,
+        0.31613056192207334,  # t_re
+        0.07894843838015173,  # t_sk
     ]
 )
 
@@ -56,14 +55,14 @@ _OUTPUT_SCALER_SCALE = np.array(
 # Corresponds to the 8 input features in order.
 _T_RE_COEFFS = np.array(
     [
-        0.00016261586852849347,
-        0.0007368142143779594,
-        -0.00043916987857211637,
-        0.00046532701146677997,
-        0.0008443934806620367,
-        0.0006663379066237714,
-        0.9932810428489056,
-        0.006016233208250791,
+        0.00016261586852849347,  # sex
+        0.0007368142143779594,  # age
+        -0.00043916987857211637,  # height
+        0.00046532701146677997,  # weight
+        0.0008443934806620367,  # tdb
+        0.0006663379066237714,  # rh
+        0.9932810428489056,  # t_re (previous)
+        0.006016233208250791,  # t_sk (previous)
     ]
 )
 # Intercept term for the Rectal Temperature (t_re) ridge regression model.
@@ -73,14 +72,14 @@ _T_RE_INTERCEPT = -0.0013528489525256315
 # Corresponds to the 8 input features in order.
 _T_SK_COEFFS = np.array(
     [
-        0.0006157845452869151,
-        0.00014854705372386215,
-        -0.0004329826169348138,
-        -0.0011471088118388912,
-        0.018904677058503336,
-        0.003188995712763656,
-        -0.0010477636196332153,
-        0.933918210580563,
+        0.0006157845452869151,  # sex
+        0.00014854705372386215,  # age
+        -0.0004329826169348138,  # height
+        -0.0011471088118388912,  # weight
+        0.018904677058503336,  # tdb
+        0.003188995712763656,  # rh
+        -0.0010477636196332153,  # t_re (previous)
+        0.933918210580563,  # t_sk (previous)
     ]
 )
 # Intercept term for the Mean Skin Temperature (t_sk) ridge regression model.
