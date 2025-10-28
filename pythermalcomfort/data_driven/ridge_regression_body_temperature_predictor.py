@@ -180,15 +180,15 @@ def ridge_regression_body_temperature_predictor(
 
     Parameters
     ----------
-    sex : Sex or list
+    sex : Sex or str or list of (Sex or str)
         Biological sex. Pass the enum instance (e.g., `Sex.male`),
         its string value (e.g., `Sex.male.value` or `"male"`),
         or a list of either for vectorized inputs.
     age : float or list
         Age, in years.
-    height : float
+    height : float or list
         Body height in meters [m].
-    weight : float
+    weight : float or list
         Body weight in kilograms [kg].
     tdb : float or list
         Ambient (dry bulb) air temperature, in °C.
@@ -222,6 +222,9 @@ def ridge_regression_body_temperature_predictor(
     ------
     ValueError
         If input arrays have inconsistent shapes after broadcasting.
+        If sex contains invalid values (must be "male"/"female" or Sex enum members).
+        If only one of initial_t_re or initial_t_sk is provided.
+        If initial_t_re and initial_t_sk are not broadcastable to the input shape.
 
     Notes
     -----
@@ -304,17 +307,20 @@ def ridge_regression_body_temperature_predictor(
     # Convert height from m to cm, handling both scalar and list-like inputs
     height_cm = np.asarray(height) * 100
 
-    # Convert sex to 0 or 1 representation
-    sex_array = np.array(sex)
-    valid_sex_values = [Sex.male, Sex.male.value, Sex.female, Sex.female.value]
-    if not np.all(np.isin(sex_array, valid_sex_values)):
-        message = f"Invalid input for sex. Must be one of {valid_sex_values}"
-        raise ValueError(message)
-
-    # Vectorize sex input: 1 for female, 0 for male
-    sex_value = np.where(
-        (sex_array == Sex.female) | (sex_array == Sex.female.value), 1, 0
-    )
+   # Convert sex (enum or string) to string values and then 0/1 encoding
+    sex_arr = np.atleast_1d(sex)
+    sex_str = np.array([s.value if isinstance(s, Sex) else str(s) for s in sex_arr])
+    valid_sex_values = np.array([Sex.male.value, Sex.female.value])
+    if not np.all(np.isin(sex_str, valid_sex_values)):
+        raise ValueError(f"Invalid input for sex. Must be one of {valid_sex_values.tolist()}")
+    # 1 for female, 0 for male
+    sex_value_arr = (sex_str == Sex.female.value).astype(int)
+    # If the original input was a scalar, convert the array back to a scalar
+    # to preserve the correct output shape.
+    if not isinstance(sex, (list, tuple, np.ndarray)):
+        sex_value = sex_value_arr.item()
+    else:
+        sex_value = sex_value_arr
 
     # Convert inputs to numpy arrays for vectorization
     inputs = np.broadcast_arrays(sex_value, age, height_cm, weight, tdb, rh)
