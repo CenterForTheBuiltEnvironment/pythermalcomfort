@@ -847,34 +847,6 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 class RidgeRegressionInputs(BaseInputs):
     """Input validation for the ridge_regression_body_temperature_predictor model."""
 
-    def __init__(
-        self,
-        sex,
-        age,
-        height,
-        weight,
-        tdb,
-        rh,
-        duration,
-        initial_t_re=None,
-        initial_t_sk=None,
-        limit_inputs=True,
-        round_output=True,
-    ):
-        super().__init__(
-            sex=sex,
-            age=age,
-            height=height,
-            weight=weight,
-            tdb=tdb,
-            rh=rh,
-            duration=duration,
-            initial_t_re=initial_t_re,
-            initial_t_sk=initial_t_sk,
-            limit_inputs=limit_inputs,
-            round_output=round_output,
-        )
-
     def _validate_finite(self, param_name):
         """Validate that a numeric input is finite."""
         value = getattr(self, param_name)
@@ -889,7 +861,9 @@ class RidgeRegressionInputs(BaseInputs):
 
         # Validate duration is positive integer
         if (
-            isinstance(self.duration, bool)
+            isinstance(
+                self.duration, bool
+            )  # bool is subclass of int; exclude explicitly.
             or not isinstance(self.duration, int)
             or self.duration <= 0
         ):

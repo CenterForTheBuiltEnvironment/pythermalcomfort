@@ -315,7 +315,7 @@ def ridge_regression_body_temperature_predictor(
 
     # Convert sex (enum or string) to string values and then 0/1 encoding
     sex_arr = np.atleast_1d(sex)
-    sex_str = sex_str = np.array(
+    sex_str = np.array(
         [(s.value if isinstance(s, Sex) else str(s)).strip().lower() for s in sex_arr]
     )
     valid_sex_values = np.array([Sex.male.value, Sex.female.value])
