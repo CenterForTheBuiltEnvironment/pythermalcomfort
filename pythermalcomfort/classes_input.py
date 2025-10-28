@@ -185,7 +185,6 @@ class BaseInputs:
 
     def __post_init__(self) -> None:
         """Validate and normalize fields using metadata declared on each field."""
-        """Validate and normalize fields using metadata declared on each field."""
         # Validate and normalise units
         units_str = (
             self.units.value if isinstance(self.units, Units) else str(self.units)
