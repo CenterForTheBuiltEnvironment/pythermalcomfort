@@ -307,17 +307,18 @@ def ridge_regression_body_temperature_predictor(
     # Convert height from m to cm, handling both scalar and list-like inputs
     height_cm = np.asarray(height) * 100
 
-   # Convert sex (enum or string) to string values and then 0/1 encoding
+    # Convert sex (enum or string) to string values and then 0/1 encoding
     sex_arr = np.atleast_1d(sex)
     sex_str = np.array([s.value if isinstance(s, Sex) else str(s) for s in sex_arr])
     valid_sex_values = np.array([Sex.male.value, Sex.female.value])
     if not np.all(np.isin(sex_str, valid_sex_values)):
-        raise ValueError(f"Invalid input for sex. Must be one of {valid_sex_values.tolist()}")
+        err_msg = f"Invalid input for sex. Must be one of {valid_sex_values.tolist()}"
+        raise ValueError(err_msg)
     # 1 for female, 0 for male
     sex_value_arr = (sex_str == Sex.female.value).astype(int)
     # If the original input was a scalar, convert the array back to a scalar
     # to preserve the correct output shape.
-    if not isinstance(sex, (list, tuple, np.ndarray)):
+    if not isinstance(sex, list | tuple | np.ndarray):
         sex_value = sex_value_arr.item()
     else:
         sex_value = sex_value_arr
@@ -345,13 +346,18 @@ def ridge_regression_body_temperature_predictor(
     if initial_t_re is not None and initial_t_sk is not None:
         try:
             # Use provided baseline temperatures
-            current_t_re = np.broadcast_to(np.asarray(initial_t_re), original_shape).ravel()
-            current_t_sk = np.broadcast_to(np.asarray(initial_t_sk), original_shape).ravel()
+            current_t_re = np.broadcast_to(
+                np.asarray(initial_t_re), original_shape
+            ).ravel()
+            current_t_sk = np.broadcast_to(
+                np.asarray(initial_t_sk), original_shape
+            ).ravel()
         except ValueError as err:
-            raise ValueError(
+            message = (
                 "initial_t_re and initial_t_sk must be broadcastable to the input shape "
                 f"{original_shape}."
-            ) from err
+            )
+            raise ValueError(message) from err
     else:
         # Baseline simulation (120 mins in a neutral environment)
         initial_t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
