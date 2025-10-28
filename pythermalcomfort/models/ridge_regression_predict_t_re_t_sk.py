@@ -161,7 +161,27 @@ def _check_ridge_regression_compliance(
     tdb: np.ndarray,
     rh: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Check if the inputs are within the model's applicability limits."""
+    """Check if the inputs are within the model's applicability limits.
+
+    Parameters
+    ----------
+    age : np.ndarray
+        Age in years.
+    height : np.ndarray
+        Body height in cm.
+    weight : np.ndarray
+        Body weight in kg.
+    tdb : np.ndarray
+        Ambient air temperature in °C.
+    rh : np.ndarray
+        Relative humidity in %.
+
+    Returns
+    -------
+    tuple of np.ndarray
+        Five arrays with valid values preserved and out-of-range values set to NaN:
+        (age_valid, height_valid, weight_valid, temp_valid, rh_valid).
+    """
     age_valid = valid_range(age, (60, 100))
     height_valid = valid_range(height, (130, 230))
     weight_valid = valid_range(weight, (40, 140))

@@ -39,7 +39,7 @@ class BaseInputs:
     d: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
-    duration: int = field(default=None, metadata={"types": (int,)})
+    duration: int = field(default=None, metadata={"types": (int, np.ndarray)})
     e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     f_bes: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
@@ -929,8 +929,8 @@ class RidgeRegressionInputs(BaseInputs):
                 target = np.broadcast(
                     self.sex, self.age, self.height, self.weight, self.tdb, self.rh
                 ).shape
-                np.broadcast_to(np.asarray(self.t_re), target)
-                np.broadcast_to(np.asarray(self.t_sk), target)
+                np.broadcast_to(np.asarray(self.t_re, dtype=float), target)
+                np.broadcast_to(np.asarray(self.t_sk, dtype=float), target)
             except ValueError as err:
                 raise ValueError(
                     "t_re and t_sk must be broadcastable to the core input shape."
