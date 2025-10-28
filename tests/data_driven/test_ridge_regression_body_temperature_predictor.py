@@ -248,3 +248,15 @@ def test_wrong_type_duration():
             duration=True,
             t_sk=32.0,
         )
+
+    with pytest.raises(TypeError):
+        ridge_regression_predict_t_re_t_sk(
+            sex=Sex.male,
+            age=70,
+            height=1.8,
+            weight=75,
+            tdb=35,
+            rh=60,
+            duration=60.2,
+            t_sk=32.0,
+        )

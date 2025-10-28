@@ -39,7 +39,7 @@ class BaseInputs:
     d: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
-    duration: int = field(default=1, metadata={"types": (int,)})
+    duration: int = field(default=None, metadata={"types": (int,)})
     e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     f_bes: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
