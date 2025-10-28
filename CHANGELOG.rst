@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.7.0 (2025-10-28)
+------------------
+
+* Added machine learning model to predict skin and rectal temperature `ridge_regression_predict_t_re_t_sk`.
+
 3.6.1 (2025-10-07)
 ------------------
 
