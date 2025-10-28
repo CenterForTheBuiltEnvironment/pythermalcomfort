@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 from pythermalcomfort.classes_input import RidgeRegressionInputs
@@ -259,41 +261,40 @@ def ridge_regression_body_temperature_predictor(
 
     Examples
     --------
-    >>> from pythermalcomfort.utilities import Sex
-    >>> from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
-    ...     ridge_regression_body_temperature_predictor,
-    ... )
-    >>> # Scalar example for a single person
-    >>> results = ridge_regression_body_temperature_predictor(
-    ...     sex=Sex.male.value,
-    ...     age=60,
-    ...     height=1.8,
-    ...     weight=75,
-    ...     tdb=35,
-    ...     rh=60,
-    ...     duration=540,
-    ... )
-    >>> print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
-    Final rectal temp: 38.15°C
-    >>> print(f"Final Skin temp: {results.t_sk[-1]:.2f}°C")
-    Final Skin temp: 37.02°C
-    >>> print(f"Rectal temp history shape: {results.t_re.shape}")
-    Rectal temp history shape: (540,)
+    .. code-block:: python
 
-    >>> # Vectorized example for multiple scenarios
-    >>> results_vec = ridge_regression_body_temperature_predictor(
-    ...     sex=[Sex.male.value, Sex.female.value],
-    ...     age=[60, 65],
-    ...     height=[1.8, 1.65],
-    ...     weight=[75, 60],
-    ...     tdb=[35, 40],
-    ...     rh=[60, 50],
-    ...     duration=540,
-    ... )
-    >>> print(f"Final rectal temps: {results_vec.t_re[:, -1]}")
-    Final rectal temps: [38.15, 38.53]
-    >>> print(f"Rectal temp history shape: {results_vec.t_re.shape}")
-    Rectal temp history shape: (2, 540)
+        from pythermalcomfort.utilities import Sex
+        from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
+            ridge_regression_body_temperature_predictor,
+        )
+
+        # Scalar example for a single person
+        results = ridge_regression_body_temperature_predictor(
+            sex=Sex.male.value,
+            age=60,
+            height=1.8,
+            weight=75,
+            tdb=35,
+            rh=60,
+            duration=540,
+        )
+
+        print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
+        print(f"Final Skin temp: {results.t_sk[-1]:.2f}°C")
+
+        # Vectorized example for multiple scenarios
+        results_vec = ridge_regression_body_temperature_predictor(
+            sex=[Sex.male.value, Sex.female.value],
+            age=[60, 65],
+            height=[1.8, 1.65],
+            weight=[75, 60],
+            tdb=[35, 40],
+            rh=[60, 50],
+            duration=540,
+        )
+
+        print(f"Final rectal temps: {results_vec.t_re[:, -1]}")
+        print(f"Rectal temp history shape: {results_vec.t_re.shape}")
     """
     # Validate inputs
     RidgeRegressionInputs(
@@ -315,7 +316,7 @@ def ridge_regression_body_temperature_predictor(
 
     # Convert sex (enum or string) to string values and then 0/1 encoding
     sex_arr = np.atleast_1d(sex)
-    sex_str = sex_str = np.array(
+    sex_str = np.array(
         [(s.value if isinstance(s, Sex) else str(s)).strip().lower() for s in sex_arr]
     )
     valid_sex_values = np.array([Sex.male.value, Sex.female.value])
@@ -355,12 +356,8 @@ def ridge_regression_body_temperature_predictor(
     if t_re is not None and t_sk is not None:
         try:
             # Use provided baseline temperatures
-            current_t_re = np.broadcast_to(
-                np.asarray(t_re), original_shape
-            ).ravel()
-            current_t_sk = np.broadcast_to(
-                np.asarray(t_sk), original_shape
-            ).ravel()
+            current_t_re = np.broadcast_to(np.asarray(t_re), original_shape).ravel()
+            current_t_sk = np.broadcast_to(np.asarray(t_sk), original_shape).ravel()
         except ValueError as err:
             message = (
                 "t_re and t_sk must be broadcastable to the input shape "

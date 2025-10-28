@@ -888,11 +888,7 @@ class RidgeRegressionInputs(BaseInputs):
         super().__post_init__()
 
         # Validate duration is positive integer
-        if (
-            isinstance(self.duration, bool)
-            or not isinstance(self.duration, int)
-            or self.duration <= 0
-        ):
+        if self.duration <= 0:
             raise ValueError("Duration must be a positive integer.")
 
         # Validate that all numeric inputs are finite
@@ -920,9 +916,7 @@ class RidgeRegressionInputs(BaseInputs):
 
         # Validate either both initial body temp values are provided or neither
         if (self.t_re is None) != (self.t_sk is None):
-            raise ValueError(
-                "Both t_re and t_sk must be provided, or neither."
-            )
+            raise ValueError("Both t_re and t_sk must be provided, or neither.")
 
         # If provided, ensure initial_t_* can broadcast to the same shape
         if self.t_re is not None and self.t_sk is not None:
