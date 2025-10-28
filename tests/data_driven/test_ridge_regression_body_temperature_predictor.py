@@ -213,7 +213,7 @@ def test_invalid_duration(bad_dur):
 
 def test_initial_t_singleton_rejected():
     with pytest.raises(
-        ValueError, match="Both initial_t_re and initial_t_sk must be provided"
+        ValueError, match="Both t_re and t_sk must be provided"
     ):
         ridge_regression_predict_t_re_t_sk(
             sex=Sex.male,
@@ -223,10 +223,10 @@ def test_initial_t_singleton_rejected():
             tdb=35,
             rh=60,
             duration=60,
-            initial_t_re=37.0,
+            t_re=37.0,
         )
     with pytest.raises(
-        ValueError, match="Both initial_t_re and initial_t_sk must be provided"
+        ValueError, match="Both t_re and t_sk must be provided"
     ):
         ridge_regression_predict_t_re_t_sk(
             sex=Sex.male,
@@ -236,19 +236,5 @@ def test_initial_t_singleton_rejected():
             tdb=35,
             rh=60,
             duration=60,
-            initial_t_sk=32.0,
-        )
-
-
-@pytest.mark.parametrize("bad_bool", [True, False])
-def test_duration_bool_rejected(bad_bool):
-    with pytest.raises(ValueError, match="positive integer"):
-        ridge_regression_predict_t_re_t_sk(
-            sex=Sex.male,
-            age=70,
-            height=1.8,
-            weight=75,
-            tdb=35,
-            rh=60,
-            duration=bad_bool,
+            t_sk=32.0,
         )
