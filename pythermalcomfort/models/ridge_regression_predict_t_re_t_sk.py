@@ -138,7 +138,7 @@ def _predict_temperature_simulation(
 
     # Stack as (n_scenarios, duration, 2) and inverse-scale via broadcasting
     stacked = np.stack([t_re_history_scaled, t_sk_history_scaled], axis=-1)
-    inv = (stacked - _OUTPUT_SCALER_OFFSET) / _OUTPUT_SCALER_SCALE
+    inv = _inverse_scale_output(stacked)
     t_re_history = inv[..., 0]
     t_sk_history = inv[..., 1]
 
@@ -264,7 +264,7 @@ def ridge_regression_predict_t_re_t_sk(
     .. code-block:: python
 
         from pythermalcomfort.utilities import Sex
-        from pythermalcomfort.data_driven.ridge_regression_predict_t_re_t_sk import (
+        from pythermalcomfort.models.ridge_regression_predict_t_re_t_sk import (
             ridge_regression_predict_t_re_t_sk,
         )
 
