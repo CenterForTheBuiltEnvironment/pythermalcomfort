@@ -41,3 +41,4 @@ References
 .. [Ji2022] Ji L, Laouadi A, Wang L, Lacasse MA. Development of a bioheat model for older people under hot and cold exposures. Building Simulation. 2022;15(10):1815-1829.
 .. [Yan2025] Yan J, Tong Z, Wang Y, Feng S, Su Y, Song Y, Wen Q, Yin C. From measurements to regulations: An actionable approach for sustainable urban cooling via heat-resilient urban planning. Sustainable Cities and Society. 2025;125:106361.
 .. [Schlatter1987] Schlatter TW. Temperature-humidity index. In: Climatology. Encyclopedia of Earth Science. Springer; 1987. DOI: 10.1007/0-387-30749-4_176
+.. [Forbes2025] Forbes C, Coccarelli A, Xu Z, Meade RD, Kenny GP, Binnewies S, Bach AJE. Biophysical versus machine learning models for predicting rectal and skin temperatures in older adults. J Therm Biol. 2025 Feb;128:104078. DOI: 10.1016/j.jtherbio.2025.104078. Epub 2025 Feb 22. PMID: 40010162.
