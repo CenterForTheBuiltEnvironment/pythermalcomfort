@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from pythermalcomfort.models.ridge_regression_body_temperature_predictor import (
+from pythermalcomfort.models.ridge_regression_predict_t_re_t_sk import (
     _inverse_scale_output,
     _scale_features,
-    ridge_regression_body_temperature_predictor,
+    ridge_regression_predict_t_re_t_sk,
 )
 from pythermalcomfort.utilities import Sex
 
@@ -48,7 +48,7 @@ def test_ridge_regression_inverse_scale_output():
 def test_ridge_regression_scalar_parametrised(sex_in):
     """Test the model with scalar inputs."""
     duration = 540
-    result = ridge_regression_body_temperature_predictor(
+    result = ridge_regression_predict_t_re_t_sk(
         sex=sex_in,
         age=60,
         height=1.80,
@@ -78,7 +78,7 @@ def test_ridge_regression_vectorized():
     tdb = [35, 40]
     rh = [60, 50]
 
-    result = ridge_regression_body_temperature_predictor(
+    result = ridge_regression_predict_t_re_t_sk(
         sex=sex,
         age=age,
         height=height,
@@ -113,7 +113,7 @@ def test_ridge_regression_broadcasting():
     tdb = [30, 35]
     rh = 50  # scalar
 
-    result = ridge_regression_body_temperature_predictor(
+    result = ridge_regression_predict_t_re_t_sk(
         sex=sex,
         age=age,
         height=height,
@@ -137,7 +137,7 @@ def test_ridge_regression_broadcasting():
 
     # Ensure it raises error for incompatible shapes
     with pytest.raises(ValueError, match="broadcastable to a common shape"):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=[Sex.male.value, Sex.female.value],
             age=[30, 40, 50],  # Incompatible shape
             height=1.70,
@@ -151,7 +151,7 @@ def test_ridge_regression_broadcasting():
 def test_ridge_regression_initial_body_temp():
     """Test the model with initial body temperatures provided."""
     duration = 60
-    result = ridge_regression_body_temperature_predictor(
+    result = ridge_regression_predict_t_re_t_sk(
         sex=Sex.male.value,
         age=70,
         height=1.80,
@@ -175,7 +175,7 @@ def test_ridge_regression_initial_body_temp():
 
 def test_ridge_regression_initial_t_broadcast_error():
     with pytest.raises(ValueError, match="broadcastable"):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=[Sex.male.value, Sex.female.value],
             age=[70, 75],
             height=[1.80, 1.70],
@@ -190,7 +190,7 @@ def test_ridge_regression_initial_t_broadcast_error():
 
 def test_invalid_sex():
     with pytest.raises(ValueError):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex="unknown", age=70, height=1.8, weight=75, tdb=35, rh=60, duration=60
         )
 
@@ -198,7 +198,7 @@ def test_invalid_sex():
 @pytest.mark.parametrize("bad", [np.nan, np.inf, -np.inf])
 def test_non_finite_inputs(bad):
     with pytest.raises(ValueError):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=Sex.male, age=70, height=1.8, weight=75, tdb=bad, rh=60, duration=60
         )
 
@@ -206,7 +206,7 @@ def test_non_finite_inputs(bad):
 @pytest.mark.parametrize("bad_dur", [0, -5])
 def test_invalid_duration(bad_dur):
     with pytest.raises(ValueError, match="positive integer"):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=Sex.male, age=70, height=1.8, weight=75, tdb=35, rh=60, duration=bad_dur
         )
 
@@ -215,7 +215,7 @@ def test_initial_t_singleton_rejected():
     with pytest.raises(
         ValueError, match="Both initial_t_re and initial_t_sk must be provided"
     ):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=Sex.male,
             age=70,
             height=1.8,
@@ -228,7 +228,7 @@ def test_initial_t_singleton_rejected():
     with pytest.raises(
         ValueError, match="Both initial_t_re and initial_t_sk must be provided"
     ):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=Sex.male,
             age=70,
             height=1.8,
@@ -243,7 +243,7 @@ def test_initial_t_singleton_rejected():
 @pytest.mark.parametrize("bad_bool", [True, False])
 def test_duration_bool_rejected(bad_bool):
     with pytest.raises(ValueError, match="positive integer"):
-        ridge_regression_body_temperature_predictor(
+        ridge_regression_predict_t_re_t_sk(
             sex=Sex.male,
             age=70,
             height=1.8,

@@ -161,7 +161,7 @@ def _check_ridge_regression_compliance(
     return age_valid, height_valid, mass_valid, temp_valid, rh_valid
 
 
-def ridge_regression_body_temperature_predictor(
+def ridge_regression_predict_t_re_t_sk(
     sex: Sex | str | list[Sex | str],
     age: float | list[float],
     height: float | list[float],
@@ -264,33 +264,33 @@ def ridge_regression_body_temperature_predictor(
     .. code-block:: python
 
         from pythermalcomfort.utilities import Sex
-        from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
-            ridge_regression_body_temperature_predictor,
+        from pythermalcomfort.data_driven.ridge_regression_predict_t_re_t_sk import (
+            ridge_regression_predict_t_re_t_sk
         )
 
         # Scalar example for a single person
-        results = ridge_regression_body_temperature_predictor(
+        results = ridge_regression_predict_t_re_t_sk(
             sex=Sex.male.value,
             age=60,
             height=1.8,
             weight=75,
             tdb=35,
             rh=60,
-            duration=540,
+            duration=540
         )
 
         print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
         print(f"Final Skin temp: {results.t_sk[-1]:.2f}°C")
 
         # Vectorized example for multiple scenarios
-        results_vec = ridge_regression_body_temperature_predictor(
+        results_vec = ridge_regression_predict_t_re_t_sk(
             sex=[Sex.male.value, Sex.female.value],
             age=[60, 65],
             height=[1.8, 1.65],
             weight=[75, 60],
             tdb=[35, 40],
             rh=[60, 50],
-            duration=540,
+            duration=540
         )
 
         print(f"Final rectal temps: {results_vec.t_re[:, -1]}")

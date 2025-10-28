@@ -845,7 +845,7 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
 @dataclass
 class RidgeRegressionInputs(BaseInputs):
-    """Input validation for the ridge_regression_body_temperature_predictor model."""
+    """Input validation for the ridge_regression_predict_t_re_t_sk model."""
 
     def __init__(
         self,
