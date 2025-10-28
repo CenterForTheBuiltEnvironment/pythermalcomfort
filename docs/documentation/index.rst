@@ -9,7 +9,6 @@ and background material. Use the links below to navigate by topic.
     :maxdepth: 2
 
     models
-    models_data_driven
     utilities_functions
     clothing
     met

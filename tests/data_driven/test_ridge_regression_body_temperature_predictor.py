@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pythermalcomfort.data_driven.ridge_regression_body_temperature_predictor import (
+from pythermalcomfort.models.ridge_regression_body_temperature_predictor import (
     _inverse_scale_output,
     _scale_features,
     ridge_regression_body_temperature_predictor,
