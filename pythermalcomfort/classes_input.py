@@ -887,7 +887,11 @@ class RidgeRegressionInputs(BaseInputs):
         super().__post_init__()
 
         # Validate duration is positive integer
-        if self.duration <= 0:
+        if (
+            isinstance(self.duration, bool)
+            or not isinstance(self.duration, int)
+            or self.duration <= 0
+        ):
             raise ValueError("Duration must be a positive integer.")
 
         # Validate that all numeric inputs are finite
