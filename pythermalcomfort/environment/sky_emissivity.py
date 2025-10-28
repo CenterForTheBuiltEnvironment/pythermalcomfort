@@ -1,27 +1,34 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import Literal
+
 import numpy as np
-from typing import Literal, Union, List
 
-from pythermalcomfort.classes_input import SkyEmissivityBruntInputs, SkyEmissivitySwinbankInputs, SkyEmissivityClarkAllenInputs
-from pythermalcomfort.utilities import Units, units_converter
+from pythermalcomfort.classes_input import (
+    SkyEmissivityBruntInputs,
+    SkyEmissivityClarkAllenInputs,
+    SkyEmissivitySwinbankInputs,
+)
 from pythermalcomfort.classes_return import AutoStrMixin, Eps_Sky
-
+from pythermalcomfort.utilities import Units, units_converter
 
 # Is chaining really a useful approach here?
 # For example it might be better to just optionall apply correction? sky = SkyEmissivity.brunt(tdp=10, correction=EpsSky.apply_dilley) instead of
 # eps_sky = SkyEmissivity.brunt(tdp=10).apply_billy()
 
-# Variant 01: 
+# Variant 01:
 # Example:
 # eps_sky = SkyEmissivity.brunt(tdp=10)
 # eps_sky = SkyEmissivity.brunt(tdp=10).apply_billy()
 # ...
 
+
 @dataclass(frozen=True, repr=False)
 class SkyEmissivityResult(AutoStrMixin):
     """Represents sky emissivity (ε_sky)."""
-    eps_sky: Union[float, np.ndarray]
+
+    eps_sky: float | np.ndarray
 
     def __post_init__(self):
         if np.any(np.asarray(self.eps_sky) < 0) or np.any(np.asarray(self.eps_sky) > 1):
@@ -34,6 +41,7 @@ class SkyEmissivityResult(AutoStrMixin):
 
     # Add Kimball, Unsworth and Crawford
 
+
 @dataclass
 class SkyEmissivity:
     """Collection of empirical sky emissivity models."""
@@ -42,7 +50,7 @@ class SkyEmissivity:
     def brunt(
         tdp: float | list[float],
         units: Literal["SI", "IP"] = Units.SI.value,
-        ) -> SkyEmissivityResult:
+    ) -> SkyEmissivityResult:
         """
         Calculate sky emissivity using the Brunt (1975) empirical model.
 
@@ -56,9 +64,9 @@ class SkyEmissivity:
         Returns
         -------
         EpsSky
-            Instance containing the computed sky emissivity (eps_sky), 
+            Instance containing the computed sky emissivity (eps_sky),
             clipped to the physical range [0.0, 1.0].
-        """  
+        """
         SkyEmissivityBruntInputs(tdp=tdp)
 
         if units.upper() == Units.IP.value:
@@ -76,13 +84,13 @@ class SkyEmissivity:
     def swinbank(
         tdb: float | list[float],
         units: Literal["SI", "IP"] = Units.SI.value,
-        ) -> SkyEmissivityResult:
+    ) -> SkyEmissivityResult:
         """
         Calculate sky emissivity using the Swinbank (1963) empirical formula.
 
         .. note::
-            This is a simple calculation based on ambient air temperature. 
-            It has shown large deviations compared to modern methods 
+            This is a simple calculation based on ambient air temperature.
+            It has shown large deviations compared to modern methods
             and is **not recommended for accurate modeling**.
 
         Parameters
@@ -114,16 +122,16 @@ class SkyEmissivity:
         eps_sky = np.clip(eps_sky, 0.0, 1.0)
 
         # Return a typed dataclass
-        return SkyEmissivityResult(eps_sky=eps_sky)   
+        return SkyEmissivityResult(eps_sky=eps_sky)
 
     def clark_allen(
         tdb: float | list[float],
         fcn: float | list[float],
         units: str = Units.SI.value,
-        ) -> SkyEmissivityResult:
+    ) -> SkyEmissivityResult:
         """
         Calculate sky emissivity using the Clark & Allen (1978) model.
-        
+
         Parameters
         ----------
         tdp : float or list of floats
@@ -140,7 +148,7 @@ class SkyEmissivity:
 
         """
 
-        # Notes BG: Read here: https://doi.org/10.26868/25222708.2017.569 
+        # Notes BG: Read here: https://doi.org/10.26868/25222708.2017.569
         # https://www.proquest.com/openview/4763607fbd21956404a6329a060ae2b4/1?pq-origsite=gscholar&cbl=18750&diss=y
 
         SkyEmissivityClarkAllenInputs(tdp=tdp, fcn=cloud_fraction)
@@ -159,7 +167,4 @@ class SkyEmissivity:
 
         return SkyEmissivityResult(eps_sky=epsilon_sky)
 
-
         # add Dilly, Prata and Angstrom
-
-

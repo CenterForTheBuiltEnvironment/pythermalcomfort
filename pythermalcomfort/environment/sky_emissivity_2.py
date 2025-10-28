@@ -1,42 +1,44 @@
 from __future__ import annotations
-from dataclasses import dataclass
-import numpy as np
-from typing import Union, Callable, Optional
 
+from collections.abc import Callable
+from dataclasses import dataclass
+
+import numpy as np
 
 from pythermalcomfort.classes_input import (
     SkyEmissivityBruntInputs,
-    SkyEmissivitySwinbankInputs,
     SkyEmissivityClarkAllenInputs,
+    SkyEmissivitySwinbankInputs,
 )
 from pythermalcomfort.utilities import Units, units_converter
 
-# Variant 02: 
+# Variant 02:
 # Example:
 # eps_sky = SkyEmissivity.brunt(tdp=10)
-# eps_sky = SkyEmissivity.brunt(tdp=10, correction=EpsSky.apply_dilley) 
+# eps_sky = SkyEmissivity.brunt(tdp=10, correction=EpsSky.apply_dilley)
 # ...
+
 
 @dataclass(frozen=True)
 class EpsSky:
     """Immutable container for sky emissivity value."""
-    eps_sky: Union[float, np.ndarray]
+
+    eps_sky: float | np.ndarray
 
     @staticmethod
-    def dilly(eps: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def dilly(eps: float | np.ndarray) -> float | np.ndarray:
         """Dilley correction (max 1.0)."""
         return np.minimum(1.0, np.asarray(eps) * 1.05)
 
     @staticmethod
-    def prata(eps: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def prata(eps: float | np.ndarray) -> float | np.ndarray:
         """Placeholder for Prata correction example."""
         return np.minimum(1.0, np.asarray(eps) * 1.03)
 
     @staticmethod
     def example_correction_with_inputs(
-        eps: Union[float, np.ndarray],
-        **kwargs
-    ) -> Union[float, np.ndarray]:
+        eps: float | np.ndarray, **kwargs
+    ) -> float | np.ndarray:
         """
         Example correction that can take extra inputs from kwargs.
 
@@ -47,7 +49,6 @@ class EpsSky:
         return np.minimum(1.0, np.asarray(eps) * factor)
 
 
-
 class SkyEmissivity:
     """Collection of empirical sky emissivity models."""
 
@@ -55,7 +56,7 @@ class SkyEmissivity:
     def brunt(
         tdp: float | list[float],
         units: str = Units.SI.value,
-        correction: Optional[Callable[[Union[float, np.ndarray]], Union[float, np.ndarray]]] = None,
+        correction: Callable[[float | np.ndarray], float | np.ndarray] | None = None,
     ) -> EpsSky:
         """Brunt (1975) model."""
         SkyEmissivityBruntInputs(tdp=tdp)
@@ -75,7 +76,7 @@ class SkyEmissivity:
     def swinbank(
         tdb: float | list[float],
         units: str = Units.SI.value,
-        correction: Optional[Callable[[Union[float, np.ndarray]], Union[float, np.ndarray]]] = None,
+        correction: Callable[[float | np.ndarray], float | np.ndarray] | None = None,
     ) -> EpsSky:
         """Swinbank (1963) model — simple ambient air temperature approach."""
         SkyEmissivitySwinbankInputs(tdb=tdb)
@@ -97,7 +98,7 @@ class SkyEmissivity:
         tdp: float | list[float],
         cloud_fraction: float | list[float] = 0.0,
         units: str = Units.SI.value,
-        correction: Optional[Callable[[Union[float, np.ndarray]], Union[float, np.ndarray]]] = None,
+        correction: Callable[[float | np.ndarray], float | np.ndarray] | None = None,
     ) -> EpsSky:
         """Clark & Allen (1978) model with optional cloud fraction."""
         SkyEmissivityClarkAllenInputs(tdp=tdp, fcn=cloud_fraction)
@@ -116,4 +117,3 @@ class SkyEmissivity:
             eps = correction(eps)
 
         return EpsSky(eps_sky=eps)
-
