@@ -1,3 +1,10 @@
+"""Ridge regression model for predicting rectal and skin temperature.
+
+Based on fold 1 from Forbes et al. (2025), doi:10.1016/j.jtherbio.2025.104078.
+Trained on adults aged 60-100 in minimal clothing under stationary conditions.
+Uses Min-Max scaling on features and outputs.
+"""
+
 from __future__ import annotations
 
 import numpy as np
@@ -91,6 +98,8 @@ _T_SK_INTERCEPT = 0.04356328728329839
 _BASELINE_DURATION = 120  # minutes
 _THERMONEUTRAL_TDB = 23.0  # °C
 _THERMONEUTRAL_RH = 50.0  # %
+_BASELINE_T_RE_INITIAL = 37.0  # °C, initial rectal temperature for baseline
+_BASELINE_T_SK_INITIAL = 32.0  # °C, initial skin temperature for baseline
 
 
 def _scale_features(features: np.ndarray) -> np.ndarray:
@@ -155,10 +164,10 @@ def _check_ridge_regression_compliance(
     """Check if the inputs are within the model's applicability limits."""
     age_valid = valid_range(age, (60, 100))
     height_valid = valid_range(height, (130, 230))
-    mass_valid = valid_range(weight, (40, 140))
+    weight_valid = valid_range(weight, (40, 140))
     temp_valid = valid_range(tdb, (0, 60))
     rh_valid = valid_range(rh, (0, 100))
-    return age_valid, height_valid, mass_valid, temp_valid, rh_valid
+    return age_valid, height_valid, weight_valid, temp_valid, rh_valid
 
 
 def ridge_regression_predict_t_re_t_sk(
@@ -342,7 +351,7 @@ def ridge_regression_predict_t_re_t_sk(
         (
             age_valid,
             height_valid,
-            mass_valid,
+            weight_valid,
             temp_valid,
             rh_valid,
         ) = _check_ridge_regression_compliance(
@@ -366,8 +375,8 @@ def ridge_regression_predict_t_re_t_sk(
             raise ValueError(message) from err
     else:
         # Baseline simulation (120 mins in a neutral environment)
-        t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
-        t_sk = np.full_like(flat_inputs[0], 32.0, dtype=float)
+        t_re = np.full_like(flat_inputs[0], _BASELINE_T_RE_INITIAL, dtype=float)
+        t_sk = np.full_like(flat_inputs[0], _BASELINE_T_SK_INITIAL, dtype=float)
 
         baseline_features = np.stack(
             [
@@ -413,7 +422,7 @@ def ridge_regression_predict_t_re_t_sk(
         all_valid = ~(
             np.isnan(age_valid)
             | np.isnan(height_valid)
-            | np.isnan(mass_valid)
+            | np.isnan(weight_valid)
             | np.isnan(temp_valid)
             | np.isnan(rh_valid)
         )
