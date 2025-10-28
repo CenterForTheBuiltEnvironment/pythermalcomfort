@@ -30,12 +30,6 @@ class BaseInputs:
     asw: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
-    initial_t_re: float | int | np.ndarray | list = field(
-        default=None, metadata={"types": (float, int, np.ndarray, list)}
-    )
-    initial_t_sk: float | int | np.ndarray | list = field(
-        default=None, metadata={"types": (float, int, np.ndarray, list)}
-    )
     body_surface_area: float | int | np.ndarray | list = field(
         default=1.8258, metadata={"types": (float, int, np.ndarray, list)}
     )
@@ -45,7 +39,7 @@ class BaseInputs:
     d: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
-    duration: int = field(default=None, metadata={"types": (int,)})
+    duration: int = field(default=1, metadata={"types": (int,)})
     e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     f_bes: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
@@ -117,7 +111,13 @@ class BaseInputs:
     sol_transmittance: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
+    t_re: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
     t_running_mean: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    t_sk: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
     tdb: float | int | np.ndarray | list = field(
@@ -856,8 +856,8 @@ class RidgeRegressionInputs(BaseInputs):
         tdb,
         rh,
         duration,
-        initial_t_re=None,
-        initial_t_sk=None,
+        t_re=None,
+        t_sk=None,
         limit_inputs=True,
         round_output=True,
     ):
@@ -869,8 +869,8 @@ class RidgeRegressionInputs(BaseInputs):
             tdb=tdb,
             rh=rh,
             duration=duration,
-            initial_t_re=initial_t_re,
-            initial_t_sk=initial_t_sk,
+            t_re=t_re,
+            t_sk=t_sk,
             limit_inputs=limit_inputs,
             round_output=round_output,
         )
@@ -903,8 +903,8 @@ class RidgeRegressionInputs(BaseInputs):
             "tdb",
             "rh",
             "duration",
-            "initial_t_re",
-            "initial_t_sk",
+            "t_re",
+            "t_sk",
         ]:
             self._validate_finite(param_name)
 
@@ -919,23 +919,23 @@ class RidgeRegressionInputs(BaseInputs):
             ) from err
 
         # Validate either both initial body temp values are provided or neither
-        if (self.initial_t_re is None) != (self.initial_t_sk is None):
+        if (self.t_re is None) != (self.t_sk is None):
             raise ValueError(
-                "Both initial_t_re and initial_t_sk must be provided, or neither."
+                "Both t_re and t_sk must be provided, or neither."
             )
 
         # If provided, ensure initial_t_* can broadcast to the same shape
-        if self.initial_t_re is not None and self.initial_t_sk is not None:
+        if self.t_re is not None and self.t_sk is not None:
             try:
                 # Derive the target shape from a successful broadcast of core inputs
                 target = np.broadcast(
                     self.sex, self.age, self.height, self.weight, self.tdb, self.rh
                 ).shape
-                np.broadcast_to(np.asarray(self.initial_t_re), target)
-                np.broadcast_to(np.asarray(self.initial_t_sk), target)
+                np.broadcast_to(np.asarray(self.t_re), target)
+                np.broadcast_to(np.asarray(self.t_sk), target)
             except ValueError as err:
                 raise ValueError(
-                    "initial_t_re and initial_t_sk must be broadcastable to the core input shape."
+                    "t_re and t_sk must be broadcastable to the core input shape."
                 ) from err
 
         # Basic plausibility checks

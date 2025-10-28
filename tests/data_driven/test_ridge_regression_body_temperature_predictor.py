@@ -159,8 +159,8 @@ def test_ridge_regression_initial_body_temp():
         tdb=35,
         rh=60,
         duration=duration,
-        initial_t_re=37.0,
-        initial_t_sk=32.0,
+        t_re=37.0,
+        t_sk=32.0,
     )
     # Check that the output is a numpy array with the correct shape
     assert isinstance(result.t_re, np.ndarray)
@@ -183,8 +183,8 @@ def test_ridge_regression_initial_t_broadcast_error():
             tdb=[35, 35],
             rh=[60, 60],
             duration=60,
-            initial_t_re=[37.0, 37.1, 37.2],  # bad shape
-            initial_t_sk=32.0,
+            t_re=[37.0, 37.1, 37.2],  # bad shape
+            t_sk=32.0,
         )
 
 

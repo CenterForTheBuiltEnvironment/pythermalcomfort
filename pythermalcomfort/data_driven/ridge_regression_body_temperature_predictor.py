@@ -162,8 +162,8 @@ def ridge_regression_body_temperature_predictor(
     tdb: float | list[float],
     rh: float | list[float],
     duration: int,
-    initial_t_re: float | list[float] | None = None,
-    initial_t_sk: float | list[float] | None = None,
+    t_re: float | list[float] | None = None,
+    t_sk: float | list[float] | None = None,
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PredictedBodyTemperatures:
@@ -172,8 +172,8 @@ def ridge_regression_body_temperature_predictor(
     This model simulates the rectal (t_re) and mean skin (t_sk)
     temperatures by first establishing a baseline in a thermoneutral environment
     (23°C, 50% RH for 120 mins) and then simulating exposure to the specified
-    environmental conditions for `duration`. If a `initial_t_re` and
-    `initial_t_sk` are provided, then the initial 120 min simulation is skipped.
+    environmental conditions for `duration`. If a `t_re` and
+    `t_sk` are provided, then the initial 120 min simulation is skipped.
     Coefficients are taken from fold one from the study [Forbes2025]_
     (https://doi.org/10.1016/j.jtherbio.2025.104078). See notes documentation
     for limitations with this model.
@@ -196,11 +196,11 @@ def ridge_regression_body_temperature_predictor(
         Relative humidity, in %.
     duration : int
         Duration of the simulation in the specified environment, in minutes.
-    initial_t_re : float or list, optional
+    t_re : float or list, optional
         Initial rectal temperature (°C). If provided, the baseline simulation
         at 23°C, 50% RH for 120 minutes is skipped, and this value is used
         as the starting rectal temperature for the main simulation.
-    initial_t_sk : float or list, optional
+    t_sk : float or list, optional
         Initial mean skin temperature (°C). If provided, the baseline simulation
         at 23°C, 50% RH for 120 minutes is skipped, and this value is used
         as the starting mean skin temperature for the main simulation.
@@ -223,8 +223,8 @@ def ridge_regression_body_temperature_predictor(
     ValueError
         If input arrays have inconsistent shapes after broadcasting.
         If sex contains invalid values (must be "male"/"female" or Sex enum members).
-        If only one of initial_t_re or initial_t_sk is provided.
-        If initial_t_re and initial_t_sk are not broadcastable to the input shape.
+        If only one of t_re or t_sk is provided.
+        If t_re and t_sk are not broadcastable to the input shape.
 
     Notes
     -----
@@ -298,8 +298,8 @@ def ridge_regression_body_temperature_predictor(
         tdb=tdb,
         rh=rh,
         duration=duration,
-        initial_t_re=initial_t_re,
-        initial_t_sk=initial_t_sk,
+        t_re=t_re,
+        t_sk=t_sk,
         limit_inputs=limit_inputs,
         round_output=round_output,
     )
@@ -344,24 +344,24 @@ def ridge_regression_body_temperature_predictor(
             flat_inputs[5],
         )
 
-    if initial_t_re is not None and initial_t_sk is not None:
+    if t_re is not None and t_sk is not None:
         try:
             # Use provided baseline temperatures
             current_t_re = np.broadcast_to(
-                np.asarray(initial_t_re), original_shape
+                np.asarray(t_re), original_shape
             ).ravel()
             current_t_sk = np.broadcast_to(
-                np.asarray(initial_t_sk), original_shape
+                np.asarray(t_sk), original_shape
             ).ravel()
         except ValueError as err:
             raise ValueError(
-                "initial_t_re and initial_t_sk must be broadcastable to the input shape "
+                "t_re and t_sk must be broadcastable to the input shape "
                 f"{original_shape}."
             ) from err
     else:
         # Baseline simulation (120 mins in a neutral environment)
-        initial_t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
-        initial_t_sk = np.full_like(flat_inputs[0], 32.0, dtype=float)
+        t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
+        t_sk = np.full_like(flat_inputs[0], 32.0, dtype=float)
 
         baseline_features = np.stack(
             [
@@ -371,8 +371,8 @@ def ridge_regression_body_temperature_predictor(
                 flat_inputs[3],  # weight
                 np.full_like(flat_inputs[0], 23.0),  # tdb = 23°C
                 np.full_like(flat_inputs[0], 50.0),  # humidity = 50%
-                initial_t_re,
-                initial_t_sk,
+                t_re,
+                t_sk,
             ],
             axis=1,
         )
