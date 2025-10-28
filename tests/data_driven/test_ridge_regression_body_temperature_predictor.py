@@ -234,3 +234,17 @@ def test_initial_t_singleton_rejected():
             duration=60,
             t_sk=32.0,
         )
+
+
+def test_wrong_type_duration():
+    with pytest.raises(ValueError):
+        ridge_regression_predict_t_re_t_sk(
+            sex=Sex.male,
+            age=70,
+            height=1.8,
+            weight=75,
+            tdb=35,
+            rh=60,
+            duration=True,
+            t_sk=32.0,
+        )
