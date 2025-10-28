@@ -265,7 +265,7 @@ def ridge_regression_predict_t_re_t_sk(
 
         from pythermalcomfort.utilities import Sex
         from pythermalcomfort.data_driven.ridge_regression_predict_t_re_t_sk import (
-            ridge_regression_predict_t_re_t_sk
+            ridge_regression_predict_t_re_t_sk,
         )
 
         # Scalar example for a single person
@@ -276,7 +276,7 @@ def ridge_regression_predict_t_re_t_sk(
             weight=75,
             tdb=35,
             rh=60,
-            duration=540
+            duration=540,
         )
 
         print(f"Final Rectal temp: {results.t_re[-1]:.2f}°C")
@@ -290,7 +290,7 @@ def ridge_regression_predict_t_re_t_sk(
             weight=[75, 60],
             tdb=[35, 40],
             rh=[60, 50],
-            duration=540
+            duration=540,
         )
 
         print(f"Final rectal temps: {results_vec.t_re[:, -1]}")
