@@ -172,6 +172,7 @@ def test_ridge_regression_initial_body_temp():
     assert result.t_re[-1] == pytest.approx(37.33, abs=1e-2)
     assert result.t_sk[-1] == pytest.approx(37.00, abs=1e-2)
 
+
 def test_ridge_regression_initial_t_broadcast_error():
     with pytest.raises(ValueError, match="broadcastable"):
         ridge_regression_body_temperature_predictor(
@@ -186,11 +187,13 @@ def test_ridge_regression_initial_t_broadcast_error():
             initial_t_sk=32.0,
         )
 
+
 def test_invalid_sex():
     with pytest.raises(ValueError):
         ridge_regression_body_temperature_predictor(
             sex="unknown", age=70, height=1.8, weight=75, tdb=35, rh=60, duration=60
         )
+
 
 @pytest.mark.parametrize("bad", [np.nan, np.inf, -np.inf])
 def test_non_finite_inputs(bad):
@@ -198,6 +201,7 @@ def test_non_finite_inputs(bad):
         ridge_regression_body_temperature_predictor(
             sex=Sex.male, age=70, height=1.8, weight=75, tdb=bad, rh=60, duration=60
         )
+
 
 @pytest.mark.parametrize("bad_dur", [0, -5])
 def test_invalid_duration(bad_dur):
