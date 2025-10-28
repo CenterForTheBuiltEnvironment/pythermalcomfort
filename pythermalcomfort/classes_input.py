@@ -888,7 +888,9 @@ class RidgeRegressionInputs(BaseInputs):
 
         # Validate duration is positive integer
         if (
-            isinstance(self.duration, bool)
+            isinstance(
+                self.duration, bool
+            )  # bool is a subclass of int; exclude explicitly
             or not isinstance(self.duration, int)
             or self.duration <= 0
         ):
@@ -901,7 +903,6 @@ class RidgeRegressionInputs(BaseInputs):
             "weight",
             "tdb",
             "rh",
-            "duration",
             "t_re",
             "t_sk",
         ]:
