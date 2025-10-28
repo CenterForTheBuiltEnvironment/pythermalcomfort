@@ -18,9 +18,23 @@ class WorkIntensity(str, Enum):
     LIGHT = "light"
 
 
+# Revisit: Can we add Parameter description here?
 @dataclass
 class BaseInputs:
-    """Base inputs with metadata-driven validation."""
+    """
+    Base inputs with metadata-driven validation.
+
+    Parameters
+    ----------
+    tdb : float
+        Dry bulb temperature in degrees Celsius (°C).
+    eps_sky : float
+        Sky emissivity, physically constrained between 0 and 1.
+    tdp : float
+        Dew point temperature in degrees Celsius (°C).
+    fcn : float
+        Fraction
+    """
 
     a_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     age: float | int | np.ndarray | list = field(
@@ -116,6 +130,9 @@ class BaseInputs:
     tdb: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
+    tdp: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
     tg: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
@@ -174,6 +191,12 @@ class BaseInputs:
     )
     wme: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    eps_sky: float | int | np.ndarray | list = field(
+        default=0.7, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    fcn: float | int | np.ndarray | list = field(
+        default=1, metadata={"types": (float, int, np.ndarray, list)}
     )
 
     def __post_init__(self) -> None:
@@ -706,6 +729,28 @@ class SETInputs(BaseInputs):
             units=units,
             limit_inputs=limit_inputs,
         )
+
+
+@dataclass
+class SkyEmissivityBruntInputs(BaseInputs):
+    def __init__(self, tdp):
+        super().__init__(
+            tdp=tdp,
+        )
+
+
+@dataclass
+class SkyEmissivitySwinbankInputs(BaseInputs):
+    def __init__(self, tdb):
+        super().__init__(
+            tdb=tdb,
+        )
+
+
+@dataclass
+class SkyEmissivityClarkAllenInputs(BaseInputs):
+    def __init__(self, tdb, fcn):
+        super().__init__(tdb=tdb, fcn=fcn)
 
 
 @dataclass
