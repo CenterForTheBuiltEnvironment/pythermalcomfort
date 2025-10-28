@@ -85,6 +85,11 @@ _T_SK_COEFFS = np.array(
 # Intercept term for the Mean Skin Temperature (t_sk) ridge regression model.
 _T_SK_INTERCEPT = 0.04356328728329839
 
+# Thermoneutral baseline configuration
+_BASELINE_DURATION = 120  # minutes
+_THERMONEUTRAL_TDB = 23.0  # °C
+_THERMONEUTRAL_RH = 50.0  # %
+
 
 def _scale_features(features: np.ndarray) -> np.ndarray:
     """Scales input features using predefined scaling constants."""
@@ -207,7 +212,8 @@ def ridge_regression_body_temperature_predictor(
     limit_inputs : bool, optional
         If True, limits the inputs to the standard applicability limits. Defaults to True.
     round_output : bool, optional
-        If True, rounds output value. If False, it does not round it. Defaults to True.
+        If True, rounds outputs to 2 decimal places; otherwise leaves full precision.
+        Defaults to True.
 
     Returns
     -------
@@ -309,17 +315,19 @@ def ridge_regression_body_temperature_predictor(
 
     # Convert sex (enum or string) to string values and then 0/1 encoding
     sex_arr = np.atleast_1d(sex)
-    sex_str = np.array([s.value if isinstance(s, Sex) else str(s) for s in sex_arr])
+    sex_str = sex_str = np.array(
+        [(s.value if isinstance(s, Sex) else str(s)).strip().lower() for s in sex_arr]
+    )
     valid_sex_values = np.array([Sex.male.value, Sex.female.value])
     if not np.all(np.isin(sex_str, valid_sex_values)):
-        raise ValueError(
-            f"Invalid input for sex. Must be one of {valid_sex_values.tolist()}"
-        )
+        err_msg = f"Invalid input for sex. Must be one of {valid_sex_values.tolist()}"
+        raise ValueError(err_msg)
     # 1 for female, 0 for male
     sex_value_arr = (sex_str == Sex.female.value).astype(int)
     # If the original input was a scalar, convert the array back to a scalar
     # to preserve the correct output shape.
-    if not isinstance(sex, (list, tuple, np.ndarray)):
+    supported_sex_values = (list, tuple, np.ndarray)
+    if not isinstance(sex, supported_sex_values):
         sex_value = sex_value_arr.item()
     else:
         sex_value = sex_value_arr
@@ -354,10 +362,11 @@ def ridge_regression_body_temperature_predictor(
                 np.asarray(t_sk), original_shape
             ).ravel()
         except ValueError as err:
-            raise ValueError(
+            message = (
                 "t_re and t_sk must be broadcastable to the input shape "
                 f"{original_shape}."
-            ) from err
+            )
+            raise ValueError(message) from err
     else:
         # Baseline simulation (120 mins in a neutral environment)
         t_re = np.full_like(flat_inputs[0], 37.0, dtype=float)
@@ -369,8 +378,8 @@ def ridge_regression_body_temperature_predictor(
                 flat_inputs[1],  # age
                 flat_inputs[2],  # height
                 flat_inputs[3],  # weight
-                np.full_like(flat_inputs[0], 23.0),  # tdb = 23°C
-                np.full_like(flat_inputs[0], 50.0),  # humidity = 50%
+                np.full_like(flat_inputs[0], _THERMONEUTRAL_TDB),  # tdb
+                np.full_like(flat_inputs[0], _THERMONEUTRAL_RH),  # relative humidity
                 t_re,
                 t_sk,
             ],
@@ -378,7 +387,7 @@ def ridge_regression_body_temperature_predictor(
         )
 
         baseline_t_re_hist, baseline_t_sk_hist = _predict_temperature_simulation(
-            baseline_features, duration=120
+            baseline_features, duration=_BASELINE_DURATION
         )
         current_t_re = baseline_t_re_hist[:, -1]
         current_t_sk = baseline_t_sk_hist[:, -1]
