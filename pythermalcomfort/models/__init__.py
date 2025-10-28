@@ -56,6 +56,7 @@ __all__ = [
     "pmv_e",
     "pmv_ppd_ashrae",
     "pmv_ppd_iso",
+    "ridge_regression_predict_t_re_t_sk",
     "set_tmp",
     "solar_gain",
     "thi",
