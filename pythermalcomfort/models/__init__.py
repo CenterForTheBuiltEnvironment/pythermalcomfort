@@ -18,6 +18,7 @@ from .pmv_athb import pmv_athb
 from .pmv_e import pmv_e
 from .pmv_ppd_ashrae import pmv_ppd_ashrae
 from .pmv_ppd_iso import pmv_ppd_iso
+from .ridge_regression_predict_t_re_t_sk import ridge_regression_predict_t_re_t_sk
 from .set_tmp import set_tmp
 from .solar_gain import solar_gain
 from .thi import thi
