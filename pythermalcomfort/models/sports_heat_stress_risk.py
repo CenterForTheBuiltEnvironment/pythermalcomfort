@@ -124,6 +124,25 @@ def sports_heat_stress_risk(
     risk_levels = np.vectorize(_calc_risk_single_value)(
         tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
     )
+
+    # thermal_sensation = {
+    #     -2.5: "Cold",
+    #     -1.5: "Cool",
+    #     -0.5: "Slightly Cool",
+    #     0.5: "Neutral",
+    #     1.5: "Slightly Warm",
+    #     2.5: "Warm",
+    #     10: "Hot",
+    # }
+    #
+    # return PMVPPD(
+    #     pmv=pmv_array,
+    #     ppd=ppd_array,
+    #     tsv=mapping(pmv_array, thermal_sensation, right=False),
+    # )
+
+    # todo use the pmv_ppd_iso as a reference for the code implementation
+
     return risk_levels
 
 
