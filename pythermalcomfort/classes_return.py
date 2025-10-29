@@ -1009,6 +1009,29 @@ class JOS3Output(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
+class PredictedBodyTemperatures(AutoStrMixin):
+    """Dataclass for returning predicted temperature history.
+
+    The `duration` mentioned in the shapes below is the `duration` parameter
+    passed to the prediction function.
+
+    Attributes
+    ----------
+    t_re : numpy.ndarray of float, in °C
+        Predicted rectal temperature history.
+        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
+        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
+    t_sk : numpy.ndarray of float, in °C
+        Predicted mean skin temperature history.
+        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
+        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
+    """
+
+    t_re: np.ndarray
+    t_sk: np.ndarray
+
+
+@dataclass(frozen=True, repr=False)
 class ScaleWindSpeedLog(AutoStrMixin):
     """Dataclass to represent the output of scale_wind_speed_log.
 

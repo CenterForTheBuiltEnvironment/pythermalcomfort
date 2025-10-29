@@ -287,6 +287,14 @@ Adjusted Predicted Mean Votes with Expectancy Factor (ePMV)
 .. autoclass:: pythermalcomfort.classes_return.EPMV
     :members:
 
+Ridge Regression to predict Rectal and Skin Temperatures
+--------------------------------------------------------
+
+.. autofunction:: pythermalcomfort.models.ridge_regression_predict_t_re_t_sk.ridge_regression_predict_t_re_t_sk
+
+.. autoclass:: pythermalcomfort.classes_return.PredictedBodyTemperatures
+    :members:
+
 Solar gain on people
 --------------------
 
