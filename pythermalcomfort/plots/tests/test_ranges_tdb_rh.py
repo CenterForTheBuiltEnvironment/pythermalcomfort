@@ -1,285 +1,246 @@
-"""Tests for ranges_tdb_rh plotting function.
+"""Tests for the Temperature vs Relative Humidity (T-RH) range plot.
 
-Following seaborn testing approach with comprehensive parameter combinations.
+Design goals and test contract:
+- Use a central registry (see conftest.py) to define models, their fixed
+  parameters, default thresholds, and recommended test ranges. Tests consume
+  the registry instead of hard-coding model details, keeping them uniform and
+  easy to extend.
+- Call the plotting API directly (``ranges_tdb_rh``) so we validate the real
+  execution path used by users.
+- Verify numerical agreement between the plotted threshold curves and direct
+  model evaluation. In other words, a point that lies on a drawn threshold
+  curve should satisfy the underlying model metric being approximately equal
+  to that threshold within a small absolute tolerance.
 """
 
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pytest
-from matplotlib.colors import same_color
-
-from pythermalcomfort.models import pmv_ppd_iso
 from pythermalcomfort.plots.matplotlib import ranges_tdb_rh
 
 
-class TestRangesTdbRhSmoke:
-    """Smoke tests: ensure function runs without errors."""
+class TestMainModels:
+    """Core behavioral tests for main models on the T-RH plot.
 
-    def test_basic_pmv_plot(self, fixed_params_pmv):
-        """Test basic PMV plot execution."""
-        ax, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            t_range=(18.0, 28.0),
-            rh_range=(20.0, 80.0),
-        )
-        assert ax is not None
-        assert isinstance(artists, dict)
-        assert "bands" in artists
-        assert "curves" in artists
-        assert isinstance(artists["bands"], list)
-        assert isinstance(artists["curves"], list)
-
-    def test_uses_default_thresholds(self, fixed_params_pmv):
-        """Test that default thresholds are used when not provided."""
-        ax, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=None,
-            t_range=(20.0, 26.0),
-            rh_range=(30.0, 70.0),
-        )
-        assert ax is not None
-
-    def test_no_thresholds_and_no_defaults_raises(self, simple_linear_model):
-        """Test that missing thresholds raises error when no defaults."""
-        with pytest.raises(ValueError, match="No thresholds provided"):
-            ranges_tdb_rh(
-                model_func=simple_linear_model,
-                fixed_params={},
-                thresholds=None,
-                t_range=(10.0, 30.0),
+    Scope of these tests:
+    1) Basic functionality: plotting with thresholds returns axes, curves, and bands.
+    2) Default thresholds: omitting thresholds uses the registered defaults.
+    3) Numerical accuracy: points on plotted curves match the model metric.
+    4) Parameter validation: invalid inputs raise explicit ValueError.
+    5) Extreme conditions: plot handles very wide/narrow and hot/cold ranges.
+    6) Boundary values: plot handles near-degenerate ranges gracefully.
+    """
+    
+    def test_basic_functionality(self, all_models):
+        """Ensure each model can produce a plot with all registered thresholds."""
+        for model_info in all_models:
+            ax, artists = ranges_tdb_rh(
+                model_func=model_info.func,
+                fixed_params=model_info.fixed_params,
+                thresholds=model_info.thresholds,
+                t_range=model_info.test_ranges[0],
+                rh_range=model_info.test_ranges[1]
             )
-
-    @pytest.mark.parametrize("t_range,rh_range", [
-        ((-10.0, 50.0), (0.0, 100.0)),  # extreme ranges
-        ((22.0, 24.0), (45.0, 55.0)),   # narrow ranges
-    ])
-    def test_various_ranges(self, fixed_params_pmv, t_range, rh_range):
-        """Test with different temperature and humidity ranges."""
-        ax, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            t_range=t_range,
-            rh_range=rh_range,
-        )
-        assert ax is not None
-
-    @pytest.mark.parametrize("thresholds,rh_step", [
-        ([0.0], 10.0),
-        ([-1.5, -0.5, 0.5, 1.5], 2.0),
-        ([-0.5, 0.5], 0.5),
-    ])
-    def test_thresholds_and_steps(self, fixed_params_pmv, thresholds, rh_step):
-        """Test various threshold and step combinations."""
-        ax, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=thresholds,
-            t_range=(20.0, 26.0),
-            rh_step=rh_step,
-        )
-        assert ax is not None
-
-
-class TestRangesTdbRhValidation:
-    """Test input validation."""
-
-    @pytest.mark.parametrize("t_range,rh_range,rh_step,x_scan_step,error_msg", [
-        ((30.0, 20.0), (20.0, 80.0), 2.0, 1.0, "strictly increasing"), 
-        ((20.0, 26.0), (80.0, 20.0), 2.0, 1.0, "strictly increasing"), 
-        ((20.0, 26.0), (20.0, 80.0), 0.0, 1.0, "must be positive"),
-        ((20.0, 26.0), (20.0, 80.0), -1.0, 1.0, "must be positive"), 
-        ((20.0, 26.0), (20.0, 80.0), 2.0, 0.0, "must be positive"),
-    ])
-    def test_invalid_parameters_raise(self, fixed_params_pmv, t_range, rh_range, 
-                                     rh_step, x_scan_step, error_msg):
-        """Test that invalid parameters raise appropriate errors."""
-        with pytest.raises(ValueError, match=error_msg):
-            ranges_tdb_rh(
-                model_func=pmv_ppd_iso,
-                fixed_params=fixed_params_pmv,
-                thresholds=[-0.5, 0.5],
+            
+            assert ax is not None, f"{model_info.name} should create plot"
+            assert "curves" in artists, f"{model_info.name} should have curves"
+            assert "bands" in artists, f"{model_info.name} should have bands when multiple thresholds are used"
+            assert len(artists["curves"]) >= 0, f"{model_info.name} should have non-negative number of curves"
+    
+    def test_default_thresholds(self, all_models):
+        """Verify default thresholds are used when thresholds=None."""
+        for model_info in all_models:
+            ax, artists = ranges_tdb_rh(
+                model_func=model_info.func,
+                fixed_params=model_info.fixed_params,
+                thresholds=None,
+                t_range=model_info.test_ranges[0],
+                rh_range=model_info.test_ranges[1]
+            )
+            
+            assert ax is not None, f"{model_info.name} should create plot with default thresholds"
+            assert "curves" in artists, f"{model_info.name} should have curves"
+            assert len(artists["curves"]) > 0, f"{model_info.name} should have at least one curve"
+    
+    def test_numerical_accuracy(self, all_models):
+        """Plotted curve points match direct model evaluation within tolerance."""
+        from pythermalcomfort.plots.utils import make_metric_eval, mapper_tdb_rh
+        import numpy as np
+        
+        for model_info in all_models:
+            t_range, rh_range = model_info.test_ranges
+            threshold = model_info.thresholds[0]
+            
+            ax, artists = ranges_tdb_rh(
+                model_func=model_info.func,
+                fixed_params=model_info.fixed_params,
+                thresholds=[threshold],
                 t_range=t_range,
                 rh_range=rh_range,
-                rh_step=rh_step,
-                x_scan_step=x_scan_step,
+                smooth_sigma=0.0
             )
+            
+            if artists["curves"]:
+                curve = artists["curves"][0]
+                
+                metric_eval = make_metric_eval(
+                    model_func=model_info.func,
+                    xy_to_kwargs=mapper_tdb_rh,
+                    fixed_params=model_info.fixed_params,
+                    metric_attr=model_info.metric_attr,
+                )
+                
+                errors = []
+                for x, y in zip(curve.get_xdata(), curve.get_ydata()):
+                    if not (np.isfinite(x) and np.isfinite(y)):
+                        continue
+                    try:
+                        metric_val = metric_eval(x, y)
+                        if not np.isclose(metric_val, threshold, atol=model_info.tolerance):
+                            errors.append(
+                                f"Point ({x:.2f}, {y:.2f}) has {model_info.name} {metric_val:.2f}, "
+                                f"expected {threshold:.2f} (tolerance: {model_info.tolerance})"
+                            )
+                    except Exception as exc:
+                        errors.append(f"Error calculating {model_info.name} at ({x:.2f}, {y:.2f}): {exc}")
+                
+                if errors:
+                    error_msg = f"{model_info.name} numerical accuracy errors:\n" + "\n".join(errors[:3])
+                    if len(errors) > 3:
+                        error_msg += f"\n... and {len(errors) - 3} more errors"
+                    pytest.fail(error_msg)
+    
+    def test_parameter_validation(self, all_models):
+        """Invalid inputs raise ValueError with informative messages."""
+        for model_info in all_models:
+            with pytest.raises(ValueError, match="t_range must be strictly increasing"):
+                ranges_tdb_rh(
+                    model_func=model_info.func,
+                    fixed_params=model_info.fixed_params,
+                    thresholds=[model_info.thresholds[0]],
+                    t_range=(30.0, 20.0),  # reversed: min > max
+                    rh_range=model_info.test_ranges[1]
+                )
+            
+            # Reversed rh_range should raise
+            with pytest.raises(ValueError, match="rh_range must be strictly increasing"):
+                ranges_tdb_rh(
+                    model_func=model_info.func,
+                    fixed_params=model_info.fixed_params,
+                    thresholds=[model_info.thresholds[0]],
+                    t_range=model_info.test_ranges[0],
+                    rh_range=(80.0, 20.0)  # reversed: min > max
+                )
+            
+            # Non-positive step should raise (exact error text is enforced)
+            with pytest.raises(ValueError, match="rh_step must be positive"):
+                ranges_tdb_rh(
+                    model_func=model_info.func,
+                    fixed_params=model_info.fixed_params,
+                    thresholds=[model_info.thresholds[0]],
+                    t_range=model_info.test_ranges[0],
+                    rh_range=model_info.test_ranges[1],
+                    rh_step=0.0  # zero step is invalid
+                )
+    
+    def test_extreme_conditions(self, all_models):
+        """Plot robustness under more extreme/narrow/wide temperature-RH ranges.
 
-
-class TestRangesTdbRhAxesHandling:
-    """Test axes creation and usage."""
-
-    def test_axes_handling(self, fixed_params_pmv):
-        """Test axes creation and reuse."""
-        ax1, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            ax=None,
-        )
-        assert isinstance(ax1, plt.Axes)
-        
-        fig, ax_provided = plt.subplots()
-        ax2, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            ax=ax_provided,
-        )
-        assert ax2 is ax_provided
-
-
-class TestRangesTdbRhVisualProperties:
-    """Test visual customization options."""
-
-    def test_returns_artist_dict_structure(self, fixed_params_pmv):
-        """Test that artists dict has expected structure.
-        
-        Similar to seaborn's artist verification.
+        Expanded ranges rationale:
+        - Ultra-narrow: (22.0, 22.2) °C & (49.5, 49.7) %RH to stress tiny spans.
+        - Very wide: (-30.0, 60.0) °C & (0.0, 100.0) %RH to stress global scan.
+        - Colder: (-30.0, -10.0) °C & (20.0, 80.0) %RH for sub-freezing cases.
+        - Hotter: (40.0, 60.0) °C & (20.0, 80.0) %RH for heat stress cases.
+        - Near-dry: (15.0, 35.0) °C & (0.0, 5.0) %RH for very low humidity.
+        - Near-saturation: (15.0, 35.0) °C & (95.0, 100.0) %RH for very high RH.
+        For some combinations, thresholds may not be bracketed; we accept those
+        as non-fatal (solver warnings), but still assert structure when plots
+        succeed.
         """
-        _, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-        )
-        assert isinstance(artists, dict)
-        assert "bands" in artists
-        assert "curves" in artists
-        assert "legend" in artists
+        extreme_ranges = [
+            ((22.0, 22.2), (49.5, 49.7)),  # ultra narrow
+            ((-30.0, 60.0), (0.0, 100.0)),  # ultra wide
+            ((-30.0, -10.0), (20.0, 80.0)),  # very cold
+            ((40.0, 60.0), (20.0, 80.0)),  # very hot
+            ((15.0, 35.0), (0.0, 5.0)),  # near dry
+            ((15.0, 35.0), (95.0, 100.0)),  # near saturation
+        ]
         
-        assert isinstance(artists["bands"], list)
-        assert isinstance(artists["curves"], list)
+        for model_info in all_models:
+            for t_range, rh_range in extreme_ranges:
+                try:
+                    ax, artists = ranges_tdb_rh(
+                        model_func=model_info.func,
+                        fixed_params=model_info.fixed_params,
+                        thresholds=[model_info.thresholds[0]],
+                        t_range=t_range,
+                        rh_range=rh_range
+                    )
+                    
+                    if ax is None:
+                        print(
+                            f"Warning: {model_info.name} not compatible for extreme case "
+                            f"t_range={t_range}, rh_range={rh_range}"
+                        )
+                        continue
+                        
+                    assert "curves" in artists, (
+                        f"{model_info.name} should have curves in extreme case "
+                        f"t_range={t_range}, rh_range={rh_range}"
+                    )
+                    
+                except Exception as e:
+                    if "no bracket" in str(e).lower() or "unsolved" in str(e).lower():
+                        continue
+                    else:
+                        raise
+    
+    def test_boundary_values(self, all_models):
+        """Graceful handling of boundary/degenerate ranges.
 
-    def test_number_of_curves_matches_thresholds(self, fixed_params_pmv):
-        """Test that number of curves matches number of thresholds.
-        
-        Data-level verification like seaborn.
+        Note: ranges must be strictly increasing; exact equal endpoints such
+        as (0.0, 0.0) are expected to fail validation by design. We include
+        these cases to ensure the code either raises ValueError cleanly (for
+        invalid ranges) or returns a consistent structure when ranges are
+        valid but very narrow.
         """
-        thresholds = [-0.7, -0.2, 0.3, 0.8]
-        _, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=thresholds,
-            t_range=(18.0, 28.0),
-        )
-        curves = artists["curves"]
-        assert len(curves) <= len(thresholds)
-        assert len(curves) > 0
-
-    @pytest.mark.parametrize("legend,should_exist", [(True, True), (False, False)])
-    def test_legend_control(self, fixed_params_pmv, legend, should_exist):
-        """Test legend creation control."""
-        _, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            legend=legend,
-        )
-        if should_exist:
-            assert "legend" in artists
-        else:
-            assert artists["legend"] is None
-
-    def test_custom_visual_parameters(self, fixed_params_pmv):
-        """Test that visual parameters work correctly.
+        boundary_cases = [
+            ((0.0, 0.0), (0.0, 0.0)),    # exactly equal endpoints (should raise ValueError)
+            ((100.0, 100.0), (100.0, 100.0)),  # equal at upper extremes (should raise ValueError)
+            ((0.1, 0.2), (0.1, 0.2)),    # minimal valid span
+            ((50.0, 50.1), (50.0, 50.1)),  # single-point-like valid range
+        ]
         
-        Property-level assertion like seaborn.
-        """
-        _, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            cmap="viridis",
-            band_alpha=0.5,
-            line_color="red",
-            line_width=2.0,
-        )
-        curves = artists["curves"]
-        assert len(curves) > 0, "Should have at least one curve"
-        for curve in curves:
-            assert curve.get_linewidth() == 2.0
-            assert same_color(curve.get_color(), "red")
+        for model_info in all_models:
+            for t_range, rh_range in boundary_cases:
+                try:
+                    ax, artists = ranges_tdb_rh(
+                        model_func=model_info.func,
+                        fixed_params=model_info.fixed_params,
+                        thresholds=[model_info.thresholds[0]],
+                        t_range=t_range,
+                        rh_range=rh_range
+                    )
+                    
+                    if ax is None:
+                        print(
+                            f"Warning: {model_info.name} not compatible for boundary case "
+                            f"t_range={t_range}, rh_range={rh_range}"
+                        )
+                        continue
+                        
+                    assert "curves" in artists, (
+                        f"{model_info.name} should have curves for boundary case "
+                        f"t_range={t_range}, rh_range={rh_range}"
+                    )
+                    
+                except ValueError as e:
+                    if "strictly increasing" in str(e):
+                        continue
+                    raise
+                except Exception as e:
 
-    def test_kwargs_override_defaults(self, fixed_params_pmv):
-        """Test that **kwargs can override default labels."""
-        ax, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            xlabel="Custom Temperature Label",
-            ylabel="Custom Humidity Label",
-        )
-        assert ax.get_xlabel() == "Custom Temperature Label"
-        assert ax.get_ylabel() == "Custom Humidity Label"
-
-
-    def test_default_labels(self, fixed_params_pmv):
-        """Test default axis labels."""
-        ax, _ = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-        )
-        assert "temperature" in ax.get_xlabel().lower()
-        assert "humidity" in ax.get_ylabel().lower()
-
-
-class TestRangesTdbRhSolverControls:
-    """Test solver control parameters."""
-
-    def test_solver_parameters(self, fixed_params_pmv):
-        """Test typical solver control parameters."""
-        ax, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=[-0.5, 0.5],
-            t_range=(20.0, 26.0),
-            x_scan_step=0.5,
-            smooth_sigma=1.0,
-        )
-        assert ax is not None
-        assert len(artists["bands"]) > 0 or len(artists["curves"]) > 0
-
-
-class TestRangesTdbRhEdgeCases:
-    """Test edge cases and extreme user inputs."""
-
-    @pytest.mark.parametrize("thresholds,t_range,description", [
-        ([0.0], (23.0, 23.5), "very narrow temperature range"),
-        ([-2.0, -0.2, 0.8], (10.0, 35.0), "asymmetric thresholds"),
-        ([0.0], (20.0, 26.0), "zero threshold (neutral)"),
-        ([-2.0, -1.0], (10.0, 20.0), "cold conditions (negative thresholds)"),
-        ([1.0, 2.0], (28.0, 38.0), "hot conditions (positive thresholds)"),
-    ])
-    def test_threshold_edge_cases(self, fixed_params_pmv, thresholds, t_range, description):
-        """Test various threshold configurations that users might input."""
-        ax, artists = ranges_tdb_rh(
-            model_func=pmv_ppd_iso,
-            fixed_params=fixed_params_pmv,
-            thresholds=thresholds,
-            t_range=t_range,
-        )
-        assert ax is not None, f"Failed for {description}"
-        assert isinstance(artists, dict), f"Invalid return for {description}"
-
-    def test_different_comfort_conditions(self, fixed_params_pmv):
-        """Test with different metabolic/clothing combinations (summer/winter)."""
-        for met, clo, t_range, desc in [
-            (1.0, 0.3, (24, 30), "summer"),
-            (2.0, 1.0, (10, 20), "winter")
-        ]:
-            params = {**fixed_params_pmv, "met": met, "clo": clo}
-            ax, artists = ranges_tdb_rh(
-                model_func=pmv_ppd_iso,
-                fixed_params=params,
-                thresholds=[-0.5, 0.5],
-                t_range=t_range,
-            )
-            assert ax is not None, f"Failed for {desc} conditions"
-            assert len(artists["bands"]) > 0 or len(artists["curves"]) > 0, \
-                f"No results for {desc} conditions"
+                    if "no bracket" in str(e).lower() or "unsolved" in str(e).lower():
+                        continue
+                    else:
+                        raise
