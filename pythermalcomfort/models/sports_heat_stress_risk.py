@@ -56,7 +56,7 @@ class Sports:
 
 
 def sports_heat_stress_risk(
-    tdb: float, tr: float, rh: float, vr: float, sport: _SportsValues
+    tdb: float | list[float], tr: float | list[float], rh: float | list[float], vr: float | list[float], sport: _SportsValues
 ):
     # todo missing docstring
     # todo add references to the docstring
