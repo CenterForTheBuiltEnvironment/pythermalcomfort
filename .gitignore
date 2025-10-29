@@ -69,3 +69,6 @@ docs/_build
 
 # Mypy Cache
 .mypy_cache/
+
+# ignore local examples
+examples/
