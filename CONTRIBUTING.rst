@@ -45,6 +45,9 @@ To set up `pythermalcomfort` for local development:
     cd pythermalcomfort
     git remote add upstream git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
     git fetch upstream
+    # install the dependencies with pipenv
+    pip install pipenv
+    pipenv sync --dev
 
 2. Create a feature branch (use the naming rules below):
 
