@@ -13,14 +13,14 @@ def test_sports_heat_stress_risk_scalar(monkeypatch):
     v = 2
     tr = 20
     result = sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB)
-    assert result == pytest.approx(0.88888, rel=1e-3)
+    assert result == pytest.approx(0.9, rel=1e-3)
 
     t = 40
     rh = 40
     v = 2
     tr = 20
     result = sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB)
-    assert result == pytest.approx(2.32885906, rel=1e-3)
+    assert result == pytest.approx(2.3, rel=1e-3)
 
     t = [40, 40]
     rh = 40
@@ -28,7 +28,7 @@ def test_sports_heat_stress_risk_scalar(monkeypatch):
     tr = 20
     np.testing.assert_allclose(
         sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB),
-        [2.32885906, 2.32885906],
+        [2.3, 2.3],
         rtol=0.01,
         atol=0.01,
     )

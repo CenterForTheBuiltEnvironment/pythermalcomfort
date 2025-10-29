@@ -64,7 +64,7 @@ def sports_heat_stress_risk(
     vr: float | list[float],
     sport: _SportsValues,
 ):
-    """Short description. todo add the description form the paper
+    """Short description. todo add the description form the paper.
 
     Parameters
     ----------
@@ -262,7 +262,7 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     # todo include the recommendations based on the risk level
     # todo return a dataclass with the risk level, risk level interpolated, thresholds, and recommendations
 
-    return risk_level_interpolated
+    return round(risk_level_interpolated, 1)
 
 
 if __name__ == "__main__":
