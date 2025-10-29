@@ -58,6 +58,39 @@ class Sports:
 def sports_heat_stress_risk(
     tdb: float | list[float], tr: float | list[float], rh: float | list[float], vr: float | list[float], sport: _SportsValues
 ):
+    """Short description. todo add the description form the paper
+
+    Parameters
+    ----------
+    tdb : float or list of float
+        Dry bulb air temperature [°C].
+    tr : float or list of float
+        Mean radiant temperature [°C].
+    rh : float or list of float
+        Relative humidity [%].
+    vr : float or list of float
+        Relative air speed [m/s].
+    sport¨ : _SportsValues
+        Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
+        Use one of the entries from :pyclass:`Sports`.
+
+    Returns
+    -------
+    todo this should be a dataclass
+
+    Raises
+    ------
+    ValueError
+        If the risk level could not be determined due to NaN thresholds or if the internal
+        solver fails to produce thresholds that allow a risk determination.
+
+    Examples
+    --------
+        >>> from pythermalcomfort.models.sports_heat_stress_risk import sports_heat_stress_risk, Sports
+        >>> sports_heat_stress_risk(tdb=32, tr=32, rh=40, vr=2.0, sport=Sports.RUNNING)
+        2.4
+
+    """
     # todo missing docstring
     # todo add references to the docstring
     # todo add examples to the docstring
