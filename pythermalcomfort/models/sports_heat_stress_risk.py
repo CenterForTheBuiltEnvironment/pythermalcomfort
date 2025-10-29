@@ -121,6 +121,13 @@ def sports_heat_stress_risk(
     rh = np.asarray(rh)
     vr = np.asarray(vr)
 
+    risk_levels = np.vectorize(_calc_risk_single_value)(
+        tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
+    )
+    return risk_levels
+
+
+def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     # set the max and min thresholds for the risk levels
     sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
 
