@@ -27,89 +27,26 @@ def ranges_tdb_psychrometric(
     w_step: float = 5e-4,  # 0.5 g/kg
     rh_isolines: Sequence[float] = tuple(range(10, 100, 10)) + (100,),
     draw_background: bool = True,
+    # Visual controls
+
     # Solver controls
     x_scan_step: float = 1.0,
     smooth_sigma: float = 0.8,
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
-    # Forwarded plot customizations (visual + solver) to plot_threshold_region
-    plot_kwargs: dict[str, Any] | None = None,
+    # Additional matplotlib parameters
+    title: str | None = None,             
+    fontsize: float = 12.0,                
+    plot_kwargs: dict[str, Any] | None = None,  # The previous version allowed direct transmission of any parameters, which may have affected the core logic.
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot comfort metric regions over a psychrometric chart (Tdb vs humidity ratio).
+    """Plot comfort/risk ranges over a psychrometric chart (Tdb vs humidity ratio).
 
-    This function visualizes regions defined by one or more threshold values for a
-    comfort metric (e.g., PMV, SET) as a function of dry-bulb temperature (x-axis)
-    and humidity ratio (y-axis). The background shows the saturation curve and
-    relative humidity isolines. This is a convenience wrapper around
-    ``calc_plot_ranges`` with sensible defaults for psychrometric charts, and is
-    suitable for most comfort models in pythermalcomfort.
-
-    Parameters
-    ----------
-    model_func : Callable[..., Any]
-        The comfort model function to evaluate. Must accept keyword arguments for all
-        required variables and return a result with the desired metric.
-    fixed_params : dict[str, Any] or None, optional
-        Dictionary of model parameters to keep fixed for all evaluations (e.g.,
-        tr, met, clo, vr, wme, p_atm). If None, all non-x/y model arguments must be
-        provided by the user.
-    thresholds : Sequence[float] or None, optional
-        List of threshold values to define the region boundaries. If None, uses
-        the default thresholds registered for the model.
-    t_range : tuple[float, float], default (10.0, 36.0)
-        The (min, max) range for dry-bulb temperature [°C] on the x-axis.
-    w_range : tuple[float, float], default (0.0, 0.03)
-        The (min, max) range for humidity ratio [kg/kg] on the y-axis.
-    w_step : float, default 5e-4
-        Step size for the humidity ratio grid.
-    rh_isolines : Sequence[float], default (10, 20, ..., 100)
-        Relative humidity values (%) for background isolines.
-    draw_background : bool, default True
-        Whether to draw the saturation curve and RH isolines in the background.
-    x_scan_step : float, default 1.0
-        Step size for scanning the temperature axis when solving for thresholds.
-    smooth_sigma : float, default 0.8
-        Sigma for optional smoothing of the threshold curves.
-    ax : matplotlib.axes.Axes or None, optional
-        Axes to plot on. If None, a new figure and axes are created.
-    legend : bool, default True
-        Whether to add a default legend for the regions.
-    plot_kwargs : dict[str, Any] or None, optional
-        Additional keyword arguments forwarded to ``calc_plot_ranges`` for further
-        customization (e.g., cmap, band_colors, xlabel, ylabel, etc.).
-
-    Returns
-    -------
-    ax : matplotlib.axes.Axes
-        The matplotlib Axes with the plot.
-    artists : dict[str, Any]
-        Dictionary with keys 'bands', 'curves', and 'legend' containing the
-        corresponding matplotlib artists for further customization.
-
-    Raises
-    ------
-    ValueError
-        If w_step or x_scan_step is not positive, or if no thresholds are provided
-        and no defaults are registered for the model.
-
-    Examples
-    --------
-    >>> from pythermalcomfort.models import pmv_ppd_iso
-    >>> from pythermalcomfort.plots.matplotlib import ranges_tdb_psychrometric
-    >>> ax, artists = ranges_tdb_psychrometric(
-    ...     model_func=pmv_ppd_iso,
-    ...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
-    ...     thresholds=[-0.5, 0.5],
-    ...     t_range=(18, 30),
-    ...     w_range=(0.002, 0.018),
-    ...     w_step=0.001,
-    ...     plot_kwargs={"cmap": "coolwarm"},
-    ... )
-    >>> import matplotlib.pyplot as plt
-    >>> plt.show()
+    Visual appearance can be overridden via ``plot_kwargs`` (e.g., cmap, labels, etc.).
+    Core solving logic remains unchanged.
     """
     fixed_params = dict(fixed_params or {})
+
     # Validate ranges and steps
     t_lo, t_hi = _validate_range("t_range", t_range)
     w_lo, w_hi = _validate_range("w_range", w_range)
@@ -125,10 +62,9 @@ def ranges_tdb_psychrometric(
             raise ValueError(
                 "No thresholds provided and no defaults registered for this model."
             )
-
+     # The style is not fixed; all settings will be based on the Figure level from now on.
     if ax is None:
-        plt.style.use("seaborn-v0_8-whitegrid")
-        _, ax = plt.subplots(figsize=(7, 3), dpi=300, constrained_layout=True)
+        _, ax = plt.subplots()  
 
     # Background chart (saturation curve and RH isolines)
     p_pa = float(fixed_params.get("p_atm", 101325.0))
@@ -147,7 +83,7 @@ def ranges_tdb_psychrometric(
                 ax.plot(t_grid_bg, w_curve, color="lightgray", lw=0.6, ls="--")
 
         handles, labels = ax.get_legend_handles_labels()
-        if handles:
+        if handles and legend:  
             ax.legend(
                 handles=handles,
                 labels=labels,
@@ -175,7 +111,7 @@ def ranges_tdb_psychrometric(
             # if never achievable within [t_lo, t_hi], leave at t_hi (no area)
             x_left_clip[i] = t_hi
 
-    # Delegate region plotting (mapper converts W->RH internally)
+  
     kwargs: dict[str, Any] = {
         "model_func": model_func,
         "xy_to_kwargs": mapper_tdb_w,
@@ -185,19 +121,62 @@ def ranges_tdb_psychrometric(
         "y_values": y_values,
         "metric_attr": None,
         "ax": ax,
-        "xlabel": "Dry-bulb air temperature [°C]",
-        "ylabel": "Humidity ratio [kg/kg]",
+        "xlabel": "Dry-bulb air temperature [°C]",  
+        "ylabel": "Humidity ratio [kg/kg]",         
         "legend": legend,
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
         "x_left_clip": x_left_clip,
-    }
-    if plot_kwargs:
-        kwargs.update(plot_kwargs)
+    }  
+    # Explicit visual controls
+    if plot_kwargs: kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
+    #Controllable appearance and reliable computing
+    ax, artists = calc_plot_ranges(**kwargs)  
 
-    ax, artists = calc_plot_ranges(**kwargs)
 
-    ax.set_xlim(t_lo, t_hi)
-    ax.set_ylim(w_lo, w_hi)
+    ax.set_xlim(t_lo, t_hi)  
+    ax.set_ylim(w_lo, w_hi)   
+
+
+    fig = ax.figure                       
+    fig.set_size_inches(7, 5)             
+    fig.set_dpi(150)                      # Size and clarity modification
+    fig.suptitle(                         # Place the title on the Figure layer to avoid overlapping with the legend.
+        title or "Psychrometric Chart (Tdb vs Humidity Ratio)",
+        fontsize=fontsize,
+        y=0.96,
+    )
+
+    try:
+        pos = ax.get_position()
+        ax.set_position([pos.x0, max(0.06, pos.y0 + 0.02), pos.width, pos.height * 0.92])  # Move the text upwards and compress it to leave space for the title/legend.
+    except Exception:
+        pass  # To prevent individual backend errors
 
     return ax, artists
+
+
+if __name__ == "__main__":
+    from pythermalcomfort.models import pmv_ppd_iso  
+
+    ax, _ = ranges_tdb_psychrometric(
+        model_func=pmv_ppd_iso,
+        fixed_params={
+            "tr": 25.0,
+            "met": 1.2,
+            "clo": 0.5,
+            "vr": 0.1,
+            "wme": 0.0,
+          
+        },
+        thresholds=[-0.5, 0.5],
+        t_range=(18, 30),
+        w_range=(0.002, 0.018),
+        w_step=0.001,
+
+        title="Psychrometric comfort ranges",  
+        fontsize=12.0,                          
+    )
+
+    import matplotlib.pyplot as plt
+    plt.show()

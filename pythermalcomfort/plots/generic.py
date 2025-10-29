@@ -13,6 +13,14 @@ from .utils import (
 )
 
 
+# Default plot configuration constants
+DEFAULT_FIGSIZE = (7, 4)
+DEFAULT_DPI = 300
+DEFAULT_STYLE = "seaborn-v0_8-whitegrid"
+MIN_REGION_WIDTH = 1e-12  # Minimum width for valid regions
+DEFAULT_LEGEND_LOC = "lower center"  # Default legend location
+DEFAULT_LEGEND_ANCHOR = (0.5, 1)  # Default legend anchor position
+
 def calc_plot_ranges(
     *,
     model_func: Callable[..., Any],
@@ -128,13 +136,13 @@ def calc_plot_ranges(
     >>> plt.show()
     """
     if ax is None:
-        plt.style.use("seaborn-v0_8-whitegrid")
-        _, ax = plt.subplots(figsize=(7, 4), dpi=300, constrained_layout=True)
+        plt.style.use(DEFAULT_STYLE)
+        _, ax = plt.subplots(figsize=DEFAULT_FIGSIZE, dpi=DEFAULT_DPI, constrained_layout=True)
 
     # Build evaluator and compute curves
     metric_xy = make_metric_eval(
         model_func=model_func,
-        xy_to_kwargs=xy_to_kwargs,
+        mapper=xy_to_kwargs,
         fixed_params=fixed_params,
         metric_attr=metric_attr,
     )
@@ -149,55 +157,66 @@ def calc_plot_ranges(
     )
 
     curves: list[np.ndarray] = res["curves"]
-    y_arr: np.ndarray = res["y_values"]
-    thr_list: list[float] = res["thresholds"]
+    y_values_array: np.ndarray = res["y_values"]
+    thresholds_list: list[float] = res["thresholds"]
 
     # Prepare color bands
+    # Validate that only one color specification method is used
     if band_colors is not None and cmap != "coolwarm":
-        raise ValueError("Provide only one of cmap or band_colors, not both.")
+        raise ValueError("Cannot specify both band_colors and custom cmap. Use either band_colors or the default cmap.")
 
     needed = len(thresholds) + 1
     if band_colors is not None:
         if len(band_colors) != needed:
             raise ValueError("band_colors must have length equal to number of regions")
-        band_colors = band_colors
     else:
         cmap_obj = plt.get_cmap(cmap)
         band_colors = [cmap_obj(i / (needed - 1)) for i in range(needed)]
 
-    # Optional left clip per y (same length as y_arr)
+    # Optional left clip per y (same length as y_values_array)
     clip_arr = None
     if x_left_clip is not None:
         clip_arr = np.asarray(list(x_left_clip), dtype=float)
-        if clip_arr.shape != y_arr.shape:
+        if clip_arr.shape != y_values_array.shape:
             raise ValueError("x_left_clip must have same shape as y_values")
 
     # Constant x boundaries
     x_lo, x_hi = float(x_bounds[0]), float(x_bounds[1])
-    left_const = np.full_like(y_arr, x_lo, dtype=float)
-    right_const = np.full_like(y_arr, x_hi, dtype=float)
+    left_const = np.full_like(y_values_array, x_lo, dtype=float)
+    right_const = np.full_like(y_values_array, x_hi, dtype=float)
 
-    # Fill regions between curves
-    regions = (
-        ([(left_const, curves[0])] if curves else [])
-        + [(curves[i], curves[i + 1]) for i in range(len(curves) - 1)]
-        + ([(curves[-1], right_const)] if curves else [(left_const, right_const)])
-    )
+    # Build regions between curves
+    regions = []
+    
+    if curves:
+        # First region: from left boundary to first curve
+        regions.append((left_const, curves[0]))
+        
+        # Middle regions: between consecutive curves
+        for i in range(len(curves) - 1):
+            regions.append((curves[i], curves[i + 1]))
+        
+        # Last region: from last curve to right boundary
+        regions.append((curves[-1], right_const))
+    else:
+        # No curves: single region from left to right boundary
+        regions.append((left_const, right_const))
 
     band_artists = []
     for i, (left, right) in enumerate(regions):
         # Apply left clip if provided to ensure valid domain (e.g., RH <= 100%)
         left_plot = np.maximum(left, clip_arr) if clip_arr is not None else left
-        m = np.isfinite(left_plot) & np.isfinite(right)
-        if m.any():
-            # Only fill where the band has positive width after clipping
-            width_mask = (right - left_plot) > 1e-12
-            m = m & width_mask
-            if m.any():
+        
+        # Combined mask for finite values and positive width
+        finite_mask = np.isfinite(left_plot) & np.isfinite(right)
+        width_mask = (right - left_plot) > MIN_REGION_WIDTH
+        valid_mask = finite_mask & width_mask
+        
+        if valid_mask.any():
                 coll = ax.fill_betweenx(
-                    y_arr[m],
-                    left_plot[m],
-                    right[m],
+                    y_values_array[valid_mask],
+                    left_plot[valid_mask],
+                    right[valid_mask],
                     color=band_colors[i],
                     alpha=band_alpha,
                     linewidth=0,
@@ -211,7 +230,7 @@ def calc_plot_ranges(
         if clip_arr is not None:
             m = m & (curve >= clip_arr)
         if m.any():
-            (ln,) = ax.plot(curve[m], y_arr[m], color=line_color, linewidth=line_width)
+            (ln,) = ax.plot(curve[m], y_values_array[m], color=line_color, linewidth=line_width)
             curve_artists.append(ln)
 
     # Minimal axis labels
@@ -225,14 +244,14 @@ def calc_plot_ranges(
     if legend:
         legend_elements = []
         for i in range(needed):
-            if i == 0 and len(thr_list) > 0:
-                label = f"< {thr_list[0]:.1f}"
-            elif i == needed - 1 and len(thr_list) > 0:
-                label = f"> {thr_list[-1]:.1f}"
-            elif len(thr_list) == 0:
+            if i == 0 and len(thresholds_list) > 0:
+                label = f"< {thresholds_list[0]:.1f}"
+            elif i == needed - 1 and len(thresholds_list) > 0:
+                label = f"> {thresholds_list[-1]:.1f}"
+            elif len(thresholds_list) == 0:
                 label = "Region"
             else:
-                label = f"{thr_list[i - 1]:.1f} to {thr_list[i]:.1f}"
+                label = f"{thresholds_list[i - 1]:.1f} to {thresholds_list[i]:.1f}"
             legend_elements.append(
                 plt.Rectangle(
                     (0, 0),
@@ -245,8 +264,8 @@ def calc_plot_ranges(
             )
         legend_artist = ax.legend(
             handles=legend_elements,
-            loc="lower center",
-            bbox_to_anchor=(0.5, 1),
+            loc=DEFAULT_LEGEND_LOC,
+            bbox_to_anchor=DEFAULT_LEGEND_ANCHOR,
             ncol=min(6, len(legend_elements)),
             framealpha=0.8,
             markerscale=0.6,

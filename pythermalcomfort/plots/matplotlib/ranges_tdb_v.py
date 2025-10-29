@@ -30,6 +30,10 @@ def ranges_tdb_v(
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
+    # Title parameter
+    title: str | None = None,  
+    # Font size parameter 
+    fontsize: float = 12,     
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
@@ -136,10 +140,23 @@ def ranges_tdb_v(
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
     }
+    
     if plot_kwargs:
-        kwargs.update(plot_kwargs)
+        # only prevent logic parameters from being overridden
+        kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
 
     ax, artists = calc_plot_ranges(**kwargs)
+
+    # Automatically control figure size (ensure the chart is properly scaled)
+    fig = plt.gcf()
+    fig.set_size_inches(7, 5)
+    fig.set_dpi(150)
+    # Place title at the Figure level (ensure it doesn’t overlap with legend)
+    fig.suptitle(title or "Air Temperature vs Air Speed", fontsize=fontsize, y=0.96) 
+
+    # Adjust plot area position (to leave space for the title and legend）
+    pos = ax.get_position()
+    ax.set_position([pos.x0, pos.y0 - 0.03, pos.width, pos.height])
 
     return ax, artists
 
