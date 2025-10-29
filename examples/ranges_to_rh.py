@@ -68,7 +68,7 @@ def ranges_to_rh(
 
     # Build y (RH) grid
     y_values = np.arange(rh_lo, rh_hi + 1e-9, float(rh_step))
-    # Prepare call with sane defaults then let plot_kwargs override
+    
     kwargs: dict[str, Any] = {
         "model_func": model_func,
         "xy_to_kwargs": mapper_top_rh,
@@ -85,13 +85,10 @@ def ranges_to_rh(
         "smooth_sigma": float(smooth_sigma),
     }  
 
-    if plot_kwargs: 
-         # only prevent logic parameters from being overridden
-        kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
-
+    if plot_kwargs: kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
     ax, artists = calc_plot_ranges(**kwargs)       # The call remains unchanged, only the source of the parameters changes
 
-    # Automatically control figure size (ensure the chart is properly scaled)
+    
     fig = ax.figure                                  
     fig.set_size_inches(7, 5)                        
     fig.set_dpi(150)                                 
@@ -110,7 +107,7 @@ def ranges_to_rh(
 
     return ax, artists
 
-#smoke test
+
 if __name__ == "__main__":
     from pythermalcomfort.models import pmv_ppd_iso  # type: ignore
 

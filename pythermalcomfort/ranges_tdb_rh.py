@@ -30,10 +30,8 @@ def ranges_tdb_rh(
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
-    # Title parameter
-    title: str | None = None, 
-    # Font size parameter 
-    fontsize: float = 12,      
+    title: str | None = None,  # 🟢 新增：标题参数
+    fontsize: float = 12,      # 🟢 新增：字体大小参数
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
@@ -82,21 +80,21 @@ def ranges_tdb_rh(
     ax, artists
         The Matplotlib Axes and a dict with 'bands', 'curves', 'legend'.
     """
-    # Add stricter input validation to ensure min < max
+    # 🟢 修改：增加更严格的输入范围验证，确保 min < max
     t_lo, t_hi = _validate_range("t_range", t_range)
     rh_lo, rh_hi = _validate_range("rh_range", rh_range)
     if t_lo >= t_hi or rh_lo >= rh_hi:
         raise ValueError("Invalid range: min must be smaller than max.")
 
 
-    # Unified logic for checking step values
+    # 🟢 修改：统一 step 检查逻辑
     if rh_step <= 0 or x_scan_step <= 0:
-        raise ValueError("Both rh_step and x_scan_step must be positive.")  
+        raise ValueError("Both rh_step and x_scan_step must be positive.")  # 🟢 合并报错
 
     # Determine thresholds
     if thresholds is None:
         thresholds = get_default_thresholds(model_func)
-        # Provide a more detailed error message
+        # 🟢 修改：提供更详细的错误信息
         if thresholds is None:
             raise ValueError(
                 f"No thresholds provided and no defaults registered for {model_func.__name__}."
@@ -121,23 +119,22 @@ def ranges_tdb_rh(
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
     }
-    
+ 
     if plot_kwargs:
-        # only prevent logic parameters from being overridden
-        kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
+        # Let user-provided overrides take precedence (e.g., cmap/band_alpha/etc.)
+        kwargs.update(plot_kwargs)
 
     # Delegate to generic plotter
     ax, artists = calc_plot_ranges(**kwargs)
 
 
-    # Automatically control figure size (ensure the chart is properly scaled)
+    # 🟢 新增：自动控制画布大小（解决图太大的问题）
     fig = plt.gcf()
     fig.set_size_inches(7, 5)
     fig.set_dpi(150)
-    # Place title at the Figure level (ensure it doesn’t overlap with legend)
-    fig.suptitle(title or "Temperature vs Relative Humidity", fontsize=fontsize, y=0.96) 
+    fig.suptitle(title or "Temperature vs Relative Humidity", fontsize=fontsize, y=0.96) #将标题放在 Figure 层（确保标题和图例不会重叠）
 
-    # Adjust plot area position (to leave space for the title and legend)
+    # 🟢 9️⃣ 调整绘图区位置（让标题与图例都有空间）
     pos = ax.get_position()
     ax.set_position([pos.x0, pos.y0 - 0.03, pos.width, pos.height])
 

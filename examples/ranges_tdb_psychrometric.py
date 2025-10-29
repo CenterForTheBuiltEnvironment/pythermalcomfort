@@ -157,7 +157,7 @@ def ranges_tdb_psychrometric(
 
 
 if __name__ == "__main__":
-    from pythermalcomfort.models import pmv_ppd_iso  
+    from pythermalcomfort.models import pmv_ppd_iso  # type: ignore
 
     ax, _ = ranges_tdb_psychrometric(
         model_func=pmv_ppd_iso,
