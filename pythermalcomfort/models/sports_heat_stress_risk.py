@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import warnings
 from dataclasses import dataclass
 
@@ -56,7 +58,11 @@ class Sports:
 
 
 def sports_heat_stress_risk(
-    tdb: float | list[float], tr: float | list[float], rh: float | list[float], vr: float | list[float], sport: _SportsValues
+    tdb: float | list[float],
+    tr: float | list[float],
+    rh: float | list[float],
+    vr: float | list[float],
+    sport: _SportsValues,
 ):
     """Short description. todo add the description form the paper
 
@@ -96,7 +102,11 @@ def sports_heat_stress_risk(
         rh = 50
         v = 0.1
 
-        from pythermalcomfort.models.sports_heat_stress_risk import sports_heat_stress_risk, Sports
+        from pythermalcomfort.models.sports_heat_stress_risk import (
+            sports_heat_stress_risk,
+            Sports,
+        )
+
         # call with prepared variables
         sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
         # Expected: ~2.4
@@ -105,6 +115,11 @@ def sports_heat_stress_risk(
     # todo add references to the docstring
     # todo add examples to the docstring
     # todo the function should accept either float or arrays as all the other functions pythermalcomfort
+
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    rh = np.asarray(rh)
+    vr = np.asarray(vr)
 
     # set the max and min thresholds for the risk levels
     sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
@@ -247,7 +262,7 @@ if __name__ == "__main__":
     # first example
     t = 35
     rh = 40
-    v = .1
+    v = 0.1
     tr = 70
     sport = "running"
     print(sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB))
@@ -262,9 +277,7 @@ if __name__ == "__main__":
             results.append((t, rh, risk_interp))
     import pandas as pd
 
-    df = pd.DataFrame(
-        results, columns=["tdb", "rh", "risk_level_interpolated"]
-    )
+    df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"])
     df_pivot = df.pivot(index="rh", columns="tdb", values="risk_level_interpolated")
     df_pivot.sort_index(ascending=False, inplace=True)
     import matplotlib.pyplot as plt
