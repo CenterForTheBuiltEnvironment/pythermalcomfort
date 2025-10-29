@@ -30,6 +30,10 @@ def ranges_tdb_rh(
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
+    # Title parameter
+    title: str | None = None, 
+    # Font size parameter 
+    fontsize: float = 12,      
     # Forwarded plot customizations (visual + solver) to plot_threshold_region
     plot_kwargs: dict[str, Any] | None = None,
 ) -> tuple[plt.Axes, dict[str, Any]]:
@@ -78,20 +82,24 @@ def ranges_tdb_rh(
     ax, artists
         The Matplotlib Axes and a dict with 'bands', 'curves', 'legend'.
     """
-    # Validate ranges and steps
+    # Add stricter input validation to ensure min < max
     t_lo, t_hi = _validate_range("t_range", t_range)
     rh_lo, rh_hi = _validate_range("rh_range", rh_range)
-    if rh_step <= 0:
-        raise ValueError("rh_step must be positive")
-    if x_scan_step <= 0:
-        raise ValueError("x_scan_step must be positive")
+    if t_lo >= t_hi or rh_lo >= rh_hi:
+        raise ValueError("Invalid range: min must be smaller than max.")
+
+
+    # Unified logic for checking step values
+    if rh_step <= 0 or x_scan_step <= 0:
+        raise ValueError("Both rh_step and x_scan_step must be positive.")  
 
     # Determine thresholds
     if thresholds is None:
         thresholds = get_default_thresholds(model_func)
+        # Provide a more detailed error message
         if thresholds is None:
             raise ValueError(
-                "No thresholds provided and no defaults registered for this model."
+                f"No thresholds provided and no defaults registered for {model_func.__name__}."
             )
 
     # Build y (RH) grid
@@ -113,11 +121,38 @@ def ranges_tdb_rh(
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
     }
+    
     if plot_kwargs:
-        # Let user-provided overrides take precedence (e.g., cmap/band_alpha/etc.)
-        kwargs.update(plot_kwargs)
+        # only prevent logic parameters from being overridden
+        kwargs.update({k: v for k, v in plot_kwargs.items() if k not in ("model_func", "xy_to_kwargs")})
 
     # Delegate to generic plotter
     ax, artists = calc_plot_ranges(**kwargs)
 
+
+    # Automatically control figure size (ensure the chart is properly scaled)
+    fig = plt.gcf()
+    fig.set_size_inches(7, 5)
+    fig.set_dpi(150)
+    # Place title at the Figure level (ensure it doesn’t overlap with legend)
+    fig.suptitle(title or "Temperature vs Relative Humidity", fontsize=fontsize, y=0.96) 
+
+    # Adjust plot area position (to leave space for the title and legend)
+    pos = ax.get_position()
+    ax.set_position([pos.x0, pos.y0 - 0.03, pos.width, pos.height])
+
     return ax, artists
+
+if __name__ == "__main__":
+    from pythermalcomfort.models import pmv_ppd_iso  
+
+    ax, artists = ranges_tdb_rh(
+        model_func=pmv_ppd_iso,
+        fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
+        thresholds=[-0.5, 0.5],
+        t_range=(15, 35),
+        rh_range=(10, 90),
+        rh_step=5,
+       #title= "PMV Comfort Zones (Tdb–RH)"
+    )
+    plt.show()
