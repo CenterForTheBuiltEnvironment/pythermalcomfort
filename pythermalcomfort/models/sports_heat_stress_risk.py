@@ -86,12 +86,22 @@ def sports_heat_stress_risk(
 
     Examples
     --------
-        >>> from pythermalcomfort.models.sports_heat_stress_risk import sports_heat_stress_risk, Sports
-        >>> sports_heat_stress_risk(tdb=32, tr=32, rh=40, vr=2.0, sport=Sports.RUNNING)
-        2.4
+    .. code-block:: python
+
+        from pythermalcomfort.models import pmv_ppd_iso
+        from pythermalcomfort.utilities import v_relative
+
+        tdb = 25
+        tr = 25
+        rh = 50
+        v = 0.1
+
+        from pythermalcomfort.models.sports_heat_stress_risk import sports_heat_stress_risk, Sports
+        # call with prepared variables
+        sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
+        # Expected: ~2.4
 
     """
-    # todo missing docstring
     # todo add references to the docstring
     # todo add examples to the docstring
     # todo the function should accept either float or arrays as all the other functions pythermalcomfort
