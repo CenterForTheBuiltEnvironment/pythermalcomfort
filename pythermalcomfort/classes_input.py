@@ -1289,35 +1289,45 @@ class IREQInputs(BaseInputs):
     limit_inputs: bool = field(default=True) # Whether to enforce valid physical limits on inputs
 
     def __post_init__(self):
-        """Validate and convert inputs for the IREQ model."""
-        
+        """Validate and normalise inputs for the IREQ model."""
+        # Call base class post-init for generic validation and Series conversion
         super().__post_init__()
-       
-        # Convert potential pandas.Series or list-like objects to NumPy arrays or lists.
-        for attr in ["m", "w_work", "p_air", "v_walk", "tdb", "tr", "v", "rh", "clo"]:
-            val = getattr(self, attr)
-            if hasattr(val, "to_numpy"):
-                val = val.to_numpy()
-            elif hasattr(val, "tolist"):
-                val = val.tolist()
-            setattr(self, attr, val)
 
-         # 'm' is mandatory for IREQ, so raise an error if missing.
+        # --- Validate and normalise required inputs ---
         if self.m is None:
             raise ValueError("Parameter 'm' (metabolic rate) is required for IREQ calculation.")
-        if np.any(np.array(self.m) <= 0):
+
+        self.m = np.asarray(self.m, dtype=float)
+        if np.any(self.m <= 0):
             raise ValueError("Metabolic rate 'm' must be greater than 0.")
 
-        # Validation
-        if np.any(np.array(self.w_work) < 0):
+        # --- Validate and normalise optional numeric parameters ---
+        self.w_work = np.asarray(self.w_work, dtype=float)
+        if np.any(self.w_work < 0):
             raise ValueError("External work 'w_work' must be non-negative.")
-        if np.any(np.array(self.p_air) <= 0):
+
+        self.p_air = np.asarray(self.p_air, dtype=float)
+        if np.any(self.p_air <= 0):
             raise ValueError("Air pressure 'p_air' must be positive.")
-        if np.any(np.array(self.v_walk) < 0):
+
+        self.v_walk = np.asarray(self.v_walk, dtype=float)
+        if np.any(self.v_walk < 0):
             raise ValueError("Walking speed 'v_walk' must be non-negative.")
-        if np.any(np.array(self.v) < 0):
+
+        self.v = np.asarray(self.v, dtype=float)
+        if np.any(self.v < 0):
             raise ValueError("Air velocity 'v' must be non-negative.")
-        if np.any((np.array(self.rh) < 0) | (np.array(self.rh) > 100)):
+
+        self.rh = np.asarray(self.rh, dtype=float)
+        if np.any((self.rh < 0) | (self.rh > 100)):
             raise ValueError("Relative humidity 'rh' must be between 0 and 100%.")
-        if np.any(np.array(self.clo) < 0):
+
+        self.clo = np.asarray(self.clo, dtype=float)
+        if np.any(self.clo < 0):
             raise ValueError("Clothing insulation 'clo' must be non-negative.")
+
+        # --- Normalise optional environmental inputs ---
+        if self.tdb is not None:
+            self.tdb = np.asarray(self.tdb, dtype=float)
+        if self.tr is not None:
+            self.tr = np.asarray(self.tr, dtype=float)
