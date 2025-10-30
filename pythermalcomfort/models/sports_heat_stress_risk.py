@@ -84,7 +84,12 @@ def sports_heat_stress_risk(
     Returns
     -------
     todo this should be a dataclass
-
+    SportsHeatStressRiskResult
+        Dataclass containing:
+        - ``pmv`` : Predicted mean vote (float or np.ndarray)
+        - ``p`` : Heat strain probability (float or np.ndarray)
+        - ``risk_level`` : Risk classification (str or np.ndarray)
+    """
     Raises
     ------
     ValueError
