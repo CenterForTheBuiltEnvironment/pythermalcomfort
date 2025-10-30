@@ -412,8 +412,9 @@ def _solve_dle_iteration(
         step_factor = step_factor / 2
         q_store = np.where(energy_balance > 0, q_store + step_factor, q_store - step_factor)
 
+    # Guard against division by zero
+    q_store = np.where(np.abs(q_store) < 1e-10, np.sign(q_store) * 1e-10, q_store)
     return -40.0 / q_store
-
 
 def _calculate_ireq_conditions(
     m: np.ndarray,
@@ -463,10 +464,10 @@ def _calculate_ireq_conditions(
     # Format DLE result
     dle_result = np.round(dle * 10.0) / 10.0
     if np.isscalar(dle_result):
-        if dle > 8 or dle < 0:
+        if dle_result > 8 or dle_result < 0:
             dle_result = "more than 8"
     else:
-        mask = (dle > 8) | (dle < 0)
+        mask = (dle_result > 8) | (dle_result < 0)
         if np.any(mask):
             dle_result = dle_result.astype(object)
             dle_result[mask] = "more than 8"
