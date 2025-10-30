@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -1290,6 +1290,8 @@ class IREQInputs(BaseInputs):
 
     def __post_init__(self):
         """Validate and convert inputs for the IREQ model."""
+        
+        super().__post_init__()
        
         # Convert potential pandas.Series or list-like objects to NumPy arrays or lists.
         for attr in ["m", "w_work", "p_air", "v_walk", "tdb", "tr", "v", "rh", "clo"]:

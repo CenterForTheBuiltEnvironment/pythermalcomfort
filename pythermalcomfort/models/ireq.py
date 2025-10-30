@@ -176,21 +176,15 @@ def calc_ireq(
         dle_neutral=results_neutral["dle"],
     )
     
-
 def _validate_input_shapes(*arrays) -> None:
-    """Validate that inputs are broadcastable (NumPy broadcasting)."""
-    non_scalars = [np.asarray(a) for a in arrays if np.shape(a) != ()] # Convert inputs to ndarrays and keep only those that are not scalars
-    if not non_scalars:
-        return  
-
+    """Validate inputs are broadcastable."""
+    shapes = [np.shape(a) for a in arrays if np.shape(a) != ()]
+    if not shapes:
+        return
     try:
-        # only broadcasting check, not change data
-        np.broadcast_arrays(*non_scalars) # Ask NumPy to compute a common broadcasted shape; raises ValueError if incompatible
+        np.broadcast_shapes(*shapes)
     except ValueError as e:
-        shapes = [np.shape(a) for a in arrays] # Collect the original shapes to provide a clear error message
         raise ValueError(f"Incompatible shapes for broadcasting: {shapes}") from e
-
-
 
 def _validate_input_ranges(
     m: np.ndarray,
@@ -467,8 +461,15 @@ def _calculate_ireq_conditions(
     icl_clo = np.round((icl_m2cw / 0.155) * 10.0) / 10.0
     
     # Format DLE result
-    dle_result = np.where(dle > 8, "more than 8", np.round(dle * 10.0) / 10.0)
-    
+    dle_result = np.round(dle * 10.0) / 10.0
+    if np.isscalar(dle_result):
+        if dle > 8 or dle < 0:
+            dle_result = "more than 8"
+    else:
+        mask = (dle > 8) | (dle < 0)
+        if np.any(mask):
+            dle_result = dle_result.astype(object)
+            dle_result[mask] = "more than 8"
 
     return {
         "ireq": ireq_clo,
