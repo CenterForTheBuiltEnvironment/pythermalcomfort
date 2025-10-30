@@ -65,7 +65,7 @@ def sports_heat_stress_risk(
     sport: _SportsValues,
 ):
     """Short description. todo add the description form the paper.
-    ""This study evaluates Sports Medicine Australia's 2021 extreme heat policy using a heat-balance model, showing improved protection against heat stress for adults in community sports."
+    This study evaluates Sports Medicine Australia's 2021 extreme heat policy using a heat-balance model, showing improved protection against heat stress for adults in community sports.
 
     Parameters
     ----------
@@ -83,15 +83,16 @@ def sports_heat_stress_risk(
 
     Returns
     -------
-    todo this should be a dataclass
+    # todo this should be a dataclass
     SportsHeatStressRiskResult
-        Dataclass containing:
-        - ``pmv`` : Predicted mean vote (float or np.ndarray)
-        - ``p`` : Heat strain probability (float or np.ndarray)
-        - ``risk_level`` : Risk classification (str or np.ndarray)
-    """
+        Dataclass containing the results:
+        - pmv : Predicted Mean Vote (float or np.ndarray)
+        - p : Heat strain probability (float or np.ndarray)
+        - risk_level : Risk classification (str or np.ndarray)
+
     Raises
     ------
+
     ValueError
         If the risk level could not be determined due to NaN thresholds or if the internal
         solver fails to produce thresholds that allow a risk determination.
@@ -117,9 +118,44 @@ def sports_heat_stress_risk(
         sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
         # Expected: ~2.4
 
-    """
-    # todo add references to the docstring
+   # todo add references to the docstring
+
+    References
+    ----------
+    1. Sports Medicine Australia. (2021). *Extreme Heat Policy for Community Sport*.
+       https://sma.org.au/resources-advice/extreme-heat-policy/
+
     # todo add examples to the docstring
+    Examples
+    --------
+    .. code-block:: python
+
+        import numpy as np
+        from pythermalcomfort.models.sports_heat_stress_risk import (
+        sports_heat_stress_risk,
+        Sports,
+        SportsHeatStressRiskResult
+        )
+
+        # Define environmental conditions
+        tdb = 25          # Dry bulb temperature [°C]
+        tr = 25           # Mean radiant temperature [°C]
+        rh = 50           # Relative humidity [%]
+        vr = 0.1          # Air velocity [m/s]
+
+        # Choose sport
+        sport = Sports.RUNNING
+
+        # Call the function
+        result: SportsHeatStressRiskResult = sports_heat_stress_risk(
+        tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
+        )
+
+        # Access individual results
+        print("Predicted Mean Vote (PMV):", result.pmv)
+        print("Heat strain probability:", result.p)
+        print("Risk level:", result.risk_level)
+    """
     # todo the function should accept either float or arrays as all the other functions pythermalcomfort
 
     tdb = np.asarray(tdb)
