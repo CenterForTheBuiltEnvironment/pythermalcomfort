@@ -1,15 +1,18 @@
 Changelog
 =========
 
-3.7.0 (2025-10-16)
+3.8.0 (2025-10-30)
 ------------------
 
-* Added the `calc_ireq()` function implementing the ISO 11079 Required Clothing Insulation (IREQ) model.
-* The model estimates required clothing insulation for both minimum (`IREQ_min`) and neutral (`IREQ_neutral`) thermal balance conditions, as well as Duration Limited Exposure (DLE) limits.
-* The function supports scalar and vectorized numpy array inputs, automatic broadcasting, and full input validation (type, shape, and physical range checks).
-* Added comprehensive unit tests (`test_ireq.py`) covering scalar, array, broadcasting, invalid, and edge-case inputs.
-* Added validation cases from ISO 11079 Table F.1 for deterministic reference comparison.
-* Added `IREQ` dataclass to standardize model outputs and documentation under `docs/documentation/models.rst`.
+* Added calc_ireq() function implementing the Required Clothing Insulation (IREQ) according to ISO 11079:2007.
+* Added IREQ dataclass to classes_return.py to standardize output attributes (ireq_neutral, ireq_min, icl_neutral, icl_min, dle_neutral, dle_min).
+* Extended classes_input.py with input validation for IREQ-related parameters.
+* Added comprehensive unit tests in tests/test_ireq.py covering scalar, array, broadcasting, and invalid input cases.
+
+3.7.0 (2025-10-28)
+------------------
+
+* Added machine learning model to predict skin and rectal temperature ridge_regression_predict_t_re_t_sk.
 
 3.6.1 (2025-10-07)
 ------------------

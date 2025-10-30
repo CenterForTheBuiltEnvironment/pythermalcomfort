@@ -1,8 +1,7 @@
 import numpy as np
 from typing import Union, Dict, Any
-import pandas  as pd
-from pythermalcomfort.classes_input import IREQInputs
 from pythermalcomfort.classes_return import IREQ
+
 
 def calc_ireq(
     m: Union[float, np.ndarray],
@@ -71,7 +70,7 @@ def calc_ireq(
     --------
     .. code-block:: python
 
-    from ireq import calc_ireq
+    from pythermalcomfort.models.ireq import calc_ireq
     import numpy as np
 
     # Scalar (single-point) usage
@@ -150,15 +149,6 @@ def calc_ireq(
     _validate_input_ranges(m_arr, w_work_arr, tdb_arr, tr_arr, p_air_arr,
                           v_walk_arr, v_arr, rh_arr, clo_arr)
 
-    # Apply input boundaries
-    m_arr = np.clip(m_arr, 58.0, 400.0)
-    tdb_arr = np.minimum(tdb_arr, 10.0)
-    
-    # Calculate walking speed boundaries
-    w_min_calculated = 0.0052 * (m_arr - 58.0)
-    v_walk_arr = np.clip(v_walk_arr, w_min_calculated, 1.2)
-    v_arr = np.clip(v_arr, 0.4, 18.0)
-
     # Convert clothing insulation from clo to m2C/W
     clo_m2cw = clo_arr * 0.155
     
@@ -176,6 +166,7 @@ def calc_ireq(
         v_arr, rh_arr, clo_m2cw, r_air, "neutral"
     )
 
+
     return IREQ(
         ireq_min=results_min["ireq"],
         ireq_neutral=results_neutral["ireq"],
@@ -184,12 +175,21 @@ def calc_ireq(
         dle_min=results_min["dle"],
         dle_neutral=results_neutral["dle"],
     )
+    
 
 def _validate_input_shapes(*arrays) -> None:
-    """Validate that all input arrays have compatible shapes."""
-    shapes = [arr.shape for arr in arrays if hasattr(arr, 'shape') and arr.shape != ()]
-    if shapes and not all(shape == shapes[0] for shape in shapes):
-        raise ValueError("All input arrays must have the same shape")
+    """Validate that inputs are broadcastable (NumPy broadcasting)."""
+    non_scalars = [np.asarray(a) for a in arrays if np.shape(a) != ()] # Convert inputs to ndarrays and keep only those that are not scalars
+    if not non_scalars:
+        return  
+
+    try:
+        # only broadcasting check, not change data
+        np.broadcast_arrays(*non_scalars) # Ask NumPy to compute a common broadcasted shape; raises ValueError if incompatible
+    except ValueError as e:
+        shapes = [np.shape(a) for a in arrays] # Collect the original shapes to provide a clear error message
+        raise ValueError(f"Incompatible shapes for broadcasting: {shapes}") from e
+
 
 
 def _validate_input_ranges(
@@ -203,24 +203,56 @@ def _validate_input_ranges(
     rh: np.ndarray,
     clo: np.ndarray,
 ) -> None:
-    """Validate input parameter ranges."""
-    if np.any(m < 58) or np.any(m > 400):
-        raise ValueError("Metabolic rate m must be between 58 and 400 W/m2")
-    
-    if np.any(tdb > 10):
-        raise ValueError("Air temperature tdb must be <= 10°C")
-    
-    if np.any(v < 0.4) or np.any(v > 18):
-        raise ValueError("Air velocity v must be between 0.4 and 18 m/s")
-    
-    if np.any(rh < 0) or np.any(rh > 100):
-        raise ValueError("Relative humidity rh must be between 0 and 100%")
-    
-    if np.any(w_work < 0):
+    """Validate input parameter ranges (finite values and physical bounds)."""
+
+    # 1) All inputs must be finite: disallow NaN and Inf to avoid numerical issues
+    for name, arr in {
+        "m": m,
+        "w_work": w_work,
+        "tdb": tdb,
+        "tr": tr,
+        "p_air": p_air,
+        "v_walk": v_walk,
+        "v": v,
+        "rh": rh,
+        "clo": clo,
+    }.items():
+        if np.any(~np.isfinite(arr)):
+            raise ValueError(f"{name} contains NaN or Inf")
+
+    # 2) Physical / model range constraints
+    # m range（W/m2）
+    if np.any((m < 58.0) | (m > 400.0)):
+        raise ValueError("Metabolic rate m must be within [58, 400] W/m2")
+
+    # tdb Upper bound（°C）
+    if np.any(tdb > 10.0):
+        raise ValueError("Air temperature tdb must be ≤ 10 °C")
+
+    # v range（m/s）
+    if np.any((v < 0.4) | (v > 18.0)):
+        raise ValueError("Air velocity v must be within [0.4, 18] m/s")
+
+    # rh range（%）
+    if np.any((rh < 0.0) | (rh > 100.0)):
+        raise ValueError("Relative humidity rh must be within [0, 100] %")
+
+    # w_work > 0
+    if np.any(w_work < 0.0):
         raise ValueError("Work rate w_work must be non-negative")
-    
-    if np.any(clo < 0):
+
+    # clo > 0
+    if np.any(clo < 0.0):
         raise ValueError("Clothing insulation clo must be non-negative")
+
+    # p_air > 0
+    if np.any(p_air <= 0.0):
+        raise ValueError("Air permeability p_air must be > 0 (log() domain)")
+
+    # v_walk （m/s）
+    v_walk_min = 0.0052 * (m - 58.0)
+    if np.any((v_walk < v_walk_min) | (v_walk > 1.2)):
+        raise ValueError("Walking speed v_walk must satisfy 0.0052*(m-58) ≤ v_walk ≤ 1.2 m/s")
 
 
 def _calculate_air_insulation(v: np.ndarray, v_walk: np.ndarray) -> np.ndarray:
@@ -294,7 +326,7 @@ def _solve_ireq_iteration(
     t_exhale: np.ndarray,
     p_exhale: np.ndarray,
 ) -> np.ndarray:
-    """Solve for IREQ value iteratively."""
+    """Iteratively solve for IREQ value."""
     ireq = np.full_like(m, 0.5)
     step_factor = np.full_like(m, 0.5)
     energy_balance = np.full_like(m, 1.0)
@@ -319,11 +351,12 @@ def _solve_ireq_iteration(
         q_conv = f_clothing * h_conv * (t_clothing - tdb)
         
         energy_balance = m - w_work - q_evap - q_resp - q_rad - q_conv
-        
-        # Bisection method update
-        step_factor = np.where(energy_balance > 0, step_factor / 2, step_factor / 2)
-        ireq = np.where(energy_balance > 0, ireq - step_factor, ireq + step_factor)
     
+        # Bisection step (halve step size every iteration)
+        step_factor = step_factor / 2
+        # Move ireq opposite to residual sign
+        ireq = np.where(energy_balance > 0, ireq - step_factor, ireq + step_factor)
+
     # Final IREQ calculation
     f_clothing = 1.0 + 1.197 * ireq
     h_rad, h_conv = _calculate_heat_transfer_coefficients(t_clothing, tr, r_air)
@@ -349,7 +382,7 @@ def _solve_dle_iteration(
     t_exhale: np.ndarray,
     p_exhale: np.ndarray,
 ) -> np.ndarray:
-    """Solve for DLE value iteratively."""
+    """Iteratively solve for DLE value."""
     q_store = np.full_like(m, -40.0)
     step_factor = np.full_like(m, 500.0)
     energy_balance = np.full_like(m, 1.0)
@@ -382,9 +415,9 @@ def _solve_dle_iteration(
         energy_balance = m - w_work - q_evap - q_resp - q_rad - q_conv - q_store
         
         # Bisection method update
-        step_factor = np.where(energy_balance > 0, step_factor / 2, step_factor / 2)
+        step_factor = step_factor / 2
         q_store = np.where(energy_balance > 0, q_store + step_factor, q_store - step_factor)
-    
+
     return -40.0 / q_store
 
 
@@ -436,6 +469,7 @@ def _calculate_ireq_conditions(
     # Format DLE result
     dle_result = np.where(dle > 8, "more than 8", np.round(dle * 10.0) / 10.0)
     
+
     return {
         "ireq": ireq_clo,
         "icl": icl_clo,
