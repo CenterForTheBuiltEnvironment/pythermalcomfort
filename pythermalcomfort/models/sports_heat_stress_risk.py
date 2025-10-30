@@ -65,6 +65,7 @@ def sports_heat_stress_risk(
     sport: _SportsValues,
 ):
     """Short description. todo add the description form the paper.
+    ""This study evaluates Sports Medicine Australia's 2021 extreme heat policy using a heat-balance model, showing improved protection against heat stress for adults in community sports."
 
     Parameters
     ----------
