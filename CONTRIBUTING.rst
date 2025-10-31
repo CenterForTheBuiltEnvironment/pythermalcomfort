@@ -109,6 +109,7 @@ Formatting and linting
     ruff format
     docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
     # optional; install pre-commit hooks (pre-commit install)
+    # pre-commit run --all-files
 
 Pull request checklist
 ----------------------
