@@ -25,7 +25,7 @@ Documentation Improvements
 pythermalcomfort can always use more documentation: docs, docstrings, examples,
 and tutorials are all valuable. Hence, if you find something missing or unclear,
 please consider contributing an improvement!
-The documentation is built using ¨Sphinx and reStructuredText, all the files are
+The documentation is built using Sphinx and reStructuredText, all the files are
 located in the `docs/` folder.
 
 Features, Feedback, and Discussions
@@ -171,51 +171,52 @@ When implementing the function, follow these guidelines:
 
      # pythermalcomfort/models/my_func.py
      import numpy as np
+     from dataclasses import dataclass
+     from pythermalcomfort.classes_input import MyFuncInputs
+     from pythermalcomfort.classes_return import DataClassResult
 
-     def my_func(x: float | np.ndarray) -> float | np.ndarray:
-            """Short description.
+     def my_func(x: float | np.ndarray) -> DataClassResult:
+        """Short description.
 
-            Add more detailed description here in a new paragraph and include
-            citations.
+        Add more detailed description here in a new paragraph and include
+        citations.
 
-            Parameters
-            ----------
-            x: float | np.ndarray
-                Description of x (include units).
+        Parameters
+        ----------
+        x: float | np.ndarray
+            Description of x (include units).
 
-            Returns
-            -------
-            Dataclass or float | np.ndarray
-                Description of return value (include units).
+        Returns
+        -------
+        DataClassResult
+            Description of return value (include units).
 
-            Raises
-            ------
-            Include if applicable, e.g.:
-                ValueError
-                If x is negative.
+        Raises
+        ------
+        ValueError
+            If x is negative.
 
-            Examples
-            --------
-            .. code-block:: python
+        Examples
+        --------
+        .. code-block:: python
 
-                from pythermalcomfort.models import my_func
+            from pythermalcomfort.models import my_func
 
-                tdb = 25
-                result = my_func(tdb)
-                print(result)  # Expected output: ...
-            """
+            tdb = 25
+            result = my_func(tdb)
+            print(result)  # Expected output: ...
+        """
 
-            MyFuncInputs(x=x)  # validate inputs
+        # validate and normalize inputs via dataclass
+        MyFuncInputs(x=x)
 
-            x_arr = np.asarray(x)  # normalize to numpy array
-            # perform calculations
+        x_arr = np.atleast_1d(x)
+        if np.any(x_arr < 0):
+            raise ValueError("x must be non-negative")
 
-            if np.any(x_arr < 0):
-                raise ValueError("x must be non-negative")
-
-            # round results if needed as we do elsewhere
-
-            return DataClassResult(result=value)  # always return dataclass
+        # simple example computation
+        value = x_arr * 2
+        return DataClassResult(result=value)
 
 
 3) Create / update an input dataclass for functions of models.
