@@ -420,7 +420,12 @@ def _solve_dle_iteration(
         q_store = np.where(energy_balance > 0, q_store + step_factor, q_store - step_factor)
 
     # Guard against division by zero
-    q_store = np.where(np.abs(q_store) < 1e-10, np.sign(q_store) * 1e-10, q_store)
+    tiny = 1e-10
+    q_store = np.where(
+        np.abs(q_store) < tiny,
+        tiny * np.where(q_store >= 0, 1.0, -1.0),
+        q_store,
+    )
     return -40.0 / q_store
 
 def _calculate_ireq_conditions(

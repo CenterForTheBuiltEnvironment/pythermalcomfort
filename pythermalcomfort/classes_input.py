@@ -1249,9 +1249,9 @@ class IREQInputs(BaseInputs):
         Metabolic rate [W/m²]. Must be positive and within 58–400 W/m².
         Note: 1 met ≈ 58 W/m². Convert from "met" to W/m² before calling this function.
     w_work : float or array-like, optional
-        External mechanical work [met]. Default is 0.
+        External mechanical work [W/m²]. Default is 0.
     p_air : float or array-like, optional
-        Air pressure [kPa]. Default is 8.0 (≈ 101.3 kPa / 12.5).
+        Clothing air permeability [l/(m²·s)]. Default is 8.0.
     v_walk : float or array-like, optional
         Walking speed [m/s]. Default is 0.3.
     tdb : float or array-like, optional
