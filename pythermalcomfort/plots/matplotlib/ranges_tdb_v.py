@@ -82,18 +82,18 @@ def ranges_tdb_v(
     legend : bool, default True
         Whether to add a default legend for the regions.
     **kwargs : Any
-        Additional keyword arguments passed to the underlying plotting function.
+        Additional keyword arguments passed to ``calc_plot_ranges``.
         Common options include:
         - band_colors: list of colors for each region (overrides cmap)
-        - xlabel, ylabel: axis labels
-        - title: plot title
-        - figsize: figure size tuple
-        For more options, see matplotlib.pyplot documentation.
+        Note: To set axis labels, title, or figure size, use the returned Axes object:
+        ``ax.set_xlabel(...)``, ``ax.set_title(...)``, ``ax.figure.set_size_inches(...)``
 
     Returns
     -------
     ax : matplotlib.axes.Axes
-        The matplotlib Axes with the plot.
+        The matplotlib Axes with the plot. Use this to customize labels, title,
+        and figure size: ``ax.set_xlabel(...)``, ``ax.set_ylabel(...)``,
+        ``ax.set_title(...)``, ``ax.figure.set_size_inches(...)``
     artists : dict[str, Any]
         Dictionary with keys 'bands', 'curves', and 'legend' containing the
         corresponding matplotlib artists for further customization.
@@ -135,7 +135,7 @@ def ranges_tdb_v(
     ... )
     >>> plt.show()
     
-    With advanced customization via **kwargs:
+    With advanced customization via **kwargs and returned Axes:
     >>> ax, artists = ranges_tdb_v(
     ...     model_func=pmv_ppd_iso,
     ...     fixed_params={"tr": 25, "rh": 50, "met": 1.2, "clo": 0.5},
@@ -146,9 +146,11 @@ def ranges_tdb_v(
     ...     cmap="viridis",
     ...     band_alpha=0.6,
     ...     band_colors=["lightblue", "lightgreen", "lightcoral"],
-    ...     title="Custom Temperature vs Air Speed Chart",
-    ...     figsize=(10, 6),
     ... )
+    >>> ax.set_xlabel("Air temperature [°C]")
+    >>> ax.set_ylabel("Air speed [m/s]")
+    >>> ax.set_title("Custom Temperature vs Air Speed Chart")
+    >>> ax.figure.set_size_inches(10, 6)
     >>> plt.show()
     """
     # Validate ranges and steps
@@ -180,8 +182,6 @@ def ranges_tdb_v(
         "y_values": y_values,
         "metric_attr": None,
         "ax": ax,
-        "xlabel": "Air temperature [°C]",
-        "ylabel": "Air speed [m/s]",
         "legend": legend,
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
@@ -191,8 +191,9 @@ def ranges_tdb_v(
         "line_color": line_color,
         "line_width": line_width,
     }
-    # Allow additional matplotlib parameters via **kwargs
-    calc_kwargs.update(kwargs)
+    # Allow additional parameters via **kwargs (overrides defaults)
+    if kwargs:
+        calc_kwargs.update(kwargs)
 
     ax, artists = calc_plot_ranges(**calc_kwargs)
 
