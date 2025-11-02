@@ -1246,7 +1246,8 @@ class IREQInputs(BaseInputs):
     Parameters
     ----------
     m : float or array-like
-        Metabolic rate [W/m²]. Must be positive.
+        Metabolic rate [W/m²]. Must be positive and within 58–400 W/m².
+        Note: 1 met ≈ 58 W/m². Convert from "met" to W/m² before calling this function.
     w_work : float or array-like, optional
         External mechanical work [met]. Default is 0.
     p_air : float or array-like, optional
