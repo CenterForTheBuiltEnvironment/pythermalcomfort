@@ -5,10 +5,14 @@ Contributing
 Contributions are welcome and greatly appreciated!
 Every bit helps, and credit will always be given.
 
-Bug Reports
-===========
+Bug, Feature, Discussions, and Documentation Issues
+===================================================
 
-When `reporting a bug <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_, please include:
+Bug Reports
+-----------
+
+When `reporting a bug <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_, please complete
+the issue template with as much relevant information as possible, including:
 
 * Your operating system name and version.
 * Any details about your local setup that might be helpful in troubleshooting.
@@ -16,26 +20,35 @@ When `reporting a bug <https://github.com/CenterForTheBuiltEnvironment/pythermal
 * Relevant error messages and a shortened traceback.
 
 Documentation Improvements
-==========================
+--------------------------
 
 pythermalcomfort can always use more documentation: docs, docstrings, examples,
-and tutorials are all valuable.
+and tutorials are all valuable. Hence, if you find something missing or unclear,
+please consider contributing an improvement!
+The documentation is built using Sphinx and reStructuredText, all the files are
+located in the `docs/` folder.
 
-Issues, Features and Feedback
-=============================
+Features, Feedback, and Discussions
+-----------------------------------
 
-The best way to send feedback is to open an `issue <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_.
+The best way to suggest a new feature is to open an `issue <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/issues>`_.
+Alternatively, you can start a discussion in the `Discussions section <https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/discussions>`_.
 
-If you are proposing a feature:
+If you are proposing a feature, please use the `Feature request` template and:
 
 * Explain in detail how it would work and why it's useful.
 * Keep the scope narrow so it is easier to review and implement.
-* Consider opening a discussion issue first for larger changes.
+* Consider opening a discussion first for larger changes.
 
-Contributing Code
-=================
+Contributing - Code
+===================
 
-To set up `pythermalcomfort` for local development:
+This section explains how to set up your development environment,
+run tests, format code, and contribute code changes via pull requests (PRs).
+If you want to contribute a new model or function, please see also the detailed guide
+at the end of this file.
+
+Setting up your development environment:
 
 1. Fork the repository on GitHub and clone your fork locally:
 
@@ -45,11 +58,15 @@ To set up `pythermalcomfort` for local development:
     cd pythermalcomfort
     git remote add upstream git@github.com:CenterForTheBuiltEnvironment/pythermalcomfort.git
     git fetch upstream
-    # install the dependencies with pipenv
+
+2. Set up a virtual environment and install dependencies, you should have Python 3.12+ installed and `pipenv <https://pipenv.pypa.io/en/latest/>`_ available:
+
+.. code-block:: bash
+
     pip install pipenv
     pipenv sync --dev
 
-2. Create a feature branch (use the naming rules below):
+3. Create a feature branch (use the naming rules below):
 
 .. code-block:: bash
 
@@ -74,15 +91,25 @@ Run these checks before committing and opening a PR:
     # run tests quickly (subset)
     pytest -k test_fragment
 
-    # run full test suite via tox
+To run the rest with tox and a specific Python version:
+
+.. code-block:: bash
+
+    tox -e pyXXX  # replace XXX with your Python version, e.g., 312
+
+    # alternatively run full test suite via tox, you will need to have different Python versions installed
     tox
+
+Formatting and linting
+
+.. code-block:: bash
 
     # formatting & linting (preferred)
     ruff check --fix
     ruff format
     docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
-    # optional: black or other formatters if preferred by maintainers
     # optional; install pre-commit hooks (pre-commit install)
+    # pre-commit run --all-files
 
 Pull request checklist
 ----------------------
@@ -95,205 +122,184 @@ When opening a pull request, include:
 * A CHANGELOG entry (if applicable).
 * Add yourself to AUTHORS.rst (optional).
 
-Running tests
--------------
+Contributing a New Function
+===========================
 
-To run tests locally:
+Above we have already covered how to set up your development environment,
+run tests, and format/lint your code.
 
-.. code-block:: bash
+Use this checklist and follow the detailed steps to add a new, well-tested,
+documented function consistent with the project's conventions.
+Please have a look at existing functions for reference, for example in
+``pythermalcomfort/models/pmv_ppd_iso.py`` and associated tests and utilities.
 
-    # run all tests
-    pytest
+Quick checklist (use before opening a PR)
 
-    # run a subset by keyword
-    pytest -k test_name_fragment
+- [ ] Function added under an appropriate module, if it is a thermal index/model, please add under ``pythermalcomfort/models/``.
+- [ ] Input dataclass created/updated with validation in __post_init__. See ``pythermalcomfort/classes_input.py``.
+- [ ] Return dataclass created/updated if applicable. See ``pythermalcomfort/classes_return.py``.
+- [ ] NumPy-style docstring with units, examples, and applicability limits.
+- [ ] Tests added (scalars, arrays, broadcasting, invalid inputs).
+- [ ] Documentation (autofunction/autodoc) updated.
+- [ ] CHANGELOG and AUTHORS updated (if applicable).
+- [ ] All tests pass and formatting/linting applied.
+- [ ] Add the function to ``__init__.py`` which is located in the ``pythermalcomfort/models/`` folder.
+- [ ] The function should accept both scalar and vectorized inputs (lists, numpy arrays) and return outputs of matching shape.
 
-    # run the CI matrix locally (may be slow)
-    tox
+Step-by-step guide
+------------------
 
-To run a single tox environment:
+1) Pick the module/function location
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: bash
+- If function is a new model, add under: ``pythermalcomfort/models/<module_name>.py``
+- If generic utility, consider: ``pythermalcomfort/utilities.py``
+- Use a descriptive module name.
 
-    tox -e py312
+2) Implement the function
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Formatting and linting
-----------------------
+When implementing the function, follow these guidelines:
 
-Recommended commands before pushing:
+- Keep it simple, documented, and readable.
+- Accept both scalar and vectorized inputs (lists, numpy arrays).
+- Use numpy vectorized operations for performance (e.g., ``np.log``) rather than ``math``.
+- Add a NumPy-style docstring including: Parameters, Raises, Returns, Examples, References.
+- Check in the BaseInputs how inputs are typically named, typed, and validated.
+- Example skeleton for a new function:
+
+.. code-block:: python
+
+     # pythermalcomfort/models/my_func.py
+     import numpy as np
+     from dataclasses import dataclass
+     from pythermalcomfort.classes_input import MyFuncInputs
+     from pythermalcomfort.classes_return import DataClassResult
+
+     def my_func(x: float | np.ndarray) -> DataClassResult:
+        """Short description.
+
+        Add more detailed description here in a new paragraph and include
+        citations.
+
+        Parameters
+        ----------
+        x: float | np.ndarray
+            Description of x (include units).
+
+        Returns
+        -------
+        DataClassResult
+            Description of return value (include units).
+
+        Raises
+        ------
+        ValueError
+            If x is negative.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from pythermalcomfort.models import my_func
+
+            tdb = 25
+            result = my_func(tdb)
+            print(result)  # Expected output: ...
+        """
+
+        # validate and normalize inputs via dataclass
+        MyFuncInputs(x=x)
+
+        x_arr = np.atleast_1d(x)
+        if np.any(x_arr < 0):
+            raise ValueError("x must be non-negative")
+
+        # simple example computation
+        value = x_arr * 2
+        return DataClassResult(result=value)
+
+
+3) Create / update an input dataclass for functions of models.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As previously mentioned, input validation is centralized via dataclasses, see ``pythermalcomfort/classes_input.py``. Follow these steps:
+
+- Add input dataclasses to ``pythermalcomfort/classes_input.py``
+- Put type checks and physical/applicability checks in ``__post_init__``. See for example, ``THIInputs``.
+- Types are automatically validated by the dataclass, so focus on value checks (e.g., ranges, non-negativity).
+
+4) Return types and classes_return
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As a convention, functions should return structured dataclasses where applicable.
+
+- Return a dataclass from ``classes_return.py`` to provide structured outputs.
+- Keep the public API clear and documented.
+
+5) Tests
+^^^^^^^^
+
+- Add tests under ``tests/test_<function>.py``.
+- Example pytest skeleton:
+
+.. code-block:: python
+
+   import numpy as np
+   import pytest
+   from pythermalcomfort.models.my_func import my_func
+
+   def test_my_func_scalar():
+       assert my_func(1.0) == pytest.approx(2.0)
+
+   def test_my_func_array():
+       arr = np.array([1.0, 2.0])
+       out = my_func(arr)
+       assert out.shape == arr.shape
+
+   def test_my_func_invalid():
+       with pytest.raises(ValueError):
+           my_func(-1.0)
+
+
+- Keep tests deterministic and small. Use numpy.testing where helpful.
+
+6) Documentation & autodoc
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add a short example to the function docstring.
+- Add an ``.. autofunction:: pythermalcomfort.models.my_func.my_func`` entry in the relevant docs source file (e.g., ``docs/reference.rst`` or the file that collects API references).
+- Add the return data class to the documentation if new.
+
+7) CHANGELOG and AUTHORS
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add a short line to the changelog describing the new function.
+- Optionally add yourself to AUTHORS.rst when contributing a new feature.
+
+8) Formatting, linting and tests locally
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Apply project formatters and linters:
 
 .. code-block:: bash
 
     ruff check --fix
     ruff format
-    docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort/*.py
+    docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
 
-(If your editor or CI uses other tools like black or isort, follow the project's configured pre-commit hooks.)
+    # optional; install pre-commit hooks (pre-commit install)
 
-Committing and pushing
-----------------------
+- Run tests:
 
 .. code-block:: bash
 
-    git add .
-    git commit -m "feat: short description of change"
-    git push origin Feature/short-description
-
-Submit a pull request on GitHub from your branch to the main repository.
-
-To Add a Function
------------------
-
-Use this checklist and follow the detailed steps to add a new, well-tested,
-documented function consistent with the project's conventions.
-
-Quick checklist (use before opening a PR)
-
-- [ ] Implementation added under an appropriate module.
-- [ ] Input dataclass created/updated with validation in __post_init__.
-- [ ] NumPy-style docstring with units, examples and applicability limits.
-- [ ] Tests added (scalars, arrays, broadcasting, invalid inputs).
-- [ ] Documentation (autofunction/autodoc) updated.
-- [ ] CHANGELOG and AUTHORS updated (if applicable).
-- [ ] All tests pass and formatting/linting applied.
-
-Step-by-step guide
-^^^^^^^^^^^^^^^^^^
-
-1) Pick the module location
-   - If function is a domain model, add under: ``pythermalcomfort/models/<module_name>.py``
-   - If generic utility, consider: ``pythermalcomfort/utilities.py``
-
-2) Implement the function
-   - Keep it small, pure and documented.
-   - Use numpy for numeric ops (e.g., ``np.log``) rather than ``math``.
-   - Add a NumPy-style docstring including: Parameters, Raises, Returns, Examples, References.
-   - Example skeleton:
-
-   .. code-block:: python
-
-     # pythermalcomfort/models/my_func.py
-     import numpy as np
-
-     def my_func(x: float | np.ndarray) -> float | np.ndarray:
-         """Short description.
-
-         Parameters
-         ----------
-             x: value in meters.
-
-         Returns
-         -------
-             Dataclass with fields
-
-         Raises
-         ------
-             ValueError: if x is negative.
-
-         Examples
-         --------
-             >>> my_func(1.0)
-             2.0
-         """
-
-         x_arr = np.asarray(x)
-         if np.any(x_arr < 0):
-             raise ValueError("x must be non-negative")
-         return x_arr * 2
-
-3) Create / update an input dataclass (if applicable)
-
-   - Add input dataclasses to ``pythermalcomfort/classes_input.py`` or next to the function module to centralize validation.
-   - Put type checks and physical/applicability checks in ``__post_init__``.
-   - Convert pandas Series to lists/arrays before validation.
-   - Use ``validate_type(name, allowed_types)`` for type validation.
-   - Example pattern:
-
-   .. code-block:: python
-
-     @dataclass
-     class MyFuncInputs(BaseInputs):
-         x: float | int | list | np.ndarray = None
-
-         def __post_init__(self):
-             super().__post_init__()
-             # validate types (raises TypeError)
-             validate_type(self.x, "x", (float, int, list, np.ndarray))
-             # normalize to numpy array for vectorized ops
-             self.x = np.asarray(self.x)
-             # physical checks (raises ValueError)
-             if np.any(self.x < 0):
-                 raise ValueError("x must be non-negative")
-             # broadcasting checks if multiple array fields exist
-
-
-4) Return types and classes_return
-
-   - When consistent with other functions, return a dataclass from ``classes_return.py`` to provide structured outputs.
-   - Keep the public API clear and documented.
-
-5) Tests
-
-   - Add tests under ``tests/test_<function>.py``.
-   - Cover:
-
-     - Scalar inputs (single values).
-     - Vectorized inputs (lists, numpy arrays).
-     - Broadcasting behavior and consistent output shapes.
-     - Invalid inputs (TypeError and ValueError cases).
-     - Edge cases (zeros, very small/large inputs that affect numeric stability).
-
-   - Example pytest skeleton:
-
-   .. code-block:: python
-
-       import numpy as np
-       import pytest
-       from pythermalcomfort.models.my_func import my_func
-
-       def test_my_func_scalar():
-           assert my_func(1.0) == pytest.approx(2.0)
-
-       def test_my_func_array():
-           arr = np.array([1.0, 2.0])
-           out = my_func(arr)
-           assert out.shape == arr.shape
-
-       def test_my_func_invalid():
-           with pytest.raises(ValueError):
-               my_func(-1.0)
-
-
-   - Keep tests deterministic and small. Use numpy.testing where helpful.
-
-6) Documentation & autodoc
-
-   - Add a short example to the function docstring.
-   - Add an ``.. autofunction:: pythermalcomfort.models.my_func.my_func`` entry in the relevant docs source file (e.g., ``docs/reference.rst`` or the file that collects API references).
-   - If a larger example/tutorial is needed, add an rst under ``docs/`` and include usage examples (scalar and vectorized).
-
-7) CHANGELOG and AUTHORS
-
-   - Add a short line to the changelog describing the new function.
-   - Optionally add yourself to AUTHORS.rst when contributing a new feature.
-
-8) Formatting, linting and tests locally
-
-   - Apply project formatters and linters:
-
-   .. code-block:: bash
-
-      ruff check --fix
-      ruff format
-      docformatter -r -i --wrap-summaries 88 --wrap-descriptions 88 pythermalcomfort
-
-   - Run tests:
-
-   .. code-block:: bash
-
-      pytest -q
+    tox -e pyXXX  # replace XXX with your Python version, e.g., 312
 
 9) Open a PR
+^^^^^^^^^^^^
+
+When opening a pull request, follow these guidelines:
 
 - Title: short descriptive title (e.g., "feat: add my_func for X calculation")
 - Include in PR description:
@@ -302,15 +308,6 @@ Step-by-step guide
    - How it was tested (mention key tests).
    - Notes about numeric stability or edge cases.
 - Ensure CI passes and add reviewers as appropriate.
-
-Recommended validation rules (common to many functions)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Non-negativity: ensure physical quantities that must be >= 0 are validated.
-- Domain checks: avoid taking logs/roots of non-positive numbers.
-- Shape/broadcasting: if arrays are accepted, verify shapes are compatible.
-- Units: document the expected units and validate/convert where needed.
-- Error types: use TypeError for wrong types, ValueError for invalid values.
 
 PR checklist (add to your PR description)
 
@@ -321,15 +318,6 @@ PR checklist (add to your PR description)
 - [ ] Linting and formatting applied.
 - [ ] All CI checks pass.
 
-Examples and reference patterns
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Use existing functions (e.g., ``pmv_ppd_iso.py`` and utilities) as reference
-  for structure, validation, and tests.
-- For mathematical operations prefer numpy and vectorized routines.
-- For input classes follow the BaseInputs metadata-driven pattern and centralize
-  shared conversions and type checks there.
-
 Where to get help
 -----------------
 
@@ -338,13 +326,6 @@ Where to get help
 * See the CONTRIBUTING.rst file for development and testing guidelines.
 * For API reference and examples, consult the online docs:
   `Full documentation <https://pythermalcomfort.readthedocs.io/en/latest>`_
-
-Tips
-----
-
-* Open an issue first for larger features to discuss scope and design.
-* Keep PRs focused and small where possible.
-* Include tests and documentation for public API changes.
 
 License
 =======
