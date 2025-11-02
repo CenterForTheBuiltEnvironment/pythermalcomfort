@@ -64,97 +64,110 @@ def sports_heat_stress_risk(
     vr: float | list[float],
     sport: _SportsValues,
 ):
-    """Short description. todo add the description form the paper.
-     This study evaluates Sports Medicine Australia's 2021 extreme heat policy using a heat-balance model, showing improved protection against heat stress for adults in community sports.
+    """Short description.
+    The Sports Medicine Australia (SMA) Extreme Heat Policy v2 (2024)
+    modernises Australia approach to managing heat stress risk in recreational sport.
+    Building on the 2021 version, which relied on a biophysical heat balance model,
+    the updated policy incorporates the ISO Predicted Heat Strain model
+    to deliver more accurate and sport-specific heat risk assessments.
+    It addresses previous shortcomings by improving protection during
+    very hot, dry conditions—where sweat and cardiovascular strain are greatest
+    and reducing unnecessary play suspensions in humid weather through structured cooling and rest interventions.
+    A new web-based tool simplifies application by providing
+    automated, location-specific, hourly heat risk classifications and seven-day forecasts.
+    This digital platform removes the need for manual graph interpretation,
+    reducing the potential for human error.
+    The updated policy ensures more consistent, evidence-based decision-making
+    for sporting organisations, coaches, and medical personnel responsible for athlete safety during hot weather.
 
-     Parameters
-     ----------
-     tdb : float or list of float
-         Dry bulb air temperature [°C].
-     tr : float or list of float
-         Mean radiant temperature [°C].
-     rh : float or list of float
-         Relative humidity [%].
-     vr : float or list of float
-         Relative air speed [m/s].
-     sport¨ : _SportsValues
-         Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
-         Use one of the entries from :pyclass:`Sports`.
+         Parameters
+         ----------
+         tdb : float or list of float
+             Dry bulb air temperature [°C].
+         tr : float or list of float
+             Mean radiant temperature [°C].
+         rh : float or list of float
+             Relative humidity [%].
+         vr : float or list of float
+             Relative air speed [m/s].
+         sport¨ : _SportsValues
+             Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
+             Use one of the entries from :pyclass:`Sports`.
 
-     Returns
-     -------
-     # todo this should be a dataclass
-     SportsHeatStressRiskResult
-         Dataclass containing the results:
-         - pmv : Predicted Mean Vote (float or np.ndarray)
-         - p : Heat strain probability (float or np.ndarray)
-         - risk_level : Risk classification (str or np.ndarray)
+         Returns
+         -------
+         # todo this should be a dataclass
+         SportsHeatStressRiskResult
+             Dataclass containing the results:
+             - pmv : Predicted Mean Vote (float or np.ndarray)
+             - p : Heat strain probability (float or np.ndarray)
+             - risk_level : Risk classification (str or np.ndarray)
 
-     Raises
-     ------
+         Raises
+         ------
 
-     ValueError
-         If the risk level could not be determined due to NaN thresholds or if the internal
-         solver fails to produce thresholds that allow a risk determination.
+         ValueError
+             If the risk level could not be determined due to NaN thresholds or if the internal
+             solver fails to produce thresholds that allow a risk determination.
 
-     Examples
-     --------
-     .. code-block:: python
+         Examples
+         --------
+         .. code-block:: python
 
-         from pythermalcomfort.models import pmv_ppd_iso
-         from pythermalcomfort.utilities import v_relative
+             from pythermalcomfort.models import pmv_ppd_iso
+             from pythermalcomfort.utilities import v_relative
 
-         tdb = 25
-         tr = 25
-         rh = 50
-         v = 0.1
+             tdb = 25
+             tr = 25
+             rh = 50
+             v = 0.1
 
-         from pythermalcomfort.models.sports_heat_stress_risk import (
-             sports_heat_stress_risk,
-             Sports,
-         )
+             from pythermalcomfort.models.sports_heat_stress_risk import (
+                 sports_heat_stress_risk,
+                 Sports,
+             )
 
-         # call with prepared variables
-         sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
-         # Expected: ~2.4
+             # call with prepared variables
+             sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
+             # Expected: ~2.4
 
-    # todo add references to the docstring
+        # todo add references to the docstring
 
-     References
-     ----------
-     1. Sports Medicine Australia. (2021). *Extreme Heat Policy for Community Sport*.
-        https://sma.org.au/resources-advice/extreme-heat-policy/
+         References
+         ----------
+         1. Sports Medicine Australia. (2021). *Extreme Heat Policy for Community Sport*.
+            https://sma.org.au/resources-advice/extreme-heat-policy/
 
-     # todo add examples to the docstring
-     Examples
-     --------
-     .. code-block:: python
+         # todo add examples to the docstring
+         Examples
+         --------
+         .. code-block:: python
 
-         import numpy as np
-         from pythermalcomfort.models.sports_heat_stress_risk import (
-             sports_heat_stress_risk,
-             Sports,
-             SportsHeatStressRiskResult,
-         )
+             import numpy as np
+             from pythermalcomfort.models.sports_heat_stress_risk import (
+                 sports_heat_stress_risk,
+                 Sports,
+                 SportsHeatStressRiskResult,
+             )
 
-         # Define environmental conditions
-         tdb = 25  # Dry bulb temperature [°C]
-         tr = 25  # Mean radiant temperature [°C]
-         rh = 50  # Relative humidity [%]
-         vr = 0.1  # Air velocity [m/s]
+             # Define environmental conditions
+             tdb = 25  # Dry bulb temperature [°C]
+             tr = 25  # Mean radiant temperature [°C]
+             rh = 50  # Relative humidity [%]
+             vr = 0.1  # Air velocity [m/s]
 
-         # Choose sport
-         sport = Sports.RUNNING
+             # Choose sport
+             sport = Sports.RUNNING
 
-         # Call the function
-         result: SportsHeatStressRiskResult = sports_heat_stress_risk(
-             tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
-         )
+             # Call the function
+             result: SportsHeatStressRiskResult = sports_heat_stress_risk(
+                 tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
+             )
 
-         # Access individual results
-         print("Predicted Mean Vote (PMV):", result.pmv)
-         print("Heat strain probability:", result.p)
-         print("Risk level:", result.risk_level)
+             # Access individual results
+             print("Predicted Mean Vote (PMV):", result.pmv)
+             print("Heat strain probability:", result.p)
+             print("Risk level:", result.risk_level)
     """
     # todo the function should accept either float or arrays as all the other functions pythermalcomfort
 
