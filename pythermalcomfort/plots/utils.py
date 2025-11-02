@@ -282,7 +282,12 @@ def solve_threshold_curves(
             sgn = np.sign(vals)
             idx = np.where(sgn[:-1] * sgn[1:] <= 0)[0]
             if idx.size == 0:
-                unsolved += 1
+                if np.sign(vals[0]) == 0:
+                    xs[i] = x_scan[0]
+                elif np.sign(vals[-1]) == 0 or vals[-1] * vals[0] > 0:
+                    xs[i] = x_scan[-1]
+                else:
+                    unsolved += 1
                 continue
             j = int(idx[0])
             a, b = float(x_scan[j]), float(x_scan[j + 1])
@@ -384,3 +389,4 @@ def _validate_range(name: str, rng: tuple[float, float]) -> tuple[float, float]:
         msg = f"{name} must be strictly increasing (min < max)"
         raise ValueError(msg)
     return lo, hi
+

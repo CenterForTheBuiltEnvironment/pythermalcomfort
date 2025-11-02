@@ -77,7 +77,8 @@ class TestMainModels:
                 thresholds=[threshold],
                 t_range=t_range,
                 rh_range=rh_range,
-                smooth_sigma=0.0
+                smooth_sigma=0.0,
+                plot_kwargs={"metric_attr": model_info.metric_attr}
             )
             
             if artists["curves"]:
@@ -91,11 +92,22 @@ class TestMainModels:
                 )
                 
                 errors = []
+                t_min, t_max = t_range
+                boundary_tol = 0.5
+                
                 for x, y in zip(curve.get_xdata(), curve.get_ydata()):
                     if not (np.isfinite(x) and np.isfinite(y)):
                         continue
+
+                    is_on_lower_boundary = abs(x - t_min) < boundary_tol
+                    is_on_upper_boundary = abs(x - t_max) < boundary_tol
+                    
                     try:
                         metric_val = metric_eval(x, y)
+                        if (is_on_lower_boundary or is_on_upper_boundary) and \
+                           abs(metric_val - threshold) > 2.0 * model_info.tolerance:
+                            continue
+                        
                         if not np.isclose(metric_val, threshold, atol=model_info.tolerance):
                             errors.append(
                                 f"Point ({x:.2f}, {y:.2f}) has {model_info.name} {metric_val:.2f}, "

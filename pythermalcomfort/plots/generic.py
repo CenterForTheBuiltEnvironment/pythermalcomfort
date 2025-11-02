@@ -11,6 +11,9 @@ from .utils import (
     make_metric_eval,
     solve_threshold_curves,
 )
+import seaborn as sns
+import pandas as pd
+
 
 
 def calc_plot_ranges(
@@ -37,6 +40,9 @@ def calc_plot_ranges(
     smooth_sigma: float = 0.8,
     # Optional per-y left boundary (e.g., psychrometric saturation clip)
     x_left_clip: Sequence[float] | None = None,
+    use_seaborn: bool = True,
+    seaborn_style: str = "whitegrid",
+    seaborn_palette: str = "coolwarm",
 ) -> tuple[plt.Axes, dict[str, Any]]:
     """Plot threshold regions for a generic (x, y) mapping to a model.
 
@@ -127,8 +133,11 @@ def calc_plot_ranges(
     >>> import matplotlib.pyplot as plt
     >>> plt.show()
     """
+    if use_seaborn is not False:
+        sns.set_theme(style=seaborn_style, palette=seaborn_palette)
+
     if ax is None:
-        plt.style.use("seaborn-v0_8-whitegrid")
+
         _, ax = plt.subplots(figsize=(7, 4), dpi=300, constrained_layout=True)
 
     # Build evaluator and compute curves
@@ -162,8 +171,13 @@ def calc_plot_ranges(
             raise ValueError("band_colors must have length equal to number of regions")
         band_colors = band_colors
     else:
-        cmap_obj = plt.get_cmap(cmap)
+
+        if use_seaborn:
+            cmap_obj = sns.color_palette(seaborn_palette, as_cmap=True)
+        else:
+            cmap_obj = plt.get_cmap(cmap)
         band_colors = [cmap_obj(i / (needed - 1)) for i in range(needed)]
+
 
     # Optional left clip per y (same length as y_arr)
     clip_arr = None
@@ -206,13 +220,29 @@ def calc_plot_ranges(
 
     # Draw threshold curves (clip to valid domain if clip_arr provided)
     curve_artists = []
-    for curve in curves:
+    curve_colors = band_colors[:-1] 
+    for idx, curve in enumerate(curves):
         m = np.isfinite(curve)
         if clip_arr is not None:
             m = m & (curve >= clip_arr)
         if m.any():
-            (ln,) = ax.plot(curve[m], y_arr[m], color=line_color, linewidth=line_width)
-            curve_artists.append(ln)
+            df_curve = pd.DataFrame({
+                "x": curve[m],
+                "y": y_arr[m],
+                "threshold": [thr_list[idx]] * np.count_nonzero(m),
+        })
+            ln = sns.lineplot(
+                data=df_curve,
+                x="x", y="y",
+                ax=ax,
+                color=curve_colors[idx],
+                linewidth=line_width + 0.5,
+                legend=False,
+                palette=seaborn_palette if use_seaborn else None,
+            )
+            if len(ax.lines):
+                curve_artists.append(ax.lines[-1])
+
 
     # Minimal axis labels
     if xlabel:
@@ -254,3 +284,4 @@ def calc_plot_ranges(
 
     artists = {"bands": band_artists, "curves": curve_artists, "legend": legend_artist}
     return ax, artists
+
