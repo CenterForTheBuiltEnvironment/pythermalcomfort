@@ -353,11 +353,18 @@ def _solve_ireq_iteration(
 
     # Final IREQ calculation
     f_clothing = 1.0 + 1.197 * ireq
+    r_evap_total = (0.06 / 0.38) * (r_air + ireq)
+    p_skin = _calculate_saturation_vapor_pressure(t_skin)
+    q_evap = wetness * (p_skin - p_air_vapor) / r_evap_total
+    q_resp = 1.73e-02 * m * (p_exhale - p_air_vapor) + 1.4e-03 * m * (t_exhale - tdb)
+    t_clothing = t_skin - ireq * (m - w_work - q_evap - q_resp)
     h_rad, h_conv = _calculate_heat_transfer_coefficients(t_clothing, tr, r_air)
     q_rad = f_clothing * h_rad * (t_clothing - tr)
     q_conv = f_clothing * h_conv * (t_clothing - tdb)
-    
+
     return (t_skin - t_clothing) / (q_rad + q_conv)
+    
+ 
 
 
 def _solve_dle_iteration(
@@ -477,4 +484,3 @@ def _calculate_ireq_conditions(
         "icl": icl_clo,
         "dle": dle_result,
     }
-
