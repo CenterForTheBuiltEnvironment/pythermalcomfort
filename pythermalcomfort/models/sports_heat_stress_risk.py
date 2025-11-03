@@ -248,8 +248,7 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
                 i_mst=0.4,
             ).sweat_loss_g
             / sport.duration
-            * 60
-            # normalized sweat loss to 60 minutes for all sports
+            * 60  # normalized sweat loss to 60 minutes for all sports
             - sweat_loss_g
         )
 
