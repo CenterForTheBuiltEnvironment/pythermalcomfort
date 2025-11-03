@@ -20,6 +20,29 @@ class _SportsValues:
     duration: int
 
 
+@dataclass
+class SportsHeatStressRiskResult:
+    risk_level: str
+    risk_level_interpolated: float
+    thresholds: dict
+    recommendations: str
+
+
+def _get_recommendations(risk_level_interpolated: float) -> tuple[str, str]:
+    """Return risk category and practical recommendations based on risk level."""
+    if risk_level_interpolated < 1:
+        return "Low", "Normal play; stay hydrated."
+    elif 1 <= risk_level_interpolated < 2:
+        return "Moderate", "Use caution, ensure frequent water breaks."
+    elif 2 <= risk_level_interpolated < 3:
+        return "High", "Reduce training intensity, provide shaded breaks and hydration."
+    else:
+        return (
+            "Extreme",
+            "Suspend activity, move to cool area, monitor athletes closely.",
+        )
+
+
 @dataclass(frozen=True)
 class Sports:
     ABSEILING = _SportsValues(clo=0.6, met=6.0, vr=0.5, duration=120)
@@ -145,7 +168,8 @@ def sports_heat_stress_risk(
              import numpy as np
              from pythermalcomfort.models.sports_heat_stress_risk import (
                  sports_heat_stress_risk,
-                 Sports,
+                 Sports,@dataclass
+
                  SportsHeatStressRiskResult,
              )
 
@@ -177,8 +201,8 @@ def sports_heat_stress_risk(
     # Broadcast all inputs to the same shape
     tdb, tr, rh, vr = np.broadcast_arrays(tdb, tr, rh, vr)
 
-    # Allocate array for results
-    risk_levels = np.empty_like(tdb, dtype=float)
+    # Allocate array for results (object dtype for dataclass)
+    risk_levels = np.empty(tdb.shape, dtype=object)
 
     # Calculate each value
     for i in np.ndindex(tdb.shape):
@@ -188,7 +212,7 @@ def sports_heat_stress_risk(
 
     # Return scalar if all inputs were scalar
     if risk_levels.size == 1:
-        return float(risk_levels)
+        return risk_levels[0]
     return risk_levels
 
     # thermal_sensation = {
@@ -345,7 +369,20 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     # todo include the recommendations based on the risk level
     # todo return a dataclass with the risk level, risk level interpolated, thresholds, and recommendations
 
-    return round(risk_level_interpolated, 1)
+    risk_level, recommendations = _get_recommendations(risk_level_interpolated)
+
+    thresholds = {
+        "t_medium": t_medium,
+        "t_high": t_high,
+        "t_extreme": t_extreme,
+    }
+
+    return SportsHeatStressRiskResult(
+        risk_level=risk_level,
+        risk_level_interpolated=round(risk_level_interpolated, 1),
+        thresholds=thresholds,
+        recommendations=recommendations,
+    )
 
 
 if __name__ == "__main__":
@@ -361,10 +398,17 @@ if __name__ == "__main__":
     results = []
     for t in range(20, 46, 2):
         for rh in range(0, 101, 5):
-            risk_interp = sports_heat_stress_risk(
+            result = sports_heat_stress_risk(
                 tdb=t, tr=t, rh=rh, vr=v, sport=Sports.RUNNING
             )
-            results.append((t, rh, risk_interp))
+            # extract numeric field from dataclass
+            if hasattr(result, "risk_level_interpolated"):
+                risk_val = result.risk_level_interpolated
+            else:
+                # If result is int or float, just use it directly
+                risk_val = float(result)
+            results.append((t, rh, risk_val))
+
     import pandas as pd
 
     df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"])
