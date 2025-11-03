@@ -108,6 +108,17 @@ def calc_ireq(
     print(results.ireq_neutral)  # e.g. array([...])
     print(results.dle_min)       # e.g. array([...]
 
+    Applicability
+    -------------
+    The implementation follows ISO 11079 limits:
+
+    * 58 ≤ m ≤ 400 W/m².
+    * tdb ≤ 10 °C and tr supplied.
+    * 0.4 ≤ v ≤ 18 m/s.
+    * 0 ≤ rh ≤ 100 %.
+    * 0.0052 × (m − 58) ≤ v_walk ≤ 1.2 m/s.
+    * p_air > 0 l/(m²·s) and clo ≥ 0.
+
     Notes
     -----
     The IREQ index represents the clothing insulation required to maintain thermal 
@@ -131,6 +142,11 @@ def calc_ireq(
     """
 
     # Convert all inputs to numpy arrays for vectorized operations
+    if tdb is None:
+        raise ValueError("Parameter 'tdb' (dry-bulb temperature) is required for IREQ calculation.")
+    if tr is None:
+        raise ValueError("Parameter 'tr' (mean radiant temperature) is required for IREQ calculation.")
+    
     m_arr = np.asarray(m, dtype=float)
     w_work_arr = np.asarray(w_work, dtype=float)
     tdb_arr = np.asarray(tdb, dtype=float)
@@ -321,8 +337,9 @@ def _solve_ireq_iteration(
     p_exhale: np.ndarray,
 ) -> np.ndarray:
     """Iteratively solve for IREQ value."""
-    ireq = np.full_like(m, 0.5)
-    step_factor = np.full_like(m, 0.5)
+    lower = np.zeros_like(m, dtype=float)
+    upper = np.full_like(m, 2.0, dtype=float)  # 2.0 m²·K/W ≈ 12.9 clo comfortably covers ISO tables
+    ireq = (lower + upper) / 2.0
     energy_balance = np.full_like(m, 1.0)
     
     max_iterations = 100
@@ -346,10 +363,11 @@ def _solve_ireq_iteration(
         
         energy_balance = m - w_work - q_evap - q_resp - q_rad - q_conv
     
-        # Bisection step (halve step size every iteration)
-        step_factor = step_factor / 2
-        # Move ireq opposite to residual sign
-        ireq = np.where(energy_balance > 0, ireq - step_factor, ireq + step_factor)
+        # Classic bisection: tighten the bracket and recompute midpoint
+        too_little = energy_balance > 0
+        upper = np.where(too_little, ireq, upper)
+        lower = np.where(too_little, lower, ireq)
+        ireq = (lower + upper) / 2.0
 
     # Final IREQ calculation
     f_clothing = 1.0 + 1.197 * ireq
