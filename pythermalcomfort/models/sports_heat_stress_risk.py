@@ -3,7 +3,6 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 
-# todo not implemented yet in the docs nor in the __init__.py
 import numpy as np
 import scipy
 
@@ -95,13 +94,15 @@ def sports_heat_stress_risk(
     to deliver more accurate and sport-specific heat risk assessments.
     It addresses previous shortcomings by improving protection during
     very hot, dry conditions—where sweat and cardiovascular strain are greatest
-    and reducing unnecessary play suspensions in humid weather through structured cooling and rest interventions.
+    and reducing unnecessary play suspensions in humid weather
+    through structured cooling and rest interventions.
     A new web-based tool simplifies application by providing
     automated, location-specific, hourly heat risk classifications and seven-day forecasts.
     This digital platform removes the need for manual graph interpretation,
     reducing the potential for human error.
     The updated policy ensures more consistent, evidence-based decision-making
-    for sporting organisations, coaches, and medical personnel responsible for athlete safety during hot weather.
+    for sporting organisations, coaches, and medical personnel
+    responsible for athlete safety during hot weather.
 
          Parameters
          ----------
@@ -180,7 +181,7 @@ def sports_heat_stress_risk(
              vr = 0.1  # Air velocity [m/s]
 
              # Choose sport
-             sport = Sports.RUNNING
+             sport = "running"
 
              # Call the function
              result: SportsHeatStressRiskResult = sports_heat_stress_risk(
@@ -365,9 +366,6 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
 
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
-
-    # todo include the recommendations based on the risk level
-    # todo return a dataclass with the risk level, risk level interpolated, thresholds, and recommendations
 
     risk_level, recommendations = _get_recommendations(risk_level_interpolated)
 
