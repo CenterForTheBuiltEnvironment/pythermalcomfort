@@ -367,7 +367,7 @@ if __name__ == "__main__":
     rh = 40
     v = 0.1
     tr = 70
-    sport = "running"
+    sport = Sports.RUNNING
     print(sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB))
 
     # second example
