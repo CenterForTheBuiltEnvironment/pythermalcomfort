@@ -165,6 +165,14 @@ Humidex
 .. autoclass:: pythermalcomfort.classes_return.Humidex
     :members:
 
+Required Clothing Insulation (IREQ)
+-----------------------------------
+
+.. autofunction:: pythermalcomfort.models.ireq.calc_ireq
+
+.. autoclass:: pythermalcomfort.classes_return.IREQ
+    :members:
+
 Joint system thermoregulation model (JOS-3)
 -------------------------------------------
 

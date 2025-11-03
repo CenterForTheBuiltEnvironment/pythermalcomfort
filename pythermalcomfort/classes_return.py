@@ -1043,3 +1043,32 @@ class ScaleWindSpeedLog(AutoStrMixin):
     """
 
     v_z2: npt.ArrayLike
+
+
+@dataclass(frozen=True, repr=False)
+class IREQ(AutoStrMixin):
+    """Dataclass to represent the Required Clothing Insulation (IREQ) and Duration 
+    Limited Exposure (DLE) according to ISO 11079.
+
+    Attributes
+    ----------
+    ireq_min : float, list[float], or numpy.ndarray
+        Lower bound of required insulation [clo].
+    ireq_neutral : float or list of floats  
+        Upper bound of required insulation [clo].
+    icl_min : float or list of floats
+        Lower bound of required basic clothing insulation (ISO 9920) [clo].
+    icl_neutral : float or list of floats
+        Upper bound of required basic clothing insulation (ISO 9920) [clo].
+    dle_min : float, numpy.ndarray, or str
+        Lower bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
+    dle_neutral : float or list of floats or str
+        Upper bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
+    """
+
+    ireq_min: npt.ArrayLike
+    ireq_neutral: npt.ArrayLike
+    icl_min: npt.ArrayLike
+    icl_neutral: npt.ArrayLike
+    dle_min: npt.ArrayLike | str
+    dle_neutral: npt.ArrayLike | str

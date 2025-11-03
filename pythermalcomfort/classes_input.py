@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -1237,3 +1237,98 @@ class ScaleWindSpeedLogInputs(BaseInputs):
         self.z1 = z1
         self.z0 = z0
         self.d = d
+
+
+@dataclass
+class IREQInputs(BaseInputs):
+    """Inputs for the IREQ model (ISO 11079).
+
+    Parameters
+    ----------
+    m : float or array-like
+        Metabolic rate [W/m²]. Must be positive and within 58–400 W/m².
+        Note: 1 met ≈ 58 W/m². Convert from "met" to W/m² before calling this function.
+    w_work : float or array-like, optional
+        External mechanical work [W/m²]. Default is 0.
+    p_air : float or array-like, optional
+        Clothing air permeability [l/(m²·s)]. Default is 8.0.
+    v_walk : float or array-like, optional
+        Walking speed [m/s]. Default is 0.3.
+    tdb : float or array-like, optional
+        Dry-bulb air temperature [°C].
+    tr : float or array-like, optional
+        Mean radiant temperature [°C].
+    v : float or array-like, optional
+        Air velocity [m/s]. Must be ≥ 0. Default is 0.4.
+    rh : float or array-like, optional
+        Relative humidity [%]. Must be between 0 and 100. Default is 50.
+    clo : float or array-like, optional
+        Clothing insulation [clo]. Must be ≥ 0. Default is 1.0.
+    round_output : bool, optional
+        Whether to round model results. Default is True.
+    limit_inputs : bool, optional
+        Whether to constrain inputs within valid physical bounds. Default is True.
+
+    Notes
+    -----
+    All inputs can be scalars, lists, or NumPy arrays.
+    Scalars are automatically broadcast to match array inputs.
+    """
+
+
+    m: Optional[Union[float, int, np.ndarray, list]] = field(default=None)
+    w_work: Optional[Union[float, int, np.ndarray, list]] = field(default=0)
+    p_air: Optional[Union[float, int, np.ndarray, list]] = field(default=8.0)
+    v_walk: Optional[Union[float, int, np.ndarray, list]] = field(default=0.3)
+
+    tdb: Optional[Union[float, int, np.ndarray, list]] = field(default=None)
+    tr: Optional[Union[float, int, np.ndarray, list]] = field(default=None)
+    v: Optional[Union[float, int, np.ndarray, list]] = field(default=0.4)
+    rh: Optional[Union[float, int, np.ndarray, list]] = field(default=50.0)
+    clo: Optional[Union[float, int, np.ndarray, list]] = field(default=1.0)
+    round_output: bool = field(default=True) # Whether to round model output results
+    limit_inputs: bool = field(default=True) # Whether to enforce valid physical limits on inputs
+
+    def __post_init__(self):
+        """Validate and normalise inputs for the IREQ model."""
+        # Call base class post-init for generic validation and Series conversion
+        super().__post_init__()
+
+        # --- Validate and normalise required inputs ---
+        if self.m is None:
+            raise ValueError("Parameter 'm' (metabolic rate) is required for IREQ calculation.")
+
+        self.m = np.asarray(self.m, dtype=float)
+        if np.any(self.m <= 0):
+            raise ValueError("Metabolic rate 'm' must be greater than 0.")
+
+        # --- Validate and normalise optional numeric parameters ---
+        self.w_work = np.asarray(self.w_work, dtype=float)
+        if np.any(self.w_work < 0):
+            raise ValueError("External work 'w_work' must be non-negative.")
+
+        self.p_air = np.asarray(self.p_air, dtype=float)
+        if np.any(self.p_air <= 0):
+            raise ValueError("Air pressure 'p_air' must be positive.")
+
+        self.v_walk = np.asarray(self.v_walk, dtype=float)
+        if np.any(self.v_walk < 0):
+            raise ValueError("Walking speed 'v_walk' must be non-negative.")
+
+        self.v = np.asarray(self.v, dtype=float)
+        if np.any(self.v < 0):
+            raise ValueError("Air velocity 'v' must be non-negative.")
+
+        self.rh = np.asarray(self.rh, dtype=float)
+        if np.any((self.rh < 0) | (self.rh > 100)):
+            raise ValueError("Relative humidity 'rh' must be between 0 and 100%.")
+
+        self.clo = np.asarray(self.clo, dtype=float)
+        if np.any(self.clo < 0):
+            raise ValueError("Clothing insulation 'clo' must be non-negative.")
+
+        # --- Normalise optional environmental inputs ---
+        if self.tdb is not None:
+            self.tdb = np.asarray(self.tdb, dtype=float)
+        if self.tr is not None:
+            self.tr = np.asarray(self.tr, dtype=float)
