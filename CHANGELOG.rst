@@ -6,7 +6,7 @@ Changelog
 
 * Added calc_ireq() function implementing the Required Clothing Insulation (IREQ) according to ISO 11079:2007.
 * Added IREQ dataclass to classes_return.py to standardize output attributes (ireq_neutral, ireq_min, icl_neutral, icl_min, dle_neutral, dle_min).
-* Extended classes_input.py with input validation for IREQ-related parameters.
+* Extended classes_input.py with new IREQInputs class and base input field extensions (duration, t_re, t_sk).
 * Added comprehensive unit tests in tests/test_ireq.py covering scalar, array, broadcasting, and invalid input cases.
 
 3.7.0 (2025-10-28)
