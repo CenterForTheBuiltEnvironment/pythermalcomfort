@@ -1052,7 +1052,7 @@ class IREQ(AutoStrMixin):
 
     Attributes
     ----------
-    ireq_min : float or list of floats
+    ireq_min : float, list[float], or numpy.ndarray
         Lower bound of required insulation [clo].
     ireq_neutral : float or list of floats  
         Upper bound of required insulation [clo].
@@ -1060,7 +1060,7 @@ class IREQ(AutoStrMixin):
         Lower bound of required basic clothing insulation (ISO 9920) [clo].
     icl_neutral : float or list of floats
         Upper bound of required basic clothing insulation (ISO 9920) [clo].
-    dle_min : float or list of floats or str
+    dle_min : float, numpy.ndarray, or str
         Lower bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
     dle_neutral : float or list of floats or str
         Upper bound of duration limited exposure [hours] (values > 8 represented as "more than 8").
