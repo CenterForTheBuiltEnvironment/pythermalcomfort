@@ -96,7 +96,6 @@ def sports_heat_stress_risk(
 
          Returns
          -------
-         # todo this should be a dataclass
          SportsHeatStressRiskResult
              Dataclass containing the results:
              - pmv : Predicted Mean Vote (float or np.ndarray)
@@ -131,14 +130,14 @@ def sports_heat_stress_risk(
              sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
              # Expected: ~2.4
 
-        # todo add references to the docstring
+
 
          References
          ----------
          1. Sports Medicine Australia. (2021). *Extreme Heat Policy for Community Sport*.
             https://sma.org.au/resources-advice/extreme-heat-policy/
 
-         # todo add examples to the docstring
+
          Examples
          --------
          .. code-block:: python
@@ -169,16 +168,28 @@ def sports_heat_stress_risk(
              print("Heat strain probability:", result.p)
              print("Risk level:", result.risk_level)
     """
-    # todo the function should accept either float or arrays as all the other functions pythermalcomfort
+    # Accept both scalar and array-like inputs (consistent with other pythermalcomfort functions)
+    tdb = np.array(tdb, ndmin=1, dtype=float)
+    tr = np.array(tr, ndmin=1, dtype=float)
+    rh = np.array(rh, ndmin=1, dtype=float)
+    vr = np.array(vr, ndmin=1, dtype=float)
 
-    tdb = np.asarray(tdb)
-    tr = np.asarray(tr)
-    rh = np.asarray(rh)
-    vr = np.asarray(vr)
+    # Broadcast all inputs to the same shape
+    tdb, tr, rh, vr = np.broadcast_arrays(tdb, tr, rh, vr)
 
-    risk_levels = np.vectorize(_calc_risk_single_value)(
-        tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
-    )
+    # Allocate array for results
+    risk_levels = np.empty_like(tdb, dtype=float)
+
+    # Calculate each value
+    for i in np.ndindex(tdb.shape):
+        risk_levels[i] = _calc_risk_single_value(
+            tdb=tdb[i], tr=tr[i], rh=rh[i], vr=vr[i], sport=sport
+        )
+
+    # Return scalar if all inputs were scalar
+    if risk_levels.size == 1:
+        return float(risk_levels)
+    return risk_levels
 
     # thermal_sensation = {
     #     -2.5: "Cold",
@@ -203,7 +214,7 @@ def sports_heat_stress_risk(
 
 def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     # set the max and min thresholds for the risk levels
-    sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
+    sweat_loss_g = 825  # 825 g per hour
 
     max_t_low = 34.5  # maximum tdb for low risk
     max_t_medium = 39  # maximum tdb for medium risk
@@ -230,7 +241,6 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
                 met=sport.met,
                 clo=sport.clo,
                 posture="standing",
-                # todo check if I can use duration=60 for all sports
                 duration=sport.duration,
                 round=False,
                 limit_inputs=False,
@@ -238,8 +248,8 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
                 i_mst=0.4,
             ).sweat_loss_g
             / sport.duration
-            * 45
-            # todo I want to remove the above line and calculate a fixed value for all sports over 60 min
+            * 60
+            # normalized sweat loss to 60 minutes for all sports
             - sweat_loss_g
         )
 
