@@ -1,8 +1,8 @@
 """Ridge regression model for predicting rectal and skin temperature.
 
-Based on fold 1 from Forbes et al. (2025), doi:10.1016/j.jtherbio.2025.104078.
-Trained on adults aged 60-100 in minimal clothing under stationary conditions.
-Uses Min-Max scaling on features and outputs.
+Based on fold 1 from Forbes et al. (2025), doi:10.1016/j.jtherbio.2025.104078. Trained
+on adults aged 60-100 in minimal clothing under stationary conditions. Uses Min-Max
+scaling on features and outputs.
 """
 
 from __future__ import annotations
@@ -203,7 +203,8 @@ def ridge_regression_predict_t_re_t_sk(
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> PredictedBodyTemperatures:
-    """Predicts the full history of core and skin temperature changes based on a ridge regression model.
+    """Predicts the full history of core and skin temperature changes based on a ridge
+    regression model.
 
     This model simulates the rectal (t_re) and mean skin (t_sk)
     temperatures by first establishing a baseline in a thermoneutral environment

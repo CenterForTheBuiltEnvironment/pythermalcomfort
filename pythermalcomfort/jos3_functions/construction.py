@@ -1,7 +1,8 @@
-"""This module provides models for calculating various body parameters including surface area,
-weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
+"""This module provides models for calculating various body parameters including surface
+area, weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 
-The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
+The values of a NumPy array containing 17 elements correspond to the body parts defined
+in JOS3BodyParts.
 """
 
 import numpy as np
@@ -78,7 +79,6 @@ def to_array_body_parts(inp) -> np.ndarray:
     ------
     ValueError
         If the input type is not supported or if the input list or ndarray is not of length 17.
-
     """
     if isinstance(inp, int | float):
         return np.full(Default.num_body_parts, inp)
@@ -133,7 +133,6 @@ def bsa_rate(
 
         bsa_ratio = bsa_rate(height=1.80, weight=75, bsa_equation="dubois")
         print(bsa_ratio)
-
     """
     bsa_all = body_surface_area(
         height=height,
@@ -184,7 +183,6 @@ def local_bsa(
 
         local_bsa_values = local_bsa(height=1.80, weight=75, bsa_equation="dubois")
         print(local_bsa_values)
-
     """
     bsa_ratio = bsa_rate(height=height, weight=weight, bsa_equation=bsa_equation)
     return Default.local_bsa * bsa_ratio
@@ -202,7 +200,6 @@ def weight_rate(weight: float) -> float:
     -------
     float
         The ratio of the body weight to the standard body.
-
     """
     return weight / Default.weight
 
@@ -250,7 +247,6 @@ def bfb_rate(
 
         bfb_ratio = bfb_rate(height=1.80, weight=75, age=30, ci=2.59)
         print(bfb_ratio)
-
     """
     ci *= 60  # Convert unit from L/min/m² to L/h/m²
 
@@ -293,7 +289,6 @@ def conductance(
     conductance : numpy.ndarray
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
-
     """
     if fat < 12.5:
         cdt_cr_sk = np.asarray(
@@ -575,7 +570,6 @@ def capacity(
     np.ndarray
         Thermal capacity [J/K].
         The shape is (NUM_NODES).
-
     """
     # Define capacities [Wh/K]
 

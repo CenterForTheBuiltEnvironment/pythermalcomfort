@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.7.2 (2025-11-04)
+------------------
+
+* Added two biophysical fan use models for determining safe fan use limits: Resting [Morris2021]_ and Occupational [Foster2021]_
+
 3.7.0 (2025-10-28)
 ------------------
 

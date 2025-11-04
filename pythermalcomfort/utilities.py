@@ -59,7 +59,6 @@ def p_sat_torr(tdb: float | list[float]) -> float | list[float]:
     -------
     p_sat : float
         saturation vapor pressure [torr]
-
     """
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
@@ -81,7 +80,6 @@ def enthalpy_air(
     -------
     enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
@@ -116,7 +114,6 @@ def p_sat(tdb: float | list[float]) -> float | list[float]:
     -------
     p_sat: float or list of floats
         saturation vapor pressure, [Pa]
-
     """
     ta_k = tdb + c_to_k
     # pre-calculate the value before passing it to .where
@@ -147,7 +144,6 @@ def antoine(tdb: float | np.ndarray) -> np.ndarray:
     -------
     float or list of floats
         Saturated vapor pressure [kPa].
-
     """
     tdb = np.asarray(tdb)
     return math.e ** (16.6536 - 4030.183 / (tdb + 235))
@@ -187,7 +183,6 @@ def psy_ta_rh(
         dew point temperature, [°C]
     h: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     tdb = np.asarray(tdb)
     rh = np.asarray(rh)
@@ -226,7 +221,6 @@ def wet_bulb_tmp(
     -------
     tdb: float or list of floats
         wet-bulb temperature, [°C]
-
     """
     twb = (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
@@ -256,7 +250,6 @@ def dew_point_tmp(
     -------
     dew_point_tmp: float or list of floats
         dew point temperature, [°C]
-
     """
     tdb = np.asarray(tdb)
     rh = np.asarray(rh)
@@ -308,7 +301,6 @@ def mean_radiant_tmp(
     -------
     tr: float or list of floats
         mean radiant temperature, [°C]
-
     """
     standard = standard.lower()
 
@@ -570,7 +562,6 @@ def body_surface_area(
 
         bsa = body_surface_area(weight=70, height=1.75, formula="dubois")
         print(bsa)
-
     """
     if formula == BodySurfaceAreaEquations.dubois.value:
         return 0.202 * (weight**0.425) * (height**0.725)
@@ -602,7 +593,6 @@ def f_svv(w: float, h: float, d: float) -> float:
     -------
     f_svv  : float
         sky-vault view fraction ranges between 0 and 1
-
     """
     return (
         math.degrees(math.atan(h / (2 * d)))
@@ -627,7 +617,6 @@ def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
     -------
     vr  : float or list of floats
         relative air speed, [m/s]
-
     """
     v = np.asarray(v)
     met = np.asarray(met)
@@ -664,7 +653,6 @@ def clo_dynamic_ashrae(
     -------
     clo : float or list of floats
         dynamic clothing insulation (I :sub:`cl,r`), [clo]
-
     """
     clo = np.asarray(clo)
     met = np.asarray(met)
@@ -710,7 +698,6 @@ def clo_dynamic_iso(
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
-
     """
     model = model.lower()
     if model not in [Models.iso_9920_2007.value]:
@@ -767,7 +754,6 @@ def running_mean_outdoor_temperature(
     -------
     t_rm  : float
         running mean outdoor temperature
-
     """
     units = units.upper()
     if units == Units.IP.value:
@@ -795,7 +781,6 @@ def units_converter(from_units=Units.IP.value, **kwargs) -> list[float]:
     Returns
     -------
     converted values in SI units
-
     """
     results = []
     from_units = from_units.upper()
@@ -830,7 +815,8 @@ def operative_tmp(
     v: float | list[float],
     standard: str = "ISO",
 ) -> float | list[float]:
-    """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
+    """Calculate the operative temperature in accordance with ISO 7726:1998
+    [7726ISO1998]_.
 
     Parameters
     ----------
@@ -848,7 +834,6 @@ def operative_tmp(
     -------
     to: float
         operative temperature, [°C]
-
     """
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
@@ -882,7 +867,6 @@ def clo_intrinsic_insulation_ensemble(
     -------
     i_cl: float
         intrinsic insulation of the clothing ensemble, [clo]
-
     """
     clo_garments = np.asarray(clo_garments)
     return np.sum(clo_garments) * 0.835 + 0.161
@@ -905,7 +889,6 @@ def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
     -------
     f_cl: float or list of floats
         area factor of the clothing ensemble, [m2]
-
     """
     i_cl = np.asarray(i_cl)
     return 1 + 0.28 * i_cl
@@ -940,7 +923,6 @@ def clo_insulation_air_layer(
     -------
     i_a_r: float or list of floats
         boundary air layer insulation, [clo]
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -999,7 +981,6 @@ def clo_total_insulation(
     -------
     i_t_r: float or list of floats
         total insulation of the clothing ensemble, [clo]
-
     """
     i_t = np.asarray(i_t)
     vr = np.asarray(vr)
@@ -1032,8 +1013,8 @@ def clo_correction_factor_environment(
     v_walk: float | list[float],
     i_cl: float | list[float],
 ) -> float | list[float]:
-    """Return the correction factor for the total insulation of the
-    clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+    """Return the correction factor for the total insulation of the clothing ensemble
+    (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
 
     This correction factor takes into account of the fact that the values of
     (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
@@ -1056,7 +1037,6 @@ def clo_correction_factor_environment(
         correction factor for the total insulation of the clothing ensemble
         (`I`:sub:`T,r` / (`I`:sub:`T`)) or the basic/intrinsic insulation
         (`I`:sub:`cl,r` / (`I`:sub:`cl`))
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -1077,7 +1057,8 @@ def clo_correction_factor_environment(
 
 
 def _correction_nude(_vr, _vw) -> float:
-    """Calculate the correction factor for the total insulation of the clothing ensemble."""
+    """Calculate the correction factor for the total insulation of the clothing
+    ensemble."""
     return np.exp(
         -0.533 * (_vr - 0.15)
         + 0.069 * (_vr - 0.15) ** 2

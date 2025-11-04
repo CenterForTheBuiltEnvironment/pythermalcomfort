@@ -97,7 +97,6 @@ def pet_steady(
             clo=[0.5, 0.6],
         )
         print(result.pet)  # [24.67 31.46]
-
     """
     # Validate inputs using the PETSteadyInputs class
     PETSteadyInputs(
@@ -170,7 +169,6 @@ def _pet_steady_vectorised(
             "m_blood": Blood flow rate, [kg/m2/h] and "alpha": repartition of body
             mass
             between core and skin [].
-
         """
         # skin and core temperatures set values
         tc_set = 36.6  # 36.8
@@ -206,7 +204,6 @@ def _pet_steady_vectorised(
         -------
         m_rsw : float
             The sweating flow rate, [g/m2/h].
-
         """
         tc_set = 36.6  # 36.8
         tsk_set = 34  # 33.7
@@ -234,9 +231,9 @@ def _pet_steady_vectorised(
         _clo=0.9,
         actual_environment=False,
     ):
-        """Solve PET by either computing the vectorial balance of the three unknown temperatures
-        (T_core, T_sk, T_clo) or by finding the environment operative temperature that yields
-        the same energy balance as the actual environment.
+        """Solve PET by either computing the vectorial balance of the three unknown
+        temperatures (T_core, T_sk, T_clo) or by finding the environment operative
+        temperature that yields the same energy balance as the actual environment.
 
         Parameters
         ----------
@@ -261,7 +258,6 @@ def _pet_steady_vectorised(
         -------
         float or list
             PET or energy balance.
-
         """
         e_skin = 0.99  # Skin emissivity
         e_clo = 0.95  # Clothing emissivity
@@ -461,7 +457,6 @@ def _pet_steady_vectorised(
         -------
         float
             The PET comfort index.
-
         """
 
         # Definition of a function with the input variables of the PET reference situation

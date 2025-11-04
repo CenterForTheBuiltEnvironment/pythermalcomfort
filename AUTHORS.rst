@@ -15,6 +15,7 @@ Contributors
 * Chris Mackey
 * `Jonas Kittner`_
 * `Connor Forbes`_
+* `Nicholas Ravanelli`_
 
 .. _Federico Tartarini: https://www.linkedin.com/in/federico-tartarini-3991995b/
 .. _Stefano Schiavon: https://www.linkedin.com/in/stefanoschiavon/
@@ -22,6 +23,7 @@ Contributors
 .. _Jonas Kittner: https://github.com/jkittner/
 .. _Akihisa Nomoto: https://www.linkedin.com/in/akihisa-nomoto-3b872611b/
 .. _Connor Forbes: https://www.linkedin.com/in/connor-forbes-1a490117b/
+.. _Nicholas Ravanelli: https://www.linkedin.com/in/nicholas-ravanelli/
 
 Acknowledgements
 ----------------

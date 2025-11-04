@@ -366,7 +366,6 @@ class JOS3:
         plt.ylabel("Skin temperature [°C]")  # Set y-label as 'Skin temperature [°C]'
         plt.xlabel("Time [min]")  # Set x-label as 'Time [min]'
         plt.show()  # Show the plot
-
     """
 
     def __init__(
@@ -380,8 +379,8 @@ class JOS3:
         bmr_equation: str = Default.bmr_equation,
         bsa_equation: str = Default.bsa_equation,
     ):
-        """Initialize a new instance of the JOS3 class, which models and simulates various
-        physiological parameters related to human thermoregulation.
+        """Initialize a new instance of the JOS3 class, which models and simulates
+        various physiological parameters related to human thermoregulation.
 
         This class uses mathematical models to calculate and predict body temperature,
         basal metabolic rate, body surface area, and other related parameters.
@@ -418,7 +417,6 @@ class JOS3:
         .. code-block:: python
 
             jos3_model = JOS3(height=1.75, weight=70, age=25, sex="female")
-
         """
         # validate body parameters
         validate_body_parameters(height=height, weight=weight, age=age, body_fat=fat)
@@ -551,7 +549,6 @@ class JOS3:
         -------
         to : float
             Operative temperature [°C].
-
         """
         # Default parameters
         initial_to = 28
@@ -610,8 +607,8 @@ class JOS3:
 
     # TODO check the name of the function and the docstring
     def _reset_setpt(self) -> JOS3Output:
-        """Reset set-point temperatures under steady state conditions. For a nude person in a reference environment,
-        of 50% RH, 0.1 m/s air velocity, and par=1.25.
+        """Reset set-point temperatures under steady state conditions. For a nude person
+        in a reference environment, of 50% RH, 0.1 m/s air velocity, and par=1.25.
 
         Set-point temperatures are hypothetical core or skin temperatures in a thermally neutral state
         when at rest, similar to room set-point temperatures for air conditioning. This function is
@@ -623,7 +620,6 @@ class JOS3:
         -------
         dict
             Parameters of the JOS-3 model.
-
         """
         # Set operative temperature under PMV=0 environment
         # TODO shall these be the reference values for naked?
@@ -695,7 +691,6 @@ class JOS3:
             # Access the results
             results = jos3_model.dict_results()
             print(results)
-
         """
         # Loop through the simulation for the given number of times
         for _ in range(times):
@@ -736,7 +731,6 @@ class JOS3:
             mean skin wettedness, skin wettedness, weight loss by evaporation and respiration,
             cardiac output, total thermogenesis, respiratory heat loss, and total heat loss
             from the skin to the environment.
-
         """
         # Compute convective and radiative heat transfer coefficient [W/(m2*K)]
         # based on posture, air velocity, air temperature, and skin temperature.
@@ -1142,8 +1136,8 @@ class JOS3:
         )
 
     def results(self) -> JOS3Output:
-        """Consolidate the results into a single JOS3Output instance. This makes
-        it very easy to access the time series data for each parameter.
+        """Consolidate the results into a single JOS3Output instance. This makes it very
+        easy to access the time series data for each parameter.
 
         Returns
         -------
@@ -1162,7 +1156,6 @@ class JOS3:
             output = model.results()
             print(output.t_skin_mean)
             print(output.t_skin.head)
-
         """
         merged_data = defaultdict(list)
 
@@ -1215,7 +1208,6 @@ class JOS3:
             print(
                 results["t_skin_mean"]
             )  # Access the mean skin temperature time series
-
         """
         if not self._history:
             print("The model has no data.")
@@ -1329,7 +1321,6 @@ class JOS3:
 
             # Export results to a CSV file
             model.to_csv()
-
         """
         # Use the model name and current time as default output file name
         if path is None:
@@ -1394,7 +1385,6 @@ class JOS3:
         -------
         array
             Extra heat gain of model.
-
         """
         self.ex_q[INDEX[tissue]] = value
         return self.ex_q
@@ -1409,7 +1399,6 @@ class JOS3:
         -------
         ndarray
             A NumPy array of shape (17).
-
         """
         return self._tdb
 

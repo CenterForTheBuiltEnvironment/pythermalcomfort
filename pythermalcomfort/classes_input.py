@@ -18,6 +18,14 @@ class WorkIntensity(str, Enum):
     LIGHT = "light"
 
 
+class BFU_rest_Groups(str, Enum):
+    """Enumeration for Morris LPH fan population groups."""
+
+    young = "YNG"
+    older = "OLD"
+    meds = "MEDS"
+
+
 @dataclass
 class BaseInputs:
     """Base inputs with metadata-driven validation."""
@@ -520,6 +528,222 @@ class HIInputs(BaseInputs):
 class HumidexModels(Enum):
     rana = "rana"
     masterson = "masterson"
+
+
+@dataclass(frozen=True)
+class BFU_rest_Parameters:
+    """Default physical and physiological parameters for the Morris LPH fan model."""
+
+    metabolic_rate: float = 65.0  # [W/m2]
+    external_work: float = 0.0  # [W/m2]
+    t_skin: float = 35.5  # [°C]
+    p_skin_sat_kpa: float = 5.78  # [kPa]
+    hr: float = 4.7  # [W/m2/K]
+    body_surface_area: float = 1.83  # [m2]
+    latent_heat_j_g: float = 2426.0  # [J/g]
+    sweating_efficiency_min: float = 0.55
+    rcl_off: float = 0.1291  # [m2*K/W]
+    recl_off: float = 0.0237  # [m2*kPa/W]
+    rcl_on: float = 0.1341  # [m2*K/W]
+    recl_on_front: float = 0.0112  # [m2*kPa/W]
+    recl_on_rear: float = 0.0161  # [m2*kPa/W]
+    v_on: float = 3.5  # [m/s]
+    v_off: float = 0.2  # [m/s]
+    sweat_rate: dict[str, float] = field(
+        default_factory=lambda: {
+            BFU_rest_Groups.young.value: 660.0,
+            BFU_rest_Groups.older.value: 440.0,
+            BFU_rest_Groups.meds.value: 330.0,
+        },
+    )
+    wcrit_on: dict[str, float] = field(
+        default_factory=lambda: {
+            BFU_rest_Groups.young.value: 0.65,
+            BFU_rest_Groups.older.value: 0.50,
+            BFU_rest_Groups.meds.value: 0.38,
+        },
+    )
+    wcrit_off: dict[str, float] = field(
+        default_factory=lambda: {
+            BFU_rest_Groups.young.value: 0.85,
+            BFU_rest_Groups.older.value: 0.65,
+            BFU_rest_Groups.meds.value: 0.49,
+        },
+    )
+
+
+@dataclass
+class BFU_rest_Inputs(BaseInputs):
+    group: str = field(default=BFU_rest_Groups.young.value)
+    params: BFU_rest_Parameters = field(
+        default_factory=BFU_rest_Parameters,
+        repr=False,
+    )
+
+    def __init__(
+        self,
+        tdb,
+        rh,
+        group=BFU_rest_Groups.young.value,
+        round_output=True,
+    ):
+        # Initialize with only required fields, setting others to None
+        super().__init__(
+            tdb=tdb,
+            rh=rh,
+            round_output=round_output,
+        )
+        self.group = group
+        self.params = BFU_rest_Parameters()
+        self._validate_group_specific_inputs()
+
+    def _validate_group_specific_inputs(self):
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity must be between 0 and 100 %.")
+
+        group_value = str(self.group).upper()
+        if group_value not in BFU_rest_Groups._value2member_map_:
+            raise ValueError(
+                "Invalid group. The group must be one of 'YNG', 'OLD', or 'MEDS'.",
+            )
+        self.group = group_value
+
+
+@dataclass
+class BFU_occupational_Inputs(BaseInputs):
+    """Inputs for the Foster IJBM occupational fan model."""
+
+    def __init__(
+        self,
+        tdb,
+        rh,
+        tr=None,
+        clo=0.28,
+        met=125.0,
+        fan_velocity=3.5,
+        fan_off_velocity=0.2,
+        position="standing",
+        activity="walk",
+        speed=1.66,
+        fixed_sweat_rate_lph=1.0,
+        body_surface_area=1.81,
+        round_output=True,
+    ):
+        tr_value = tr if tr is not None else tdb
+
+        super().__init__(
+            tdb=tdb,
+            tr=tr_value,
+            rh=rh,
+            clo=clo,
+            met=met,
+            body_surface_area=body_surface_area,
+            round_output=round_output,
+        )
+
+        # Replace sentinel values (999) with air temperature
+        tr_arr = np.asarray(self.tr, dtype=float)
+        tdb_arr = np.asarray(self.tdb, dtype=float)
+        self.tr = np.where(tr_arr == 999.0, tdb_arr, tr_arr)
+
+        self.fan_velocity = fan_velocity
+        self.fan_off_velocity = fan_off_velocity
+        self.speed = speed
+
+        position_arr = np.asarray(position, dtype=object)
+        position_lower = np.char.lower(position_arr.astype(str))
+        position_clean = np.where(position_lower == "sitting", "seated", position_lower)
+        self.position = (
+            position_clean.item() if position_clean.shape == () else position_clean
+        )
+
+        activity_arr = np.asarray(activity, dtype=object)
+        activity_lower = np.char.lower(activity_arr.astype(str))
+        activity_clean = np.select(
+            [activity_lower == "walk", activity_lower == "rest"],
+            ["walk", "rest"],
+            default="other",
+        )
+        self.activity = (
+            activity_clean.item() if activity_clean.shape == () else activity_clean
+        )
+
+        self.fixed_sweat_rate_lph = fixed_sweat_rate_lph
+
+        self._validate_custom_inputs()
+
+    def _validate_custom_inputs(self) -> None:
+        """Run additional internal validation for inputs in the Foster occupational
+        model."""
+
+        rh = np.asarray(self.rh, dtype=float)
+        if np.any((rh < 0) | (rh > 100)):
+            raise ValueError("Relative humidity must be between 0 and 100 %.")
+
+        position_arr = np.asarray(self.position, dtype=object)
+        position_values = np.char.lower(position_arr.astype(str))
+        if not np.isin(position_values, ["standing", "seated"]).all():
+            raise ValueError("position must contain only 'standing' or 'seated'.")
+
+        activity_arr = np.asarray(self.activity, dtype=object)
+        activity_values = np.char.lower(activity_arr.astype(str))
+        if not np.isin(activity_values, ["walk", "rest", "cycle"]).all():
+            raise ValueError(
+                "activity must contain only values convertible to 'walk', 'rest', or 'cycle'.",
+            )
+
+        def _validate_non_negative(value, name: str) -> None:
+            arr = np.asarray(value, dtype=float)
+            if np.any(arr < 0):
+                message = f"{name} must be greater than or equal to 0."
+                raise ValueError(message)
+
+        _validate_non_negative(self.speed, "speed")
+        _validate_non_negative(self.fan_velocity, "fan_velocity")
+        _validate_non_negative(self.fan_off_velocity, "fan_off_velocity")
+
+        if self.fixed_sweat_rate_lph is not None:
+            _validate_non_negative(self.fixed_sweat_rate_lph, "fixed_sweat_rate_lph")
+
+        # Ensure broadcast compatibility across all array-like inputs
+        try:
+            core_arrays = np.broadcast_arrays(
+                self.tdb,
+                self.tr,
+                self.rh,
+                self.clo,
+                self.met,
+                self.body_surface_area,
+                self.speed,
+                self.fan_velocity,
+                self.fan_off_velocity,
+            )
+        except ValueError as err:
+            raise ValueError(
+                "Input arrays are not broadcastable to a common shape.",
+            ) from err
+
+        broadcast_shape = core_arrays[0].shape
+
+        try:
+            np.broadcast_to(position_arr, broadcast_shape)
+            np.broadcast_to(activity_arr, broadcast_shape)
+        except ValueError as err:
+            raise ValueError(
+                "position and activity must broadcast with the primary inputs.",
+            ) from err
+
+        if self.fixed_sweat_rate_lph is not None:
+            try:
+                np.broadcast_to(
+                    np.asarray(self.fixed_sweat_rate_lph, dtype=float),
+                    broadcast_shape,
+                )
+            except ValueError as err:
+                raise ValueError(
+                    "fixed_sweat_rate_lph must broadcast with the primary inputs.",
+                ) from err
 
 
 @dataclass

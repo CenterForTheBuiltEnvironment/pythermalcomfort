@@ -13,7 +13,8 @@ def heat_index_lu(
     rh: float | list[float],
     round_output: bool = True,
 ) -> HI:
-    """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model [lu]_.
+    """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model
+    [lu]_.
 
     Parameters
     ----------
@@ -38,7 +39,6 @@ def heat_index_lu(
 
         result = heat_index_lu(tdb=25, rh=50)
         print(result.hi)  # 25.9
-
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(

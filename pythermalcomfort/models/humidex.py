@@ -13,12 +13,11 @@ def humidex(
     model: str = "rana",
     round_output: bool = True,
 ) -> Humidex:
-    """Calculate the humidex (short for "humidity index"). It has been
-    developed by the Canadian Meteorological service. It was introduced in 1965
-    and then it was revised by Masterson and Richardson (1979) [Masterson1979]_. It aims
-    to describe how hot, humid weather is felt by the average person. The
-    Humidex differs from the heat index in being related to the dew point
-    rather than relative humidity [Havenith2016]_.
+    """Calculate the humidex (short for "humidity index"). It has been developed by the
+    Canadian Meteorological service. It was introduced in 1965 and then it was revised
+    by Masterson and Richardson (1979) [Masterson1979]_. It aims to describe how hot,
+    humid weather is felt by the average person. The Humidex differs from the heat index
+    in being related to the dew point rather than relative humidity [Havenith2016]_.
 
     Parameters
     ----------
@@ -57,7 +56,6 @@ def humidex(
         print(result.humidex)  # [28.2, 39.1]
         print(result.discomfort)
         # ['Little or no discomfort', 'Evident discomfort']
-
     """
     # Validate inputs using the HumidexInputs class
     HumidexInputs(
