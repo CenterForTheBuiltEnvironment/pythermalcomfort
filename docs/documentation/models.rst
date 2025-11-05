@@ -73,22 +73,22 @@ Ankle draft
 .. autoclass:: pythermalcomfort.classes_return.AnkleDraft
     :members:
 
-Biophysical Fan Use Model:  Occupational 
+Biophysical Fan Use Model:  Occupational
 -------------------------
 
 This function is derived from the occupational biophysical fan use model described by Foster et al. 2021 [Foster2021]_
 
-.. autofunction:: pythermalcomfort.models.BFU_occupational.BFU_occupational
+.. autofunction:: pythermalcomfort.models.bfu_occupational.BFU_occupational
 
 .. autoclass:: pythermalcomfort.classes_return.BFU_occupational
     :members:
 
-Biophysical Fan Use Model: Rest 
+Biophysical Fan Use Model: Rest
 -------------------------
 
 This function is derived from the resting biophysical fan use model described by Morris et al. 2021 [Morris2021]_
 
-.. autofunction:: pythermalcomfort.models.BFU_rest.BFU_rest
+.. autofunction:: pythermalcomfort.models.bfu_rest.BFU_rest
 
 .. autoclass:: pythermalcomfort.classes_return.BFU_rest
     :members:
