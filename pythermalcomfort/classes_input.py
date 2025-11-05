@@ -19,7 +19,15 @@ class WorkIntensity(str, Enum):
 
 
 class BFU_rest_Groups(str, Enum):
-    """Enumeration for Morris LPH fan population groups."""
+    """
+    Enumeration for population groups as described in Morris et al. 2021 .
+
+    Mapping:
+        YNG  = Young adults, 18–45 years
+        OLD  = Older adults, 65+ years
+        MEDS = Older adults +65 years on medication
+               (e.g., anticholinergics, beta-blockers, diuretics)
+    """
 
     young = "YNG"
     older = "OLD"
@@ -542,11 +550,11 @@ class BFU_rest_Parameters:
     body_surface_area: float = 1.83  # [m2]
     latent_heat_j_g: float = 2426.0  # [J/g]
     sweating_efficiency_min: float = 0.55
-    rcl_off: float = 0.1291  # [m2*K/W]
-    recl_off: float = 0.0237  # [m2*kPa/W]
-    rcl_on: float = 0.1341  # [m2*K/W]
-    recl_on_front: float = 0.0112  # [m2*kPa/W]
-    recl_on_rear: float = 0.0161  # [m2*kPa/W]
+    r_cl_off: float = 0.1291  # [m2*K/W]
+    r_ecl_off: float = 0.0237  # [m2*kPa/W]
+    r_cl_on: float = 0.1341  # [m2*K/W]
+    r_ecl_on_front: float = 0.0112  # [m2*kPa/W]
+    r_ecl_on_rear: float = 0.0161  # [m2*kPa/W]
     v_on: float = 3.5  # [m/s]
     v_off: float = 0.2  # [m/s]
     sweat_rate: dict[str, float] = field(
@@ -605,7 +613,7 @@ class BFU_rest_Inputs(BaseInputs):
         group_value = str(self.group).upper()
         if group_value not in BFU_rest_Groups._value2member_map_:
             raise ValueError(
-                "Invalid group. The group must be one of 'YNG', 'OLD', or 'MEDS'.",
+                "Invalid group. The group must be one of {'YNG','OLD','MEDS'}.",
             )
         self.group = group_value
 
@@ -651,23 +659,17 @@ class BFU_occupational_Inputs(BaseInputs):
         self.fan_off_velocity = fan_off_velocity
         self.speed = speed
 
-        position_arr = np.asarray(position, dtype=object)
-        position_lower = np.char.lower(position_arr.astype(str))
-        position_clean = np.where(position_lower == "sitting", "seated", position_lower)
-        self.position = (
-            position_clean.item() if position_clean.shape == () else position_clean
-        )
+        def normalize(x, vocab=None, default=None):
+            arr = np.atleast_1d(x)
+            out = np.array([ (vocab or {}).get(str(s).lower(), (default if default is not None else str(s).lower()))
+                            for s in arr ], dtype=object)
+            return out[0] if (np.isscalar(x) or np.asarray(x).shape == ()) else out
 
-        activity_arr = np.asarray(activity, dtype=object)
-        activity_lower = np.char.lower(activity_arr.astype(str))
-        activity_clean = np.select(
-            [activity_lower == "walk", activity_lower == "rest"],
-            ["walk", "rest"],
-            default="other",
-        )
-        self.activity = (
-            activity_clean.item() if activity_clean.shape == () else activity_clean
-        )
+        normalize_position = lambda x: normalize(x, {"sitting":"seated", "stand":"standing"}, "standing")
+        normalize_activity = lambda x: normalize(x, {"walk":"walk","rest":"rest","cycle":"cycle"}, "walk")
+
+        self.position = normalize_position(position) 
+        self.activity = normalize_activity(activity)
 
         self.fixed_sweat_rate_lph = fixed_sweat_rate_lph
 
@@ -696,7 +698,7 @@ class BFU_occupational_Inputs(BaseInputs):
         def _validate_non_negative(value, name: str) -> None:
             arr = np.asarray(value, dtype=float)
             if np.any(arr < 0):
-                message = f"{name} must be greater than or equal to 0."
+                message = f"{name} [m/s] must be greater than or equal to 0."
                 raise ValueError(message)
 
         _validate_non_negative(self.speed, "speed")

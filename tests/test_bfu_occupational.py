@@ -64,10 +64,10 @@ def test_foster_fans_array():
     np.testing.assert_array_equal(result.interpretation, expected_interpretation)
 
 
-def test_foster_fans_invalid_position():
+def test_foster_fans_invalid_airflow():
     with pytest.raises(ValueError):
         BFU_occupational(
             tdb=30.0,
             rh=60.0,
-            position="lying",
+            fan_velocity=-0.3
         )

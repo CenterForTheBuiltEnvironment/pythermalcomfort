@@ -64,17 +64,17 @@ def morris_lph_fans(
 
     def _dry_heat_flux(
         tdb_arr: np.ndarray,
-        rcl: float,
+        r_cl: float,
         v_ms: float,
         t_skin: float,
         hr: float,
     ) -> np.ndarray:
         """Compute combined convective and radiative heat loss [W/m²]."""
-        icl = _icl_from_rcl(rcl)
+        icl = _icl_from_rcl(r_cl)
         fcl = _fcl_from_icl(icl)
         hc = _hc_from_v(v_ms)
         h = hc + hr
-        r_total = rcl + (1.0 / (fcl * h))
+        r_total = r_cl + (1.0 / (fcl * h))
         return (t_skin - tdb_arr) / r_total
 
     def _respiratory(
@@ -91,7 +91,7 @@ def morris_lph_fans(
     def _required_evaporation(
         tdb_arr: np.ndarray,
         rh_arr: np.ndarray,
-        rcl: float,
+        r_cl: float,
         v_ms: float,
         metabolic_rate: float,
         external_work: float,
@@ -99,13 +99,13 @@ def morris_lph_fans(
         hr: float,
     ) -> np.ndarray:
         c_res_e_res = _respiratory(tdb_arr, rh_arr, metabolic_rate)
-        c_plus_r = _dry_heat_flux(tdb_arr, rcl, v_ms, t_skin, hr)
+        c_plus_r = _dry_heat_flux(tdb_arr, r_cl, v_ms, t_skin, hr)
         return metabolic_rate - external_work - c_plus_r - c_res_e_res
 
     def _max_evaporation(
         tdb_arr: np.ndarray,
         rh_arr: np.ndarray,
-        rcl: float,
+        r_cl: float,
         recl: float,
         v_ms: float,
         wcrit: float,
@@ -113,7 +113,7 @@ def morris_lph_fans(
         hr: float,
     ) -> np.ndarray:
         """Compute the maximum physical evaporation rate [W/m²]."""
-        icl = _icl_from_rcl(rcl)
+        icl = _icl_from_rcl(r_cl)
         fcl = _fcl_from_icl(icl)
         hc = _hc_from_v(v_ms)
         he = _he_from_hc(hc)
@@ -125,7 +125,6 @@ def morris_lph_fans(
     def _sweat_limited_max_evaporation(
         ereq: np.ndarray,
         emax_physical: np.ndarray,
-        wcrit: float,
         sweating_efficiency_min: float,
         sweat_rate_ml_h: float,
         latent_heat_j_g: float,
@@ -162,18 +161,18 @@ def morris_lph_fans(
     def _fan_state(fan_on: bool) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         wcrit = params.wcrit_on[group_key] if fan_on else params.wcrit_off[group_key]
         sweat_rate = params.sweat_rate[group_key]
-        rcl = params.rcl_on if fan_on else params.rcl_off
-        recl = (
-            0.5 * (params.recl_on_front + params.recl_on_rear)
+        r_cl = params.r_cl_on if fan_on else params.r_cl_off
+        r_ecl = (
+            0.5 * (params.r_ecl_on_front + params.r_ecl_on_rear)
             if fan_on
-            else params.recl_off
+            else params.r_ecl_off
         )
         v = params.v_on if fan_on else params.v_off
 
         ereq = _required_evaporation(
             tdb_arr,
             rh_arr,
-            rcl,
+            r_cl,
             v,
             params.metabolic_rate,
             params.external_work,
@@ -183,8 +182,8 @@ def morris_lph_fans(
         emax_physical = _max_evaporation(
             tdb_arr,
             rh_arr,
-            rcl,
-            recl,
+            r_cl,
+            r_ecl,
             v,
             wcrit,
             params.p_skin_sat_kpa,
@@ -193,7 +192,6 @@ def morris_lph_fans(
         emax_sweat = _sweat_limited_max_evaporation(
             ereq,
             emax_physical,
-            wcrit,
             params.sweating_efficiency_min,
             sweat_rate,
             params.latent_heat_j_g,
