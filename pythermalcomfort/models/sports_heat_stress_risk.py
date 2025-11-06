@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 import scipy
 
 from pythermalcomfort.models import phs
+from pythermalcomfort.shared_functions import mapping
 
 
 @dataclass
@@ -17,29 +19,6 @@ class _SportsValues:
     met: float
     vr: float
     duration: int
-
-
-@dataclass
-class SportsHeatStressRiskResult:
-    risk_level: str
-    risk_level_interpolated: float
-    thresholds: dict
-    recommendations: str
-
-
-def _get_recommendations(risk_level_interpolated: float) -> tuple[str, str]:
-    """Return risk category and practical recommendations based on risk level."""
-    if risk_level_interpolated < 1:
-        return "Low", "Normal play; stay hydrated."
-    elif 1 <= risk_level_interpolated < 2:
-        return "Moderate", "Use caution, ensure frequent water breaks."
-    elif 2 <= risk_level_interpolated < 3:
-        return "High", "Reduce training intensity, provide shaded breaks and hydration."
-    else:
-        return (
-            "Extreme",
-            "Suspend activity, move to cool area, monitor athletes closely.",
-        )
 
 
 @dataclass(frozen=True)
@@ -79,6 +58,14 @@ class Sports:
     WALKING = _SportsValues(clo=0.5, met=5.0, vr=0.5, duration=180)
 
 
+@dataclass
+class SportsHeatStressRiskResult:
+    risk_level: Any  # str or np.ndarray[str]
+    risk_level_interpolated: Any  # float or np.ndarray[float]
+    thresholds: Any | None = None  # optional
+    recommendations: Any | None = None  # optional
+
+
 def sports_heat_stress_risk(
     tdb: float | list[float],
     tr: float | list[float],
@@ -87,46 +74,48 @@ def sports_heat_stress_risk(
     sport: _SportsValues,
 ):
     """
-    Short description.
-    The Sports Medicine Australia (SMA) Extreme Heat Policy v2 (2024)
-    modernises Australia approach to managing heat stress risk in recreational sport.
-    Building on the 2021 version, which relied on a biophysical heat balance model,
-    the updated policy incorporates the ISO Predicted Heat Strain model
-    to deliver more accurate and sport-specific heat risk assessments.
-    It addresses previous shortcomings by improving protection during
-    very hot, dry conditions—where sweat and cardiovascular strain are greatest
-    and reducing unnecessary play suspensions in humid weather
-    through structured cooling and rest interventions.
-    A new web-based tool simplifies application by providing
-    automated, location-specific, hourly heat risk classifications and seven-day forecasts.
-    This digital platform removes the need for manual graph interpretation,
-    reducing the potential for human error.
-    The updated policy ensures more consistent, evidence-based decision-making
-    for sporting organisations, coaches, and medical personnel
-    responsible for athlete safety during hot weather.
+    Calculate heat stress risk in accordance with [SMA2024]_.
+
+    The  SMA Extreme Heat Policy (EHP v2 (2024))
+    calculates heat stress risk using the ISO Predicted Heat Strain (PHS) model,
+    which estimates the balance between metabolic heat production,
+    environmental heat load, and evaporative cooling capacity.
+    For each sport, the model incorporates sport-specific factors such as
+    metabolic rate, clothing insulation, and self-generated airflow
+    to determine critical thresholds for sweat loss and core temperature.
+    These thresholds are then used to define four risk levels-
+    Low, Moderate, High, and Extreme—providing tailored recommendations for
+    rest, hydration, and cooling interventions.
 
     Parameters
     ----------
-    tdb : float or list of float
-        Dry bulb air temperature [°C].
-    tr : float or list of float
-        Mean radiant temperature [°C].
-    rh : float or list of float
-        Relative humidity [%].
-    vr : float or list of float
-        Relative air speed [m/s].
+    tdb : float | np.ndarray
+        Dry-bulb air temperature [°C]. Defines the ambient air temperature of the environment.
+    tr : float | np.ndarray
+        Mean radiant temperature [°C]. Represents the uniform temperature of an imaginary enclosure
+        where the radiant heat exchange equals that of the actual environment.
+    rh : float | np.ndarray
+        Relative humidity [%]. Indicates the amount of moisture in the air as a percentage of saturation.
+    vr : float | np.ndarray
+        Relative air speed [m/s]. Includes both ambient air velocity and self-generated movement
+        during activity.
     sport : _SportsValues
         Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
-        Use one of the entries from :class:`Sports`.
+        Use one of the predefined entries from :py:class:`Sports` to specify typical clothing insulation,
+        metabolic rate, air movement, and activity duration for a particular sport.se one of the predefined entries from :class:`~pythermalcomfort.models.sports_heat_stress_risk.Sports`.
 
     Returns
     -------
-    SportsHeatStressRiskResult
-        Dataclass containing the results:
-        - risk_level : str, Risk classification ("Low", "Moderate", "High", "Extreme")
-        - risk_level_interpolated : float, Interpolated risk level
-        - thresholds : dict, Contains keys "t_medium", "t_high", "t_extreme"
-        - recommendations : str, Practical guidance based on risk level
+          - `risk_level` : str or ndarray[str]
+            Qualitative class: "Low", "Moderate", "High", "Extreme". Type matches input shape.
+          - `risk_level_interpolated` : float or ndarray[float]
+            Quantitative index in [0, 3], rounded to one decimal. Type matches input shape.
+          - `thresholds` : dict or ndarray[dict]
+            Temperature thresholds (°C): `{'t_medium', 't_high', 't_extreme'}`.
+            Values may be clipped to bounds or `np.nan` if solver fails or inputs are out of range.
+            Type matches input shape.
+          - `recommendations` : str or ndarray[str]
+            Text guidance tied to `risk_level`. Type matches input shape.
 
     Raises
     ------
@@ -138,81 +127,76 @@ def sports_heat_stress_risk(
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models.sports_heat_stress_risk import (
-            sports_heat_stress_risk,
-            Sports,
-        )
-
-        # Environmental conditions
-        tdb = 25
-        tr = 25
-        rh = 50
-        vr = 0.1
-
-        # Choose sport
+    if __name__ == "__main__":
+        # First example
+        t = 35
+        rh = 40
+        v = 0.1
+        tr = 70
         sport = Sports.RUNNING
+        print(sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB))
 
-        # Call the function
-        result: SportsHeatStressRiskResult = sports_heat_stress_risk(
-            tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
-        )
+        # Second example
+        results = []
+        for t in range(20, 46, 2):
+            for rh in range(0, 101, 5):
+                result = sports_heat_stress_risk(
+                    tdb=t, tr=t, rh=rh, vr=v, sport=Sports.RUNNING
+                )
+                # extract numeric field from dataclass
+                if hasattr(result, "risk_level_interpolated"):
+                    risk_val = result.risk_level_interpolated
+                else:
+                    # If result is int or float, just use it directly
+                    risk_val = float(result)
+                results.append((t, rh, risk_val))
 
-        # Access results
-        print("Risk level:", result.risk_level)
-        print("Interpolated risk level:", result.risk_level_interpolated)
-        print("Thresholds:", result.thresholds)
-        print("Recommendations:", result.recommendations)
+        import pandas as pd
 
-    References
-    ----------
-    1. Sports Medicine Australia. (2021). *Extreme Heat Policy for Community Sport*.
-       https://sma.org.au/resources-advice/extreme-heat-policy/
-    2. Sports Medicine Australia. (2024). *Extreme Heat Policy v2*.
-       [Insert official 2024 policy link if available]
+        df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"])
+        df_pivot = df.pivot(index="rh", columns="tdb", values="risk_level_interpolated")
+        df_pivot.sort_index(ascending=False, inplace=True)
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        plt.figure(figsize=(10, 6))
+        sns.heatmap(df_pivot, cmap="YlOrRd")
+        plt.title("Sports Heat Stress Risk Level for Running")
+        plt.xlabel("Dry Bulb Temperature (°C)")
+        plt.ylabel("Relative Humidity (%)")
+        plt.show()
     """
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    rh = np.asarray(rh)
+    vr = np.asarray(vr)
 
-    # Accept both scalar and array-like inputs (consistent with other pythermalcomfort functions)
-    tdb = np.array(tdb, ndmin=1, dtype=float)
-    tr = np.array(tr, ndmin=1, dtype=float)
-    rh = np.array(rh, ndmin=1, dtype=float)
-    vr = np.array(vr, ndmin=1, dtype=float)
+    risk_levels, thresholds, recommendations = np.vectorize(
+        _calc_risk_single_value, otypes=[float, object, object]
+    )(tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport)
 
-    # Broadcast all inputs to the same shape
-    tdb, tr, rh, vr = np.broadcast_arrays(tdb, tr, rh, vr)
+    risk_level_breaks = {
+        -0.1: "Low",
+        0.9: "Moderate",
+        1.9: "High",
+        2.9: "Extreme",
+        10.0: "Extreme",
+    }
 
-    # Allocate array for results (object dtype for dataclass)
-    risk_levels = np.empty(tdb.shape, dtype=object)
+    # label mapping
+    risk_labels = mapping(risk_levels, risk_level_breaks, right=False)
 
-    # Calculate each value
-    for i in np.ndindex(tdb.shape):
-        risk_levels[i] = _calc_risk_single_value(
-            tdb=tdb[i], tr=tr[i], rh=rh[i], vr=vr[i], sport=sport
-        )
+    # coerce 0-d arrays to Python scalars so __main__ example works cleanly
+    def _scalar_or_array(x):
+        arr = np.asarray(x)
+        return arr.item() if arr.shape == () else arr
 
-    # Return scalar if all inputs were scalar
-    if risk_levels.size == 1:
-        return risk_levels[0]
-    return risk_levels
-
-    # thermal_sensation = {
-    #     -2.5: "Cold",
-    #     -1.5: "Cool",
-    #     -0.5: "Slightly Cool",
-    #     0.5: "Neutral",
-    #     1.5: "Slightly Warm",
-    #     2.5: "Warm",
-    #     10: "Hot",
-    # }
-    #
-    # return PMVPPD(
-    #     pmv=pmv_array,
-    #     ppd=ppd_array,
-    #     tsv=mapping(pmv_array, thermal_sensation, right=False),
-    # )
-
-    # todo use the pmv_ppd_iso as a reference for the code implementation
-
-    return risk_levels
+    return SportsHeatStressRiskResult(
+        risk_level=_scalar_or_array(risk_labels),
+        risk_level_interpolated=_scalar_or_array(risk_levels),
+        thresholds=_scalar_or_array(thresholds),
+        recommendations=_scalar_or_array(recommendations),
+    )
 
 
 def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
@@ -251,7 +235,7 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
                 i_mst=0.4,
             ).sweat_loss_g
             / sport.duration
-            * 60  # normalized sweat loss to 60 minutes for all sports
+            * 45
             - sweat_loss_g
         )
 
@@ -303,8 +287,6 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
         else np.nan
     )
 
-    # risk_level = np.nan
-
     # check if the thresholds are within the min and max limits defined above
     if t_medium > max_t_low:
         t_medium = max_t_low
@@ -313,7 +295,7 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     if t_extreme > max_t_high:
         t_extreme = max_t_high
 
-    # cap the thresholds to the minimum values defined above
+        # cap the thresholds to the minimum values defined above
     if t_extreme < min_t_extreme:
         t_extreme = min_t_extreme
     if t_high < min_t_high:
@@ -321,18 +303,18 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     if t_medium < min_t_medium:
         t_medium = min_t_medium
 
-    # # calcuate the risk level based on the thresholds
-    # if tdb < t_medium:
-    #     risk_level = 0
-    # elif t_medium <= tdb < t_high:
-    #     risk_level = 1
-    # elif t_high <= tdb < t_extreme:
-    #     risk_level = 2
-    # elif tdb >= t_extreme:
-    #     risk_level = 3
+        # calcuate the risk level based on the thresholds
+        # if tdb < t_medium:
+        #     risk_level = 0
+        # elif t_medium <= tdb < t_high:
+        #     risk_level = 1
+        # elif t_high <= tdb < t_extreme:
+        #     risk_level = 2
+        # elif tdb >= t_extreme:
+        #     risk_level = 3
 
-    risk_level_interpolated = np.nan
-    # calculate the risk level with one decimal place
+        risk_level_interpolated = np.nan
+        # calculate the risk level with one decimal place
     if min_t_low <= tdb < t_medium:
         risk_level_interpolated = (tdb - min_t_low) / (t_medium - min_t_low)
     elif t_medium <= tdb < t_high:
@@ -345,19 +327,20 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
 
-    risk_level, recommendations = _get_recommendations(risk_level_interpolated)
+    # # determine risk category and recommendations
+    if risk_level_interpolated < 1:
+        recommendations = "Safe to proceed"
+    elif 1 <= risk_level_interpolated < 2:
+        recommendations = "Increase rest breaks and hydration"
+    elif 2 <= risk_level_interpolated < 3:
+        recommendations = "Modify activity."
+    else:
+        recommendations = "Avoid activity."
 
-    thresholds = {
-        "t_medium": t_medium,
-        "t_high": t_high,
-        "t_extreme": t_extreme,
-    }
-
-    return SportsHeatStressRiskResult(
-        risk_level=risk_level,
-        risk_level_interpolated=round(risk_level_interpolated, 1),
-        thresholds=thresholds,
-        recommendations=recommendations,
+    return (
+        round(risk_level_interpolated, 1),
+        {"t_medium": t_medium, "t_high": t_high, "t_extreme": t_extreme},
+        recommendations,
     )
 
 
@@ -367,35 +350,29 @@ if __name__ == "__main__":
     rh = 40
     v = 0.1
     tr = 70
-    sport = Sports.RUNNING
+    sport = "running"
     print(sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB))
 
     # second example
-    results = []
-    for t in range(20, 46, 2):
-        for rh in range(0, 101, 5):
-            result = sports_heat_stress_risk(
-                tdb=t, tr=t, rh=rh, vr=v, sport=Sports.RUNNING
-            )
-            # extract numeric field from dataclass
-            if hasattr(result, "risk_level_interpolated"):
-                risk_val = result.risk_level_interpolated
-            else:
-                # If result is int or float, just use it directly
-                risk_val = float(result)
-            results.append((t, rh, risk_val))
-
-    import pandas as pd
-
-    df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"])
-    df_pivot = df.pivot(index="rh", columns="tdb", values="risk_level_interpolated")
-    df_pivot.sort_index(ascending=False, inplace=True)
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(df_pivot, cmap="YlOrRd")
-    plt.title("Sports Heat Stress Risk Level for Running")
-    plt.xlabel("Dry Bulb Temperature (°C)")
-    plt.ylabel("Relative Humidity (%)")
-    plt.show()
+    # results = []
+    # for t in range(20, 46, 2):
+    #     for rh in range(0, 101, 5):
+    #         risk_interp = sports_heat_stress_risk(
+    #             tdb=t, tr=t, rh=rh, vr=v, sport=Sports.RUNNING
+    #         )
+    #         results.append((t, rh, risk_interp.risk_level_interpolated))
+    #
+    # import pandas as pd
+    #
+    # df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"])
+    # df_pivot = df.pivot(index="rh", columns="tdb", values="risk_level_interpolated")
+    # df_pivot.sort_index(ascending=False, inplace=True)
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
+    #
+    # plt.figure(figsize=(10, 6))
+    # sns.heatmap(df_pivot, cmap="YlOrRd")
+    # plt.title("Sports Heat Stress Risk Level for Running")
+    # plt.xlabel("Dry Bulb Temperature (°C)")
+    # plt.ylabel("Relative Humidity (%)")
+    # plt.show()
