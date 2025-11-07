@@ -12,7 +12,6 @@ from .utils import (
     solve_threshold_curves,
 )
 import seaborn as sns
-import pandas as pd
 
 
 
@@ -226,19 +225,14 @@ def calc_plot_ranges(
         if clip_arr is not None:
             m = m & (curve >= clip_arr)
         if m.any():
-            df_curve = pd.DataFrame({
-                "x": curve[m],
-                "y": y_arr[m],
-                "threshold": [thr_list[idx]] * np.count_nonzero(m),
-        })
+            color_current = curve_colors[idx] if idx < len(curve_colors) else line_color
             ln = sns.lineplot(
-                data=df_curve,
-                x="x", y="y",
+                x=curve[m],
+                y=y_arr[m],
                 ax=ax,
-                color=curve_colors[idx],
+                color=color_current,
                 linewidth=line_width + 0.5,
                 legend=False,
-                palette=seaborn_palette if use_seaborn else None,
             )
             if len(ax.lines):
                 curve_artists.append(ax.lines[-1])
