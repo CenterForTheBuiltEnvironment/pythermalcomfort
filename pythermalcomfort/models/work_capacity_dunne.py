@@ -43,7 +43,6 @@ def work_capacity_dunne(
         :py:class:`~pythermalcomfort.classes_return.WorkCapacity` for more details. To access the
         `capacity` value, use the `capacity` attribute of the returned `WorkCapacity` instance, e.g.,
         `result.capacity`.
-
     """
     # validate inputs
     WorkCapacityHothapsInputs(wbgt=wbgt, work_intensity=work_intensity)

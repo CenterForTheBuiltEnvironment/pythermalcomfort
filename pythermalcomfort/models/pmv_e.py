@@ -20,14 +20,13 @@ def pmv_e(
     units: str = Units.SI.value,
     limit_inputs: bool = True,
 ) -> EPMV:
-    """Return Adjusted Predicted Mean Votes with Expectancy Factor (ePMV).
-    This index was developed by Fanger, P. O. et al. (2002). In non-air-
-    conditioned buildings in warm climates, occupants may sense the warmth as
-    being less severe than the PMV predicts. The main reason is low
-    expectations, but a metabolic rate that is estimated too high can also
-    contribute to explaining the difference. An extension of the PMV model that
-    includes an expectancy factor is introduced for use in non-air-conditioned
-    buildings in warm climates [Fanger2002]_.
+    """Return Adjusted Predicted Mean Votes with Expectancy Factor (ePMV). This index
+    was developed by Fanger, P. O. et al. (2002). In non-air- conditioned buildings in
+    warm climates, occupants may sense the warmth as being less severe than the PMV
+    predicts. The main reason is low expectations, but a metabolic rate that is
+    estimated too high can also contribute to explaining the difference. An extension of
+    the PMV model that includes an expectancy factor is introduced for use in non-air-
+    conditioned buildings in warm climates [Fanger2002]_.
 
     Parameters
     ----------
@@ -102,7 +101,6 @@ def pmv_e(
         clo_d = clo_dynamic_iso(clo=clo, met=met, v=v)
         results = pmv_e(tdb, tr, v_r, rh, met, clo_d, e_coefficient=0.6)
         print(results.e_pmv)  # 0.48
-
     """
     # Validate inputs using the EPMVInputs class
     EPMVInputs(

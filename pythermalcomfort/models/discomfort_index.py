@@ -53,7 +53,6 @@ def discomfort_index(
         print(
             result.discomfort_condition
         )  # ['Less than 50% feels discomfort', 'Most of the population feels discomfort']
-
     """
     # Validate inputs using the DiscomfortIndexInputs class
     DIInputs(

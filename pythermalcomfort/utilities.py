@@ -6,6 +6,7 @@ from enum import Enum
 from typing import NamedTuple
 
 import numpy as np
+from numpy.typing import NDArray
 
 from pythermalcomfort.classes_return import PsychrometricValues
 from pythermalcomfort.shared_functions import valid_range
@@ -47,7 +48,7 @@ class Sex(Enum):
     female = "female"
 
 
-def p_sat_torr(tdb: float | list[float]) -> float | list[float]:
+def p_sat_torr(tdb: float | list[float]) -> NDArray[np.float64]:
     """Estimates the saturation vapor pressure in [torr].
 
     Parameters
@@ -59,15 +60,15 @@ def p_sat_torr(tdb: float | list[float]) -> float | list[float]:
     -------
     p_sat : float
         saturation vapor pressure [torr]
-
     """
+    tdb = np.asarray(tdb, dtype=np.float64)
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
 def enthalpy_air(
-    tdb: float | list[float],
-    hr: float | list[float],
-) -> float | list[float]:
+    tdb: float | list[float] | NDArray[np.float64],
+    hr: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate air enthalpy_air.
 
     Parameters
@@ -81,30 +82,15 @@ def enthalpy_air(
     -------
     enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
+    tdb = np.asarray(tdb, dtype=np.float64)
+    hr = np.asarray(hr, dtype=np.float64)
     h_dry_air = cp_air * tdb
     h_sat_vap = h_fg + cp_vapour * tdb
     return h_dry_air + hr * h_sat_vap
 
 
-# pre-calculated constants for p_sat
-c1 = -5674.5359
-c2 = 6.3925247
-c3 = -0.9677843 * 1e-2
-c4 = 0.62215701 * 1e-6
-c5 = 0.20747825 * 1e-8
-c6 = -0.9484024 * 1e-12
-c7 = 4.1635019
-c8 = -5800.2206
-c9 = 1.3914993
-c10 = -0.048640239
-c11 = 0.41764768 * 1e-4
-c12 = -0.14452093 * 1e-7
-c13 = 6.5459673
-
-
-def p_sat(tdb: float | list[float]) -> float | list[float]:
+def p_sat(tdb: float | list[float] | NDArray[np.float64]) -> NDArray[np.float64]:
     """Calculate vapour pressure of water at different temperatures.
 
     Parameters
@@ -116,8 +102,24 @@ def p_sat(tdb: float | list[float]) -> float | list[float]:
     -------
     p_sat: float or list of floats
         saturation vapor pressure, [Pa]
-
     """
+
+    # pre-calculated constants for p_sat
+    c1 = -5674.5359
+    c2 = 6.3925247
+    c3 = -0.9677843 * 1e-2
+    c4 = 0.62215701 * 1e-6
+    c5 = 0.20747825 * 1e-8
+    c6 = -0.9484024 * 1e-12
+    c7 = 4.1635019
+    c8 = -5800.2206
+    c9 = 1.3914993
+    c10 = -0.048640239
+    c11 = 0.41764768 * 1e-4
+    c12 = -0.14452093 * 1e-7
+    c13 = 6.5459673
+
+    tdb = np.asarray(tdb, dtype=np.float64)
     ta_k = tdb + c_to_k
     # pre-calculate the value before passing it to .where
     log_ta_k = np.log(ta_k)
@@ -135,7 +137,7 @@ def p_sat(tdb: float | list[float]) -> float | list[float]:
     )
 
 
-def antoine(tdb: float | np.ndarray) -> np.ndarray:
+def antoine(tdb: float | list[float]) -> NDArray[np.float64]:
     """Calculate saturated vapor pressure using Antoine equation [kPa].
 
     Parameters
@@ -147,16 +149,15 @@ def antoine(tdb: float | np.ndarray) -> np.ndarray:
     -------
     float or list of floats
         Saturated vapor pressure [kPa].
-
     """
-    tdb = np.asarray(tdb)
+    tdb = np.asarray(tdb, dtype=np.float64)
     return math.e ** (16.6536 - 4030.183 / (tdb + 235))
 
 
 def psy_ta_rh(
     tdb: float | list[float],
     rh: float | list[float],
-    p_atm=101325,
+    p_atm: float = 101325,
 ) -> PsychrometricValues:
     """Calculate psychrometric values of air based on dry bulb air temperature and
     relative humidity.
@@ -187,10 +188,10 @@ def psy_ta_rh(
         dew point temperature, [°C]
     h: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
-    tdb = np.asarray(tdb)
-    rh = np.asarray(rh)
+    tdb = np.asarray(tdb, dtype=np.float64)
+    rh = np.asarray(rh, dtype=np.float64)
+    p_atm = np.asarray(p_atm, dtype=np.float64)
 
     p_saturation = p_sat(tdb)
     p_vap = rh / 100 * p_saturation
@@ -210,9 +211,9 @@ def psy_ta_rh(
 
 
 def wet_bulb_tmp(
-    tdb: float | list[float],
-    rh: float | list[float],
-) -> float | list[float]:
+    tdb: float | list[float] | NDArray[np.float64],
+    rh: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate the wet-bulb temperature using the Stull equation [Stull2011]_.
 
     Parameters
@@ -226,9 +227,12 @@ def wet_bulb_tmp(
     -------
     tdb: float or list of floats
         wet-bulb temperature, [°C]
-
     """
-    twb = (
+
+    tdb = np.asarray(tdb, dtype=np.float64)
+    rh = np.asarray(rh, dtype=np.float64)
+
+    return (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
         + np.arctan(tdb + rh)
         - np.arctan(rh - 1.676331)
@@ -236,38 +240,50 @@ def wet_bulb_tmp(
         - 4.686035
     )
 
-    return np.around(twb, 1)
-
 
 def dew_point_tmp(
-    tdb: float | list[float],
-    rh: float | list[float],
-) -> float | list[float]:
+    tdb: float | list[float] | NDArray[np.float64],
+    rh: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:  # This is the simplified return type
     """Calculate the dew point temperature.
 
-    Parameters
-    ----------
-    tdb: float or list of floats
-        dry bulb air temperature, [°C]
-    rh: float or list of floats
-        relative humidity, [%]
+        The equation use the Magnus formula using the coefficient from
+        the 2024 edition of the Guide to Instruments and Methods of
+        Observation. [WMO2024]_.
 
-    Returns
-    -------
-    dew_point_tmp: float or list of floats
-        dew point temperature, [°C]
+        Parameters
+        ----------
+        tdb: float or list of floats
+            dry bulb air temperature, [°C]
+        rh: float or list of floats
+            relative humidity, [%]
 
+        Returns
+        -------
+        dew_point_tmp: ndarray
+            dew point temperature, [°C]
+
+        Example
+        -------
+        .. code-block:: python
+
+            from pythermalcomfort.utilities import dew_point_tmp
+    ¨
+            tdb = 25.0  # dry bulb temperature in °C
+            rh = 60.0  # relative humidity in %
+            t_d = dew_point_tmp(tdb, rh)
     """
-    tdb = np.asarray(tdb)
-    rh = np.asarray(rh)
+    tdb = np.asarray(tdb, dtype=np.float64)
+    rh = np.asarray(rh, dtype=np.float64)
 
-    c = 257.14
-    b = 18.678
-    d = 234.5
+    if np.any(rh < 0) or np.any(rh > 100):
+        raise ValueError("Relative humidity must be between 0 and 100%.")
 
-    gamma_m = np.log(rh / 100 * np.exp((b - tdb / d) * (tdb / (c + tdb))))
-
-    return np.round(c * gamma_m / (b - gamma_m), 1)
+    e_w = 6.112 * np.exp(
+        (17.62 * tdb) / (243.12 + tdb)
+    )  # saturation vapor pressure in hPa
+    e_s = (rh / 100) * e_w  # actual vapor pressure in hPa
+    return 243.12 * np.log(e_s / 6.112) / (17.62 - np.log(e_s / 6.112))
 
 
 def mean_radiant_tmp(
@@ -277,7 +293,7 @@ def mean_radiant_tmp(
     d: float | list[float] = 0.15,
     emissivity: float | list[float] = 0.95,
     standard="Mixed Convection",
-) -> float | list[float]:
+) -> NDArray[np.float64]:
     """Convert the globe temperature reading into mean radiant temperature in accordance
     with either the Mixed Convection developed by Teitelbaum E. et al. (2022) or the ISO
     7726:1998 Standard [7726ISO1998]_.
@@ -309,6 +325,23 @@ def mean_radiant_tmp(
     tr: float or list of floats
         mean radiant temperature, [°C]
 
+    Raises
+    ------
+    ValueError
+        If the standard is not recognized. Please choose either 'Mixed Convection' or 'ISO'.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        from pythermalcomfort.utilities import mean_radiant_tmp
+
+        tg = 53.2  # globe temperature in °C
+        tdb = 30.0  # dry bulb temperature in °C
+        v = 0.3  # air speed in m/s
+        d = 0.1  # diameter of the globe in m
+        tr = mean_radiant_tmp(tg, tdb, v, d, standard="ISO")
+        print(tr)  # 74.8
     """
     standard = standard.lower()
 
@@ -364,9 +397,7 @@ def mean_radiant_tmp(
         )
 
         d_valid = valid_range(d, (0.04, 0.15))
-        tr = np.where(~np.isnan(d_valid), tr, np.nan)
-
-        return np.around(tr, 1)
+        return np.where(~np.isnan(d_valid), tr, np.nan)
 
     if standard == "iso":  # pragma: no branch
         tg = np.add(tg, c_to_k)
@@ -379,7 +410,7 @@ def mean_radiant_tmp(
         # get the biggest between the two coefficients
         h = np.maximum(h_f, h_n)
 
-        tr = (
+        return (
             np.power(
                 np.power(tg, 4) + h * (tg - tdb) / (emissivity * (5.67 * 10**-8)),
                 0.25,
@@ -387,7 +418,9 @@ def mean_radiant_tmp(
             - c_to_k
         )
 
-        return np.around(tr, 1)
+    raise ValueError(
+        "Standard not recognized. Please choose either 'Mixed Convection' or 'ISO'.",
+    )
 
 
 def validate_type(value, name: str, allowed_types: tuple):
@@ -401,7 +434,7 @@ def validate_type(value, name: str, allowed_types: tuple):
         raise TypeError(invalid_type_msg)
 
 
-def transpose_sharp_altitude(sharp: float, altitude: float) -> float:
+def transpose_sharp_altitude(sharp: float, altitude: float) -> tuple[float, float]:
     """Transpose the solar altitude and solar azimuth angles."""
     altitude_new = math.degrees(
         math.asin(
@@ -570,7 +603,6 @@ def body_surface_area(
 
         bsa = body_surface_area(weight=70, height=1.75, formula="dubois")
         print(bsa)
-
     """
     if formula == BodySurfaceAreaEquations.dubois.value:
         return 0.202 * (weight**0.425) * (height**0.725)
@@ -602,7 +634,6 @@ def f_svv(w: float, h: float, d: float) -> float:
     -------
     f_svv  : float
         sky-vault view fraction ranges between 0 and 1
-
     """
     return (
         math.degrees(math.atan(h / (2 * d)))
@@ -611,7 +642,10 @@ def f_svv(w: float, h: float, d: float) -> float:
     )
 
 
-def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
+def v_relative(
+    v: float | list[float] | NDArray[np.float64],
+    met: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Estimates the relative air speed which combines the average air speed of the
     space plus the relative air speed caused by the body movement. The same equation is
     used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
@@ -625,12 +659,11 @@ def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
 
     Returns
     -------
-    vr  : float or list of floats
+    vr : float or list of floats
         relative air speed, [m/s]
-
     """
-    v = np.asarray(v)
-    met = np.asarray(met)
+    v = np.asarray(v, dtype=np.float64)
+    met = np.asarray(met, dtype=np.float64)
     return np.where(met > 1, np.around(v + 0.3 * (met - 1), 3), v)
 
 
@@ -664,14 +697,16 @@ def clo_dynamic_ashrae(
     -------
     clo : float or list of floats
         dynamic clothing insulation (I :sub:`cl,r`), [clo]
-
     """
-    clo = np.asarray(clo)
-    met = np.asarray(met)
+    clo = np.asarray(clo, dtype=np.float64)
+    met = np.asarray(met, dtype=np.float64)
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
-        invalid_model_msg = f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        invalid_model_msg = (
+            f"PMV calculations can only be performed in compliance "
+            f"with ASHRAE {Models.ashrae_55_2023.value}"
+        )
         raise ValueError(invalid_model_msg)
 
     return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
@@ -710,11 +745,13 @@ def clo_dynamic_iso(
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
-
     """
     model = model.lower()
     if model not in [Models.iso_9920_2007.value]:
-        invalid_model_msg = f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
+        invalid_model_msg = (
+            f"PMV calculations can only be performed in "
+            f"compliance with ISO {Models.iso_9920_2007.value}"
+        )
         raise ValueError(invalid_model_msg)
 
     clo = np.asarray(clo)
@@ -768,6 +805,89 @@ def running_mean_outdoor_temperature(
     t_rm  : float
         running mean outdoor temperature
 
+    Examples
+    --------
+    .. code-block:: python
+
+        from pythermalcomfort.utilities import running_mean_outdoor_temperature
+
+        temp_array = [
+            22.0,
+            20.5,
+            19.0,
+            21.0,
+            18.5,
+            17.0,
+            16.5,
+        ]  # daily mean temperatures
+        t_rm = running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI")
+
+        # Calculate the mean radiant temperature using the previous 7 days from an array of daily mean temperatures
+        temp_array = [
+            22.0,
+            20.5,
+            19.0,
+            21.0,
+            18.5,
+            17.0,
+            16.5,
+            15.0,
+            14.5,
+        ]  # daily mean temperatures
+        days_to_consider = 7
+        results = []
+        for i in range(len(temp_array) - days_to_consider + 1):
+            subset = temp_array[i : i + days_to_consider]
+            print(f"Subset for days {i + 1} to {i + days_to_consider}: {subset}")
+            t_rm = running_mean_outdoor_temperature(subset, alpha=0.8, units="SI")
+            print(f"Days {i + 1} to {i + days_to_consider}: t_rm = {t_rm}")
+            results.append(t_rm)
+
+    Calculate the running mean outdoor temperature from hourly data:
+
+    .. code-block:: python
+
+        import pandas as pd
+        import numpy as np
+        from pythermalcomfort.utilities import running_mean_outdoor_temperature
+
+        # Step 1: Create a DataFrame with hourly dry bulb temperature (tdb) data
+        # for 10 days starting from January 1, 2025. We simulate hourly data with
+        # a base temperature of 20°C plus sinusoidal daily variation and some noise.
+        start_date = pd.Timestamp("2025-01-01")
+        hourly_index = pd.date_range(start=start_date, periods=10 * 24, freq="h")
+        # Simulate tdb with daily cycle: 20°C base + 10°C amplitude sinusoidal + noise
+        t_out_hourly = (
+            20
+            + 10 * np.sin(2 * np.pi * (hourly_index.hour / 24))
+            + np.random.normal(0, 2, len(hourly_index))
+        )
+        df = pd.DataFrame({"t_out": t_out_hourly}, index=hourly_index)
+
+        # Step 2: Resample the hourly data to daily mean temperatures
+        # This gives us the average temperature for each day.
+        df_daily = df.resample("D").mean()
+
+        # Step 3: Calculate the running mean outdoor temperature for each day
+        # using the previous 7 days' daily means. The function requires the array
+        # in descending order (newest to oldest). For the first 6 days, there is
+        # insufficient data (less than 7 days), so they remain NaN.
+        df_daily["running_mean"] = np.nan
+        for i in range(7, len(df_daily)):
+            # Get the previous 7 days' means (from i-7 to i-1), reverse to newest first
+            prev_7_days = df_daily["t_out"].iloc[i - 7 : i].values[::-1]
+            # Calculate the running mean and assign to the current day
+            df_daily.loc[df_daily.index[i], "running_mean"] = (
+                running_mean_outdoor_temperature(
+                    prev_7_days.tolist(), alpha=0.8, units="SI"
+                )
+            )
+
+        df["date"] = df.index.date
+        df_daily["date"] = df_daily.index.date
+        df.reset_index().merge(
+            df_daily[["date", "running_mean"]], on="date", how="left"
+        ).set_index("index").drop(columns=["date"])
     """
     units = units.upper()
     if units == Units.IP.value:
@@ -795,7 +915,6 @@ def units_converter(from_units=Units.IP.value, **kwargs) -> list[float]:
     Returns
     -------
     converted values in SI units
-
     """
     results = []
     from_units = from_units.upper()
@@ -829,8 +948,9 @@ def operative_tmp(
     tr: float | list[float],
     v: float | list[float],
     standard: str = "ISO",
-) -> float | list[float]:
-    """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
+) -> NDArray[np.float64]:
+    """Calculate the operative temperature in accordance with ISO 7726:1998
+    [7726ISO1998]_.
 
     Parameters
     ----------
@@ -848,8 +968,10 @@ def operative_tmp(
     -------
     to: float
         operative temperature, [°C]
-
     """
+    tdb = np.asarray(tdb, dtype=np.float64)
+    tr = np.asarray(tr, dtype=np.float64)
+    v = np.asarray(v, dtype=np.float64)
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
     if standard.lower() == "ashrae":
@@ -865,7 +987,7 @@ def operative_tmp(
 
 def clo_intrinsic_insulation_ensemble(
     clo_garments: float | list[float],
-) -> float | list[float]:
+) -> float:
     """Calculate the intrinsic insulation of a clothing ensemble based on individual
     garments.
 
@@ -882,13 +1004,14 @@ def clo_intrinsic_insulation_ensemble(
     -------
     i_cl: float
         intrinsic insulation of the clothing ensemble, [clo]
-
     """
     clo_garments = np.asarray(clo_garments)
     return np.sum(clo_garments) * 0.835 + 0.161
 
 
-def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
+def clo_area_factor(
+    i_cl: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate the clothing area factor (f_cl) of the clothing ensemble as a function
     of the intrinsic insulation of the clothing ensemble. This equation is in accordance
     with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
@@ -905,18 +1028,17 @@ def clo_area_factor(i_cl: float | list[float]) -> float | list[float]:
     -------
     f_cl: float or list of floats
         area factor of the clothing ensemble, [m2]
-
     """
-    i_cl = np.asarray(i_cl)
+    i_cl = np.asarray(i_cl, dtype=np.float64)
     return 1 + 0.28 * i_cl
 
 
 # TODO implement the vr and v_walk functions as a function of the met
 def clo_insulation_air_layer(
-    vr: float | list[float],
-    v_walk: float | list[float],
-    i_a_static: float | list[float],
-) -> float | list[float]:
+    vr: float | list[float] | NDArray[np.float64],
+    v_walk: float | list[float] | NDArray[np.float64],
+    i_a_static: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`).
 
     The static
@@ -940,7 +1062,6 @@ def clo_insulation_air_layer(
     -------
     i_a_r: float or list of floats
         boundary air layer insulation, [clo]
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -958,12 +1079,12 @@ def clo_insulation_air_layer(
 
 
 def clo_total_insulation(
-    i_t: float | list[float],
-    vr: float | list[float],
-    v_walk: float | list[float],
-    i_a_static: float | list[float],
-    i_cl: float | list[float],
-) -> float | list[float]:
+    i_t: float | list[float] | NDArray[np.float64],
+    vr: float | list[float] | NDArray[np.float64],
+    v_walk: float | list[float] | NDArray[np.float64],
+    i_a_static: float | list[float] | NDArray[np.float64],
+    i_cl: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`).
 
     The clothing ensemble (`I`:sub:`T,r`) which is
@@ -999,7 +1120,6 @@ def clo_total_insulation(
     -------
     i_t_r: float or list of floats
         total insulation of the clothing ensemble, [clo]
-
     """
     i_t = np.asarray(i_t)
     vr = np.asarray(vr)
@@ -1031,9 +1151,9 @@ def clo_correction_factor_environment(
     vr: float | list[float],
     v_walk: float | list[float],
     i_cl: float | list[float],
-) -> float | list[float]:
-    """Return the correction factor for the total insulation of the
-    clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+) -> NDArray[np.float64]:
+    """Return the correction factor for the total insulation of the clothing ensemble
+    (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
 
     This correction factor takes into account of the fact that the values of
     (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
@@ -1056,7 +1176,6 @@ def clo_correction_factor_environment(
         correction factor for the total insulation of the clothing ensemble
         (`I`:sub:`T,r` / (`I`:sub:`T`)) or the basic/intrinsic insulation
         (`I`:sub:`cl,r` / (`I`:sub:`cl`))
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -1076,8 +1195,9 @@ def clo_correction_factor_environment(
     return np.where(i_cl == 0, _correction_nude(_vr=vr, _vw=v_walk), c_f)
 
 
-def _correction_nude(_vr, _vw) -> float:
-    """Calculate the correction factor for the total insulation of the clothing ensemble."""
+def _correction_nude(_vr, _vw) -> NDArray[np.float64]:
+    """Calculate the correction factor for the total insulation of the clothing
+    ensemble."""
     return np.exp(
         -0.533 * (_vr - 0.15)
         + 0.069 * (_vr - 0.15) ** 2
@@ -1086,7 +1206,7 @@ def _correction_nude(_vr, _vw) -> float:
     )
 
 
-def _correction_normal_clothing(_vr, _vw) -> float:
+def _correction_normal_clothing(_vr, _vw) -> NDArray[np.float64]:
     """Calculate the correction factor for normal clothing."""
     return np.exp(
         -0.281 * (_vr - 0.15)

@@ -27,7 +27,8 @@ def two_nodes_gagge(
     w_max: float | list[float] = False,
     calculate_ce: bool = False,
 ) -> SET | GaggeTwoNodes:
-    """Gagge Two-node model of human temperature regulation Gagge et al (1986) [Gagge1986]_.
+    """Gagge Two-node model of human temperature regulation Gagge et al (1986)
+    [Gagge1986]_.
 
     [Gagge1986]_ This model can be used to calculate a variety of indices, including:
 
@@ -95,7 +96,6 @@ def two_nodes_gagge(
 
         result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
-
     """
     # Validate inputs using the TwoNodesInputs class
     GaggeTwoNodesInputs(

@@ -89,7 +89,6 @@ def adaptive_ashrae(
         adaptive_ashrae(tdb=25, tr=25, t_running_mean=9, v=0.1)
         # AdaptiveASHRAE(tmp_cmf=np.float64(nan), ... acceptability_90=array(False))
         # The adaptive thermal comfort model can only be used if the running mean temperature is higher than 10°C.
-
     """
     # Validate inputs using the ASHRAEInputs class
     ASHRAEInputs(

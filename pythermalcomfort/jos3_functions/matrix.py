@@ -1,6 +1,5 @@
-"""This code defines a set of models and constants to model heat exchange and
-blood flow in different body parts and layers.
-"""
+"""This code defines a set of models and constants to model heat exchange and blood flow
+in different body parts and layers."""
 
 import numpy as np
 
@@ -17,7 +16,6 @@ def index_order():
     -------
     index_dict : nested dictionary
         keys are the body names and layer names
-
     """
     # Defines existing layers as 1 or None
     index_dict = {}
@@ -82,7 +80,6 @@ def index_by_layer(layer):
     Returns
     -------
     indices of the matrix : list
-
     """
     # Gets indices by the layer name
     out_index = []
@@ -105,7 +102,6 @@ def valid_index_by_layer(layer):
     Returns
     -------
     indices of the matrix : list
-
     """
     # Gets valid indices of the layer name
     out_index = []
@@ -439,7 +435,6 @@ def remove_body_name(text):
         Parameter name removed the body name.
     removed : str
         The removed body name
-
     """
     rtext = text
     removed = None

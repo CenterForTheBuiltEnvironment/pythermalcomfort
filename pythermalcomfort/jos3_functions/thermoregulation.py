@@ -1,5 +1,4 @@
-"""This code includes some models of jos-3 model to calculate human
-thermoregulation.
+"""This code includes some models of jos-3 model to calculate human thermoregulation.
 
 The values of a NumPy array containing 17 body parts
 """
@@ -34,7 +33,6 @@ def natural_convection(posture: str, tdb: float, t_skin: float) -> np.ndarray:
     ------
     ValueError
         If the posture is not one of the valid options.
-
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -155,7 +153,6 @@ def forced_convection(v: float) -> np.ndarray:
     -------
     np.ndarray
         Forced convection heat transfer coefficient body segments.
-
     """
     hc_a = np.asarray(
         [
@@ -232,7 +229,6 @@ def conv_coef(
     -------
     np.ndarray
         Convective heat transfer coefficient (hc) [W/(m2*K)].
-
     """
     hc_natural = natural_convection(posture=posture, tdb=tdb, t_skin=t_skin)
     hc_forced = forced_convection(v=v)
@@ -252,7 +248,6 @@ def rad_coef(posture: str) -> np.ndarray:
     -------
     np.ndarray
         Radiative heat transfer coefficient (hr) [W/(m2*K)].
-
     """
     if posture.lower() == Postures.standing.value:
         # Ichihara et al., 1997, https://doi.org/10.3130/aija.62.45_5
@@ -352,7 +347,6 @@ def fixed_hc(hc: np.ndarray, v: np.ndarray) -> np.ndarray:
     -------
     np.ndarray
         Fixed convective heat transfer coefficient (hc) [W/(m2*K)].
-
     """
     mean_hc = np.average(hc, weights=cons.Default.local_bsa)
     mean_va = np.average(v, weights=cons.Default.local_bsa)
@@ -373,7 +367,6 @@ def fixed_hr(hr: np.ndarray) -> np.ndarray:
     -------
     np.ndarray
         Fixed radiative heat transfer coefficient (hr) [W/(m2*K)].
-
     """
     mean_hr = np.average(hr, weights=cons.Default.local_bsa)
     _fixed_hr = hr * 4.7 / mean_hr
@@ -399,7 +392,6 @@ def operative_temp(tdb, tr, hc, hr):
     -------
     to : float or array
         Operative temperature [°C]
-
     """
     to = (hc * tdb + hr * tr) / (hc + hr)
     return to
@@ -418,7 +410,6 @@ def clo_area_factor(clo):
     -------
     fcl : float or array
         clothing area factor [-]
-
     """
     fcl = np.where(clo < 0.5, clo * 0.2 + 1, clo * 0.1 + 1.05)
     return fcl
@@ -426,8 +417,7 @@ def clo_area_factor(clo):
 
 # TODO this function is different from ISO 9920
 def dry_r(hc, hr, clo):
-    """Calculate total sensible thermal resistance (between the skin and
-    ambient air).
+    """Calculate total sensible thermal resistance (between the skin and ambient air).
 
     Parameters
     ----------
@@ -447,7 +437,6 @@ def dry_r(hc, hr, clo):
     ------
     ValueError
         If any of the input parameters are negative.
-
     """
     if (np.asarray(hc) < 0).any() or (np.asarray(hr) < 0).any():
         raise ValueError("Input parameters hc and hr must be non-negative.")
@@ -465,8 +454,8 @@ def wet_r(
     i_clo,
     lewis_rate,
 ):
-    """Calculate total evaporative thermal resistance (between the skin and
-    ambient air).
+    """Calculate total evaporative thermal resistance (between the skin and ambient
+    air).
 
     Parameters
     ----------
@@ -488,7 +477,6 @@ def wet_r(
     ------
     ValueError
         If any of the input parameters are negative.
-
     """
     if (np.asarray(hc) < 0).any():
         raise ValueError("Input parameters hc must be non-negative.")
@@ -513,7 +501,6 @@ def error_signals(err_sk=0.0):
     -------
     tuple
         Warm signal (WRMS) [°C] and Cold signal (CLDS) [°C].
-
     """
     err_sk = np.asarray(err_sk, dtype=float)
 
@@ -562,7 +549,6 @@ def tetens(x: float) -> float:
     -------
     float
         Saturated vapor pressure [kPa].
-
     """
     return 0.61078 * 10 ** (7.5 * x / (x + 237.3))
 
@@ -612,7 +598,6 @@ def evaporation(
         Maximum evaporative heat loss at the skin [W].
     e_sweat : TYPE
         Evaporative heat loss at the skin by only sweating [W].
-
     """
     wrms, clds = error_signals(
         err_sk,
@@ -721,7 +706,6 @@ def skin_blood_flow(
     -------
     bf_skin : array
         Skin blood flow rate [L/h].
-
     """
     wrms, clds = error_signals(err_sk)
 
@@ -875,7 +859,6 @@ def ava_blood_flow(
     -------
     bf_ava_hand, bf_ava_foot : array
         AVA blood flow rate at hand and foot [L/h].
-
     """
     # Cal. mean error body core temp.
     cap_bcr = [10.2975, 9.3935, 4.488]  # Thermal capacity at chest, back and pelvis
@@ -934,7 +917,6 @@ def basal_met(
     -------
      bmr: float
         Basal metabolic rate [W].
-
     """
     if bmr_equation == "harris-benedict":
         if sex == Sex.male.value:
@@ -1003,7 +985,6 @@ def local_mbase(
     -------
     mbase : array
         Local basal metabolic rate (Mbase) [W].
-
     """
     mbase_all = basal_met(height, weight, age, sex, bmr_equation)
     # Distribution coefficient of basal metabolic rate
@@ -1118,7 +1099,6 @@ def local_q_work(bmr, par):
     ------
     ValueError
         If par is less than 1.
-
     """
     if par < 1:
         raise ValueError("par must be 1 or more")
@@ -1192,7 +1172,6 @@ def shivering(
     -------
     q_shiv : array
         Local thermogenesis by shivering [W].
-
     """
     # Integrated error signal in the warm and cold receptors
     wrms, clds = error_signals(err_sk)
@@ -1311,7 +1290,6 @@ def nonshivering(
     -------
     q_nst : array
         Local metabolic rate by non-shivering [W].
-
     """
     # NST (Non-Shivering Thermogenesis) model, Asaka, 2016
     wrms, clds = error_signals(err_sk)
@@ -1401,7 +1379,6 @@ def sum_m(mbase: np.ndarray, q_work, q_shiv, q_nst):
     -------
     q_thermogenesis_core, q_thermogenesis_muscle, q_thermogenesis_fat, q_thermogenesis_skin : array
         Total thermogenesis in core, muscle, fat, skin layers [W].
-
     """
     q_thermogenesis_core = mbase[0].copy()
     q_thermogenesis_muscle = mbase[1].copy()
@@ -1456,7 +1433,6 @@ def cr_ms_fat_blood_flow(
     -------
     bf_core, bf_muscle, bf_fat : array
         Core, muscle and fat blood flow rate [L/h].
-
     """
     # Basal blood flow rate [L/h]
     # core, CBFB
@@ -1563,7 +1539,6 @@ def sum_bf(bf_core, bf_muscle, bf_fat, bf_skin, bf_ava_hand, bf_ava_foot):
     -------
     co : float
         Cardiac output (the sum of the whole blood flow rate) [L/h].
-
     """
     # Cardiac output (CO)
     co = 0
@@ -1594,7 +1569,6 @@ def resp_heat_loss(tdb: float, p_a: float, q_thermogenesis_total: float):
         Sensible heat loss by respiration [W].
     res_lh : float
         Latent heat loss by respiration [W].
-
     """
     res_sh = 0.0014 * q_thermogenesis_total * (34 - tdb)  # Sensible heat loss
     res_lh = 0.0173 * q_thermogenesis_total * (5.87 - p_a)  # Latent heat loss

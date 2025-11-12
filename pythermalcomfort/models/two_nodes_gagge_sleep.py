@@ -19,7 +19,8 @@ def two_nodes_gagge_sleep(
     p_atm: float = 101325,
     **kwargs,
 ) -> GaggeTwoNodesSleep:
-    """Adaption of the Gagge two-node model for sleep thermal environment, developed by Yan, S., Xiong, J., Kim, J. and de Dear, R. [Yan2022]_.
+    """Adaption of the Gagge two-node model for sleep thermal environment, developed by
+    Yan, S., Xiong, J., Kim, J. and de Dear, R. [Yan2022]_.
 
     Parameters
     ----------
@@ -78,7 +79,6 @@ def two_nodes_gagge_sleep(
         A dataclass containing the results of the Gagge two-node model for sleep thermal environment.
         See :py:class:`~pythermalcomfort.classes_return.GaggeTwoNodesSleep` for more details.
         To access the results, use the corresponding attributes of the returned instance, e.g. `result.e_skin`.
-
     """
     ltime = kwargs.pop("ltime", 1)
     height = kwargs.pop("height", 171)
@@ -417,7 +417,6 @@ def _fnsvp(t):
     -------
     float
         Saturation vapor pressure [Pa]
-
     """
     return math.exp(18.6686 - 4030.183 / (t + 235))
 
