@@ -233,15 +233,13 @@ def wet_bulb_tmp(
         wet-bulb temperature, [°C]
 
     """
-    twb = (
+    return (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
         + np.arctan(tdb + rh)
         - np.arctan(rh - 1.676331)
         + 0.00391838 * rh**1.5 * np.arctan(0.023101 * rh)
         - 4.686035
     )
-
-    return np.around(twb, 1)
 
 
 def dew_point_tmp(
@@ -250,32 +248,40 @@ def dew_point_tmp(
 ) -> NDArray[np.float64]:  # This is the simplified return type
     """Calculate the dew point temperature.
 
-    The equation use the Magnus formula (Magnus, 1844), used by Tetens (1930) with different
-    coefficients and converted to its present form by Murray (1967).
+        The equation use the Magnus formula using the coefficient from
+        the 2024 edition of the Guide to Instruments and Methods of
+        Observation. [WMO2024]_.
 
-    Parameters
-    ----------
-    tdb: float or list of floats
-        dry bulb air temperature, [°C]
-    rh: float or list of floats
-        relative humidity, [%]
+        Parameters
+        ----------
+        tdb: float or list of floats
+            dry bulb air temperature, [°C]
+        rh: float or list of floats
+            relative humidity, [%]
 
-    Returns
-    -------
-    dew_point_tmp: float or list of floats
-        dew point temperature, [°C]
+        Returns
+        -------
+        dew_point_tmp: ndarray
+            dew point temperature, [°C]
 
+        Example
+        -------
+        .. code-block:: python
+
+            from pythermalcomfort.utilities import dew_point_tmp
+    ¨
+            tdb = 25.0  # dry bulb temperature in °C
+            rh = 60.0  # relative humidity in %
+            t_d = dew_point_tmp(tdb, rh)
     """
-    tdb = np.asarray(tdb)
-    rh = np.asarray(rh)
+    tdb = np.asarray(tdb, dtype=np.float64)
+    rh = np.asarray(rh, dtype=np.float64)
 
-    c = 257.14
-    b = 18.678
-    d = 234.5
-
-    gamma_m = np.log(rh / 100 * np.exp((b - tdb / d) * (tdb / (c + tdb))))
-
-    return np.round(c * gamma_m / (b - gamma_m), 1)
+    e_w = 6.112 * np.exp(
+        (17.62 * tdb) / (243.12 + tdb)
+    )  # saturation vapor pressure in hPa
+    e_s = (rh / 100) * e_w  # actual vapor pressure in hPa
+    return 243.12 * np.log(e_s / 6.112) / (17.62 - np.log(e_s / 6.112))
 
 
 def mean_radiant_tmp(
@@ -837,7 +843,7 @@ def operative_tmp(
     tr: float | list[float],
     v: float | list[float],
     standard: str = "ISO",
-) -> float | list[float]:
+) -> NDArray[np.float64]:
     """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
 
     Parameters
