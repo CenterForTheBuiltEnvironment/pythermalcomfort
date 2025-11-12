@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.8.0 (2025-11-12)
+------------------
+
+* Fixed the equation to calculate the dew point temperature in the utilities module to comply with WMO 2024 guidelines.
+
 3.7.0 (2025-10-28)
 ------------------
 
