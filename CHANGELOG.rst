@@ -1,10 +1,15 @@
 Changelog
 =========
 
-3.7.2 (2025-11-04)
+3.9.0 (2025-11-12)
 ------------------
 
 * Added two biophysical fan use models for determining safe fan use limits: Resting [Morris2021]_ and Occupational [Foster2021]_
+
+3.8.0 (2025-11-12)
+------------------
+
+* Fixed the equation to calculate the dew point temperature in the utilities module to comply with WMO 2024 guidelines.
 
 3.7.0 (2025-10-28)
 ------------------
