@@ -392,9 +392,7 @@ def mean_radiant_tmp(
         )
 
         d_valid = valid_range(d, (0.04, 0.15))
-        tr = np.where(~np.isnan(d_valid), tr, np.nan)
-
-        return np.around(tr, 1)
+        return np.where(~np.isnan(d_valid), tr, np.nan)
 
     if standard == "iso":  # pragma: no branch
         tg = np.add(tg, c_to_k)
@@ -407,15 +405,13 @@ def mean_radiant_tmp(
         # get the biggest between the two coefficients
         h = np.maximum(h_f, h_n)
 
-        tr = (
+        return (
             np.power(
                 np.power(tg, 4) + h * (tg - tdb) / (emissivity * (5.67 * 10**-8)),
                 0.25,
             )
             - c_to_k
         )
-
-        return np.around(tr, 1)
 
 
 def validate_type(value, name: str, allowed_types: tuple):
@@ -992,7 +988,9 @@ def clo_intrinsic_insulation_ensemble(
     return np.sum(clo_garments) * 0.835 + 0.161
 
 
-def clo_area_factor(i_cl: float | list[float]) -> NDArray[np.float64]:
+def clo_area_factor(
+    i_cl: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Calculate the clothing area factor (f_cl) of the clothing ensemble as a function
     of the intrinsic insulation of the clothing ensemble. This equation is in accordance
     with the ISO 9920:2009 standard [ISO9920]_ Section 5. The standard warns that the
