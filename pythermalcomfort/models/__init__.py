@@ -1,9 +1,3 @@
-from pythermalcomfort.models.sports_heat_stress_risk import (
-    Sports,
-    SportsHeatStressRiskResult,
-    sports_heat_stress_risk,
-)
-
 from .adaptive_ashrae import adaptive_ashrae
 from .adaptive_en import adaptive_en
 from .ankle_draft import ankle_draft
@@ -80,7 +74,4 @@ __all__ = [
     "work_capacity_hothaps",
     "work_capacity_iso",
     "work_capacity_niosh",
-    "sports_heat_stress_risk",
-    "Sports",
-    "SportsHeatStressRiskResult",
 ]

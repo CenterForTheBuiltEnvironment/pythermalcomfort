@@ -42,7 +42,3 @@ References
 .. [Yan2025] Yan J, Tong Z, Wang Y, Feng S, Su Y, Song Y, Wen Q, Yin C. From measurements to regulations: An actionable approach for sustainable urban cooling via heat-resilient urban planning. Sustainable Cities and Society. 2025;125:106361.
 .. [Schlatter1987] Schlatter TW. Temperature-humidity index. In: Climatology. Encyclopedia of Earth Science. Springer; 1987. DOI: 10.1007/0-387-30749-4_176
 .. [Forbes2025] Forbes C, Coccarelli A, Xu Z, Meade RD, Kenny GP, Binnewies S, Bach AJE. Biophysical versus machine learning models for predicting rectal and skin temperatures in older adults. J Therm Biol. 2025 Feb;128:104078. DOI: 10.1016/j.jtherbio.2025.104078. Epub 2025 Feb 22. PMID: 40010162.
-.. [SMA2021] Sports Medicine Australia. Extreme Heat Policy v1 (2021). Canberra (AUS): Sports Medicine Australia; 2021.
-.. [SMA2024] Sports Medicine Australia. Extreme Heat Policy v2 (2024). Canberra (AUS): Sports Medicine Australia; 2024. Available from: https://sma-heat-policy.sydney.edu.au
-.. [ISO2004] International Organization for Standardization. Ergonomics of the Thermal Environment — Analytical Determination and Interpretation of Heat Stress Using Calculation of the Predicted Heat Strain (ISO 7933:2004). Geneva (CHE): ISO; 2004.
-.. [Parsons2014] Parsons KC. Human Thermal Environments: The Effects of Hot, Moderate, and Cold Environments on Human Health, Comfort and Performance. 3rd ed. Boca Raton (FL): CRC Press; 2014.
