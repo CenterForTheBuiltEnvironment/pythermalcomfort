@@ -58,21 +58,21 @@ def pmv_athb(
 
     Returns
     -------
-    ATHBResults
-        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHBResults` for more details.
+    ATHB
+        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHB` for more details.
 
     Examples
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import athb
+        from pythermalcomfort.models import pmv_athb
 
         # calculate the predicted mean vote (PMV) using the Adaptive Thermal Heat Balance model
-        results = athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20)
+        results = pmv_athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20)
         print(results.athb_pmv)  # returns the PMV value
 
         # for multiple points
-        results = athb(
+        results = pmv_athb(
             tdb=[25, 25, 25],
             tr=[25, 25, 25],
             vr=[0.1, 0.1, 0.1],
