@@ -323,6 +323,18 @@ def mean_radiant_tmp(
     tr: float or list of floats
         mean radiant temperature, [°C]
 
+    Examples
+    --------
+    .. code-block:: python
+
+        from pythermalcomfort.utilities import mean_radiant_tmp
+
+        tg = 53.2  # globe temperature in °C
+        tdb = 30.0  # dry bulb temperature in °C
+        v = 0.3  # air speed in m/s
+        d = 0.1  # diameter of the globe in m
+        tr = mean_radiant_tmp(tg, tdb, v, d, standard="ISO")
+        print(tr)  # 74.8
     """
     standard = standard.lower()
 
