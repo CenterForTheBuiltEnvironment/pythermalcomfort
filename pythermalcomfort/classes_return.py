@@ -319,6 +319,77 @@ class Humidex(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
+class BFU_rest(AutoStrMixin):
+    """Dataclass for the fan biophysical model from Morris et al. 2021.
+
+    Attributes
+    ----------
+    heat_storage : float or list of floats
+        Differential heat storage when using the fan vs. not using the fan, [W/m²].
+    e_req_fan : float or list of floats
+        Required evaporative heat loss with the fan, [W/m²].
+    e_max_fan : float or list of floats
+        Maximum possible evaporative heat loss with the fan, [W/m²].
+    e_req_no_fan : float or list of floats
+        Required evaporative heat loss without the fan, [W/m²].
+    e_max_no_fan : float or list of floats
+        Maximum possible evaporative heat loss without the fan, [W/m²].
+    group : str
+        Population group identifier used for the calculation (YNG, OLD, MEDS).
+    """
+
+    heat_storage: float | list[float]
+    e_req_fan: float | list[float]
+    e_max_fan: float | list[float]
+    e_req_no_fan: float | list[float]
+    e_max_no_fan: float | list[float]
+    group: str
+
+
+@dataclass(frozen=True, repr=False)
+class BFU_occupational(AutoStrMixin):
+    """Dataclass for the occupational fan use model from Foster et al. 2021.
+
+    Attributes
+    ----------
+    storage_fan : float or list of floats
+        Heat storage rate when the fan is operating, [W/m²].
+    storage_no_fan : float or list of floats
+        Heat storage rate without the fan, [W/m²].
+    delta_storage : float or list of floats
+        Reduction in heat storage provided by the fan (positive means beneficial), [W/m²].
+    dry_heat_fan : float or list of floats
+        Dry heat loss with the fan (radiative + convective), [W/m²].
+    dry_heat_no_fan : float or list of floats
+        Dry heat loss without the fan, [W/m²].
+    evaporative_heat_fan : float or list of floats
+        Evaporative heat loss via sweating with the fan, [W/m²].
+    evaporative_heat_no_fan : float or list of floats
+        Evaporative heat loss via sweating without the fan, [W/m²].
+    respiratory_heat : float or list of floats
+        Combined sensible and latent respiratory heat exchange, [W/m²].
+    sweat_efficiency_fan : float or list of floats
+        Sweating efficiency (η) with the fan, [-].
+    sweat_efficiency_no_fan : float or list of floats
+        Sweating efficiency (η) without the fan, [-].
+    interpretation : int or list of int
+        Qualitative interpretation based on Foster et al 2021 (1 = beneficial, 0 = neutral, -1 = harmful).
+    """
+
+    storage_fan: float | list[float]
+    storage_no_fan: float | list[float]
+    delta_storage: float | list[float]
+    dry_heat_fan: float | list[float]
+    dry_heat_no_fan: float | list[float]
+    evaporative_heat_fan: float | list[float]
+    evaporative_heat_no_fan: float | list[float]
+    respiratory_heat: float | list[float]
+    sweat_efficiency_fan: float | list[float]
+    sweat_efficiency_no_fan: float | list[float]
+    interpretation: int | list[int]
+
+
+@dataclass(frozen=True, repr=False)
 class NET(AutoStrMixin):
     """Dataclass to represent the Normal Effective Temperature (NET).
 
