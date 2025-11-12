@@ -82,6 +82,11 @@ def solar_gain(
         See :py:class:`~pythermalcomfort.classes_return.SolarGain` for more details.
         To access the `erf` and `delta_mrt` values, use the corresponding attributes of the returned `SolarGain` instance, e.g., `result.erf`.
 
+    Raises
+    ------
+    ValueError
+        If the posture is not one of 'standing', 'supine', or 'sitting'.
+
     Examples
     --------
     .. code-block:: python
@@ -100,6 +105,20 @@ def solar_gain(
         )
         print(result.erf)  # 42.9
         print(result.delta_mrt)  # 10.3
+
+    Applicability
+    -------------
+    This model is applicable under the following conditions:
+
+    - Solar altitude (sol_altitude) must be between 0° and 90°.
+    - Solar horizontal angle (sharp) must be between 0° and 180°.
+    - Direct-beam solar radiation (sol_radiation_dir) should typically range from 200 to 1000 W/m², as per ASHRAE 55 Table C2-3.
+    - Solar transmittance (sol_transmittance) must be between 0 and 1.
+    - Sky-vault view fraction (f_svv) and body surface exposure fraction (f_bes) must be between 0 and 1.
+    - Average short-wave absorptivity (asw) typically ranges from 0.57 to 0.84, depending on skin and clothing color.
+    - Posture must be one of 'standing', 'supine', or 'sitting'.
+    - Floor reflectance (floor_reflectance) is assumed constant at 0.6, but can vary.
+    - All inputs are in SI units (e.g., angles in degrees, radiation in W/m²).
     """
     # Validate inputs using the SolarGainInputs class
     SolarGainInputs(
