@@ -60,7 +60,6 @@ def p_sat_torr(tdb: float | list[float]) -> NDArray[np.float64]:
     -------
     p_sat : float
         saturation vapor pressure [torr]
-
     """
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
@@ -82,7 +81,6 @@ def enthalpy_air(
     -------
     enthalpy_air: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     hr = np.asarray(hr, dtype=np.float64)
@@ -103,7 +101,6 @@ def p_sat(tdb: float | list[float] | NDArray[np.float64]) -> NDArray[np.float64]
     -------
     p_sat: float or list of floats
         saturation vapor pressure, [Pa]
-
     """
 
     # pre-calculated constants for p_sat
@@ -151,7 +148,6 @@ def antoine(tdb: float | list[float]) -> NDArray[np.float64]:
     -------
     float or list of floats
         Saturated vapor pressure [kPa].
-
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     return math.e ** (16.6536 - 4030.183 / (tdb + 235))
@@ -191,7 +187,6 @@ def psy_ta_rh(
         dew point temperature, [°C]
     h: float or list of floats
         enthalpy_air [J/kg dry air]
-
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     rh = np.asarray(rh, dtype=np.float64)
@@ -231,7 +226,6 @@ def wet_bulb_tmp(
     -------
     tdb: float or list of floats
         wet-bulb temperature, [°C]
-
     """
     return (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
@@ -596,7 +590,6 @@ def body_surface_area(
 
         bsa = body_surface_area(weight=70, height=1.75, formula="dubois")
         print(bsa)
-
     """
     if formula == BodySurfaceAreaEquations.dubois.value:
         return 0.202 * (weight**0.425) * (height**0.725)
@@ -628,7 +621,6 @@ def f_svv(w: float, h: float, d: float) -> float:
     -------
     f_svv  : float
         sky-vault view fraction ranges between 0 and 1
-
     """
     return (
         math.degrees(math.atan(h / (2 * d)))
@@ -653,7 +645,6 @@ def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
     -------
     vr  : float or list of floats
         relative air speed, [m/s]
-
     """
     v = np.asarray(v, dtype=np.float64)
     met = np.asarray(met, dtype=np.float64)
@@ -690,7 +681,6 @@ def clo_dynamic_ashrae(
     -------
     clo : float or list of floats
         dynamic clothing insulation (I :sub:`cl,r`), [clo]
-
     """
     clo = np.asarray(clo, dtype=np.float64)
     met = np.asarray(met, dtype=np.float64)
@@ -736,7 +726,6 @@ def clo_dynamic_iso(
     -------
     clo : float or list of floats
         dynamic clothing insulation, [clo]
-
     """
     model = model.lower()
     if model not in [Models.iso_9920_2007.value]:
@@ -832,7 +821,6 @@ def running_mean_outdoor_temperature(
             t_rm = running_mean_outdoor_temperature(subset, alpha=0.8, units="SI")
             print(f"Days {i + 1} to {i + days_to_consider}: t_rm = {t_rm}")
             results.append(t_rm)
-
     """
     units = units.upper()
     if units == Units.IP.value:
@@ -860,7 +848,6 @@ def units_converter(from_units=Units.IP.value, **kwargs) -> list[float]:
     Returns
     -------
     converted values in SI units
-
     """
     results = []
     from_units = from_units.upper()
@@ -895,7 +882,8 @@ def operative_tmp(
     v: float | list[float],
     standard: str = "ISO",
 ) -> NDArray[np.float64]:
-    """Calculate the operative temperature in accordance with ISO 7726:1998 [7726ISO1998]_.
+    """Calculate the operative temperature in accordance with ISO 7726:1998
+    [7726ISO1998]_.
 
     Parameters
     ----------
@@ -913,7 +901,6 @@ def operative_tmp(
     -------
     to: float
         operative temperature, [°C]
-
     """
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
@@ -947,7 +934,6 @@ def clo_intrinsic_insulation_ensemble(
     -------
     i_cl: float
         intrinsic insulation of the clothing ensemble, [clo]
-
     """
     clo_garments = np.asarray(clo_garments)
     return np.sum(clo_garments) * 0.835 + 0.161
@@ -970,7 +956,6 @@ def clo_area_factor(i_cl: float | list[float]) -> NDArray[np.float64]:
     -------
     f_cl: float or list of floats
         area factor of the clothing ensemble, [m2]
-
     """
     i_cl = np.asarray(i_cl, dtype=np.float64)
     return 1 + 0.28 * i_cl
@@ -1005,7 +990,6 @@ def clo_insulation_air_layer(
     -------
     i_a_r: float or list of floats
         boundary air layer insulation, [clo]
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -1064,7 +1048,6 @@ def clo_total_insulation(
     -------
     i_t_r: float or list of floats
         total insulation of the clothing ensemble, [clo]
-
     """
     i_t = np.asarray(i_t)
     vr = np.asarray(vr)
@@ -1097,8 +1080,8 @@ def clo_correction_factor_environment(
     v_walk: float | list[float],
     i_cl: float | list[float],
 ) -> NDArray[np.float64]:
-    """Return the correction factor for the total insulation of the
-    clothing ensemble (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
+    """Return the correction factor for the total insulation of the clothing ensemble
+    (`I`:sub:`T`) or the basic/intrinsic insulation (`I`:sub:`cl`).
 
     This correction factor takes into account of the fact that the values of
     (`I`:sub:`T`) and (`I`:sub:`cl`) are estimated in static conditions. In real
@@ -1121,7 +1104,6 @@ def clo_correction_factor_environment(
         correction factor for the total insulation of the clothing ensemble
         (`I`:sub:`T,r` / (`I`:sub:`T`)) or the basic/intrinsic insulation
         (`I`:sub:`cl,r` / (`I`:sub:`cl`))
-
     """
     vr = np.asarray(vr)
     v_walk = np.asarray(v_walk)
@@ -1142,7 +1124,8 @@ def clo_correction_factor_environment(
 
 
 def _correction_nude(_vr, _vw) -> NDArray[np.float64]:
-    """Calculate the correction factor for the total insulation of the clothing ensemble."""
+    """Calculate the correction factor for the total insulation of the clothing
+    ensemble."""
     return np.exp(
         -0.533 * (_vr - 0.15)
         + 0.069 * (_vr - 0.15) ** 2

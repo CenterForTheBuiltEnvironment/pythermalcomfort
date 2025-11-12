@@ -91,7 +91,6 @@ def set_tmp(
 
         result = set_tmp(tdb=[25, 25], tr=25, v=0.1, rh=50, met=1.2, clo=0.5)
         print(result.set)  # [24.3, 24.3]
-
     """
     tdb = np.asarray(tdb)
     tr = np.asarray(tr)

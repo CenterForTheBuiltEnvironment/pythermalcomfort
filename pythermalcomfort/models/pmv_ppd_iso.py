@@ -131,7 +131,6 @@ def pmv_ppd_iso(
         )
         print(result.pmv)  # [-0.  0.41]
         print(result.ppd)  # [5.  8.5]
-
     """
     # Validate inputs using the PMVPPDInputs class
     PMVPPDInputs(

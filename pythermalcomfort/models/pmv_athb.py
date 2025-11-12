@@ -17,13 +17,13 @@ def pmv_athb(
     t_running_mean: float | list[float],
     clo: bool | float | list[float] = False,
 ) -> ATHB:
-    """Return the PMV value calculated with the Adaptive Thermal Heat Balance
-    Framework [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework
-    introduced a method to account for the three adaptive principals, namely
-    physiological, behavioral, and psychological adaptation, individually
-    within existing heat balance models. The objective is a predictive model of
-    thermal sensation applicable during the design stage or in international
-    standards without knowing characteristics of future occupants.
+    """Return the PMV value calculated with the Adaptive Thermal Heat Balance Framework
+    [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework introduced a
+    method to account for the three adaptive principals, namely physiological,
+    behavioral, and psychological adaptation, individually within existing heat balance
+    models. The objective is a predictive model of thermal sensation applicable during
+    the design stage or in international standards without knowing characteristics of
+    future occupants.
 
     Parameters
     ----------
@@ -81,7 +81,6 @@ def pmv_athb(
             t_running_mean=[20, 20, 20],
         )
         print(results.athb_pmv)
-
     """
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)
