@@ -794,6 +794,45 @@ def running_mean_outdoor_temperature(
     t_rm  : float
         running mean outdoor temperature
 
+    Examples
+    --------
+    .. code-block:: python
+
+        from pythermalcomfort.utilities import running_mean_outdoor_temperature
+
+        temp_array = [
+            22.0,
+            20.5,
+            19.0,
+            21.0,
+            18.5,
+            17.0,
+            16.5,
+        ]  # daily mean temperatures
+        t_rm = running_mean_outdoor_temperature(temp_array, alpha=0.8, units="SI")
+        print(t_rm)  # 19.5
+
+        # Calculate the mean radiant temperature using the previous 7 days from an array of daily mean temperatures
+        temp_array = [
+            22.0,
+            20.5,
+            19.0,
+            21.0,
+            18.5,
+            17.0,
+            16.5,
+            15.0,
+            14.5,
+        ]  # daily mean temperatures
+        days_to_consider = 7
+        results = []
+        for i in range(len(temp_array) - days_to_consider + 1):
+            subset = temp_array[i : i + days_to_consider]
+            print(f"Subset for days {i + 1} to {i + days_to_consider}: {subset}")
+            t_rm = running_mean_outdoor_temperature(subset, alpha=0.8, units="SI")
+            print(f"Days {i + 1} to {i + days_to_consider}: t_rm = {t_rm}")
+            results.append(t_rm)
+
     """
     units = units.upper()
     if units == Units.IP.value:
