@@ -228,6 +228,10 @@ def wet_bulb_tmp(
     tdb: float or list of floats
         wet-bulb temperature, [°C]
     """
+
+    tdb = np.asarray(tdb, dtype=np.float64)
+    rh = np.asarray(rh, dtype=np.float64)
+
     return (
         tdb * np.arctan(0.151977 * (rh + 8.313659) ** 0.5)
         + np.arctan(tdb + rh)
