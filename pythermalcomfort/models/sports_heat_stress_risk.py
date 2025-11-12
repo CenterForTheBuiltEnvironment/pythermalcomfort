@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 
-# todo not implemented yet in the docs nor in the __init__.py
+# todo add the function to the docs and to the __init__.py
 import numpy as np
 import scipy
 
@@ -64,7 +64,9 @@ def sports_heat_stress_risk(
     vr: float | list[float],
     sport: _SportsValues,
 ):
-    """Short description. todo add the description form the paper.
+    """Short description of the function.
+
+    todo explain what the function does and cite the paper DOI:10.1016/j.jsams.2025.03.006
 
     Parameters
     ----------
@@ -76,13 +78,13 @@ def sports_heat_stress_risk(
         Relative humidity [%].
     vr : float or list of float
         Relative air speed [m/s].
-    sport¨ : _SportsValues
+    sport : _SportsValues
         Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
         Use one of the entries from :pyclass:`Sports`.
 
     Returns
     -------
-    todo this should be a dataclass
+    todo this should be a dataclass as in pmv_ppd_iso
 
     Raises
     ------
@@ -113,7 +115,7 @@ def sports_heat_stress_risk(
 
     """
     # todo add references to the docstring
-    # todo add examples to the docstring
+    # todo add examples which are at the end of this file to the docstring
     # todo the function should accept either float or arrays as all the other functions pythermalcomfort
 
     tdb = np.asarray(tdb)
@@ -125,28 +127,19 @@ def sports_heat_stress_risk(
         tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
     )
 
-    # thermal_sensation = {
-    #     -2.5: "Cold",
-    #     -1.5: "Cool",
-    #     -0.5: "Slightly Cool",
-    #     0.5: "Neutral",
-    #     1.5: "Slightly Warm",
-    #     2.5: "Warm",
-    #     10: "Hot",
-    # }
-    #
-    # return PMVPPD(
-    #     pmv=pmv_array,
-    #     ppd=ppd_array,
-    #     tsv=mapping(pmv_array, thermal_sensation, right=False),
-    # )
-
     # todo use the pmv_ppd_iso as a reference for the code implementation
 
+    # todo below is a placeholder but the actual implementation should return a dataclass with the risk value
+    #  interpolated and the risk level thresholds Low, Medium, High, Extreme as per the online tool
+    #  https://sma-heat-policy.sydney.edu.au/
     return risk_levels
 
 
 def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
+    """Calculate the risk level for a single set of inputs.
+
+    # todo implement the docstring
+    """
     # set the max and min thresholds for the risk levels
     sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
 
@@ -184,7 +177,8 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
             ).sweat_loss_g
             / sport.duration
             * 45
-            # todo I want to remove the above line and calculate a fixed value for all sports over 60 min
+            # todo DO NOT CHANGE this
+            #  Federico Tartarini will remove the above line and calculate a fixed value for all sports over 60 min
             - sweat_loss_g
         )
 
