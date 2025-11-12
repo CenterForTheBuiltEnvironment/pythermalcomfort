@@ -61,7 +61,9 @@ def heat_index_lu(
 
 # combining the two functions find_eqvar and find_T
 @np.vectorize
-def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
+def _lu_heat_index_vectorized(
+    tdb: np.ndarray, rh: np.ndarray
+) -> np.ndarray:  # Thermodynamic parameters
     t_c_k = 273.16  # K
     p_triple_point = 611.65  # Pa
     e0v = 2.3740e6  # J/kg

@@ -53,6 +53,14 @@ def test_t_dp() -> None:
     assert dew_point_tmp(40.0, 50.0) == pytest.approx(27.587, abs=1e-1)  # High temp
 
 
+def test_t_dp_invalid_rh() -> None:
+    """Test that dew_point_tmp raises ValueError for invalid relative humidity."""
+    with pytest.raises(ValueError):
+        dew_point_tmp(25, 110)
+    with pytest.raises(ValueError):
+        dew_point_tmp(25, -10)
+
+
 def test_t_wb() -> None:
     """Test the wet bulb temperature function with various inputs."""
     assert wet_bulb_tmp(27.1, 66.4) == pytest.approx(22.4, abs=1e-1)

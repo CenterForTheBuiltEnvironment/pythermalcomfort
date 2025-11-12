@@ -61,6 +61,7 @@ def p_sat_torr(tdb: float | list[float]) -> NDArray[np.float64]:
     p_sat : float
         saturation vapor pressure [torr]
     """
+    tdb = np.asarray(tdb, dtype=np.float64)
     return np.exp(18.6686 - 4030.183 / (tdb + 235.0))
 
 
@@ -270,6 +271,9 @@ def dew_point_tmp(
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     rh = np.asarray(rh, dtype=np.float64)
+
+    if np.any(rh < 0) or np.any(rh > 100):
+        raise ValueError("Relative humidity must be between 0 and 100%.")
 
     e_w = 6.112 * np.exp(
         (17.62 * tdb) / (243.12 + tdb)
