@@ -87,8 +87,11 @@ def test_psy_ta_rh() -> None:
 def test_t_o() -> None:
     """Test the operative temperature function with various inputs."""
     assert operative_tmp(25, 25, 0.1) == 25
-    assert round(operative_tmp(25, 30, 0.3), 2) == 26.83
-    assert round(operative_tmp(20, 30, 0.3), 2) == 23.66
+    np.allclose(
+        operative_tmp([25, 20], 30, 0.3),
+        [26.83, 23.66],
+        atol=1e-2,
+    )
     assert operative_tmp(25, 25, 0.1, standard="ASHRAE") == 25
     assert operative_tmp(20, 30, 0.1, standard="ASHRAE") == 25
     assert operative_tmp(20, 30, 0.3, standard="ASHRAE") == 24

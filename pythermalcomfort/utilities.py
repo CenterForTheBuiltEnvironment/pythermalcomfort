@@ -325,6 +325,11 @@ def mean_radiant_tmp(
     tr: float or list of floats
         mean radiant temperature, [°C]
 
+    Raises
+    ------
+    ValueError
+        If the standard is not recognized. Please choose either 'Mixed Convection' or 'ISO'.
+
     Examples
     --------
     .. code-block:: python
@@ -412,6 +417,10 @@ def mean_radiant_tmp(
             )
             - c_to_k
         )
+
+    raise ValueError(
+        "Standard not recognized. Please choose either 'Mixed Convection' or 'ISO'.",
+    )
 
 
 def validate_type(value, name: str, allowed_types: tuple):
@@ -633,7 +642,10 @@ def f_svv(w: float, h: float, d: float) -> float:
     )
 
 
-def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
+def v_relative(
+    v: float | list[float] | NDArray[np.float64],
+    met: float | list[float] | NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Estimates the relative air speed which combines the average air speed of the
     space plus the relative air speed caused by the body movement. The same equation is
     used in the ASHRAE 55:2023 and ISO 7730:2005 standards.
@@ -647,7 +659,7 @@ def v_relative(v: float | list[float], met: float | list[float]) -> np.ndarray:
 
     Returns
     -------
-    vr  : float or list of floats
+    vr : float or list of floats
         relative air speed, [m/s]
     """
     v = np.asarray(v, dtype=np.float64)
@@ -691,7 +703,10 @@ def clo_dynamic_ashrae(
 
     model = model.lower()
     if model not in [Models.ashrae_55_2023.value]:
-        invalid_model_msg = f"PMV calculations can only be performed in compliance with ASHRAE {Models.ashrae_55_2023.value}"
+        invalid_model_msg = (
+            f"PMV calculations can only be performed in compliance "
+            f"with ASHRAE {Models.ashrae_55_2023.value}"
+        )
         raise ValueError(invalid_model_msg)
 
     return np.where(met > 1.2, np.around(clo * (0.6 + 0.4 / met), 3), clo)
@@ -733,7 +748,10 @@ def clo_dynamic_iso(
     """
     model = model.lower()
     if model not in [Models.iso_9920_2007.value]:
-        invalid_model_msg = f"PMV calculations can only be performed in compliance with ISO {Models.iso_9920_2007.value}"
+        invalid_model_msg = (
+            f"PMV calculations can only be performed in "
+            f"compliance with ISO {Models.iso_9920_2007.value}"
+        )
         raise ValueError(invalid_model_msg)
 
     clo = np.asarray(clo)
@@ -951,6 +969,9 @@ def operative_tmp(
     to: float
         operative temperature, [°C]
     """
+    tdb = np.asarray(tdb, dtype=np.float64)
+    tr = np.asarray(tr, dtype=np.float64)
+    v = np.asarray(v, dtype=np.float64)
     if standard.lower() == "iso":
         return (tdb * np.sqrt(10 * v) + tr) / (1 + np.sqrt(10 * v))
     if standard.lower() == "ashrae":
@@ -1014,9 +1035,9 @@ def clo_area_factor(
 
 # TODO implement the vr and v_walk functions as a function of the met
 def clo_insulation_air_layer(
-    vr: float | list[float],
-    v_walk: float | list[float],
-    i_a_static: float | list[float],
+    vr: float | list[float] | NDArray[np.float64],
+    v_walk: float | list[float] | NDArray[np.float64],
+    i_a_static: float | list[float] | NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Calculate the insulation of the boundary air layer (`I`:sub:`a,r`).
 
@@ -1058,11 +1079,11 @@ def clo_insulation_air_layer(
 
 
 def clo_total_insulation(
-    i_t: float | list[float],
-    vr: float | list[float],
-    v_walk: float | list[float],
-    i_a_static: float | list[float],
-    i_cl: float | list[float],
+    i_t: float | list[float] | NDArray[np.float64],
+    vr: float | list[float] | NDArray[np.float64],
+    v_walk: float | list[float] | NDArray[np.float64],
+    i_a_static: float | list[float] | NDArray[np.float64],
+    i_cl: float | list[float] | NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Calculate the total insulation of the clothing ensemble (`I`:sub:`T,r`).
 
