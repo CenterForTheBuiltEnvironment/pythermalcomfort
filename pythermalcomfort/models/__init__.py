@@ -8,6 +8,7 @@ from .discomfort_index import discomfort_index
 from .esi import esi
 from .heat_index_lu import heat_index_lu
 from .heat_index_rothfusz import heat_index_rothfusz
+from .heatwatch import heatwatch
 from .humidex import humidex
 from .jos3 import JOS3
 from .net import net
@@ -48,6 +49,7 @@ __all__ = [
     "esi",
     "heat_index_lu",
     "heat_index_rothfusz",
+    "heatwatch",
     "humidex",
     "net",
     "pet_steady",

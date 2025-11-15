@@ -552,6 +552,22 @@ class GaggeTwoNodesJi(AutoStrMixin):
 
 
 @dataclass(frozen=True, repr=False)
+class HeatWatch(AutoStrMixin):
+    """Dataclass to represent the results of the HeatWatch thermal comfort index.
+
+    Attributes
+    ----------
+    hss : float or list of floats
+        The HeatWatch thermal comfort index.
+    risk_category : str or list of str
+        The risk category associated with the HeatWatch index.
+    """
+
+    hss: float | list[float] | NDArray[np.float64]
+    risk_category: str | list[str]
+
+
+@dataclass(frozen=True, repr=False)
 class THI(AutoStrMixin):
     """Dataclass to represent the Temperature-Humidity Index (THI).
 
