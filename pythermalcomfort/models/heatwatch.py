@@ -7,7 +7,7 @@ from pythermalcomfort.classes_return import HeatWatch
 from pythermalcomfort.models import two_nodes_gagge
 
 
-def calculate_w_max(persona: Persona) -> float:
+def _calculate_w_max(persona: Persona) -> float:
     w_max = 1.0
     if persona.age >= 80:
         w_max *= 0.65
@@ -38,7 +38,7 @@ def calculate_w_max(persona: Persona) -> float:
     return w_max
 
 
-def calculate_coefficient_disc_m_bl(persona: Persona) -> float:
+def _calculate_coefficient_disc_m_bl(persona: Persona) -> float:
     coefficient = 1.0
     if persona.age >= 80:
         min(coefficient, 0.3)
@@ -114,7 +114,7 @@ def heatwatch(
     heatwatch_index : float
         The HeatWatch thermal comfort index.
     """
-    # # Validate inputs using the PMVPPDInputs class
+    # # Validate inputs by creating a class instance, below is an example
     # PMVPPDInputs(
     #     tdb=tdb,
     #     tr=tr,
@@ -134,13 +134,10 @@ def heatwatch(
     met = np.asarray(met, dtype=np.float64)
     clo = np.asarray(clo, dtype=np.float64)
 
-    w_max = calculate_w_max(persona)
-    coefficient_disc_m_bl = calculate_coefficient_disc_m_bl(persona)
+    w_max = _calculate_w_max(persona)
+    coefficient_disc_m_bl = _calculate_coefficient_disc_m_bl(persona)
 
-    result = two_nodes_gagge(tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo, w_max=w_max, round_output=False)
-
-    m_bl = result["m_bl"]
-    disc = result["disc"]
+    results = two_nodes_gagge(tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo, w_max=w_max, round_output=False)
 
     m_bl_min = 1.2  # min skin blood flow
     m_bl_max = 90  # max skin blood flow
@@ -150,10 +147,10 @@ def heatwatch(
     disc_max = 5.0  # max discomfort index
 
     # Thermal discomfort
-    ratio_disc = disc / disc_max
+    ratio_disc = results.disc / disc_max
 
     # Skin blood flow
-    ratio_m_bl = (m_bl - m_bl_min) / (m_bl_max - m_bl_min)
+    ratio_m_bl = (results.m_bl - m_bl_min) / (m_bl_max - m_bl_min)
 
     # Combine discomfort index with the normalised skin blood flow
     disc_m_bl = ratio_disc * coefficient_disc_m_bl + ratio_m_bl * (
@@ -200,11 +197,11 @@ if __name__ == "__main__":
     # Example usage
     # from pythermalcomfort.heatwatch import Persona, heatwatch
 
-    tdb = [30, 35, 40]
+    tdb = [30, 33, 40]
     tr = [32, 37, 42]
-    v = [0.3, 0.5, 0.7]
-    rh = [50, 60, 70]
-    met = 1.2
+    v = .3
+    rh = 50
+    met = 1.5
     clo = 0.5
 
     p = Persona(
