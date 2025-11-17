@@ -122,7 +122,7 @@ def extract_metric(result: Any, metric_attr: str | None = None) -> float:
             raise ValueError(msg) from exc
 
     # Fallback inference for common names
-    for name in ("pmv", "set", "hi", "utci"):
+    for name in ("pmv", "set", "hi", "utci", "heat_index_rothfusz"):
         if hasattr(result, name):
             return float(getattr(result, name))
 
