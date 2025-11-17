@@ -27,23 +27,28 @@ def ranges_tdb_psychrometric(
     w_step: float = 5e-4,  # 0.5 g/kg
     rh_isolines: Sequence[float] = tuple(range(10, 100, 10)) + (100,),
     draw_background: bool = True,
+    # Visual controls (most commonly used)
+    cmap: str = "coolwarm",
+    band_alpha: float = 0.85,
+    line_color: str = "black",
+    line_width: float = 1.0,
     # Solver controls
     x_scan_step: float = 1.0,
     smooth_sigma: float = 0.8,
     # Plot controls
     ax: plt.Axes | None = None,
     legend: bool = True,
-    # Forwarded plot customizations (visual + solver) to plot_threshold_region
-    plot_kwargs: dict[str, Any] | None = None,
+    # Additional matplotlib parameters
+    **kwargs: Any,
 ) -> tuple[plt.Axes, dict[str, Any]]:
-    """Plot comfort metric regions over a psychrometric chart (Tdb vs humidity ratio).
+    """Plot comfort/risk ranges over a psychrometric chart (Tdb vs humidity ratio).
 
     This function visualizes regions defined by one or more threshold values for a
     comfort metric (e.g., PMV, SET) as a function of dry-bulb temperature (x-axis)
     and humidity ratio (y-axis). The background shows the saturation curve and
-    relative humidity isolines. This is a convenience wrapper around
-    ``calc_plot_ranges`` with sensible defaults for psychrometric charts, and is
-    suitable for most comfort models in pythermalcomfort.
+    relative humidity isolines. The most commonly used visual parameters
+    are exposed directly in the function signature, while additional customization
+    options are available through **kwargs.
 
     Parameters
     ----------
@@ -67,6 +72,15 @@ def ranges_tdb_psychrometric(
         Relative humidity values (%) for background isolines.
     draw_background : bool, default True
         Whether to draw the saturation curve and RH isolines in the background.
+    cmap : str, default "coolwarm"
+        Colormap name for the regions. Common options: "coolwarm", "viridis",
+        "plasma", "RdYlBu". See matplotlib colormaps for full list.
+    band_alpha : float, default 0.85
+        Transparency (0-1) for the filled regions.
+    line_color : str, default "black"
+        Color for the threshold curves.
+    line_width : float, default 1.0
+        Line width for the threshold curves.
     x_scan_step : float, default 1.0
         Step size for scanning the temperature axis when solving for thresholds.
     smooth_sigma : float, default 0.8
@@ -75,14 +89,20 @@ def ranges_tdb_psychrometric(
         Axes to plot on. If None, a new figure and axes are created.
     legend : bool, default True
         Whether to add a default legend for the regions.
-    plot_kwargs : dict[str, Any] or None, optional
-        Additional keyword arguments forwarded to ``calc_plot_ranges`` for further
-        customization (e.g., cmap, band_colors, xlabel, ylabel, etc.).
+    **kwargs : Any
+        Additional keyword arguments passed to ``calc_plot_ranges``.
+        Common options include:
+        - band_colors: list of colors for each region (overrides cmap)
+        Note: To set axis labels, title, or figure size, use the returned Axes object:
+        ``ax.set_xlabel(...)``, ``ax.set_ylabel(...)``, ``ax.set_title(...)``,
+        ``ax.figure.set_size_inches(...)``
 
     Returns
     -------
     ax : matplotlib.axes.Axes
-        The matplotlib Axes with the plot.
+        The matplotlib Axes with the plot. Use this to customize labels, title,
+        and figure size: ``ax.set_xlabel(...)``, ``ax.set_ylabel(...)``,
+        ``ax.set_title(...)``, ``ax.figure.set_size_inches(...)``
     artists : dict[str, Any]
         Dictionary with keys 'bands', 'curves', and 'legend' containing the
         corresponding matplotlib artists for further customization.
@@ -95,6 +115,7 @@ def ranges_tdb_psychrometric(
 
     Examples
     --------
+    Basic usage:
     >>> from pythermalcomfort.models import pmv_ppd_iso
     >>> from pythermalcomfort.plots.matplotlib import ranges_tdb_psychrometric
     >>> ax, artists = ranges_tdb_psychrometric(
@@ -104,9 +125,42 @@ def ranges_tdb_psychrometric(
     ...     t_range=(18, 30),
     ...     w_range=(0.002, 0.018),
     ...     w_step=0.001,
-    ...     plot_kwargs={"cmap": "coolwarm"},
     ... )
     >>> import matplotlib.pyplot as plt
+    >>> plt.show()
+    
+    With visual customization:
+    >>> ax, artists = ranges_tdb_psychrometric(
+    ...     model_func=pmv_ppd_iso,
+    ...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
+    ...     thresholds=[-0.5, 0.5],
+    ...     t_range=(18, 30),
+    ...     w_range=(0.002, 0.018),
+    ...     w_step=0.001,
+    ...     cmap="viridis",
+    ...     band_alpha=0.6,
+    ...     line_color="darkred",
+    ...     line_width=2.0,
+    ...     draw_background=True,
+    ... )
+    >>> plt.show()
+    
+    With advanced customization via **kwargs and returned Axes:
+    >>> ax, artists = ranges_tdb_psychrometric(
+    ...     model_func=pmv_ppd_iso,
+    ...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1},
+    ...     thresholds=[-0.5, 0.5],
+    ...     t_range=(18, 30),
+    ...     w_range=(0.002, 0.018),
+    ...     w_step=0.001,
+    ...     cmap="viridis",
+    ...     band_alpha=0.6,
+    ...     band_colors=["lightblue", "lightgreen", "lightcoral"],
+    ... )
+    >>> ax.set_xlabel("Dry-bulb air temperature [°C]")
+    >>> ax.set_ylabel("Humidity ratio [kg/kg]")
+    >>> ax.set_title("Custom Psychrometric Chart")
+    >>> ax.figure.set_size_inches(12, 8)
     >>> plt.show()
     """
     fixed_params = dict(fixed_params or {})
@@ -176,7 +230,7 @@ def ranges_tdb_psychrometric(
             x_left_clip[i] = t_hi
 
     # Delegate region plotting (mapper converts W->RH internally)
-    kwargs: dict[str, Any] = {
+    calc_kwargs: dict[str, Any] = {
         "model_func": model_func,
         "xy_to_kwargs": mapper_tdb_w,
         "fixed_params": fixed_params,
@@ -185,17 +239,21 @@ def ranges_tdb_psychrometric(
         "y_values": y_values,
         "metric_attr": None,
         "ax": ax,
-        "xlabel": "Dry-bulb air temperature [°C]",
-        "ylabel": "Humidity ratio [kg/kg]",
         "legend": legend,
         "x_scan_step": float(x_scan_step),
         "smooth_sigma": float(smooth_sigma),
         "x_left_clip": x_left_clip,
+        # Explicit visual controls
+        "cmap": cmap,
+        "band_alpha": band_alpha,
+        "line_color": line_color,
+        "line_width": line_width,
     }
-    if plot_kwargs:
-        kwargs.update(plot_kwargs)
+    # Allow additional parameters via **kwargs (overrides defaults)
+    if kwargs:
+        calc_kwargs.update(kwargs)
 
-    ax, artists = calc_plot_ranges(**kwargs)
+    ax, artists = calc_plot_ranges(**calc_kwargs)
 
     ax.set_xlim(t_lo, t_hi)
     ax.set_ylim(w_lo, w_hi)

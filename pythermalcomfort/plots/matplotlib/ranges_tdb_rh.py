@@ -12,6 +12,7 @@ from pythermalcomfort.plots.utils import (
     get_default_thresholds,
     mapper_tdb_rh,
 )
+import seaborn as sns
 
 __all__ = ["ranges_tdb_rh"]
 
@@ -121,3 +122,43 @@ def ranges_tdb_rh(
     ax, artists = calc_plot_ranges(**kwargs)
 
     return ax, artists
+
+
+if __name__ == "__main__":
+    from pythermalcomfort.models.pmv_ppd_iso import pmv_ppd_iso
+    import matplotlib.pyplot as plt
+
+    fixed_params = {
+        "tr": 25,
+        "vr": 0.3,
+        "met": 1.2,
+        "clo": 0.5,
+    }
+
+    ax, artists = ranges_tdb_rh(
+        model_func=pmv_ppd_iso,
+        fixed_params=fixed_params,
+        t_range=(10, 40),
+        rh_range=(0, 100),
+        thresholds=[-3, -2, -1, 0, 1, 2, 3],
+    )
+
+    fig = plt.gcf()
+    fig.set_size_inches(4, 3)         
+    plt.title("PMV Comfort Zones vs. Air Temp and Humidity (ISO 7730)", fontsize=8, pad=15)
+    plt.xlabel("Air Temperature [°C]", fontsize=7)
+    plt.ylabel("Relative Humidity [%]", fontsize=7)
+
+    plt.xlim(10, 40)
+    plt.ylim(0, 100)
+    plt.grid(alpha=0.3, linestyle="--", linewidth=0.5)
+
+    leg = plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.08),
+                     ncol=5, fontsize=9, frameon=False)
+
+    plt.tight_layout()
+    plt.savefig("pmv_iso_comfort_zones.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
+
+
