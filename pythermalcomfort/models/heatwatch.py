@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-import numpy as np
 from dataclasses import dataclass
+
+import numpy as np
 
 from pythermalcomfort.classes_return import HeatWatch
 from pythermalcomfort.models import two_nodes_gagge
+from pythermalcomfort.utilities import Postures
 
 
 def _calculate_w_max(persona: Persona) -> float:
@@ -66,8 +68,9 @@ def _calculate_coefficient_disc_m_bl(persona: Persona) -> float:
 @dataclass()
 class Persona:
     age: int
-    obesity: bool
-    medication: bool
+    position: str = Postures.standing.value
+    obesity: bool = False
+    medication: bool = False
     pregnancy: bool = False
     mobility_impairment: bool = False
     homelessness: bool = False
@@ -137,11 +140,20 @@ def heatwatch(
     w_max = _calculate_w_max(persona)
     coefficient_disc_m_bl = _calculate_coefficient_disc_m_bl(persona)
 
-    results = two_nodes_gagge(tdb=tdb, tr=tr, v=v, rh=rh, met=met, clo=clo, w_max=w_max, round_output=False)
+    results = two_nodes_gagge(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        rh=rh,
+        met=met,
+        clo=clo,
+        w_max=w_max,
+        round_output=False,
+        position=persona.position,
+    )
 
     m_bl_min = 1.2  # min skin blood flow
     m_bl_max = 90  # max skin blood flow
-    w_min = 0.06  # min skin wettedness
     tdb_reduce_risk_ratio = 0.7
     tdb_reduce_risk = 28.0  # °C
     disc_max = 5.0  # max discomfort index
@@ -199,7 +211,7 @@ if __name__ == "__main__":
 
     tdb = [30, 33, 40]
     tr = [32, 37, 42]
-    v = .3
+    v = 0.3
     rh = 50
     met = 1.5
     clo = 0.5
