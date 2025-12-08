@@ -303,6 +303,14 @@ Solar gain on people
 .. autoclass:: pythermalcomfort.classes_return.SolarGain
     :members:
 
+Sports Heat Stress Risk
+------------------------
+
+.. autofunction:: pythermalcomfort.models.sports_heat_stress_risk.sports_heat_stress_risk
+
+.. autoclass:: pythermalcomfort.classes_return.SportsHeatStressRisk
+    :members:
+
 Standard Effective Temperature (SET)
 ------------------------------------
 
