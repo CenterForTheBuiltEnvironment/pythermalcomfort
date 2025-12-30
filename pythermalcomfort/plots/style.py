@@ -1,0 +1,141 @@
+"""Style configuration for plots.
+
+This module provides the Style class for configuring plot appearance.
+Style is the ONLY mutable component after plot creation.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from matplotlib.colors import Colormap
+
+
+@dataclass
+class Style:
+    """User-adjustable plot styling.
+
+    This is the only mutable component after plot creation. All fields have
+    sensible defaults, allowing minimal configuration for common use cases.
+
+    Parameters
+    ----------
+    figsize : tuple[float, float]
+        Figure size in inches (width, height).
+    dpi : int
+        Figure resolution in dots per inch.
+    cmap : str or Colormap
+        Colormap for region bands. Ignored if band_colors is provided.
+    band_colors : Sequence[str] or None
+        Explicit colors for each region. Overrides cmap if provided.
+        Must have length equal to len(thresholds) + 1.
+    band_alpha : float
+        Opacity for filled region bands (0-1).
+    line_color : str
+        Color for threshold boundary lines.
+    line_width : float
+        Width of threshold boundary lines.
+    xlabel : str or None
+        X-axis label. If None, uses preset default.
+    ylabel : str or None
+        Y-axis label. If None, uses preset default.
+    title : str or None
+        Plot title.
+    show_legend : bool
+        Whether to display the legend.
+    legend_loc : str
+        Legend location (matplotlib location string).
+    legend_ncol : int
+        Number of columns in the legend.
+    show_grid : bool
+        Whether to display grid lines.
+    grid_alpha : float
+        Opacity of grid lines (0-1).
+    base_style : str
+        Base matplotlib style to apply (e.g., 'seaborn-v0_8-whitegrid').
+        Explicit settings in this Style instance will override the base style.
+        Default is empty string (no base style). Note: Using base styles can
+        cause display issues in Jupyter when rendering multiple plots.
+
+    Examples
+    --------
+    >>> style = Style(title="PMV Comfort Zones", band_alpha=0.6)
+    >>> style.cmap = "viridis"  # Modify after creation
+    """
+
+    # Figure settings
+    figsize: tuple[float, float] = (8, 5)
+    dpi: int = 300
+
+    # Region band settings
+    cmap: str | Colormap = "coolwarm"
+    band_colors: Sequence[str] | None = None
+    band_alpha: float = 0.75
+
+    # Threshold line settings
+    line_color: str = "black"
+    line_width: float = 1.0
+
+    # Labels
+    xlabel: str | None = None
+    ylabel: str | None = None
+    title: str | None = None
+
+    # Legend settings
+    show_legend: bool = True
+    legend_loc: str = "center left"  # Anchor point of the legend box
+    legend_bbox: tuple[float, float] = (1.02, 0.5)  # Position outside right edge
+    legend_ncol: int = 1
+    legend_alpha: float = 0.8
+
+    # Grid settings
+    show_grid: bool = True
+    grid_alpha: float = 0.3
+
+    # Base matplotlib style (our explicit settings override this)
+    # Default empty string for best Jupyter compatibility
+    base_style: str = ""
+
+    # Font settings
+    font_sizes: dict[str, int] = field(
+        default_factory=lambda: {
+            "title": 14,
+            "label": 12,
+            "tick": 10,
+            "legend": 10,
+        }
+    )
+
+    def copy(self) -> Style:
+        """Return a shallow copy of this Style instance.
+
+        Returns
+        -------
+        Style
+            A new Style instance with the same settings.
+        """
+        return Style(
+            figsize=self.figsize,
+            dpi=self.dpi,
+            cmap=self.cmap,
+            band_colors=self.band_colors,
+            band_alpha=self.band_alpha,
+            line_color=self.line_color,
+            line_width=self.line_width,
+            xlabel=self.xlabel,
+            ylabel=self.ylabel,
+            title=self.title,
+            show_legend=self.show_legend,
+            legend_loc=self.legend_loc,
+            legend_bbox=self.legend_bbox,
+            legend_ncol=self.legend_ncol,
+            legend_alpha=self.legend_alpha,
+            show_grid=self.show_grid,
+            grid_alpha=self.grid_alpha,
+            base_style=self.base_style,
+            font_sizes=dict(self.font_sizes),
+        )

@@ -1,0 +1,216 @@
+"""Predefined presets for common thermal comfort models.
+
+This module provides Preset configurations that reduce boilerplate
+when creating plots for common models like PMV, UTCI, Heat Index, etc.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+
+@dataclass(frozen=True)
+class Preset:
+    """Predefined configuration for plotting a specific model.
+
+    Contains default thresholds, labels, and axis settings that work
+    well for a particular model or index.
+
+    Parameters
+    ----------
+    name : str
+        Human-readable name for the preset.
+    thresholds : list[float]
+        Default threshold values for region boundaries.
+    labels : list[str]
+        Labels for each region (len = len(thresholds) + 1).
+    metric_attr : str or None
+        Attribute name to extract from model result.
+    xlabel : str
+        Default x-axis label.
+    ylabel : str
+        Default y-axis label.
+    x_range : tuple[float, float] or None
+        Default (min, max) for x-axis.
+    y_range : tuple[float, float] or None
+        Default (min, max) for y-axis.
+    xy_mapper_name : str
+        Name of the mapper function to use (e.g., "mapper_tdb_rh").
+    """
+
+    name: str
+    thresholds: list[float]
+    labels: list[str]
+    metric_attr: str | None
+    xlabel: str
+    ylabel: str
+    x_range: tuple[float, float] | None = None
+    y_range: tuple[float, float] | None = None
+    xy_mapper_name: str = "mapper_tdb_rh"
+
+    def get_xy_mapper(self) -> Callable[[float, float, dict[str, Any]], dict[str, Any]]:
+        """Get the xy_to_kwargs mapper function for this preset."""
+        from pythermalcomfort.plots import utils
+
+        return getattr(utils, self.xy_mapper_name)
+
+
+# -----------------------------------------------------------------------------
+# PMV Presets
+# -----------------------------------------------------------------------------
+
+PMV_PRESET = Preset(
+    name="PMV (ISO 7730)",
+    thresholds=[-0.5, 0.5],
+    labels=["Cool (< -0.5)", "Neutral (-0.5 to 0.5)", "Warm (> 0.5)"],
+    metric_attr="pmv",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(10.0, 36.0),
+    y_range=(0.0, 100.0),
+)
+
+PMV_EXTENDED_PRESET = Preset(
+    name="PMV Extended Categories",
+    thresholds=[-2.0, -1.0, -0.5, 0.5, 1.0, 2.0],
+    labels=[
+        "Cold (< -2)",
+        "Cool (-2 to -1)",
+        "Slightly cool (-1 to -0.5)",
+        "Neutral (-0.5 to 0.5)",
+        "Slightly warm (0.5 to 1)",
+        "Warm (1 to 2)",
+        "Hot (> 2)",
+    ],
+    metric_attr="pmv",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(10.0, 40.0),
+    y_range=(0.0, 100.0),
+)
+
+# -----------------------------------------------------------------------------
+# UTCI Preset
+# -----------------------------------------------------------------------------
+
+UTCI_PRESET = Preset(
+    name="UTCI Thermal Stress",
+    thresholds=[-40.0, -27.0, -13.0, 0.0, 9.0, 26.0, 32.0, 38.0, 46.0],
+    labels=[
+        "Extreme cold stress (< -40)",
+        "Very strong cold stress (-40 to -27)",
+        "Strong cold stress (-27 to -13)",
+        "Moderate cold stress (-13 to 0)",
+        "Slight cold stress (0 to 9)",
+        "No thermal stress (9 to 26)",
+        "Moderate heat stress (26 to 32)",
+        "Strong heat stress (32 to 38)",
+        "Very strong heat stress (38 to 46)",
+        "Extreme heat stress (> 46)",
+    ],
+    metric_attr="utci",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(-50.0, 50.0),
+    y_range=(0.0, 100.0),
+)
+
+# Simplified UTCI preset with fewer categories
+UTCI_SIMPLE_PRESET = Preset(
+    name="UTCI Simplified",
+    thresholds=[9.0, 26.0, 32.0],
+    labels=[
+        "Cold stress (< 9)",
+        "No thermal stress (9 to 26)",
+        "Moderate heat stress (26 to 32)",
+        "Strong heat stress (> 32)",
+    ],
+    metric_attr="utci",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(0.0, 45.0),
+    y_range=(0.0, 100.0),
+)
+
+# -----------------------------------------------------------------------------
+# Heat Index Preset
+# -----------------------------------------------------------------------------
+
+HEAT_INDEX_PRESET = Preset(
+    name="Heat Index (Rothfusz)",
+    thresholds=[27.0, 32.0, 41.0, 54.0],
+    labels=[
+        "No risk (< 27°C)",
+        "Caution (27 to 32°C)",
+        "Extreme caution (32 to 41°C)",
+        "Danger (41 to 54°C)",
+        "Extreme danger (> 54°C)",
+    ],
+    metric_attr="hi",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(20.0, 50.0),
+    y_range=(0.0, 100.0),
+)
+
+# -----------------------------------------------------------------------------
+# SET Preset
+# -----------------------------------------------------------------------------
+
+SET_PRESET = Preset(
+    name="SET (Standard Effective Temperature)",
+    thresholds=[22.0, 24.0, 26.0, 28.0, 32.0],
+    labels=[
+        "Cool (< 22)",
+        "Slightly cool (22 to 24)",
+        "Neutral (24 to 26)",
+        "Slightly warm (26 to 28)",
+        "Warm (28 to 32)",
+        "Hot (> 32)",
+    ],
+    metric_attr="set",
+    xlabel="Air temperature [°C]",
+    ylabel="Relative humidity [%]",
+    x_range=(15.0, 35.0),
+    y_range=(0.0, 100.0),
+)
+
+# -----------------------------------------------------------------------------
+# Registry for lookup by model function name
+# -----------------------------------------------------------------------------
+
+_PRESET_REGISTRY: dict[str, Preset] = {
+    "pmv_ppd_iso": PMV_PRESET,
+    "pmv_ppd_ashrae": PMV_PRESET,
+    "utci": UTCI_PRESET,
+    "heat_index_rothfusz": HEAT_INDEX_PRESET,
+    "set_tmp": SET_PRESET,
+}
+
+
+def get_preset(model_func) -> Preset | None:
+    """Get the predefined preset for a model function.
+
+    Parameters
+    ----------
+    model_func : Callable
+        A pythermalcomfort model function.
+
+    Returns
+    -------
+    Preset or None
+        The preset for this model, or None if no preset exists.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.models import pmv_ppd_iso
+    >>> preset = get_preset(pmv_ppd_iso)
+    >>> preset.name
+    'PMV (ISO 7730)'
+    """
+    name = getattr(model_func, "__name__", "")
+    return _PRESET_REGISTRY.get(name)

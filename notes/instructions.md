@@ -1,0 +1,9 @@
+# Instructions for Claude Code
+
+1. Review notes/development-context.md for a general overview of me and my colleagues were thinking earlier
+2. Thoroughly review current implementation developed by my colleague: review current approach documented in pythermalcomfort/plots and pythermalcomfort/plots/matplotlib and use it as a starting point; I'd like to build on that and hear your feedback on how valuable this is moving forward; especially the models should be the primary source
+3. Review earluer AI chatbot proposal in notes/claude-proposal.md
+4. Develop a plan for the plotting feature that is a good compromise between flexibility and usability: the implemenation should be neat, concise and well-structured, but not overcomplicated and hard to use for intermediate users; I had the following thoughts on this: Ideally, we design the plotting functionality component-oriented: I was thinking that each plot could consist of three distinct elements: 1. Data representation: mapping data to a marker/visual, e.g. using dots, lines, ranges; 2. Context: This could sit on top of the data representation and provides the possibility to add to the plot over/underlays (comfort regions, psychrometric chart, category summary plot (e.g. counting number of samples in certain category)); this would depend on the model used; 3. Aesthetics: all settings that users might want to adjust: colors, font settings, axis styling, colormaps etc. (only as much as needed, doesn't to be too sophisticated) -> this No.3 should be the only component the user can adjust afterwards
+
+
+IMPORTANT: This is about planning the implementation, so please focus on this. I think showing examples of the full stack would be great, but not for every single plot (similar to the proposal in notes/claude-proposal.md)
