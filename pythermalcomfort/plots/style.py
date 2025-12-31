@@ -25,7 +25,7 @@ class Style:
     Parameters
     ----------
     figsize : tuple[float, float]
-        Figure size in inches (width, height).
+        Figure size in inches (width, height). Wider default for summary subplot.
     dpi : int
         Figure resolution in dots per inch.
     cmap : str or Colormap
@@ -60,15 +60,42 @@ class Style:
         Explicit settings in this Style instance will override the base style.
         Default is empty string (no base style). Note: Using base styles can
         cause display issues in Jupyter when rendering multiple plots.
+    show_fixed_params : bool
+        Whether to display fixed parameters as annotation/subtitle.
+    fixed_params_loc : str
+        Location for fixed params: "subtitle" or "annotation".
+    scatter_size : float
+        Size of scatter points.
+    scatter_color : str
+        Default color for scatter points (when not colored by value).
+    scatter_alpha : float
+        Opacity of scatter points (0-1).
+    scatter_edgecolor : str
+        Edge color of scatter points.
+    scatter_linewidth : float
+        Width of scatter point edges.
+    scatter_marker : str
+        Marker style for scatter points.
+    show_summary : bool
+        Whether to show summary distribution bar when data is added.
+    summary_bar_width : str
+        Width of the summary bar as percentage of main axes (e.g., "30%").
+    summary_bar_height : str
+        Height of the summary bar as percentage of main axes (e.g., "3%").
+    summary_y_position : float
+        Vertical position of summary bar in axes coordinates (0=bottom, 1=top).
+    summary_min_pct_for_text : float
+        Minimum percentage threshold to display text on a segment.
 
     Examples
     --------
     >>> style = Style(title="PMV Comfort Zones", band_alpha=0.6)
     >>> style.cmap = "viridis"  # Modify after creation
+    >>> style.show_summary = True  # Enable summary subplot
     """
 
     # Figure settings
-    figsize: tuple[float, float] = (8, 5)
+    figsize: tuple[float, float] = (10, 5)  # Wider for summary subplot
     dpi: int = 300
 
     # Region band settings
@@ -107,8 +134,28 @@ class Style:
             "label": 12,
             "tick": 10,
             "legend": 10,
+            "summary": 8,
         }
     )
+
+    # Fixed params annotation settings
+    show_fixed_params: bool = True
+    fixed_params_loc: str = "subtitle"  # "subtitle" or "annotation"
+
+    # DataSeries scatter settings
+    scatter_size: float = 30.0
+    scatter_color: str = "#ea536e"  # Match earlier examples
+    scatter_alpha: float = 0.8
+    scatter_edgecolor: str = "white"
+    scatter_linewidth: float = 0.5
+    scatter_marker: str = "o"
+
+    # Summary bar settings (stacked horizontal bar at bottom-right)
+    show_summary: bool = False  # Off by default, user enables when adding data
+    summary_bar_width: str = "35%"  # Width of inset axes (% of main axes)
+    summary_bar_height: str = "4%"  # Height of inset axes (% of main axes)
+    summary_y_position: float = 0.03  # Vertical position (0=bottom, 1=top)
+    summary_min_pct_for_text: float = 8.0  # Min % to show text on segment
 
     def copy(self) -> Style:
         """Return a shallow copy of this Style instance.
@@ -138,4 +185,17 @@ class Style:
             grid_alpha=self.grid_alpha,
             base_style=self.base_style,
             font_sizes=dict(self.font_sizes),
+            show_fixed_params=self.show_fixed_params,
+            fixed_params_loc=self.fixed_params_loc,
+            scatter_size=self.scatter_size,
+            scatter_color=self.scatter_color,
+            scatter_alpha=self.scatter_alpha,
+            scatter_edgecolor=self.scatter_edgecolor,
+            scatter_linewidth=self.scatter_linewidth,
+            scatter_marker=self.scatter_marker,
+            show_summary=self.show_summary,
+            summary_bar_width=self.summary_bar_width,
+            summary_bar_height=self.summary_bar_height,
+            summary_y_position=self.summary_y_position,
+            summary_min_pct_for_text=self.summary_min_pct_for_text,
         )

@@ -6,10 +6,25 @@ thermal comfort visualizations.
 Primary API
 -----------
 Plot : class
-    Main facade for creating plots. Use Plot.ranges() to create range plots.
+    Main facade for creating plots. Use Plot.range() for threshold-based
+    region plots, or Plot.adaptive() for adaptive comfort model plots.
 Style : class
     Mutable styling configuration. The only component that can be
     modified after plot creation.
+
+Scenes
+------
+BaseScene : class
+    Abstract base class for scene types.
+RangeScene : class
+    Generic threshold-based region visualization.
+AdaptiveScene : class
+    ASHRAE 55 Adaptive Comfort Model visualization.
+
+Data
+----
+DataSeries : class
+    Overlay data points for scenes.
 
 Presets
 -------
@@ -24,24 +39,30 @@ SET_PRESET : Preset
 
 Examples
 --------
-Simple usage with automatic preset detection:
+Simple range plot with automatic preset detection:
 
->>> from pythermalcomfort.models import pmv_ppd_iso
+>>> from pythermalcomfort.models import utci
 >>> from pythermalcomfort.plots import Plot
->>> plot = Plot.ranges(
-...     pmv_ppd_iso,
-...     fixed_params={"tr": 25, "met": 1.2, "clo": 0.5, "vr": 0.1, "wme": 0},
-... )
->>> plot.style.title = "PMV Comfort Regions"
+>>> plot = Plot.range(utci, fixed_params={"v": 1.0, "tr": 25})
+>>> plot.style.title = "UTCI Thermal Stress"
 >>> fig, ax = plot.render()
+
+Adaptive comfort with data overlay and summary:
+
+>>> from pythermalcomfort.plots import Plot
+>>> plot = Plot.adaptive()
+>>> plot = plot.add_data(x=t_outdoor, y=t_operative)
+>>> plot.style.show_summary = True
+>>> fig, axes = plot.render()
 
 Custom styling:
 
 >>> from pythermalcomfort.plots import Plot, Style
 >>> style = Style(cmap="viridis", band_alpha=0.6)
->>> plot = Plot.ranges(model_func, fixed_params={...}, style=style)
+>>> plot = Plot.range(model_func, fixed_params={...}, style=style)
 """
 
+from pythermalcomfort.plots.data_series import DataSeries
 from pythermalcomfort.plots.plot import Plot
 from pythermalcomfort.plots.presets import (
     HEAT_INDEX_PRESET,
@@ -54,16 +75,23 @@ from pythermalcomfort.plots.presets import (
     get_preset,
 )
 from pythermalcomfort.plots.ranges import Ranges
-from pythermalcomfort.plots.regions import Regions
+from pythermalcomfort.plots.scenes import AdaptiveScene, BaseScene, RangeScene
 from pythermalcomfort.plots.style import Style
+from pythermalcomfort.plots.summary import SummaryRenderer
 
 __all__ = [
     # Primary API
     "Plot",
     "Style",
-    # Data and context (for advanced use)
+    # Scenes
+    "BaseScene",
+    "RangeScene",
+    "AdaptiveScene",
+    # Data
+    "DataSeries",
+    "SummaryRenderer",
+    # Internal (for advanced use)
     "Ranges",
-    "Regions",
     # Presets
     "Preset",
     "get_preset",
