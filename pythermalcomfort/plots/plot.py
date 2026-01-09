@@ -17,6 +17,7 @@ from pythermalcomfort.plots.data_series import DataSeries
 from pythermalcomfort.plots.scenes.adaptive_scene import AdaptiveScene
 from pythermalcomfort.plots.scenes.range_scene import RangeScene
 from pythermalcomfort.plots.style import Style
+from pythermalcomfort.plots.presets import get_preset
 from pythermalcomfort.plots.summary import SummaryRenderer
 
 if TYPE_CHECKING:
@@ -192,7 +193,17 @@ class Plot:
             preset=preset,
         )
 
-        plot_style = style if style is not None else Style()
+        # Look up preset if not provided
+        if preset is None:
+            preset = get_preset(model_func)
+
+        # Create style with preset's cmap if user didn't provide a style
+        if style is None:
+            plot_style = Style(cmap=preset.cmap if preset else "coolwarm")
+        else:
+            plot_style = style
+
+        # plot_style = style if style is not None else Style()
 
         # Set axis labels from scene if not explicitly set
         if plot_style.xlabel is None:
@@ -379,6 +390,8 @@ class Plot:
             else _nullcontext()
         )
 
+        plt.rcParams["font.family"] = self._style.font_family
+
         with style_context:
             # Determine if info panel is needed
             has_data = self._data_series is not None and len(self._data_series) > 0
@@ -462,6 +475,7 @@ class Plot:
         include_legend : bool
             Whether to include the legend (False when using info panel).
         """
+        
         style = self._style
 
         # Labels

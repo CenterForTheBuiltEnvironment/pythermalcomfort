@@ -144,6 +144,7 @@ class Style:
     base_style: str = ""
 
     # Font settings
+    font_family: str = "Arial"
     font_sizes: dict[str, int] = field(
         default_factory=lambda: {
             "title": 14,
@@ -206,6 +207,7 @@ class Style:
             show_grid=self.show_grid,
             grid_alpha=self.grid_alpha,
             base_style=self.base_style,
+            font_family=self.font_family,
             font_sizes=dict(self.font_sizes),
             show_fixed_params=self.show_fixed_params,
             scatter_size=self.scatter_size,

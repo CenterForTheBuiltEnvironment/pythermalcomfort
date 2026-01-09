@@ -51,6 +51,7 @@ class Preset:
     x_range: tuple[float, float] | None = None
     y_range: tuple[float, float] | None = None
     xy_mapper_name: str = "mapper_tdb_rh"
+    cmap: str = "coolwarm"  # Default colormap
 
     def get_xy_mapper(self) -> Callable[[float, float, dict[str, Any]], dict[str, Any]]:
         """Get the xy_to_kwargs mapper function for this preset."""
@@ -72,6 +73,7 @@ PMV_PRESET = Preset(
     ylabel="Relative humidity [%]",
     x_range=(10.0, 36.0),
     y_range=(0.0, 100.0),
+    cmap="coolwarm",
 )
 
 PMV_EXTENDED_PRESET = Preset(
@@ -91,49 +93,7 @@ PMV_EXTENDED_PRESET = Preset(
     ylabel="Relative humidity [%]",
     x_range=(10.0, 40.0),
     y_range=(0.0, 100.0),
-)
-
-# -----------------------------------------------------------------------------
-# UTCI Preset
-# -----------------------------------------------------------------------------
-
-UTCI_PRESET = Preset(
-    name="UTCI Thermal Stress",
-    thresholds=[-40.0, -27.0, -13.0, 0.0, 9.0, 26.0, 32.0, 38.0, 46.0],
-    labels=[
-        "Extreme cold stress (< -40)",
-        "Very strong cold stress (-40 to -27)",
-        "Strong cold stress (-27 to -13)",
-        "Moderate cold stress (-13 to 0)",
-        "Slight cold stress (0 to 9)",
-        "No thermal stress (9 to 26)",
-        "Moderate heat stress (26 to 32)",
-        "Strong heat stress (32 to 38)",
-        "Very strong heat stress (38 to 46)",
-        "Extreme heat stress (> 46)",
-    ],
-    metric_attr="utci",
-    xlabel="Air temperature [°C]",
-    ylabel="Relative humidity [%]",
-    x_range=(-50.0, 50.0),
-    y_range=(0.0, 100.0),
-)
-
-# Simplified UTCI preset with fewer categories
-UTCI_SIMPLE_PRESET = Preset(
-    name="UTCI Simplified",
-    thresholds=[9.0, 26.0, 32.0],
-    labels=[
-        "Cold stress (< 9)",
-        "No thermal stress (9 to 26)",
-        "Moderate heat stress (26 to 32)",
-        "Strong heat stress (> 32)",
-    ],
-    metric_attr="utci",
-    xlabel="Air temperature [°C]",
-    ylabel="Relative humidity [%]",
-    x_range=(0.0, 45.0),
-    y_range=(0.0, 100.0),
+    cmap="coolwarm",
 )
 
 # -----------------------------------------------------------------------------
@@ -154,29 +114,8 @@ HEAT_INDEX_PRESET = Preset(
     xlabel="Air temperature [°C]",
     ylabel="Relative humidity [%]",
     x_range=(20.0, 50.0),
-    y_range=(0.0, 100.0),
-)
-
-# -----------------------------------------------------------------------------
-# SET Preset
-# -----------------------------------------------------------------------------
-
-SET_PRESET = Preset(
-    name="SET (Standard Effective Temperature)",
-    thresholds=[22.0, 24.0, 26.0, 28.0, 32.0],
-    labels=[
-        "Cool (< 22)",
-        "Slightly cool (22 to 24)",
-        "Neutral (24 to 26)",
-        "Slightly warm (26 to 28)",
-        "Warm (28 to 32)",
-        "Hot (> 32)",
-    ],
-    metric_attr="set",
-    xlabel="Air temperature [°C]",
-    ylabel="Relative humidity [%]",
-    x_range=(15.0, 35.0),
-    y_range=(0.0, 100.0),
+    y_range=(40.0, 100.0),
+    cmap="YlOrRd",
 )
 
 # -----------------------------------------------------------------------------
@@ -186,9 +125,7 @@ SET_PRESET = Preset(
 _PRESET_REGISTRY: dict[str, Preset] = {
     "pmv_ppd_iso": PMV_PRESET,
     "pmv_ppd_ashrae": PMV_PRESET,
-    "utci": UTCI_PRESET,
     "heat_index_rothfusz": HEAT_INDEX_PRESET,
-    "set_tmp": SET_PRESET,
 }
 
 
