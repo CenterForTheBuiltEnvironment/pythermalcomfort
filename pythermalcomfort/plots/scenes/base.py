@@ -159,4 +159,4 @@ class BaseScene(ABC):
         if not params:
             return ""
         parts = [f"{k}: {v}" for k, v in params.items()]
-        return " | ".join(parts)
+        return "Fixed Inputs:\n" + " , ".join(parts)

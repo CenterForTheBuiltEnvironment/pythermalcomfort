@@ -74,7 +74,6 @@ from pythermalcomfort.plots.presets import (
     Preset,
     get_preset,
 )
-from pythermalcomfort.plots.ranges import Ranges
 from pythermalcomfort.plots.scenes import AdaptiveScene, BaseScene, RangeScene
 from pythermalcomfort.plots.style import Style
 from pythermalcomfort.plots.summary import SummaryRenderer
@@ -90,8 +89,6 @@ __all__ = [
     # Data
     "DataSeries",
     "SummaryRenderer",
-    # Internal (for advanced use)
-    "Ranges",
     # Presets
     "Preset",
     "get_preset",

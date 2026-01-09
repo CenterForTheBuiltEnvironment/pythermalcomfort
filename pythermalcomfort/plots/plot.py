@@ -442,7 +442,9 @@ class Plot:
         if style.ylabel:
             ax.set_ylabel(style.ylabel, fontsize=style.font_sizes.get("label", 12))
         if style.title:
-            ax.set_title(style.title, fontsize=style.font_sizes.get("title", 14))
+            ax.set_title(style.title, fontsize=style.font_sizes.get("title", 14), loc=style.title_alignment)
+        if style.title_x_position is not None:
+            ax.title.set_position((style.title_x_position, style.title_y_position))
 
         # Tick labels
         ax.tick_params(labelsize=style.font_sizes.get("tick", 10))
@@ -461,35 +463,15 @@ class Plot:
         if not text:
             return
 
-        if self._style.fixed_params_loc == "subtitle":
-            # Add as subtitle below main title
-            current_title = ax.get_title()
-            if current_title:
-                ax.set_title(
-                    current_title,
-                    fontsize=self._style.font_sizes.get("title", 14),
-                )
-            ax.text(
-                0.5, 1.02,
-                text,
-                transform=ax.transAxes,
-                ha="center",
-                va="bottom",
-                fontsize=self._style.font_sizes.get("tick", 10),
-                color="gray",
-            )
-        else:
-            # Add as annotation in corner
-            ax.text(
-                0.02, 0.98,
-                text,
-                transform=ax.transAxes,
-                ha="left",
-                va="top",
-                fontsize=self._style.font_sizes.get("tick", 10),
-                color="gray",
-                bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
-            )
+        ax.text(
+            1.04, 0.95,
+            text,
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=self._style.font_sizes.get("tick", 10),
+            color="gray",
+        )
 
     def show(self) -> None:
         """Render and display the plot."""

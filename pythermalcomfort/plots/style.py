@@ -111,16 +111,19 @@ class Style:
     xlabel: str | None = None
     ylabel: str | None = None
     title: str | None = None
+    title_x_position: float = 0.0  # Left-align by default
+    title_y_position: float = 1.1  # Slightly above the plot
+    title_alignment: str = "left"  # Align title to the left
 
     # Legend settings
     show_legend: bool = True
     legend_loc: str = "center left"  # Anchor point of the legend box
     legend_bbox: tuple[float, float] = (1.02, 0.5)  # Position outside right edge
     legend_ncol: int = 1
-    legend_alpha: float = 0.8
+    legend_alpha: float = 0.0
 
     # Grid settings
-    show_grid: bool = True
+    show_grid: bool = False
     grid_alpha: float = 0.3
 
     # Base matplotlib style (our explicit settings override this)
@@ -140,7 +143,6 @@ class Style:
 
     # Fixed params annotation settings
     show_fixed_params: bool = True
-    fixed_params_loc: str = "subtitle"  # "subtitle" or "annotation"
 
     # DataSeries scatter settings
     scatter_size: float = 30.0
@@ -153,7 +155,7 @@ class Style:
     # Summary bar settings (stacked horizontal bar at bottom-right)
     show_summary: bool = False  # Off by default, user enables when adding data
     summary_bar_width: str = "35%"  # Width of inset axes (% of main axes)
-    summary_bar_height: str = "4%"  # Height of inset axes (% of main axes)
+    summary_bar_height: str = "10%"  # Height of inset axes (% of main axes)
     summary_y_position: float = 0.03  # Vertical position (0=bottom, 1=top)
     summary_min_pct_for_text: float = 8.0  # Min % to show text on segment
 
@@ -176,6 +178,9 @@ class Style:
             xlabel=self.xlabel,
             ylabel=self.ylabel,
             title=self.title,
+            title_x_position=self.title_x_position,
+            title_y_position=self.title_y_position,
+            title_alignment=self.title_alignment,
             show_legend=self.show_legend,
             legend_loc=self.legend_loc,
             legend_bbox=self.legend_bbox,
@@ -186,7 +191,6 @@ class Style:
             base_style=self.base_style,
             font_sizes=dict(self.font_sizes),
             show_fixed_params=self.show_fixed_params,
-            fixed_params_loc=self.fixed_params_loc,
             scatter_size=self.scatter_size,
             scatter_color=self.scatter_color,
             scatter_alpha=self.scatter_alpha,

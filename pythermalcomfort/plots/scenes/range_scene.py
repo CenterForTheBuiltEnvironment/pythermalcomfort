@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pythermalcomfort.plots.presets import get_preset
-from pythermalcomfort.plots.ranges import Ranges
 from pythermalcomfort.plots.scenes.base import BaseScene
+from pythermalcomfort.plots.utils import make_metric_eval, solve_threshold_curves
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -197,46 +197,170 @@ class RangeScene(BaseScene):
 
         return mapper
 
-    def _compute_ranges(self) -> Ranges:
+    def _compute_ranges(self) -> dict:
         """Compute threshold curves using the solver."""
         y_values = np.arange(
             self.y_range[0], self.y_range[1] + 1e-9, float(self.y_step)
         )
 
-        return Ranges.from_model(
+        # Build metric evaluator
+        metric_xy = make_metric_eval(
             model_func=self.model_func,
             xy_to_kwargs=self._get_xy_mapper(),
             fixed_params=self.fixed_params,
-            thresholds=list(self.thresholds),
-            x_bounds=self.x_range,
-            y_values=y_values,
             metric_attr=self.metric_attr,
         )
 
+        # Solve for threshold curves
+        result = solve_threshold_curves(
+            metric_xy=metric_xy,
+            thresholds=list(self.thresholds),
+            y_values=y_values,
+            x_bounds=self.x_range,
+        )
+
+        return {
+            "curves": result["curves"],
+            "y_values": result["y_values"],
+            "thresholds": result["thresholds"],
+            "x_bounds": self.x_range,
+        }
+
     def render(self, ax: plt.Axes, style: Style) -> dict[str, Any]:
-        """Render threshold regions on the axes.
+        """Render threshold regions on the axes."""
+        # Compute ranges
+        data = self._compute_ranges()
+        curves = data["curves"]
+        y_arr = data["y_values"]
+        x_lo, x_hi = data["x_bounds"]
+        n_regions = len(data["thresholds"]) + 1
 
-        Parameters
-        ----------
-        ax : matplotlib.axes.Axes
-            The axes to render on.
-        style : Style
-            Style configuration.
+        # Prepare colors
+        band_colors = self._get_band_colors(style, n_regions)
 
-        Returns
-        -------
-        dict[str, Any]
-            Dictionary with 'bands', 'curves', 'legend' artists.
-        """
-        # Compute ranges and render directly
-        ranges = self._compute_ranges()
-        artists = ranges.render(ax, style, labels=self.labels)
+        # Constant x boundaries
+        left_const = np.full_like(y_arr, x_lo, dtype=float)
+        right_const = np.full_like(y_arr, x_hi, dtype=float)
+
+        # Build region boundaries: (left_curve, right_curve) pairs
+        if curves:
+            regions_bounds = (
+                [(left_const, curves[0])]
+                + [(curves[i], curves[i + 1]) for i in range(len(curves) - 1)]
+                + [(curves[-1], right_const)]
+            )
+        else:
+            regions_bounds = [(left_const, right_const)]
+
+        # Render filled bands
+        band_artists = []
+        for i, (left, right) in enumerate(regions_bounds):
+            mask = np.isfinite(left) & np.isfinite(right)
+            width_mask = (right - left) > 1e-12
+            mask = mask & width_mask
+
+            if mask.any():
+                coll = ax.fill_betweenx(
+                    y_arr[mask],
+                    left[mask],
+                    right[mask],
+                    color=band_colors[i],
+                    alpha=style.band_alpha,
+                    linewidth=0,
+                    zorder=0,
+                )
+                band_artists.append(coll)
+
+        # Render threshold curves
+        curve_artists = []
+        for curve in curves:
+            mask = np.isfinite(curve)
+            if mask.any():
+                (ln,) = ax.plot(
+                    curve[mask],
+                    y_arr[mask],
+                    color=style.line_color,
+                    linewidth=style.line_width,
+                    zorder=1,
+                )
+                curve_artists.append(ln)
+
+        # Render legend
+        legend_artist = None
+        if style.show_legend:
+            legend_artist = self._render_legend(ax, style, band_colors)
 
         # Set axis limits
         ax.set_xlim(self.x_range)
         ax.set_ylim(self.y_range)
 
-        return artists
+        return {
+            "bands": band_artists,
+            "curves": curve_artists,
+            "legend": legend_artist,
+        }
+    
+    def _get_band_colors(self, style: Style, n_regions: int) -> list:
+        """Get colors for each region band."""
+        if style.band_colors is not None:
+            if len(style.band_colors) != n_regions:
+                msg = (
+                    f"band_colors must have {n_regions} colors "
+                    f"(got {len(style.band_colors)})"
+                )
+                raise ValueError(msg)
+            return list(style.band_colors)
+
+        # Sample from colormap
+        cmap = plt.get_cmap(style.cmap)
+        return [cmap(i / (n_regions - 1)) for i in range(n_regions)]
+
+    def _render_legend(
+        self,
+        ax: plt.Axes,
+        style: Style,
+        band_colors: list,
+    ) -> plt.Legend:
+        """Render legend for region bands."""
+        label_list = self._get_region_labels()
+
+        legend_elements = []
+        for i, label in enumerate(label_list):
+            patch = plt.Rectangle(
+                (0, 0), 1, 1,
+                facecolor=band_colors[i],
+                alpha=style.band_alpha,
+                label=label,
+            )
+            legend_elements.append(patch)
+
+        return ax.legend(
+            handles=legend_elements,
+            loc=style.legend_loc,
+            bbox_to_anchor=style.legend_bbox,
+            ncol=min(style.legend_ncol, len(legend_elements)),
+            framealpha=style.legend_alpha,
+            fontsize=style.font_sizes.get("legend", 10),
+        )
+
+    def _get_region_labels(self) -> list[str]:
+        """Get labels for each region (for legend)."""
+        if self.labels is not None:
+            return list(self.labels)
+
+        # Auto-generate labels from thresholds
+        n_regions = len(self.thresholds) + 1
+        result = []
+        for i in range(n_regions):
+            if i == 0 and self.thresholds:
+                result.append(f"< {self.thresholds[0]:.1f}")
+            elif i == n_regions - 1 and self.thresholds:
+                result.append(f"> {self.thresholds[-1]:.1f}")
+            elif self.thresholds:
+                result.append(f"{self.thresholds[i-1]:.1f} to {self.thresholds[i]:.1f}")
+            else:
+                result.append("Region")
+        return result
 
     def get_category(self, x: float, y: float) -> str:
         """Get the category label for a data point.

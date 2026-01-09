@@ -78,8 +78,8 @@ class SummaryRenderer:
             ax,
             width=style.summary_bar_width,  # e.g., "30%" or "1.5"
             height=style.summary_bar_height,  # e.g., "3%" or "0.15"
-            loc="lower right",
-            bbox_to_anchor=(0.3, style.summary_y_position, 1.0, 1.0),
+            loc="lower left",
+            bbox_to_anchor=(1.03, style.summary_y_position, 1.0, 1.0),
             bbox_transform=ax.transAxes,
             borderpad=0,
         )

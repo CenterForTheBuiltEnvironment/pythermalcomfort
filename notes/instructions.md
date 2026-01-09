@@ -104,3 +104,16 @@ fig, ax = plot.render()
 ### Tests
 - All 241 tests pass
 - All notebook cells verified working
+
+
+## Updated Instructions after Review of Phase 2
+
+After reviewing the most recent changes, I have established three goals that I want to work on before moving forward. I'd like to view on implementing them in collaboration with you, where you provide clear instructions that I then implement (coding-wise) myself. Okay, here are the goals for today:
+
+1. Clean up the module structure: I think the API works great so far and I like the overall structure of the plots module. However, I think we should clean it up a bit. Over the several iterations we've gone through, we've have either created files that we don't need anymore and ended up with a file structure that is a bit confusing. I think we should keep the scenes folder (best to organize different scenes like that), separate modules for plot, style, data_series, summary and utils (super clear given the plot modules architecture). But I am a little confused (and users might be even more confused) about ranges.py and generic.py. They don't really fit into the structure, so if they have important content, we should move things to other files so everything becomes clearer structured. We can discuss how.
+
+2. I am still not 100% satisfied with the figure/plot layout. Ideally, I was thinking to have a layout with one row, two columns, in which the left column or "subplot" is occupied by then main plot (the chart). The other column (right) could contain additional information like fixed_params, the summary and the legend. We could make the column optional and let the user tweak the width in percent of the entire figure. Let's discuss how to do this best.
+
+3. I want to almost fully implement the three core plots: Ranges, Adaptive and Psychrometric. We have a solid base for the first two, let's work on the third as well. I don't care about the aesthetic details too much just yet, but I'd like the core framework implemented for all three.
+
+Let's work through these goals chronologically and complete them taking small steps at a time. I sincerely want to understand the underlying architecture and how our changes could affect the user later.
