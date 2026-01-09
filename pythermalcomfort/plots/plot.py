@@ -10,6 +10,7 @@ from contextlib import nullcontext as _nullcontext
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import numpy as np
 
 from pythermalcomfort.plots.data_series import DataSeries
@@ -379,40 +380,59 @@ class Plot:
         )
 
         with style_context:
-            # Create figure/axes
-            if ax is None:
-                fig, main_ax = plt.subplots(
-                    figsize=self._style.figsize,
-                    dpi=self._style.dpi,
+            # Determine if info panel is needed
+            has_data = self._data_series is not None and len(self._data_series) > 0
+            show_info_panel = (
+                self._style.show_legend
+                or self._style.show_fixed_params
+                or (self._style.show_summary and has_data)
+            )
+
+            # Create figure with or without info panel
+            if show_info_panel:
+                fig = plt.figure(figsize=self._style.figsize, dpi=self._style.dpi)
+                gs = GridSpec(
+                    1, 2,
+                    width_ratios=[1 - self._style.info_panel_width, self._style.info_panel_width],
+                    wspace=0.02,
                 )
+                main_ax = fig.add_subplot(gs[0])
+                info_ax = fig.add_subplot(gs[1])
             else:
-                fig = ax.get_figure()
-                main_ax = ax
-            self._axes = [main_ax]
+                if ax is None:
+                    fig, main_ax = plt.subplots(
+                        figsize=self._style.figsize,
+                        dpi=self._style.dpi,
+                    )
+                else:
+                    fig = ax.get_figure()
+                    main_ax = ax
+                info_ax = None
+
+            self._axes = [main_ax] if info_ax is None else [main_ax, info_ax]
             self._fig = fig
 
             # 1. Render scene
-            scene_artists = self._scene.render(main_ax, self._style)
+            # Temporarily disable legend in scene when using info panel
+            if show_info_panel and self._style.show_legend:
+                original_show_legend = self._style.show_legend
+                self._style.show_legend = False
+                scene_artists = self._scene.render(main_ax, self._style)
+                self._style.show_legend = original_show_legend
+            else:
+                scene_artists = self._scene.render(main_ax, self._style)
             self._artists["scene"] = scene_artists
 
             # 2. Render data series if present
             if self._data_series is not None:
                 self._render_scatter(main_ax)
 
-            # 3. Apply style to main axes
-            self._apply_style(main_ax)
+            # 3. Apply style to main axes (without legend - that goes in info panel)
+            self._apply_style(main_ax, include_legend=not show_info_panel)
 
-            # 4. Render summary bar if needed (as inset on main axes)
-            if show_summary:
-                renderer = SummaryRenderer()
-                summary_artists = renderer.render(
-                    main_ax, self._data_series, self._scene, self._style
-                )
-                self._artists["summary"] = summary_artists
-
-            # 5. Add fixed params annotation if enabled
-            if self._style.show_fixed_params:
-                self._add_fixed_params_annotation(main_ax)
+            # 4. Set up and render info panel
+            if info_ax is not None:
+                self._render_info_panel(info_ax, has_data)
 
         return fig, main_ax
 
@@ -432,8 +452,16 @@ class Plot:
         )
         self._artists["scatter"] = scatter
 
-    def _apply_style(self, ax: plt.Axes) -> None:
-        """Apply style settings to the axes."""
+    def _apply_style(self, ax: plt.Axes, include_legend: bool = True) -> None:
+        """Apply style settings to the axes.
+        
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes
+            The axes to style.
+        include_legend : bool
+            Whether to include the legend (False when using info panel).
+        """
         style = self._style
 
         # Labels
@@ -456,6 +484,69 @@ class Plot:
         # Grid
         if style.show_grid:
             ax.grid(True, alpha=style.grid_alpha, zorder=-1)
+
+    def _render_info_panel(self, ax: plt.Axes, has_data: bool) -> None:
+        """Render the info panel with legend, fixed params, and summary."""
+        style = self._style
+
+        # Set up panel background
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.axis("off")
+
+        if style.info_panel_background is not None:
+            ax.set_facecolor(style.info_panel_background)
+            ax.patch.set_alpha(style.info_panel_alpha)
+
+        y_pos = 0.95  # Start near top
+
+        # 1. Fixed params text
+        if style.show_fixed_params:
+            text = self._scene.get_fixed_params_text()
+            if text:
+                ax.text(
+                    0.05, y_pos,
+                    text,
+                    transform=ax.transAxes,
+                    ha="left",
+                    va="top",
+                    fontsize=style.font_sizes.get("tick", 10),
+                    color="gray",
+                )
+                y_pos -= 0.12  # Move down for next element
+
+        # 2. Legend
+        if style.show_legend:
+            labels = self._scene.get_labels()
+            colors = self._scene.get_colors(style)
+
+            for i, (label, color) in enumerate(zip(labels, colors)):
+                # Color patch
+                ax.add_patch(plt.Rectangle(
+                    (0.05, y_pos - 0.03), 0.08, 0.025,
+                    facecolor=color,
+                    alpha=style.band_alpha,
+                    transform=ax.transAxes,
+                ))
+                # Label text
+                ax.text(
+                    0.15, y_pos - 0.015,
+                    label,
+                    transform=ax.transAxes,
+                    ha="left",
+                    va="center",
+                    fontsize=style.font_sizes.get("legend", 10),
+                )
+                y_pos -= 0.05
+
+            y_pos -= 0.05  # Extra space after legend
+
+        # 3. Summary bar
+        if style.show_summary and has_data:
+            from pythermalcomfort.plots.summary import SummaryRenderer
+            renderer = SummaryRenderer()
+            # Render at bottom of info panel
+            renderer.render(ax, self._data_series, self._scene, style)
 
     def _add_fixed_params_annotation(self, ax: plt.Axes) -> None:
         """Add fixed parameters annotation to the plot."""

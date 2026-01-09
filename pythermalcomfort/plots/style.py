@@ -51,6 +51,12 @@ class Style:
         Legend location (matplotlib location string).
     legend_ncol : int
         Number of columns in the legend.
+    info_panel_width : float
+        Width of the info panel as fraction of figure width (0-1).
+    info_panel_background : str or None
+        Background color for info panel. None for transparent.
+    info_panel_alpha : float
+        Opacity of the info panel background (0-1).
     show_grid : bool
         Whether to display grid lines.
     grid_alpha : float
@@ -78,12 +84,14 @@ class Style:
         Marker style for scatter points.
     show_summary : bool
         Whether to show summary distribution bar when data is added.
-    summary_bar_width : str
-        Width of the summary bar as percentage of main axes (e.g., "30%").
-    summary_bar_height : str
-        Height of the summary bar as percentage of main axes (e.g., "3%").
-    summary_y_position : float
-        Vertical position of summary bar in axes coordinates (0=bottom, 1=top).
+    summary_bar_y : float
+        Vertical position of summary bar in info panel (0=bottom, 1=top).
+    summary_bar_height : float
+        Height of summary bar in axes coordinates.
+    summary_bar_left : float
+        Left margin of summary bar in axes coordinates.
+    summary_bar_width : float
+        Width of summary bar in axes coordinates (0-1).
     summary_min_pct_for_text : float
         Minimum percentage threshold to display text on a segment.
 
@@ -122,6 +130,11 @@ class Style:
     legend_ncol: int = 1
     legend_alpha: float = 0.0
 
+    # Info panel settings
+    info_panel_width: float = 0.25  # fraction of figure width (0-1)
+    info_panel_background: str | None = "#f5f5f5"  # None for transparent
+    info_panel_alpha: float = 0.3
+
     # Grid settings
     show_grid: bool = False
     grid_alpha: float = 0.3
@@ -154,9 +167,10 @@ class Style:
 
     # Summary bar settings (stacked horizontal bar at bottom-right)
     show_summary: bool = False  # Off by default, user enables when adding data
-    summary_bar_width: str = "35%"  # Width of inset axes (% of main axes)
-    summary_bar_height: str = "10%"  # Height of inset axes (% of main axes)
-    summary_y_position: float = 0.03  # Vertical position (0=bottom, 1=top)
+    summary_bar_y: float = 0.08  # Vertical position (0=bottom, 1=top)
+    summary_bar_height: float = 0.04  # Height in axes coordinates
+    summary_bar_left: float = 0.05  # Left margin
+    summary_bar_width: float = 0.9  # Width in axes coordinates (0-1)
     summary_min_pct_for_text: float = 8.0  # Min % to show text on segment
 
     def copy(self) -> Style:
@@ -186,6 +200,9 @@ class Style:
             legend_bbox=self.legend_bbox,
             legend_ncol=self.legend_ncol,
             legend_alpha=self.legend_alpha,
+            info_panel_width=self.info_panel_width,
+            info_panel_background=self.info_panel_background,
+            info_panel_alpha=self.info_panel_alpha,
             show_grid=self.show_grid,
             grid_alpha=self.grid_alpha,
             base_style=self.base_style,
@@ -198,8 +215,9 @@ class Style:
             scatter_linewidth=self.scatter_linewidth,
             scatter_marker=self.scatter_marker,
             show_summary=self.show_summary,
-            summary_bar_width=self.summary_bar_width,
+            summary_bar_y=self.summary_bar_y,
             summary_bar_height=self.summary_bar_height,
-            summary_y_position=self.summary_y_position,
+            summary_bar_left=self.summary_bar_left,
+            summary_bar_width=self.summary_bar_width,
             summary_min_pct_for_text=self.summary_min_pct_for_text,
         )

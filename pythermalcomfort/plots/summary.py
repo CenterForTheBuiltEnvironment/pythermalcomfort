@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 if TYPE_CHECKING:
     from pythermalcomfort.plots.data_series import DataSeries
@@ -40,14 +39,10 @@ class SummaryRenderer:
     ) -> dict[str, Any]:
         """Render stacked horizontal bar showing category distribution.
 
-        Creates an inset axes positioned at the bottom-right of the plot
-        (outside the main axes) showing a stacked bar with the same colors
-        as the legend.
-
         Parameters
         ----------
         ax : matplotlib.axes.Axes
-            The main axes (used for positioning the inset).
+            The axes to render on (typically the info panel).
         data_series : DataSeries
             Data points to summarize.
         scene : BaseScene
@@ -58,7 +53,7 @@ class SummaryRenderer:
         Returns
         -------
         dict[str, Any]
-            Dictionary with 'inset_ax', 'bars', and 'texts' artists.
+            Dictionary with 'bars' and 'texts' artists.
         """
         # Get category labels and colors from scene
         labels = scene.get_labels()
@@ -72,65 +67,54 @@ class SummaryRenderer:
         for label in labels:
             percentages.append(percentages_dict.get(label, 0.0))
 
-        # Create inset axes for the stacked bar
-        # Position at bottom-right, outside the main plot
-        inset_ax = inset_axes(
-            ax,
-            width=style.summary_bar_width,  # e.g., "30%" or "1.5"
-            height=style.summary_bar_height,  # e.g., "3%" or "0.15"
-            loc="lower left",
-            bbox_to_anchor=(1.03, style.summary_y_position, 1.0, 1.0),
-            bbox_transform=ax.transAxes,
-            borderpad=0,
-        )
+        # Bar dimensions and position (from style settings)
+        bar_y = style.summary_bar_y
+        bar_height = style.summary_bar_height
+        bar_left = style.summary_bar_left
+        bar_width = style.summary_bar_width
 
         # Render stacked horizontal bar
         bar_artists = []
         text_artists = []
-        left = 0.0
+        x_pos = bar_left
 
         for i, (pct, color) in enumerate(zip(percentages, colors)):
             if pct > 0:
+                segment_width = (pct / 100.0) * bar_width
+
                 # Draw bar segment
-                bar = inset_ax.barh(
-                    0,
-                    pct,
-                    left=left,
-                    height=1.0,
-                    color=color[:3] if len(color) == 4 else color,
+                rect = plt.Rectangle(
+                    (x_pos, bar_y),
+                    segment_width,
+                    bar_height,
+                    facecolor=color[:3] if len(color) == 4 else color,
                     alpha=style.band_alpha,
                     edgecolor="white",
                     linewidth=0.5,
+                    transform=ax.transAxes,
+                    clip_on=False,
                 )
-                bar_artists.extend(bar)
+                ax.add_patch(rect)
+                bar_artists.append(rect)
 
                 # Add percentage text if segment is wide enough
                 if pct >= style.summary_min_pct_for_text:
-                    text = inset_ax.text(
-                        left + pct / 2,
-                        0,
+                    text = ax.text(
+                        x_pos + segment_width / 2,
+                        bar_y + bar_height / 2,
                         f"{pct:.0f}%",
                         ha="center",
                         va="center",
                         fontsize=style.font_sizes.get("summary", 8),
                         fontweight="bold",
                         color="white" if self._is_dark(color) else "black",
+                        transform=ax.transAxes,
                     )
                     text_artists.append(text)
 
-                left += pct
-
-        # Style the inset axes
-        inset_ax.set_xlim(0, 100)
-        inset_ax.set_ylim(-0.5, 0.5)
-        inset_ax.axis("off")
-
-        # Add a subtle border
-        for spine in inset_ax.spines.values():
-            spine.set_visible(False)
+                x_pos += segment_width
 
         return {
-            "inset_ax": inset_ax,
             "bars": bar_artists,
             "texts": text_artists,
         }
