@@ -68,6 +68,9 @@ from pythermalcomfort.plots.presets import (
     HEAT_INDEX_PRESET,
     PMV_EXTENDED_PRESET,
     PMV_PRESET,
+    ADAPTIVE_PRESET,
+    PSYCHROMETRIC_PRESET,
+    PSYCHROMETRIC_EXTENDED_PRESET,
     Preset,
     get_preset,
 )
@@ -93,4 +96,7 @@ __all__ = [
     "PMV_PRESET",
     "PMV_EXTENDED_PRESET",
     "HEAT_INDEX_PRESET",
+    "ADAPTIVE_PRESET",
+    "PSYCHROMETRIC_PRESET",
+    "PSYCHROMETRIC_EXTENDED_PRESET",
 ]

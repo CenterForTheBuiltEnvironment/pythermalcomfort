@@ -52,12 +52,34 @@ class Preset:
     y_range: tuple[float, float] | None = None
     xy_mapper_name: str = "mapper_tdb_rh"
     cmap: str = "coolwarm"  # Default colormap
+    band_colors: tuple | None = None # explicit colors override cmap
 
     def get_xy_mapper(self) -> Callable[[float, float, dict[str, Any]], dict[str, Any]]:
         """Get the xy_to_kwargs mapper function for this preset."""
         from pythermalcomfort.plots import utils
 
         return getattr(utils, self.xy_mapper_name)
+
+
+# -----------------------------------------------------------------------------
+# Adaptive Preset
+# -----------------------------------------------------------------------------
+
+ADAPTIVE_PRESET = Preset(
+    name="Adaptive Comfort (ASHRAE 55)",
+    thresholds=[2.5, 3.5],
+    labels=["90% Acceptability", "80% Acceptability", "Discomfort"],
+    metric_attr=None,
+    xlabel="Outdoor Temperature [°C]",
+    ylabel="Operative Temperature [°C]",
+    x_range=(10.0, 33.5),
+    y_range=(14.0, 36.0),
+    band_colors=(
+        (1.0, 0.0, 0.0, 0.3),      # Discomfort (red)
+        (0.0, 0.0, 1.0, 0.3),      # 80% (blue)
+        (0.0, 0.5, 0.0, 0.3),      # 90% (green)
+    ),
+)
 
 
 # -----------------------------------------------------------------------------
@@ -94,6 +116,39 @@ PMV_EXTENDED_PRESET = Preset(
     x_range=(10.0, 40.0),
     y_range=(0.0, 100.0),
     cmap="coolwarm",
+)
+
+
+# -----------------------------------------------------------------------------
+# Psychrometric Presets
+# -----------------------------------------------------------------------------
+
+PSYCHROMETRIC_PRESET = Preset(
+    name="Psychrometric (PMV Simple)",
+    thresholds=[-0.5, 0.5],
+    labels=["Cooler than Comfortable", "Comfortable", "Warmer than Comfortable"],
+    metric_attr="pmv",
+    xlabel="Dry Bulb Temperature [°C]",
+    ylabel="Humidity Ratio [g/kg]",
+    x_range=(10.0, 36.0),
+    y_range=(0.0, 30.0),
+    band_colors=(
+        (0.0, 0.0, 1.0, 0.5),      # Cooler (blue)
+        (0.0, 0.5, 0.0, 0.5),      # Comfortable (green)
+        (1.0, 0.0, 0.0, 0.5),      # Warmer (red)
+    ),
+)
+
+PSYCHROMETRIC_EXTENDED_PRESET = Preset(
+    name="Psychrometric (PMV Extended)",
+    thresholds=[-2.5, -1.5, -0.5, 0.5, 1.5, 2.5],
+    labels=["Cold", "Cool", "Slightly Cool", "Neutral", "Slightly Warm", "Warm", "Hot"],
+    metric_attr="pmv",
+    xlabel="Dry Bulb Temperature [°C]",
+    ylabel="Humidity Ratio [g/kg]",
+    x_range=(10.0, 36.0),
+    y_range=(0.0, 30.0),
+    cmap="coolwarm",  # Will use colormap if band_colors not set
 )
 
 # -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 """DataSeries - Overlay data points for scenes.
 
-This module provides the DataSeries class for adding scatter data
+This module provides the DataSeries class for adding scatter data, lines or annotations
 on top of Scene visualizations.
 """
 

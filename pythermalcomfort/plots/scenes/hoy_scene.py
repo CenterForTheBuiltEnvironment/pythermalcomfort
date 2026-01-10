@@ -1,0 +1,1 @@
+"""Hour-of-Year Scene - defines the visual elements for HOY plots."""

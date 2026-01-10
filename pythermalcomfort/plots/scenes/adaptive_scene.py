@@ -30,9 +30,9 @@ ADAPTIVE_COLORS = [
 
 # Matplotlib-compatible colors
 ADAPTIVE_COLORS_MPL = [
-    (1.0, 0.0, 0.0, 0.2),      # Discomfort (red)
-    (0.0, 0.0, 1.0, 0.2),      # 80% band (blue)
-    (0.0, 0.5, 0.0, 0.2),      # 90% band (green)
+    (0.859, 0.447, 0.373, 1),      # Discomfort
+    (0.8, 0.95, 0.7, 1),      # 80% band
+    (0.35, 0.55, 0.3, 1),      # 90% band
 ]
 
 
@@ -71,6 +71,8 @@ class AdaptiveScene(BaseScene):
     y_range: tuple[float, float] = (14.0, 36.0)
     show_80_band: bool = True
     show_90_band: bool = True
+    x_padding: float = 2.0
+    band_colors: tuple | None = None,
 
     # Override base class defaults
     thresholds: Sequence[float] = field(default_factory=lambda: [2.5, 3.5])
@@ -90,6 +92,7 @@ class AdaptiveScene(BaseScene):
         y_range: tuple[float, float] | None = None,
         show_80_band: bool = True,
         show_90_band: bool = True,
+        x_padding: float = 2.0,
     ) -> AdaptiveScene:
         """Create an AdaptiveScene.
 
@@ -114,6 +117,7 @@ class AdaptiveScene(BaseScene):
             y_range=y_range or (14.0, 36.0),
             show_80_band=show_80_band,
             show_90_band=show_90_band,
+            x_padding=x_padding,
         )
 
     def _compute_comfort_temperature(self, t_outdoor: float) -> float:
@@ -211,8 +215,8 @@ class AdaptiveScene(BaseScene):
                 )
             )
 
-        # Set axis limits
-        ax.set_xlim(self.x_range)
+        # Set axis limits (extended by padding for display)
+        ax.set_xlim(self.x_range[0] - self.x_padding, self.x_range[1] + self.x_padding)
         ax.set_ylim(self.y_range)
 
         # Add legend if enabled
@@ -276,8 +280,8 @@ class AdaptiveScene(BaseScene):
         ]
 
     def get_x_range(self) -> tuple[float, float]:
-        """Get x-axis range."""
-        return self.x_range
+        """Get x-axis range (including padding)."""
+        return (self.x_range[0] - self.x_padding, self.x_range[1] + self.x_padding)
 
     def get_y_range(self) -> tuple[float, float]:
         """Get y-axis range."""

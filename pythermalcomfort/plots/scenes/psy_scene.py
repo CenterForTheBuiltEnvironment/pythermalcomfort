@@ -45,6 +45,8 @@ class PsychrometricScene(BaseScene):
     # Whether to show all 7 PMV categories or just 3 (simple)
     extended_categories: bool = False
 
+    band_colors: tuple | None = None  # Custom colors for zones
+
     # PMV thresholds for comfort zone
     thresholds: tuple[float, ...] = field(default_factory=lambda: (-0.5, 0.5))
     labels: tuple[str, ...] | None = field(default_factory=lambda: (
@@ -60,6 +62,7 @@ class PsychrometricScene(BaseScene):
         y_range: tuple[float, float] | None = None,
         rh_lines: tuple[float, ...] | None = None,
         extended_categories: bool = False,
+        band_colors: tuple | None = None,
     ) -> PsychrometricScene:
         """Create a PsychrometricScene.
 
@@ -91,6 +94,7 @@ class PsychrometricScene(BaseScene):
             y_range=y_range or (0, 30),
             rh_lines=rh_lines or (10, 20, 30, 40, 50, 60, 70, 80, 90, 100),
             extended_categories=extended_categories,
+            band_colors=band_colors,
         )
     
     def _rh_to_humidity_ratio(self, tdb: float, rh: float) -> float:
@@ -195,13 +199,19 @@ class PsychrometricScene(BaseScene):
         if self.extended_categories:
             pmv_thresholds = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]
             zone_labels = ["Cold", "Cool", "Slightly Cool", "Neutral", "Slightly Warm", "Warm", "Hot"]
-            # Get colors from colormap
-            cmap = plt.get_cmap(style.cmap)
-            zone_colors = [cmap(i / 6) for i in range(7)]
+            # Use custom colors or colormap
+            if self.band_colors is not None:
+                zone_colors = list(self.band_colors)
+            else:
+                cmap = plt.get_cmap(style.cmap)
+                zone_colors = [cmap(i / 6) for i in range(7)]
         else:
             pmv_thresholds = [-0.5, 0.5]
             zone_labels = ["Comfortable"]
-            zone_colors = [(0, 0.5, 0, 1)]  # Green
+            if self.band_colors is not None:
+                zone_colors = [self.band_colors[0]]
+            else:
+                zone_colors = [(0, 0.5, 0, 1)]
 
         # 3. Compute comfort zone boundaries for each threshold
         rh_levels = np.linspace(0, 100, 10)
@@ -244,15 +254,12 @@ class PsychrometricScene(BaseScene):
                 )
                 comfort_artists.append(fill)
 
-        # 5. Set axis limits and labels
         ax.set_xlim(self.x_range)
         ax.set_ylim(self.y_range)
 
-        # Hide top and right spines
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
 
-        # 6. Legend
         legend_artist = None
         if style.show_legend:
             legend_artist = ax.legend(
@@ -313,12 +320,18 @@ class PsychrometricScene(BaseScene):
 
     def get_colors(self, style: Style) -> list:
         """Get colors for each category."""
-        return [
-            (0.569, 0.769, 0.914, 1),   # Cooler than Neutral (blue)
-            (0.8, 0.875, 0.7, 1),   # Neutral (green)
-            (0.859, 0.447, 0.373, 1),   # Warmer than Neutral (red)
-            (0.5, 0.5, 0.5, 0.2),   # Out of range (gray)
-        ]
+        if self.band_colors is not None:
+            return list(self.band_colors)
+
+        if self.extended_categories:
+            cmap = plt.get_cmap(style.cmap)
+            return [cmap(i / 6) for i in range(7)]
+        else:
+            return [
+                (0.0, 0.0, 1.0, 0.5),
+                (0.0, 0.5, 0.0, 0.5),
+                (1.0, 0.0, 0.0, 0.5),
+            ]
 
     def get_x_range(self) -> tuple[float, float]:
         """Get x-axis range."""
