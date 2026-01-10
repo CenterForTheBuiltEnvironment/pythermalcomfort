@@ -42,6 +42,9 @@ class PsychrometricScene(BaseScene):
     # RH curves to display (%)
     rh_lines: tuple[float, ...] = ( 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
+    # Whether to show all 7 PMV categories or just 3 (simple)
+    extended_categories: bool = False
+
     # PMV thresholds for comfort zone
     thresholds: tuple[float, ...] = field(default_factory=lambda: (-0.5, 0.5))
     labels: tuple[str, ...] | None = field(default_factory=lambda: (
@@ -56,6 +59,7 @@ class PsychrometricScene(BaseScene):
         x_range: tuple[float, float] | None = None,
         y_range: tuple[float, float] | None = None,
         rh_lines: tuple[float, ...] | None = None,
+        extended_categories: bool = False,
     ) -> PsychrometricScene:
         """Create a PsychrometricScene.
 
@@ -83,9 +87,10 @@ class PsychrometricScene(BaseScene):
 
         return cls(
             fixed_params=default_params,
-            x_range=x_range or (10.0, 36.0),
+            x_range=x_range or (10, 36),
             y_range=y_range or (0, 30),
             rh_lines=rh_lines or (10, 20, 30, 40, 50, 60, 70, 80, 90, 100),
+            extended_categories=extended_categories,
         )
     
     def _rh_to_humidity_ratio(self, tdb: float, rh: float) -> float:
@@ -172,7 +177,7 @@ class PsychrometricScene(BaseScene):
         dict[str, Any]
             Dictionary with 'rh_curves', 'comfort_zone', 'legend' artists.
         """
-        t_dry = np.linspace(self.x_range[0], self.x_range[1], 500)
+        t_dry = np.linspace(0, 50, 500)
 
         # 1. Draw RH curves (background)
         rh_curve_artists = []
@@ -186,37 +191,60 @@ class PsychrometricScene(BaseScene):
             )
             rh_curve_artists.append(line)
 
-        # 2. Compute comfort zone boundaries
+        # 2. Define thresholds and labels based on mode
+        if self.extended_categories:
+            pmv_thresholds = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]
+            zone_labels = ["Cold", "Cool", "Slightly Cool", "Neutral", "Slightly Warm", "Warm", "Hot"]
+            # Get colors from colormap
+            cmap = plt.get_cmap(style.cmap)
+            zone_colors = [cmap(i / 6) for i in range(7)]
+        else:
+            pmv_thresholds = [-0.5, 0.5]
+            zone_labels = ["Comfortable"]
+            zone_colors = [(0, 0.5, 0, 1)]  # Green
+
+        # 3. Compute comfort zone boundaries for each threshold
         rh_levels = np.linspace(0, 100, 10)
 
-        upper_temps = []
-        lower_temps = []
-        valid_rh = []
+        # Find temperatures for each PMV threshold
+        threshold_curves = {}
+        for pmv_val in pmv_thresholds:
+            temps = []
+            valid_rh = []
+            for rh in rh_levels:
+                t = self._find_comfort_temp(rh, pmv_val)
+                if t is not None and self.x_range[0] <= t <= self.x_range[1]:
+                    temps.append(t)
+                    valid_rh.append(rh)
+            if temps:
+                # Convert to humidity ratio
+                hr = [self._rh_to_humidity_ratio(t, rh) for t, rh in zip(temps, valid_rh)]
+                threshold_curves[pmv_val] = (temps, hr)
 
-        for rh in rh_levels:
-            t_upper = self._find_comfort_temp(rh, 0.5)
-            t_lower = self._find_comfort_temp(rh, -0.5)
-            if t_upper is not None and t_lower is not None:
-                upper_temps.append(t_upper)
-                lower_temps.append(t_lower)
-                valid_rh.append(rh)
+        # 4. Draw comfort zones
+        comfort_artists = []
 
-        # Convert to humidity ratio for plotting
-        upper_hr = [self._rh_to_humidity_ratio(t, rh) for t, rh in zip(upper_temps, valid_rh)]
-        lower_hr = [self._rh_to_humidity_ratio(t, rh) for t, rh in zip(lower_temps, valid_rh)]
+        if self.extended_categories:
+            pass # still to be implemented: extended categories
+        else:
+            # Simple mode: just draw neutral zone
+            lower_curve = threshold_curves.get(-0.5)
+            upper_curve = threshold_curves.get(0.5)
 
-        # 3. Draw comfort zone
-        comfort_zone = ax.fill(
-            np.concatenate([upper_temps, lower_temps[::-1]]),
-            np.concatenate([upper_hr, lower_hr[::-1]]),
-            color="green",
-            alpha=style.band_alpha * 0.5,
-            linewidth=0,
-            zorder=1,
-            label="Comfort Zone",
-        )
+            if lower_curve and upper_curve:
+                fill = ax.fill(
+                    np.concatenate([upper_curve[0], lower_curve[0][::-1]]),
+                    np.concatenate([upper_curve[1], lower_curve[1][::-1]]),
+                    # color=zone_colors[0],
+                    color=(0.8, 0.875, 0.7, 0.5),
+                    alpha=style.band_alpha,
+                    linewidth=0,
+                    zorder=1,
+                    label="Comfort Zone",
+                )
+                comfort_artists.append(fill)
 
-        # 4. Set axis limits and labels
+        # 5. Set axis limits and labels
         ax.set_xlim(self.x_range)
         ax.set_ylim(self.y_range)
 
@@ -224,7 +252,7 @@ class PsychrometricScene(BaseScene):
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
 
-        # 5. Legend
+        # 6. Legend
         legend_artist = None
         if style.show_legend:
             legend_artist = ax.legend(
@@ -235,15 +263,12 @@ class PsychrometricScene(BaseScene):
 
         return {
             "rh_curves": rh_curve_artists,
-            "comfort_zone": comfort_zone,
+            "comfort_zone": comfort_artists,
             "legend": legend_artist,
         }
     
     def get_category(self, x: float, y: float) -> str:
         """Get category for a data point.
-
-        Note: x is tdb, y is humidity ratio. We need to convert
-        humidity ratio back to RH to compute PMV.
 
         Parameters
         ----------
@@ -257,43 +282,42 @@ class PsychrometricScene(BaseScene):
         str
             Category label.
         """
-        # Approximate RH from humidity ratio (iterate to find it)
-        # For simplicity, use a rough estimation
         try:
-            # Search for RH that gives this humidity ratio at this temp
             from scipy.optimize import brentq
 
             def hr_diff(rh):
                 return self._rh_to_humidity_ratio(x, rh) - y
 
-            rh = brentq(hr_diff, 0, 120)
+            rh = brentq(hr_diff, 0, 100)
             pmv = self._compute_pmv(x, rh)
 
-            if pmv < -0.5:
-                return "Cooler than neutral"
-            elif pmv > 0.5:
-                return "Warmer than neutral"
+            if self.extended_categories:
+                pass # still to be implemented: extended categories
             else:
-                return "Neutral"
+                if pmv < -0.5:
+                    return "Cooler than neutral"
+                elif pmv > 0.5:
+                    return "Warmer than neutral"
+                else:
+                    return "Neutral"
         except (ValueError, Exception):
             return "Out of Range"
 
     def get_labels(self) -> list[str]:
         """Get category labels."""
-        return [
-            "Neutral",
-            "Cooler than neutral",
-            "Warmer than neutral",
-            "Out of Range",
-        ]
+        if self.extended_categories:
+            return None # still to be implemented: extended categories
+        else:
+            return ["Cooler than neutral", "Neutral", "Warmer than neutral"]
+
 
     def get_colors(self, style: Style) -> list:
         """Get colors for each category."""
         return [
-            (0.0, 0.5, 0.0, 0.5),   # Neutral (green)
-            (0.0, 0.0, 1.0, 0.5),   # Cooler than Neutral (blue)
-            (1.0, 0.0, 0.0, 0.5),   # Warmer than Neutral (red)
-            (0.5, 0.5, 0.5, 0.5),   # Out of range (gray)
+            (0.569, 0.769, 0.914, 1),   # Cooler than Neutral (blue)
+            (0.8, 0.875, 0.7, 1),   # Neutral (green)
+            (0.859, 0.447, 0.373, 1),   # Warmer than Neutral (red)
+            (0.5, 0.5, 0.5, 0.2),   # Out of range (gray)
         ]
 
     def get_x_range(self) -> tuple[float, float]:

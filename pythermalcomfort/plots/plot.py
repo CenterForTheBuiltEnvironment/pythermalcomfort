@@ -277,6 +277,7 @@ class Plot:
         *,
         x_range: tuple[float, float] | None = None,
         y_range: tuple[float, float] | None = None,
+        extended_categories: bool = False,
         style: Style | None = None,
     ) -> Plot:
         """Create a psychrometric chart with PMV comfort zone.
@@ -311,6 +312,7 @@ class Plot:
             fixed_params=fixed_params,
             x_range=x_range,
             y_range=y_range,
+            extended_categories=extended_categories,
         )
 
         plot_style = style if style is not None else Style()
