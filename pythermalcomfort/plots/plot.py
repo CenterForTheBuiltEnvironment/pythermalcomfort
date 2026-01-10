@@ -16,6 +16,7 @@ import numpy as np
 from pythermalcomfort.plots.data_series import DataSeries
 from pythermalcomfort.plots.scenes.adaptive_scene import AdaptiveScene
 from pythermalcomfort.plots.scenes.range_scene import RangeScene
+from pythermalcomfort.plots.scenes.psy_scene import PsychrometricScene
 from pythermalcomfort.plots.style import Style
 from pythermalcomfort.plots.presets import get_preset
 from pythermalcomfort.plots.summary import SummaryRenderer
@@ -268,6 +269,59 @@ class Plot:
             plot_style.ylabel = "Operative Temperature [°C]"
 
         return cls(scene=scene, style=plot_style)
+    
+    @classmethod
+    def psychrometric(
+        cls,
+        fixed_params: dict[str, Any] | None = None,
+        *,
+        x_range: tuple[float, float] | None = None,
+        y_range: tuple[float, float] | None = None,
+        style: Style | None = None,
+    ) -> Plot:
+        """Create a psychrometric chart with PMV comfort zone.
+
+        Creates a psychrometric chart showing:
+        - RH curves as background
+        - PMV-based comfort zone
+
+        Parameters
+        ----------
+        fixed_params : dict or None
+            Fixed parameters for PMV: tr, v, met, clo.
+            Defaults: tr=25, v=0.1, met=1.2, clo=0.5
+        x_range : tuple or None
+            Dry bulb temperature range. Default: (10, 36).
+        y_range : tuple or None
+            Humidity ratio range. Default: (0, 30).
+        style : Style or None
+            Custom style. Creates default if None.
+
+        Returns
+        -------
+        Plot
+            A configured Plot ready to render.
+
+        Examples
+        --------
+        >>> plot = Plot.psychrometric(fixed_params={"tr": 25, "v": 0.1})
+        >>> fig, ax = plot.render()
+        """
+        scene = PsychrometricScene.create(
+            fixed_params=fixed_params,
+            x_range=x_range,
+            y_range=y_range,
+        )
+
+        plot_style = style if style is not None else Style()
+
+        # Set axis labels
+        if plot_style.xlabel is None:
+            plot_style.xlabel = "Dry Bulb Temperature [°C]"
+        if plot_style.ylabel is None:
+            plot_style.ylabel = "Humidity Ratio [g/kg]"
+
+        return cls(scene=scene, style=plot_style)
 
     # =========================================================================
     # Data Methods
@@ -407,7 +461,7 @@ class Plot:
                 gs = GridSpec(
                     1, 2,
                     width_ratios=[1 - self._style.info_panel_width, self._style.info_panel_width],
-                    wspace=0.02,
+                    wspace=0.05,
                 )
                 main_ax = fig.add_subplot(gs[0])
                 info_ax = fig.add_subplot(gs[1])
@@ -506,7 +560,10 @@ class Plot:
         # Set up panel background
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
-        ax.axis("off")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for spine in ax.spines.values():
+            spine.set_visible(False)
 
         if style.info_panel_background is not None:
             ax.set_facecolor(style.info_panel_background)

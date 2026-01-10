@@ -132,7 +132,7 @@ class Style:
 
     # Info panel settings
     info_panel_width: float = 0.25  # fraction of figure width (0-1)
-    info_panel_background: str | None = "#f5f5f5"  # None for transparent
+    info_panel_background: str = None  # None for transparent
     info_panel_alpha: float = 0.3
 
     # Grid settings
@@ -169,7 +169,7 @@ class Style:
     # Summary bar settings (stacked horizontal bar at bottom-right)
     show_summary: bool = False  # Off by default, user enables when adding data
     summary_bar_y: float = 0.08  # Vertical position (0=bottom, 1=top)
-    summary_bar_height: float = 0.04  # Height in axes coordinates
+    summary_bar_height: float = 0.15  # Height in axes coordinates
     summary_bar_left: float = 0.05  # Left margin
     summary_bar_width: float = 0.9  # Width in axes coordinates (0-1)
     summary_min_pct_for_text: float = 8.0  # Min % to show text on segment
