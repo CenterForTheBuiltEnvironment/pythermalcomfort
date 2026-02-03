@@ -4,4 +4,4 @@ This package provides comprehensive tools for calculating thermal comfort indice
 heat/cold stress metrics, and thermophysiological responses using multiple models.
 """
 
-__version__ = "3.7.1"
+__version__ = "3.9.0"

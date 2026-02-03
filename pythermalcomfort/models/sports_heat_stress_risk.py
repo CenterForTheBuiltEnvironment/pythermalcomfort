@@ -3,10 +3,11 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass
 
-# todo add the function to the docs and to the __init__.py
 import numpy as np
 import scipy
 
+from pythermalcomfort.classes_input import SportsHeatStressInputs
+from pythermalcomfort.classes_return import SportsHeatStressRisk
 from pythermalcomfort.models import phs
 
 
@@ -63,10 +64,17 @@ def sports_heat_stress_risk(
     rh: float | list[float],
     vr: float | list[float],
     sport: _SportsValues,
-):
-    """Short description of the function.
+) -> SportsHeatStressRisk:
+    """Calculate sports heat stress risk levels based on environmental conditions and
+    sport-specific parameters.
 
-    todo explain what the function does and cite the paper DOI:10.1016/j.jsams.2025.03.006
+    This function assesses heat stress risk for athletes during outdoor sports by
+    combining environmental conditions with sport-specific metabolic rates and clothing
+    insulation. It uses the Predicted Heat Strain (PHS) model to determine threshold
+    temperatures for different risk categories (Low, Medium, High, Extreme). The method 
+    is based on the Sports Medicine Australia heat policy framework [SportsHeatStress2025]_, 
+    with detailed guidelines [SportsHeatPolicy2025]_ and an online implementation available 
+    at the Sports Heat Tool [SportsHeatTool]_.
 
     Parameters
     ----------
@@ -79,84 +87,147 @@ def sports_heat_stress_risk(
     vr : float or list of float
         Relative air speed [m/s].
     sport : _SportsValues
-        Sport-specific activity dataclass with fields ``clo``, ``met``, ``vr``, and ``duration``.
-        Use one of the entries from :pyclass:`Sports`.
+        Sport-specific activity dataclass with fields ``clo`` (clothing insulation),
+        ``met`` (metabolic rate), ``vr`` (relative air speed), and ``duration`` (activity duration).
+        Use one of the predefined entries from the :py:class:`Sports` class, e.g., ``Sports.RUNNING``,
+        ``Sports.SOCCER``, ``Sports.TENNIS``, etc.
 
     Returns
     -------
-    todo this should be a dataclass as in pmv_ppd_iso
+    SportsHeatStressRisk
+        A dataclass containing the heat stress risk assessment results.
+        See :py:class:`~pythermalcomfort.classes_return.SportsHeatStressRisk` for
+        more details. To access individual values, use the corresponding attributes
+        of the returned instance, e.g., ``result.risk_level_interpolated``.
 
     Raises
     ------
     ValueError
         If the risk level could not be determined due to NaN thresholds or if the internal
         solver fails to produce thresholds that allow a risk determination.
+    TypeError
+        If sport is not a valid _SportsValues instance.
 
     Examples
     --------
     .. code-block:: python
-
-        from pythermalcomfort.models import pmv_ppd_iso
-        from pythermalcomfort.utilities import v_relative
-
-        tdb = 25
-        tr = 25
-        rh = 50
-        v = 0.1
 
         from pythermalcomfort.models.sports_heat_stress_risk import (
             sports_heat_stress_risk,
             Sports,
         )
 
-        # call with prepared variables
-        sports_heat_stress_risk(tdb=tdb, tr=tr, rh=rh, vr=v, sport=Sports.RUNNING)
-        # Expected: ~2.4
+        # Example 1: Single condition for running
+        result = sports_heat_stress_risk(
+            tdb=35, tr=35, rh=40, vr=0.1, sport=Sports.RUNNING
+        )
+        print(result.risk_level_interpolated)  # Expected: ~2.4
+        print(result.t_medium)  # Temperature threshold for medium risk
+        print(result.t_high)  # Temperature threshold for high risk
+        print(result.t_extreme)  # Temperature threshold for extreme risk
+        print(result.recommendation)  # Heat stress management recommendations
 
+        # Example 2: Array inputs for multiple conditions
+        result = sports_heat_stress_risk(
+            tdb=[30, 35, 40],
+            tr=[30, 35, 40],
+            rh=[50, 50, 50],
+            vr=[0.5, 0.5, 0.5],
+            sport=Sports.SOCCER,
+        )
+        print(result.risk_level_interpolated)  # Array of risk levels
+
+        # Example 3: Different sports
+        result_tennis = sports_heat_stress_risk(
+            tdb=33, tr=70, rh=60, vr=0.1, sport=Sports.TENNIS
+        )
+        result_cycling = sports_heat_stress_risk(
+            tdb=33, tr=70, rh=60, vr=3.0, sport=Sports.CYCLING
+        )
     """
-    # todo add references to the docstring
-    # todo add examples which are at the end of this file to the docstring
-    # todo the function should accept either float or arrays as all the other functions pythermalcomfort
 
-    tdb = np.asarray(tdb)
-    tr = np.asarray(tr)
-    rh = np.asarray(rh)
-    vr = np.asarray(vr)
+    # Validate inputs using the input dataclass
+    inputs = SportsHeatStressInputs(tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport)
 
-    risk_levels = np.vectorize(_calc_risk_single_value)(
+    # Convert to numpy arrays for vectorized calculation
+    tdb = np.asarray(inputs.tdb)
+    tr = np.asarray(inputs.tr)
+    rh = np.asarray(inputs.rh)
+    vr = np.asarray(inputs.vr)
+
+    # Vectorize the calculation function to handle arrays
+    # Returns (risk_level_interpolated, t_medium, t_high, t_extreme, recommendation) for each input
+    vectorized_calc = np.vectorize(
+        _calc_risk_single_value, otypes=[float, float, float, float, str]
+    )
+    risk_levels, t_mediums, t_highs, t_extremes, recommendations = vectorized_calc(
         tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
     )
 
-    # todo use the pmv_ppd_iso as a reference for the code implementation
+    return SportsHeatStressRisk(
+        risk_level_interpolated=risk_levels,
+        t_medium=t_mediums,
+        t_high=t_highs,
+        t_extreme=t_extremes,
+        recommendation=recommendations,
+    )
 
-    # todo below is a placeholder but the actual implementation should return a dataclass with the risk value
-    #  interpolated and the risk level thresholds Low, Medium, High, Extreme as per the online tool
-    #  https://sma-heat-policy.sydney.edu.au/
-    return risk_levels
 
+def _calc_risk_single_value(
+    tdb: float, tr: float, rh: float, vr: float, sport: _SportsValues
+) -> tuple[float, float, float, float, str]:
+    """Calculate the risk level and threshold temperatures for a single set of inputs.
 
-def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
-    """Calculate the risk level for a single set of inputs.
+    Parameters
+    ----------
+    tdb : float
+        Dry bulb air temperature, [°C].
+    tr : float
+        Mean radiant temperature, [°C].
+    rh : float
+        Relative humidity, [%].
+    vr : float
+        Relative air speed, [m/s].
+    sport : _SportsValues
+        Sport-specific parameters (clo, met, vr, duration).
 
-    # todo implement the docstring
+    Returns
+    -------
+    tuple of (float, float, float, float, str)
+        Tuple containing (risk_level_interpolated, t_medium, t_high, t_extreme, recommendation).
+
     """
     # set the max and min thresholds for the risk levels
-    sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
+    sweat_loss_g = 850  # 850 g per hour
 
     max_t_low = 34.5  # maximum tdb for low risk
     max_t_medium = 39  # maximum tdb for medium risk
     max_t_high = 43.5  # maximum tdb for high risk
     min_t_low = 21  # minimum tdb for low risk
-    min_t_medium = 22  # minimum tdb for medium risk
-    min_t_high = 23  # minimum tdb for high risk
-    min_t_extreme = 25  # minimum tdb for extreme risk
+    min_t_medium = 23  # minimum tdb for medium risk
+    min_t_high = 25  # minimum tdb for high risk
+    min_t_extreme = 26  # minimum tdb for extreme risk
 
     t_cr_extreme = 40  # core temperature for extreme risk
 
-    if tdb < min_t_low:
-        return 0  # we are in the low risk category
+    if tdb < min_t_medium:
+        # Low risk - use default thresholds and risk level 0
+        return (
+            0.0,
+            min_t_medium,
+            min_t_high,
+            min_t_extreme,
+            _get_recommendation(0.0),
+        )
     if tdb > max_t_high:
-        return 3  # we are in the extreme risk category
+        # Extreme risk - use maximum thresholds and risk level 3
+        return (
+            3.0,
+            max_t_low,
+            max_t_medium,
+            max_t_high,
+            _get_recommendation(3.0),
+        )
 
     def calculate_threshold_water_loss(x):
         return (
@@ -246,16 +317,6 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     if t_medium < min_t_medium:
         t_medium = min_t_medium
 
-    # # calcuate the risk level based on the thresholds
-    # if tdb < t_medium:
-    #     risk_level = 0
-    # elif t_medium <= tdb < t_high:
-    #     risk_level = 1
-    # elif t_high <= tdb < t_extreme:
-    #     risk_level = 2
-    # elif tdb >= t_extreme:
-    #     risk_level = 3
-
     risk_level_interpolated = np.nan
     # calculate the risk level with one decimal place
     if min_t_low <= tdb < t_medium:
@@ -270,42 +331,68 @@ def _calc_risk_single_value(tdb, tr, rh, vr, sport: _SportsValues) -> float:
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
 
-    # todo include the recommendations based on the risk level
-    # todo return a dataclass with the risk level, risk level interpolated, thresholds, and recommendations
+    # Generate recommendation based on the risk level
+    recommendation = _get_recommendation(risk_level_interpolated)
 
-    return round(risk_level_interpolated, 1)
-
-
-if __name__ == "__main__":
-    # first example
-    t = 35
-    rh = 40
-    v = 0.1
-    tr = 70
-    sport = "running"
-    print(sports_heat_stress_risk(tdb=t, tr=tr, rh=rh, vr=v, sport=Sports.MTB))
-
-    # second example
-    results = []
-    for t in range(20, 46, 2):
-        for rh in range(0, 101, 5):
-            risk_interp = sports_heat_stress_risk(
-                tdb=t, tr=t, rh=rh, vr=v, sport=Sports.RUNNING
-            )
-            results.append((t, rh, risk_interp))
-    import pandas as pd
-
-    df = pd.DataFrame(results, columns=["tdb", "rh", "risk_level_interpolated"]).astype(
-        "float"
+    return (
+        round(risk_level_interpolated, 1),
+        round(t_medium, 1),
+        round(t_high, 1),
+        round(t_extreme, 1),
+        recommendation,
     )
-    df_pivot = df.pivot(index="rh", columns="tdb", values="risk_level_interpolated")
-    df_pivot.sort_index(ascending=False, inplace=True)
-    import matplotlib.pyplot as plt
-    import seaborn as sns
 
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(df_pivot, cmap="YlOrRd")
-    plt.title("Sports Heat Stress Risk Level for Running")
-    plt.xlabel("Dry Bulb Temperature (°C)")
-    plt.ylabel("Relative Humidity (%)")
-    plt.show()
+
+def _get_recommendation(risk_level: float) -> str:
+    """Get heat stress management recommendations based on risk level.
+
+    Parameters
+    ----------
+    risk_level : float
+        Interpolated risk level (0.0-3.0).
+
+    Returns
+    -------
+    str
+        Evidence-based recommendation text for managing heat stress at the given
+        risk level.
+    """
+    if risk_level < 1.0:
+        return (
+            "Recommendation: Increase hydration & modify clothing\n\n"
+            "Detailed suggestions: Maintaining hydration through regular fluid consumption and modifying clothing is still a simple, yet effective, way of keeping cool and preserving health and performance during the summer months.\n\n"
+            "You should:\n"
+            "• Ensure pre-exercise hydration by consuming 6 ml of water per kilogram of body weight every 2-3 hours before exercise. For a 70kg individual, this equates to 420ml of fluid every 2-3 hours (a standard sports drink bottle contains 500ml).\n"
+            "• Drink regularly throughout exercise. You should aim to drink enough to offset sweat losses, but it is important to avoid over-drinking because this can also have negative health effects. To familiarise yourself with how much you typically sweat and become accustomed to weighing yourself before and after practice or competition.\n"
+            "• Where possible, select lightweight and breathable clothing with extra ventilation. Remove unnecessary clothing/equipment and/ or excess clothing layers. Reduce the amount of skin that is covered by clothing – this will help increase your sweat evaporation, which will help you dissipate heat."
+        )
+    elif risk_level < 2.0:
+        return (
+            "Recommendation: Increase frequency and/or duration of rest breaks\n\n"
+            "Detailed suggestions: Increasing the frequency and/or duration of your rest breaks during exercise or sporting activities is an effective way of reducing your risk for heat illness even if minimal resources are available.\n\n"
+            "You should:\n"
+            "• During training sessions, provide a minimum of 15 minutes of rest for every 45 minutes of practice.\n"
+            "• Extend scheduled rest breaks that naturally occur during match-play of a particular sport (e.g. half-time) by ~10 minutes. This is effective for sports such as soccer/football and rugby and can be implemented across other sports such as field hockey.\n"
+            "• Implement additional rest breaks that are not normally scheduled to occur. For example, 3 to 5-min \"quarter-time\" breaks can be introduced mid-way through each half of a football or rugby match, or an extended 10-min drinks break can be introduced every hour of a cricket match or after the second set of a tennis match.\n"
+            "• For sports with continuous play without any scheduled breaks, courses, or play duration can be shortened.\n"
+            "• During all breaks in play or practice, everyone should seek shade – if natural shade is not available, portable sun shelters should be provided, and water freely available."
+        )
+    elif risk_level < 3.0:
+        return (
+            "Recommendation: Apply active cooling strategies\n\n"
+            "Detailed suggestions: Active cooling strategies should be applied during scheduled and additional rest breaks, or before and during activity if play is continuous. Below are strategies that have been shown to effectively reduce body temperature. The suitability and feasibility of each strategy will depend on the type of sport or exercise you are performing.\n\n"
+            "You should:\n"
+            "• Drink cold fluids and/or ice slushies before exercise commences. Note that cold water and ice slushy ingestion during exercise is less effective for cooling.\n"
+            "• Submerge your arms/feet in cold water.\n"
+            "• Water dousing – wetting your skin with cool water using a sponge or a spray bottle helps increase evaporation, which is the most effective cooling mechanism in the heat.\n"
+            "• Ice packs/towels – placing an ice pack or damp towel filled with crushed ice around your neck.\n"
+            "• Electric (misting) fans – outdoor fans can help keep your body cool, especially when combined with a water misting system."
+        )
+    else:
+        return (
+            "Recommendation: Consider suspending play\n\n"
+            "Detailed suggestions: The suspension of exercise/play should be considered. If play has commenced, then all activities should be stopped as soon as possible.\n\n"
+            "You should:\n"
+            "• All players should seek shade or cool refuge in an air-conditioned space if available.\n"
+            "• Active cooling strategies should be applied."
+        )

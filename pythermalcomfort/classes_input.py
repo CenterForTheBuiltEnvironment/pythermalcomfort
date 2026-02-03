@@ -1237,3 +1237,67 @@ class ScaleWindSpeedLogInputs(BaseInputs):
         self.z1 = z1
         self.z0 = z0
         self.d = d
+
+
+@dataclass
+class SportsHeatStressInputs(BaseInputs):
+    """Inputs for sports_heat_stress_risk function.
+
+    Validates types and applicability limits:
+    - tdb, tr, rh, vr must be numeric or array-like
+    - sport must be a _SportsValues instance from the Sports dataclass
+    - rh must be between 0 and 100%
+    - vr must be non-negative
+    - all input arrays must be broadcastable to a common shape
+    """
+
+    def __init__(
+        self,
+        tdb,
+        tr,
+        rh,
+        vr,
+        sport,
+    ):
+        # Store sport before calling super().__init__() as it's not a BaseInputs field
+        self.sport = sport
+
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            rh=rh,
+            vr=vr,
+        )
+
+    def __post_init__(self):
+        # Validate sport is a _SportsValues instance before calling super().__post_init__()
+        from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
+
+        if not isinstance(self.sport, _SportsValues):
+            raise TypeError(
+                "sport must be a _SportsValues instance from the Sports dataclass"
+            )
+
+        super().__post_init__()
+
+        # Convert to numpy arrays for validation
+        tdb = np.asarray(self.tdb, dtype=float)
+        tr = np.asarray(self.tr, dtype=float)
+        rh = np.asarray(self.rh, dtype=float)
+        vr = np.asarray(self.vr, dtype=float)
+
+        # Check broadcasting compatibility
+        try:
+            np.broadcast_arrays(tdb, tr, rh, vr)
+        except ValueError as err:
+            raise ValueError(
+                "Input arrays (tdb, tr, rh, vr) are not broadcastable to a common shape."
+            ) from err
+
+        # Validate relative humidity range
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity (rh) must be between 0 and 100%.")
+
+        # Validate air speed is non-negative
+        if np.any(vr < 0):
+            raise ValueError("Relative air speed (vr) must be non-negative.")
