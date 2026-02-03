@@ -4,7 +4,7 @@ import warnings
 from dataclasses import dataclass
 
 import numpy as np
-import scipy
+from scipy.optimize import brentq
 
 from pythermalcomfort.classes_input import SportsHeatStressInputs
 from pythermalcomfort.classes_return import SportsHeatStressRisk
@@ -20,9 +20,30 @@ class _SportsValues:
     vr: float
     duration: int
 
+    def __post_init__(self):
+        if not isinstance(self.clo, float) or self.clo <= 0:
+            msg = f"clo must be a positive float > 0, got {self.clo}"
+            raise ValueError(msg)
+        if not isinstance(self.met, float) or self.met <= 0:
+            msg = f"met must be a positive float > 0, got {self.met}"
+            raise ValueError(msg)
+        if not isinstance(self.vr, float) or self.vr <= 0:
+            msg = f"vr must be a positive float > 0, got {self.vr}"
+            raise ValueError(msg)
+        if not isinstance(self.duration, int) or self.duration < 0:
+            msg = f"duration must be a non-negative integer >= 0, got {self.duration}"
+            raise ValueError(msg)
+
 
 @dataclass(frozen=True)
 class Sports:
+    """Namespace of predefined sport values.
+
+    Use attributes like `Sports.RUNNING` to obtain a `_SportsValues` instance.
+    This is a plain class (not a dataclass) because the attributes are class-level
+    constants and not instance fields.
+    """
+
     ABSEILING = _SportsValues(clo=0.6, met=6.0, vr=0.5, duration=120)
     ARCHERY = _SportsValues(clo=0.75, met=4.5, vr=0.5, duration=180)
     AUSTRALIAN_FOOTBALL = _SportsValues(clo=0.47, met=7.5, vr=0.75, duration=45)
@@ -59,10 +80,10 @@ class Sports:
 
 
 def sports_heat_stress_risk(
-    tdb: float | list[float],
-    tr: float | list[float],
-    rh: float | list[float],
-    vr: float | list[float],
+    tdb: float | list[float] | np.ndarray,
+    tr: float | list[float] | np.ndarray,
+    rh: float | list[float] | np.ndarray,
+    vr: float | list[float] | np.ndarray,
     sport: _SportsValues,
 ) -> SportsHeatStressRisk:
     """Calculate sports heat stress risk levels based on environmental conditions and
@@ -150,10 +171,10 @@ def sports_heat_stress_risk(
     inputs = SportsHeatStressInputs(tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport)
 
     # Convert to numpy arrays for vectorized calculation
-    tdb = np.asarray(inputs.tdb)
-    tr = np.asarray(inputs.tr)
-    rh = np.asarray(inputs.rh)
-    vr = np.asarray(inputs.vr)
+    tdb = np.asarray(inputs.tdb, dtype=float)
+    tr = np.asarray(inputs.tr, dtype=float)
+    rh = np.asarray(inputs.rh, dtype=float)
+    vr = np.asarray(inputs.vr, dtype=float)
 
     # Vectorize the calculation function to handle arrays
     # Returns (risk_level_interpolated, t_medium, t_high, t_extreme, recommendation) for each input
@@ -195,7 +216,6 @@ def _calc_risk_single_value(
     -------
     tuple of (float, float, float, float, str)
         Tuple containing (risk_level_interpolated, t_medium, t_high, t_extreme, recommendation).
-
     """
     # set the max and min thresholds for the risk levels
     sweat_loss_g = 850  # 850 g per hour
@@ -230,69 +250,70 @@ def _calc_risk_single_value(
         )
 
     def calculate_threshold_water_loss(x):
-        return (
-            phs(
-                tdb=x,
-                tr=tr,
-                v=vr,
-                rh=rh,
-                met=sport.met,
-                clo=sport.clo,
-                posture="standing",
-                # todo check if I can use duration=60 for all sports
-                duration=sport.duration,
-                round=False,
-                limit_inputs=False,
-                acclimatized=100,
-                i_mst=0.4,
-            ).sweat_loss_g
-            / sport.duration
-            * 45
-            # todo DO NOT CHANGE this
-            #  Federico Tartarini will remove the above line and calculate a fixed value for all sports over 60 min
-            - sweat_loss_g
-        )
+        sl = phs(
+            tdb=x,
+            tr=tr,
+            v=vr,
+            rh=rh,
+            met=sport.met,
+            clo=sport.clo,
+            posture="standing",
+            duration=sport.duration,
+            round_output=False,
+            limit_inputs=False,
+            acclimatized=100,
+            i_mst=0.4,
+        ).sweat_loss_g
+
+        # Ensure a scalar float is returned for the root solver
+        sl_scalar = float(np.asarray(sl))
+        return float(sl_scalar / float(sport.duration) * 45.0 - float(sweat_loss_g))
 
     for min_t, max_t in [(0, 36), (20, 50)]:
         try:
-            t_medium = scipy.optimize.brentq(
-                calculate_threshold_water_loss, min_t, max_t
-            )
+            t_medium = brentq(calculate_threshold_water_loss, min_t, max_t)
             break
-        except ValueError as e:
-            msg = f"Solver did not find a solution for low-medium threshold for {tdb=} and {rh=}: {e}"
-            msg = f"{msg}. Setting t_medium to max threshold of {max_t_low}°C."
-            warnings.warn(msg, stacklevel=2)
-            t_medium = max_t_low
+        except ValueError:
+            continue
+    else:
+        msg = (
+            f"Solver did not find a solution for low-medium threshold for {tdb=} and {rh=}: "
+            f"all bracket ranges failed. Setting t_medium to max threshold of {max_t_low}°C."
+        )
+        warnings.warn(msg, stacklevel=2)
+        t_medium = max_t_low
 
     def calculate_threshold_core(x):
-        return (
-            phs(
-                tdb=x,
-                tr=tr,
-                v=vr,
-                rh=rh,
-                met=sport.met,
-                clo=sport.clo,
-                posture="standing",
-                duration=sport.duration,
-                round=False,
-                limit_inputs=False,
-                acclimatized=100,
-                i_mst=0.4,
-            ).t_cr
-            - t_cr_extreme
-        )
+        tcr = phs(
+            tdb=x,
+            tr=tr,
+            v=vr,
+            rh=rh,
+            met=sport.met,
+            clo=sport.clo,
+            posture="standing",
+            duration=sport.duration,
+            round_output=False,
+            limit_inputs=False,
+            acclimatized=100,
+            i_mst=0.4,
+        ).t_cr
+
+        return float(float(np.asarray(tcr)) - float(t_cr_extreme))
 
     for min_t, max_t in [(0, 36), (20, 50)]:
         try:
-            t_extreme = scipy.optimize.brentq(calculate_threshold_core, min_t, max_t)
+            t_extreme = brentq(calculate_threshold_core, min_t, max_t)
             break
-        except ValueError as e:
-            msg = f"Solver did not find a solution for high-extreme threshold for {tdb=} and {rh=}: {e}"
-            msg = f"{msg}. Setting t_extreme to max threshold of {max_t_high}°C."
-            warnings.warn(msg, stacklevel=2)
-            t_extreme = max_t_high
+        except ValueError:
+            continue
+    else:
+        msg = (
+            f"Solver did not find a solution for high-extreme threshold for {tdb=} and {rh=}: "
+            f"all bracket ranges failed. Setting t_extreme to max threshold of {max_t_high}°C."
+        )
+        warnings.warn(msg, stacklevel=2)
+        t_extreme = max_t_high
 
     # calculate t_high as the average of t_medium and t_extreme
     t_high = (
