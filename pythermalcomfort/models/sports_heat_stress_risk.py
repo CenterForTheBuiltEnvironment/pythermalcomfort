@@ -21,13 +21,13 @@ class _SportsValues:
     duration: int
 
     def __post_init__(self):
-        if not isinstance(self.clo, float) or self.clo <= 0:
+        if not isinstance(self.clo, (int, float)) or self.clo <= 0:
             msg = f"clo must be a positive float > 0, got {self.clo}"
             raise ValueError(msg)
-        if not isinstance(self.met, float) or self.met <= 0:
+        if not isinstance(self.met, (int, float)) or self.met <= 0:
             msg = f"met must be a positive float > 0, got {self.met}"
             raise ValueError(msg)
-        if not isinstance(self.vr, float) or self.vr <= 0:
+        if not isinstance(self.vr, (int, float)) or self.vr <= 0:
             msg = f"vr must be a positive float > 0, got {self.vr}"
             raise ValueError(msg)
         if not isinstance(self.duration, int) or self.duration < 0:
@@ -40,8 +40,8 @@ class Sports:
     """Namespace of predefined sport values.
 
     Use attributes like `Sports.RUNNING` to obtain a `_SportsValues` instance.
-    This is a plain class (not a dataclass) because the attributes are class-level
-    constants and not instance fields.
+    This class uses a frozen dataclass decorator to prevent modification of the
+    namespace. Attributes are class-level constants, not instance fields.
     """
 
     ABSEILING = _SportsValues(clo=0.6, met=6.0, vr=0.5, duration=120)
@@ -338,25 +338,36 @@ def _calc_risk_single_value(
     if t_medium < min_t_medium:
         t_medium = min_t_medium
 
+    # Enforce monotonic ordering: t_medium < t_high < t_extreme
+    if t_high <= t_medium:
+        t_high = t_medium + 0.1
+    if t_extreme <= t_high:
+        t_extreme = t_high + 0.1
+
     risk_level_interpolated = np.nan
     # calculate the risk level with one decimal place
-    if min_t_low <= tdb < t_medium:
+    if min_t_low <= tdb < t_medium and t_medium > min_t_low:
         risk_level_interpolated = (tdb - min_t_low) / (t_medium - min_t_low)
-    elif t_medium <= tdb < t_high:
+    elif t_medium <= tdb < t_high and t_high > t_medium:
         risk_level_interpolated = 1.0 + (tdb - t_medium) / (t_high - t_medium)
-    elif t_high <= tdb < t_extreme:
+    elif t_high <= tdb < t_extreme and t_extreme > t_high:
         risk_level_interpolated = 2.0 + (tdb - t_high) / (t_extreme - t_high)
     elif tdb >= t_extreme:
-        risk_level_interpolated = 3.0
+         risk_level_interpolated = 3.0
+    elif tdb < min_t_low:
+        risk_level_interpolated = 0.0
 
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
 
-    # Generate recommendation based on the risk level
-    recommendation = _get_recommendation(risk_level_interpolated)
+    # Round the risk level first
+    risk_level_rounded = round(risk_level_interpolated, 1)
+
+    # Generate recommendation based on the ROUNDED risk level for consistency
+    recommendation = _get_recommendation(risk_level_rounded)
 
     return (
-        round(risk_level_interpolated, 1),
+        risk_level_rounded,
         round(t_medium, 1),
         round(t_high, 1),
         round(t_extreme, 1),
