@@ -1253,11 +1253,11 @@ class SportsHeatStressInputs(BaseInputs):
 
     def __init__(
         self,
-        tdb,
-        tr,
-        rh,
-        vr,
-        sport,
+        tdb: float | int | np.ndarray | list,
+        tr: float | int | np.ndarray | list,
+        rh: float | int | np.ndarray | list,
+        vr: float | int | np.ndarray | list,
+        sport,  # Type hint would require importing _SportsValues here
     ):
         # Store sport before calling super().__init__() as it's not a BaseInputs field
         self.sport = sport
