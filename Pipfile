@@ -11,8 +11,6 @@ setuptools = "*"
 tox = "*"
 
 [dev-packages]
-pytest = "*"
-requests = "*"
 pandas = "*"
 pydantic = "*"
 tabulate = "*"
@@ -26,6 +24,9 @@ twine = "*"
 readme-renderer = "*"
 pre-commit = "*"
 blacken-docs = "*"
+pytest = "*"
+filelock = "*"
+requests = "*"
 
 [requires]
 python_version = "3.12"
