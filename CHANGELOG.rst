@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.8.0 (2025-12-05)
+3.9.0 (2026-02-03)
 ------------------
 
 * Added `sports_heat_stress_risk` function to assess heat stress risk for athletes during outdoor sports activities based on environmental conditions. Addresses issue #237.

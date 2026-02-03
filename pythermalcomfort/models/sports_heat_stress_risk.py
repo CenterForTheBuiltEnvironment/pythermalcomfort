@@ -71,8 +71,10 @@ def sports_heat_stress_risk(
     This function assesses heat stress risk for athletes during outdoor sports by
     combining environmental conditions with sport-specific metabolic rates and clothing
     insulation. It uses the Predicted Heat Strain (PHS) model to determine threshold
-    temperatures for different risk categories (Low, Medium, High, Extreme), based on
-    the Sports Medicine Australia heat policy framework [SportsHeatStress2025]_.
+    temperatures for different risk categories (Low, Medium, High, Extreme). The method 
+    is based on the Sports Medicine Australia heat policy framework [SportsHeatStress2025]_, 
+    with detailed guidelines [SportsHeatPolicy2025]_ and an online implementation available 
+    at the Sports Heat Tool [SportsHeatTool]_.
 
     Parameters
     ----------
@@ -162,20 +164,6 @@ def sports_heat_stress_risk(
         tdb=tdb, tr=tr, rh=rh, vr=vr, sport=sport
     )
 
-    # Convert scalar arrays back to scalars if input was scalar
-    if tdb.ndim == 0:
-        risk_levels = float(risk_levels)
-        t_mediums = float(t_mediums)
-        t_highs = float(t_highs)
-        t_extremes = float(t_extremes)
-        recommendations = str(recommendations)
-    else:
-        risk_levels = risk_levels.tolist()
-        t_mediums = t_mediums.tolist()
-        t_highs = t_highs.tolist()
-        t_extremes = t_extremes.tolist()
-        recommendations = recommendations.tolist()
-
     return SportsHeatStressRisk(
         risk_level_interpolated=risk_levels,
         t_medium=t_mediums,
@@ -186,7 +174,7 @@ def sports_heat_stress_risk(
 
 
 def _calc_risk_single_value(
-    tdb, tr, rh, vr, sport: _SportsValues
+    tdb: float, tr: float, rh: float, vr: float, sport: _SportsValues
 ) -> tuple[float, float, float, float, str]:
     """Calculate the risk level and threshold temperatures for a single set of inputs.
 
@@ -210,19 +198,19 @@ def _calc_risk_single_value(
 
     """
     # set the max and min thresholds for the risk levels
-    sweat_loss_g = 825  # 825 g per hour todo - FT - check this value
+    sweat_loss_g = 850  # 850 g per hour
 
     max_t_low = 34.5  # maximum tdb for low risk
     max_t_medium = 39  # maximum tdb for medium risk
     max_t_high = 43.5  # maximum tdb for high risk
     min_t_low = 21  # minimum tdb for low risk
-    min_t_medium = 22  # minimum tdb for medium risk
-    min_t_high = 23  # minimum tdb for high risk
-    min_t_extreme = 25  # minimum tdb for extreme risk
+    min_t_medium = 23  # minimum tdb for medium risk
+    min_t_high = 25  # minimum tdb for high risk
+    min_t_extreme = 26  # minimum tdb for extreme risk
 
     t_cr_extreme = 40  # core temperature for extreme risk
 
-    if tdb < min_t_low:
+    if tdb < min_t_medium:
         # Low risk - use default thresholds and risk level 0
         return (
             0.0,
@@ -371,28 +359,40 @@ def _get_recommendation(risk_level: float) -> str:
     """
     if risk_level < 1.0:
         return (
-            "Activities can proceed as planned. Ensure adequate hydration. "
-            "Monitor athletes for heat illness signs."
+            "Recommendation: Increase hydration & modify clothing\n\n"
+            "Detailed suggestions: Maintaining hydration through regular fluid consumption and modifying clothing is still a simple, yet effective, way of keeping cool and preserving health and performance during the summer months.\n\n"
+            "You should:\n"
+            "• Ensure pre-exercise hydration by consuming 6 ml of water per kilogram of body weight every 2-3 hours before exercise. For a 70kg individual, this equates to 420ml of fluid every 2-3 hours (a standard sports drink bottle contains 500ml).\n"
+            "• Drink regularly throughout exercise. You should aim to drink enough to offset sweat losses, but it is important to avoid over-drinking because this can also have negative health effects. To familiarise yourself with how much you typically sweat and become accustomed to weighing yourself before and after practice or competition.\n"
+            "• Where possible, select lightweight and breathable clothing with extra ventilation. Remove unnecessary clothing/equipment and/ or excess clothing layers. Reduce the amount of skin that is covered by clothing – this will help increase your sweat evaporation, which will help you dissipate heat."
         )
     elif risk_level < 2.0:
         return (
-            "Increase the frequency and/or duration of rest breaks during activities, "
-            "including implementing additional rest breaks that are not normally scheduled. "
-            "Monitor athletes closely. Ensure cool-down areas are available."
+            "Recommendation: Increase frequency and/or duration of rest breaks\n\n"
+            "Detailed suggestions: Increasing the frequency and/or duration of your rest breaks during exercise or sporting activities is an effective way of reducing your risk for heat illness even if minimal resources are available.\n\n"
+            "You should:\n"
+            "• During training sessions, provide a minimum of 15 minutes of rest for every 45 minutes of practice.\n"
+            "• Extend scheduled rest breaks that naturally occur during match-play of a particular sport (e.g. half-time) by ~10 minutes. This is effective for sports such as soccer/football and rugby and can be implemented across other sports such as field hockey.\n"
+            "• Implement additional rest breaks that are not normally scheduled to occur. For example, 3 to 5-min \"quarter-time\" breaks can be introduced mid-way through each half of a football or rugby match, or an extended 10-min drinks break can be introduced every hour of a cricket match or after the second set of a tennis match.\n"
+            "• For sports with continuous play without any scheduled breaks, courses, or play duration can be shortened.\n"
+            "• During all breaks in play or practice, everyone should seek shade – if natural shade is not available, portable sun shelters should be provided, and water freely available."
         )
     elif risk_level < 3.0:
         return (
-            "Implement frequent mandatory rest breaks in shaded or air-conditioned areas. "
-            "Apply active cooling strategies during scheduled and additional rest breaks. "
-            "Significantly reduce activity intensity and duration. Ensure emergency "
-            "medical support is readily available. Consider modifying, postponing, or "
-            "relocating activities."
+            "Recommendation: Apply active cooling strategies\n\n"
+            "Detailed suggestions: Active cooling strategies should be applied during scheduled and additional rest breaks, or before and during activity if play is continuous. Below are strategies that have been shown to effectively reduce body temperature. The suitability and feasibility of each strategy will depend on the type of sport or exercise you are performing.\n\n"
+            "You should:\n"
+            "• Drink cold fluids and/or ice slushies before exercise commences. Note that cold water and ice slushy ingestion during exercise is less effective for cooling.\n"
+            "• Submerge your arms/feet in cold water.\n"
+            "• Water dousing – wetting your skin with cool water using a sponge or a spray bottle helps increase evaporation, which is the most effective cooling mechanism in the heat.\n"
+            "• Ice packs/towels – placing an ice pack or damp towel filled with crushed ice around your neck.\n"
+            "• Electric (misting) fans – outdoor fans can help keep your body cool, especially when combined with a water misting system."
         )
     else:
         return (
-            "Exercise and play should be suspended. If activities have commenced, stop all "
-            "activities as soon as possible. If exceptional circumstances require activities "
-            "to proceed, implement maximum precautions including frequent mandatory rest breaks, "
-            "continuous medical monitoring, immediate access to active cooling strategies, "
-            "and clear emergency action plans."
+            "Recommendation: Consider suspending play\n\n"
+            "Detailed suggestions: The suspension of exercise/play should be considered. If play has commenced, then all activities should be stopped as soon as possible.\n\n"
+            "You should:\n"
+            "• All players should seek shade or cool refuge in an air-conditioned space if available.\n"
+            "• Active cooling strategies should be applied."
         )

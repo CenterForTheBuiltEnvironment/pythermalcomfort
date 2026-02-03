@@ -1053,6 +1053,7 @@ class SportsHeatStressRisk(AutoStrMixin):
     ----------
     risk_level_interpolated : float or list of floats
         Interpolated risk level (0.0-3.0), [dimensionless].
+        Risk levels: 0-1 = low, 1-2 = moderate, 2-3 = high, 3+ = extreme.
     t_medium : float or list of floats
         Temperature threshold for medium risk level, [°C].
     t_high : float or list of floats
