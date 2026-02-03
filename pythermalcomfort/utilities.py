@@ -244,34 +244,31 @@ def wet_bulb_tmp(
 def dew_point_tmp(
     tdb: float | list[float] | NDArray[np.float64],
     rh: float | list[float] | NDArray[np.float64],
-) -> NDArray[np.float64]:  # This is the simplified return type
+) -> NDArray[np.float64]:
     """Calculate the dew point temperature.
 
-        The equation use the Magnus formula using the coefficient from
-        the 2024 edition of the Guide to Instruments and Methods of
-        Observation. [WMO2024]_.
+    The equation use the Magnus formula using the coefficients from
+    the 2024 edition of the Guide to Instruments and Methods of
+    Observation. [WMO2024]_.
 
-        Parameters
-        ----------
-        tdb: float or list of floats
-            dry bulb air temperature, [°C]
-        rh: float or list of floats
-            relative humidity, [%]
+    Parameters
+    ----------
+    tdb : float or list of floats
+        Dry bulb air temperature, [°C]
+    rh : float or list of floats
+        Relative humidity, [%]
 
-        Returns
-        -------
-        dew_point_tmp: ndarray
-            dew point temperature, [°C]
+    Returns
+    -------
+    dew_point_tmp : ndarray
+        Dew point temperature, [°C]
 
-        Example
-        -------
-        .. code-block:: python
-
-            from pythermalcomfort.utilities import dew_point_tmp
-    ¨
-            tdb = 25.0  # dry bulb temperature in °C
-            rh = 60.0  # relative humidity in %
-            t_d = dew_point_tmp(tdb, rh)
+    Examples
+    --------
+    >>> from pythermalcomfort.utilities import dew_point_tmp
+    >>> tdb = 25.0  # dry bulb temperature in °C
+    >>> rh = 60.0  # relative humidity in %
+    >>> t_d = dew_point_tmp(tdb, rh)
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     rh = np.asarray(rh, dtype=np.float64)

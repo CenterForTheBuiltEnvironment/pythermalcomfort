@@ -45,3 +45,4 @@ References
 .. [SportsHeatStress2025] Tartarini F, Smallcombe JW, Lynch GP, Cross TJ, Broderick C, Jay O. The Sports Medicine Australia extreme heat risk and response guidelines and web tool. Journal of Science and Medicine in Sport. 2025;28(9):690-699. DOI: 10.1016/j.jsams.2025.03.006
 .. [SportsHeatPolicy2025] Sports Medicine Australia. (2025). EXTREME HEAT RISK AND RESPONSE GUIDELINES AND WEBTOOL (2025). URL: https://sma.org.au/wp-content/uploads/2026/01/Extreme-Heat-Policy-2025_v1.pdf
 .. [SportsHeatTool] Sports Heat Tool. Sports Medicine Australia. URL: https://sma-heat-policy.sydney.edu.au/
+.. [WMO2024] World Meteorological Organization. (2024). Guide to Instruments and Methods of Observation (WMO-No. 8). Geneva, Switzerland.
