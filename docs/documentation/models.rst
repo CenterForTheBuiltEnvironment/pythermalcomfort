@@ -308,6 +308,9 @@ Sports Heat Stress Risk
 
 .. autofunction:: pythermalcomfort.models.sports_heat_stress_risk.sports_heat_stress_risk
 
+.. autoclass:: pythermalcomfort.models.sports_heat_stress_risk.Sports
+    :members:
+
 .. autoclass:: pythermalcomfort.classes_return.SportsHeatStressRisk
     :members:
 

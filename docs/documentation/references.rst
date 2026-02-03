@@ -43,6 +43,6 @@ References
 .. [Schlatter1987] Schlatter TW. Temperature-humidity index. In: Climatology. Encyclopedia of Earth Science. Springer; 1987. DOI: 10.1007/0-387-30749-4_176
 .. [Forbes2025] Forbes C, Coccarelli A, Xu Z, Meade RD, Kenny GP, Binnewies S, Bach AJE. Biophysical versus machine learning models for predicting rectal and skin temperatures in older adults. J Therm Biol. 2025 Feb;128:104078. DOI: 10.1016/j.jtherbio.2025.104078. Epub 2025 Feb 22. PMID: 40010162.
 .. [SportsHeatStress2025] Tartarini F, Smallcombe JW, Lynch GP, Cross TJ, Broderick C, Jay O. The Sports Medicine Australia extreme heat risk and response guidelines and web tool. Journal of Science and Medicine in Sport. 2025;28(9):690-699. DOI: 10.1016/j.jsams.2025.03.006
-.. [SportsHeatPolicy2025] Sports Medicine Australia. (2025). EXTREME HEAT RISK AND RESPONSE GUIDELINES AND WEBTOOL (2025). URL: https://sma.org.au/wp-content/uploads/2026/01/Extreme-Heat-Policy-2025_v1.pdf
+.. [SportsHeatPolicy2025] Sports Medicine Australia. (2025). EXTREME HEAT RISK AND RESPONSE GUIDELINES AND WEBTOOL (2025). URL: https://sma.org.au/wp-content/uploads/2026/01/Extreme-Heat-Policy-2025_v1.pdf (accessed 2026-02-03)
 .. [SportsHeatTool] Sports Heat Tool. Sports Medicine Australia. URL: https://sma-heat-policy.sydney.edu.au/
 .. [WMO2024] World Meteorological Organization. (2024). Guide to Instruments and Methods of Observation (WMO-No. 8). Geneva, Switzerland.
