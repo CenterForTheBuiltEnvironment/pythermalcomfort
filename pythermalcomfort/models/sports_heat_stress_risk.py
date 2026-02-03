@@ -9,6 +9,7 @@ from scipy.optimize import brentq
 from pythermalcomfort.classes_input import SportsHeatStressInputs
 from pythermalcomfort.classes_return import SportsHeatStressRisk
 from pythermalcomfort.models import phs
+from pythermalcomfort.utilities import validate_type
 
 
 @dataclass
@@ -21,16 +22,21 @@ class _SportsValues:
     duration: int
 
     def __post_init__(self):
-        if not isinstance(self.clo, (int, float)) or self.clo <= 0:
+        validate_type(self.clo, "clo", (int, float))
+        validate_type(self.met, "met", (int, float))
+        validate_type(self.vr, "vr", (int, float))
+        validate_type(self.duration, "duration", (int))
+
+        if self.clo <= 0:
             msg = f"clo must be a positive float > 0, got {self.clo}"
             raise ValueError(msg)
-        if not isinstance(self.met, (int, float)) or self.met <= 0:
+        if self.met <= 0:
             msg = f"met must be a positive float > 0, got {self.met}"
             raise ValueError(msg)
-        if not isinstance(self.vr, (int, float)) or self.vr <= 0:
+        if self.vr <= 0:
             msg = f"vr must be a positive float > 0, got {self.vr}"
             raise ValueError(msg)
-        if not isinstance(self.duration, int) or self.duration < 0:
+        if self.duration < 0:
             msg = f"duration must be a non-negative integer >= 0, got {self.duration}"
             raise ValueError(msg)
 
