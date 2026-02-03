@@ -1241,14 +1241,35 @@ class ScaleWindSpeedLogInputs(BaseInputs):
 
 @dataclass
 class SportsHeatStressInputs(BaseInputs):
-    """Inputs for sports_heat_stress_risk function.
+    """Inputs for :func:`pythermalcomfort.models.sports_heat_stress_risk.sports_heat_stress_risk`.
 
-    Validates types and applicability limits:
-    - tdb, tr, rh, vr must be numeric or array-like
-    - sport must be a _SportsValues instance from the Sports dataclass
-    - rh must be between 0 and 100%
-    - vr must be non-negative
-    - all input arrays must be broadcastable to a common shape
+    Parameters
+    ----------
+    tdb : float or array-like
+        Dry bulb air temperature in degrees Celsius (°C).
+    tr : float or array-like
+        Mean radiant temperature in degrees Celsius (°C).
+    rh : float or array-like
+        Relative humidity in percent (%). Values must be in the interval [0, 100].
+    vr : float or array-like
+        Relative air speed in metres per second (m/s). Values must be non-negative.
+    sport : _SportsValues
+        Sport-specific parameters. Use one of the entries from
+        :class:`pythermalcomfort.models.sports_heat_stress_risk.Sports` (e.g. ``Sports.RUNNING``).
+
+    Raises
+    ------
+    TypeError
+        If ``sport`` is not a ``_SportsValues`` instance.
+    ValueError
+        If ``rh`` contains values outside [0, 100], ``vr`` contains negative values,
+        or the input arrays are not broadcastable to a common shape.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.classes_input import SportsHeatStressInputs
+    >>> from pythermalcomfort.models.sports_heat_stress_risk import Sports
+    >>> SportsHeatStressInputs(tdb=35, tr=35, rh=40, vr=0.5, sport=Sports.RUNNING)
     """
 
     def __init__(
