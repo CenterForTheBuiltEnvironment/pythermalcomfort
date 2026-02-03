@@ -224,7 +224,9 @@ def test_sports_heat_stress_risk_recommendations():
     )
     if 1.0 <= result_medium.risk_level_interpolated < 2.0:
         recommendation_medium = str(np.asarray(result_medium.recommendation).item())
-        assert "Increase frequency and/or duration of rest breaks" in recommendation_medium
+        assert (
+            "Increase frequency and/or duration of rest breaks" in recommendation_medium
+        )
 
     # Test high risk (risk level 2.0-3.0)
     result_high = sports_heat_stress_risk(
@@ -259,7 +261,9 @@ def test_sports_heat_stress_risk_array_recommendations():
 
     # Verify each recommendation is a string (may be numpy string)
     for rec in result.recommendation:
-        rec_str = str(rec) if isinstance(rec, (str, np.str_)) else str(np.asarray(rec).item())
+        rec_str = (
+            str(rec) if isinstance(rec, (str, np.str_)) else str(np.asarray(rec).item())
+        )
         assert len(rec_str) > 0
 
 
@@ -420,14 +424,10 @@ def test_sports_heat_stress_risk_boundary_values(tdb, tr, rh, vr, sport):
 def test_sports_heat_stress_risk_extreme_negative_wind_speed():
     """Test that extreme negative wind speeds raise ValueError."""
     with pytest.raises(ValueError, match="Relative air speed.*must be non-negative"):
-        sports_heat_stress_risk(
-            tdb=30, tr=30, rh=50, vr=-10.5, sport=Sports.RUNNING
-        )
+        sports_heat_stress_risk(tdb=30, tr=30, rh=50, vr=-10.5, sport=Sports.RUNNING)
 
     with pytest.raises(ValueError, match="Relative air speed.*must be non-negative"):
-        sports_heat_stress_risk(
-            tdb=30, tr=30, rh=50, vr=-0.001, sport=Sports.SOCCER
-        )
+        sports_heat_stress_risk(tdb=30, tr=30, rh=50, vr=-0.001, sport=Sports.SOCCER)
 
 
 def test_sports_heat_stress_risk_very_large_wind_speed():
@@ -472,18 +472,14 @@ def test_sports_heat_stress_risk_extreme_cold_temperatures():
 def test_sports_heat_stress_risk_extreme_hot_temperatures():
     """Test behavior with extremely high temperatures (> 60°C)."""
     # Death Valley extreme heat
-    result = sports_heat_stress_risk(
-        tdb=70, tr=70, rh=10, vr=0.5, sport=Sports.WALKING
-    )
+    result = sports_heat_stress_risk(tdb=70, tr=70, rh=10, vr=0.5, sport=Sports.WALKING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     # Should be extreme risk (3.0)
     assert risk_value == pytest.approx(3.0, abs=0.01)
 
     # Industrial environment extreme heat
-    result = sports_heat_stress_risk(
-        tdb=80, tr=80, rh=50, vr=0.1, sport=Sports.RUNNING
-    )
+    result = sports_heat_stress_risk(tdb=80, tr=80, rh=50, vr=0.1, sport=Sports.RUNNING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert risk_value == pytest.approx(3.0, abs=0.01)
@@ -498,9 +494,7 @@ def test_sports_heat_stress_risk_zero_values():
     assert 0 <= risk_value <= 3
 
     # Zero humidity and wind
-    result = sports_heat_stress_risk(
-        tdb=25, tr=25, rh=0, vr=0, sport=Sports.SOCCER
-    )
+    result = sports_heat_stress_risk(tdb=25, tr=25, rh=0, vr=0, sport=Sports.SOCCER)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
@@ -579,17 +573,13 @@ def test_sports_heat_stress_risk_large_array():
 def test_sports_heat_stress_risk_mixed_extreme_conditions():
     """Test combinations of extreme conditions."""
     # High temp + high humidity + no wind (worst case)
-    result = sports_heat_stress_risk(
-        tdb=45, tr=50, rh=100, vr=0, sport=Sports.RUNNING
-    )
+    result = sports_heat_stress_risk(tdb=45, tr=50, rh=100, vr=0, sport=Sports.RUNNING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert risk_value == pytest.approx(3.0, abs=0.01)
 
     # High temp + low humidity + high wind (best cooling case)
-    result = sports_heat_stress_risk(
-        tdb=40, tr=40, rh=5, vr=10.0, sport=Sports.CYCLING
-    )
+    result = sports_heat_stress_risk(tdb=40, tr=40, rh=5, vr=10.0, sport=Sports.CYCLING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
@@ -606,25 +596,19 @@ def test_sports_heat_stress_risk_mixed_extreme_conditions():
 def test_sports_heat_stress_risk_radiant_temperature_extremes():
     """Test with extreme differences between air and radiant temperature."""
     # Very high radiant temperature (direct sunlight)
-    result = sports_heat_stress_risk(
-        tdb=30, tr=70, rh=40, vr=0.5, sport=Sports.TENNIS
-    )
+    result = sports_heat_stress_risk(tdb=30, tr=70, rh=40, vr=0.5, sport=Sports.TENNIS)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
 
     # Very low radiant temperature (shade)
-    result = sports_heat_stress_risk(
-        tdb=35, tr=20, rh=50, vr=0.5, sport=Sports.SOCCER
-    )
+    result = sports_heat_stress_risk(tdb=35, tr=20, rh=50, vr=0.5, sport=Sports.SOCCER)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
 
     # Extreme radiant heat (hot surfaces)
-    result = sports_heat_stress_risk(
-        tdb=30, tr=80, rh=30, vr=1.0, sport=Sports.RUNNING
-    )
+    result = sports_heat_stress_risk(tdb=30, tr=80, rh=30, vr=1.0, sport=Sports.RUNNING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
@@ -633,9 +617,7 @@ def test_sports_heat_stress_risk_radiant_temperature_extremes():
 def test_sports_heat_stress_risk_negative_radiant_temperature():
     """Test with negative radiant temperatures."""
     # Cold radiant surfaces
-    result = sports_heat_stress_risk(
-        tdb=20, tr=-5, rh=40, vr=0.5, sport=Sports.WALKING
-    )
+    result = sports_heat_stress_risk(tdb=20, tr=-5, rh=40, vr=0.5, sport=Sports.WALKING)
     assert isinstance(result, SportsHeatStressRisk)
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
     assert 0 <= risk_value <= 3
@@ -759,4 +741,6 @@ def test_sports_heat_stress_risk_stress_gradient():
     # Risk should generally increase with temperature
     # (allowing for some flatness at the extremes where risk is capped at 0 or 3)
     for i in range(1, len(risks)):
-        assert risks[i] >= risks[i - 1], f"Risk decreased from {risks[i-1]} to {risks[i]} when temperature increased from {temps[i-1]} to {temps[i]}"
+        assert risks[i] >= risks[i - 1], (
+            f"Risk decreased from {risks[i - 1]} to {risks[i]} when temperature increased from {temps[i - 1]} to {temps[i]}"
+        )

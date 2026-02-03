@@ -71,9 +71,9 @@ def sports_heat_stress_risk(
     This function assesses heat stress risk for athletes during outdoor sports by
     combining environmental conditions with sport-specific metabolic rates and clothing
     insulation. It uses the Predicted Heat Strain (PHS) model to determine threshold
-    temperatures for different risk categories (Low, Medium, High, Extreme). The method 
-    is based on the Sports Medicine Australia heat policy framework [SportsHeatStress2025]_, 
-    with detailed guidelines [SportsHeatPolicy2025]_ and an online implementation available 
+    temperatures for different risk categories (Low, Medium, High, Extreme). The method
+    is based on the Sports Medicine Australia heat policy framework [SportsHeatStress2025]_,
+    with detailed guidelines [SportsHeatPolicy2025]_ and an online implementation available
     at the Sports Heat Tool [SportsHeatTool]_.
 
     Parameters
@@ -373,7 +373,7 @@ def _get_recommendation(risk_level: float) -> str:
             "You should:\n"
             "• During training sessions, provide a minimum of 15 minutes of rest for every 45 minutes of practice.\n"
             "• Extend scheduled rest breaks that naturally occur during match-play of a particular sport (e.g. half-time) by ~10 minutes. This is effective for sports such as soccer/football and rugby and can be implemented across other sports such as field hockey.\n"
-            "• Implement additional rest breaks that are not normally scheduled to occur. For example, 3 to 5-min \"quarter-time\" breaks can be introduced mid-way through each half of a football or rugby match, or an extended 10-min drinks break can be introduced every hour of a cricket match or after the second set of a tennis match.\n"
+            '• Implement additional rest breaks that are not normally scheduled to occur. For example, 3 to 5-min "quarter-time" breaks can be introduced mid-way through each half of a football or rugby match, or an extended 10-min drinks break can be introduced every hour of a cricket match or after the second set of a tennis match.\n'
             "• For sports with continuous play without any scheduled breaks, courses, or play duration can be shortened.\n"
             "• During all breaks in play or practice, everyone should seek shade – if natural shade is not available, portable sun shelters should be provided, and water freely available."
         )
