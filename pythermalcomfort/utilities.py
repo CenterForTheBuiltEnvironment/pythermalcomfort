@@ -263,6 +263,11 @@ def dew_point_tmp(
     dew_point_tmp : ndarray
         Dew point temperature, [°C]
 
+    Raises
+    ------
+    ValueError
+        If relative humidity is outside the range [0, 100]%.
+
     Examples
     --------
     >>> from pythermalcomfort.utilities import dew_point_tmp
