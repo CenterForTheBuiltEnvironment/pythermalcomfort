@@ -210,8 +210,7 @@ def test_sports_heat_stress_risk_recommendations():
         tdb=20, tr=20, rh=50, vr=0.5, sport=Sports.RUNNING
     )
     # Convert numpy array to string for comparison
-    recommendation_low = str(np.asarray(result_low.recommendation).item())
-    assert "Increase hydration & modify clothing" in recommendation_low
+    assert "Increase hydration & modify clothing" == str(result_low.recommendation)
     assert result_low.risk_level_interpolated < 1.0
 
     # Test medium risk (risk level 1.0-2.0)
@@ -219,23 +218,29 @@ def test_sports_heat_stress_risk_recommendations():
         tdb=30, tr=30, rh=50, vr=0.5, sport=Sports.RUNNING
     )
     assert 1.0 <= result_medium.risk_level_interpolated < 2.0
-    recommendation_medium = str(np.asarray(result_medium.recommendation).item())
-    assert "Increase frequency and/or duration of rest breaks" in recommendation_medium
+    assert "Increase frequency and/or duration of rest breaks" == str(
+        result_medium.recommendation
+    )
 
     # Test high risk (risk level 2.0-3.0)
     result_high = sports_heat_stress_risk(
-        tdb=38, tr=38, rh=50, vr=0.5, sport=Sports.RUNNING
+        tdb=35, tr=34, rh=30, vr=0.5, sport=Sports.RUNNING
     )
     assert 2.0 <= result_high.risk_level_interpolated < 3.0
-    recommendation_high = str(np.asarray(result_high.recommendation).item())
-    assert "Apply active cooling strategies" in recommendation_high
+    assert "Apply active cooling strategies" == str(result_high.recommendation)
+
+    # Test high risk (risk level 2.0-3.0)
+    result_high = sports_heat_stress_risk(
+        tdb=34, tr=34, rh=30, vr=0.5, sport=Sports.RUNNING
+    )
+    assert 2.0 <= result_high.risk_level_interpolated < 3.0
+    assert "Apply active cooling strategies" == str(result_high.recommendation)
 
     # Test extreme risk (risk level >= 3.0)
     result_extreme = sports_heat_stress_risk(
         tdb=50, tr=50, rh=50, vr=0.5, sport=Sports.RUNNING
     )
-    recommendation_extreme = str(np.asarray(result_extreme.recommendation).item())
-    assert "Consider suspending play" in recommendation_extreme
+    assert "Consider suspending play" in str(result_extreme.recommendation)
     assert result_extreme.risk_level_interpolated == pytest.approx(3.0, rel=1e-3)
 
 
