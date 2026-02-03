@@ -25,7 +25,7 @@ class _SportsValues:
         validate_type(self.clo, "clo", (int, float))
         validate_type(self.met, "met", (int, float))
         validate_type(self.vr, "vr", (int, float))
-        validate_type(self.duration, "duration", (int))
+        validate_type(self.duration, "duration", (int,))
 
         if self.clo <= 0:
             msg = f"clo must be a positive float > 0, got {self.clo}"
@@ -360,8 +360,6 @@ def _calc_risk_single_value(
         risk_level_interpolated = 2.0 + (tdb - t_high) / (t_extreme - t_high)
     elif tdb >= t_extreme:
         risk_level_interpolated = 3.0
-    elif tdb < min_t_low:
-        risk_level_interpolated = 0.0
 
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
