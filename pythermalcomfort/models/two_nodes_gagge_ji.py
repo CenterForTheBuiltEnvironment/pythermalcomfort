@@ -22,7 +22,8 @@ def two_nodes_gagge_ji(
     position: str = Postures.sitting.value,
     **kwargs,
 ) -> GaggeTwoNodesJi:
-    """Two-node model for older people under hot and cold exposures proposed by Ji et al. [Ji2022]_.
+    """Two-node model for older people under hot and cold exposures proposed by Ji et
+    al. [Ji2022]_.
 
     Parameters
     ----------
@@ -105,7 +106,6 @@ def two_nodes_gagge_ji(
             body_weight=80.1,
             length_time_simulation=120,
         )
-
     """
     body_weight = kwargs.pop("body_weight", 70)
     length_time_simulation = kwargs.pop("length_time_simulation", 120)

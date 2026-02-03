@@ -123,6 +123,17 @@ Clothing and activity level can be assessed using the following questions:
   :width: 600
   :alt: Clothing and activity surveys
 
+
+Thermal Disposition
+~~~~~~~~~~~~~~~~~~~
+
+Thinking about your daily life and compared to people around you (for example, colleagues at work, friends, family members), you consider yourself to be:
+
+- More sensitive to heat than most people (for example, I normally complain about feeling warm while others around me are not feeling warm)
+- More sensitive to cold than most people (for example, I normally complain about feeling cold while others around me are not feeling cold)
+- Sensitive to both heat and cold (for example, I normally complain about feeling either warm or cold while others around me are not feeling warm or cold)
+- Not too sensitive to either heat or cold (for example, I normally do not complain or complain very little about feeling either warm or cold while others around me may be feeling warm or cold)
+
 Satisfaction Surveys
 --------------------
 

@@ -45,7 +45,6 @@ def wind_chill_temperature(
 
         result = wind_chill_temperature(tdb=[-5, -10], v=[5.5, 10], round_output=True)
         print(result.wct)  # [-7.5, -15.3]
-
     """
     # Validate inputs using the WCYInputs class
     WCTInputs(

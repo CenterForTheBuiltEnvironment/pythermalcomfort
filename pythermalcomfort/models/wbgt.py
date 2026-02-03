@@ -14,8 +14,8 @@ def wbgt(
     with_solar_load: bool = False,
     round_output: bool = True,
 ) -> WBGT:
-    """Calculate the Wet Bulb Globe Temperature (WBGT) index in compliance
-    with the ISO 7243 Standard [7243ISO2017]_.
+    """Calculate the Wet Bulb Globe Temperature (WBGT) index in compliance with the ISO
+    7243 Standard [7243ISO2017]_.
 
     The WBGT is a heat stress index that
     measures the thermal environment to which a person is exposed. In most
@@ -66,7 +66,6 @@ def wbgt(
 
         result = wbgt(twb=25, tg=32, tdb=20, with_solar_load=True)
         print(result.wbgt)  # 25.9
-
     """
     # Validate inputs using the WBGTInputs class
     WBGTInputs(

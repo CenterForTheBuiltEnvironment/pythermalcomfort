@@ -6,6 +6,7 @@ from dataclasses import dataclass, fields, is_dataclass
 
 import numpy as np
 import numpy.typing as npt
+from numpy._typing import NDArray
 
 
 class AutoStrMixin:
@@ -431,12 +432,12 @@ class PMVPPD(AutoStrMixin):
 
 @dataclass(frozen=True, repr=False)
 class PsychrometricValues(AutoStrMixin):
-    p_sat: float | list[float]
-    p_vap: float | list[float]
-    hr: float | list[float]
-    wet_bulb_tmp: float | list[float]
-    dew_point_tmp: float | list[float]
-    h: float | list[float]
+    p_sat: NDArray[np.float64]
+    p_vap: NDArray[np.float64]
+    hr: NDArray[np.float64]
+    wet_bulb_tmp: NDArray[np.float64]
+    dew_point_tmp: NDArray[np.float64]
+    h: NDArray[np.float64]
 
 
 @dataclass(frozen=True, repr=False)

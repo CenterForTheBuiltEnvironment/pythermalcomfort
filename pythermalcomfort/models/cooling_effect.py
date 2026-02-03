@@ -22,12 +22,12 @@ def cooling_effect(
     wme: float | list[float] = 0,
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CE:
-    """Return the value of the Cooling Effect (`CE`_) calculated in compliance
-    with the ASHRAE 55 2020 Standard [55ASHRAE2023]_. The `CE`_ of the elevated air speed
-    is the value that, when subtracted equally from both the average air
-    temperature and the mean radiant temperature, yields the same `SET`_ under
-    still air as in the first `SET`_ calculation under elevated air speed. The
-    cooling effect is calculated only for air speed higher than 0.1 m/s.
+    """Return the value of the Cooling Effect (`CE`_) calculated in compliance with the
+    ASHRAE 55 2020 Standard [55ASHRAE2023]_. The `CE`_ of the elevated air speed is the
+    value that, when subtracted equally from both the average air temperature and the
+    mean radiant temperature, yields the same `SET`_ under still air as in the first
+    `SET`_ calculation under elevated air speed. The cooling effect is calculated only
+    for air speed higher than 0.1 m/s.
 
     .. _CE: https://en.wikipedia.org/wiki/Thermal_comfort#Cooling_Effect
     .. _SET: https://en.wikipedia.org/wiki/Thermal_comfort#Standard_effective_temperature
@@ -104,7 +104,6 @@ def cooling_effect(
             units="IP",
         )
         print(result.ce)  # [0, 3.95]
-
     """
     # Validate inputs using the CoolingEffectInputs class
     CEInputs(

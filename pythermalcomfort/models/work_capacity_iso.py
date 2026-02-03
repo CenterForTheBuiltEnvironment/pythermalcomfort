@@ -10,7 +10,8 @@ def work_capacity_iso(
     wbgt: float | list[float],
     met: float | list[float],
 ) -> WorkCapacity:
-    """Estimate work capacity due to heat based on ISO standards as described by Brode et al.
+    """Estimate work capacity due to heat based on ISO standards as described by Brode
+    et al.
 
     Estimates the amount of work that will be done at a given WBGT and
     intensity of work as a percent. 100% means work is unaffected by heat. 0%
@@ -40,8 +41,6 @@ def work_capacity_iso(
         :py:class:`~pythermalcomfort.classes_return.WorkCapacity` for more details. To access the
         `capacity` value, use the `capacity` attribute of the returned `WorkCapacity` instance, e.g.,
         `result.capacity`.
-
-
     """
     # Validate inputs
     WorkCapacityStandardsInputs(wbgt=wbgt, met=met)
