@@ -24,7 +24,7 @@ twine = "*"
 readme-renderer = "*"
 pre-commit = "*"
 blacken-docs = "*"
-pytest = ">=9.0,<9.0.3"  # CVE-2025-71176: awaiting patched version
+pytest = "*"  # CVE-2025-71176: awaiting patched version
 filelock = ">=3.20.1"  # CVE-2025-68146: fixed in 3.20.1+
 requests = ">=2.32.4"  # CVE-2024-47081: fixed in 2.32.4+
 

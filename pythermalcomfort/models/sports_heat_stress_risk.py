@@ -353,7 +353,7 @@ def _calc_risk_single_value(
     elif t_high <= tdb < t_extreme and t_extreme > t_high:
         risk_level_interpolated = 2.0 + (tdb - t_high) / (t_extreme - t_high)
     elif tdb >= t_extreme:
-         risk_level_interpolated = 3.0
+        risk_level_interpolated = 3.0
     elif tdb < min_t_low:
         risk_level_interpolated = 0.0
 
