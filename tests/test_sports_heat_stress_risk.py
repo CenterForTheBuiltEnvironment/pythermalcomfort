@@ -37,11 +37,7 @@ def test_sports_heat_stress_risk_scalar(tdb, tr, rh, vr, sport, expected_risk):
 
     # Verify expected risk level - convert to float for comparison
     risk_value = float(np.asarray(result.risk_level_interpolated).item())
-    if isinstance(expected_risk, float):
-        assert risk_value == pytest.approx(expected_risk, rel=0.01)
-    else:
-        # Handle pytest.approx objects
-        assert risk_value == expected_risk
+    assert risk_value == pytest.approx(expected_risk, rel=0.01)
 
 
 def test_sports_heat_stress_risk_array():
@@ -222,19 +218,17 @@ def test_sports_heat_stress_risk_recommendations():
     result_medium = sports_heat_stress_risk(
         tdb=30, tr=30, rh=50, vr=0.5, sport=Sports.RUNNING
     )
-    if 1.0 <= result_medium.risk_level_interpolated < 2.0:
-        recommendation_medium = str(np.asarray(result_medium.recommendation).item())
-        assert (
-            "Increase frequency and/or duration of rest breaks" in recommendation_medium
-        )
+    assert 1.0 <= result_medium.risk_level_interpolated < 2.0
+    recommendation_medium = str(np.asarray(result_medium.recommendation).item())
+    assert "Increase frequency and/or duration of rest breaks" in recommendation_medium
 
     # Test high risk (risk level 2.0-3.0)
     result_high = sports_heat_stress_risk(
         tdb=38, tr=38, rh=50, vr=0.5, sport=Sports.RUNNING
     )
-    if 2.0 <= result_high.risk_level_interpolated < 3.0:
-        recommendation_high = str(np.asarray(result_high.recommendation).item())
-        assert "Apply active cooling strategies" in recommendation_high
+    assert 2.0 <= result_high.risk_level_interpolated < 3.0
+    recommendation_high = str(np.asarray(result_high.recommendation).item())
+    assert "Apply active cooling strategies" in recommendation_high
 
     # Test extreme risk (risk level >= 3.0)
     result_extreme = sports_heat_stress_risk(
