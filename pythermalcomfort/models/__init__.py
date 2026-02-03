@@ -39,6 +39,7 @@ from .work_capacity_niosh import work_capacity_niosh
 
 __all__ = [
     "JOS3",
+    "Sports",
     "adaptive_ashrae",
     "adaptive_en",
     "ankle_draft",
@@ -61,7 +62,6 @@ __all__ = [
     "ridge_regression_predict_t_re_t_sk",
     "set_tmp",
     "solar_gain",
-    "Sports",
     "sports_heat_stress_risk",
     "thi",
     "two_nodes_gagge",
