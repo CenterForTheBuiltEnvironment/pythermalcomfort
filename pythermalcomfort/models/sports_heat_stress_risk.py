@@ -344,19 +344,13 @@ def _calc_risk_single_value(
     if t_medium < min_t_medium:
         t_medium = min_t_medium
 
-    # Enforce monotonic ordering: t_medium < t_high < t_extreme
-    if t_high <= t_medium:
-        t_high = t_medium + 0.1
-    if t_extreme <= t_high:
-        t_extreme = t_high + 0.1
-
     risk_level_interpolated = np.nan
     # calculate the risk level with one decimal place
-    if min_t_low <= tdb < t_medium and t_medium > min_t_low:
-        risk_level_interpolated = (tdb - min_t_low) / (t_medium - min_t_low)
-    elif t_medium <= tdb < t_high and t_high > t_medium:
+    if min_t_medium <= tdb < t_medium:
+        risk_level_interpolated = (tdb - min_t_medium) / (t_medium - min_t_medium)
+    elif t_medium <= tdb < t_high:
         risk_level_interpolated = 1.0 + (tdb - t_medium) / (t_high - t_medium)
-    elif t_high <= tdb < t_extreme and t_extreme > t_high:
+    elif t_high <= tdb < t_extreme:
         risk_level_interpolated = 2.0 + (tdb - t_high) / (t_extreme - t_high)
     elif tdb >= t_extreme:
         risk_level_interpolated = 3.0
