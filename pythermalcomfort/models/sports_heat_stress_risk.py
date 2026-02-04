@@ -28,13 +28,13 @@ class _SportsValues:
         validate_type(self.duration, "duration", (int,))
 
         if self.clo <= 0:
-            msg = f"clo must be a positive float > 0, got {self.clo}"
+            msg = f"clo must be a positive number > 0, got {self.clo}"
             raise ValueError(msg)
         if self.met <= 0:
-            msg = f"met must be a positive float > 0, got {self.met}"
+            msg = f"met must be a positive number > 0, got {self.met}"
             raise ValueError(msg)
         if self.vr <= 0:
-            msg = f"vr must be a positive float > 0, got {self.vr}"
+            msg = f"vr must be a positive number > 0, got {self.vr}"
             raise ValueError(msg)
         if self.duration < 0:
             msg = f"duration must be a non-negative integer >= 0, got {self.duration}"
@@ -148,11 +148,11 @@ def sports_heat_stress_risk(
         result = sports_heat_stress_risk(
             tdb=35, tr=35, rh=40, vr=0.1, sport=Sports.RUNNING
         )
-        print(result.risk_level_interpolated)  # Expected: ~2.4
-        print(result.t_medium)  # Temperature threshold for medium risk
-        print(result.t_high)  # Temperature threshold for high risk
-        print(result.t_extreme)  # Temperature threshold for extreme risk
-        print(result.recommendation)  # Heat stress management recommendations
+        print(result.risk_level_interpolated)  # 3.0 (Extreme risk)
+        print(result.t_medium)  # 23.0 (Temperature threshold for medium risk)
+        print(result.t_high)  # 25.0 (Temperature threshold for high risk)
+        print(result.t_extreme)  # 28.6 (Temperature threshold for extreme risk)
+        print(result.recommendation)  # "Consider suspending play"
 
         # Example 2: Array inputs for multiple conditions
         result = sports_heat_stress_risk(
@@ -229,7 +229,7 @@ def _calc_risk_single_value(
     max_t_low = 34.5  # maximum tdb for low risk
     max_t_medium = 39  # maximum tdb for medium risk
     max_t_high = 43.5  # maximum tdb for high risk
-    min_t_low = 21  # minimum tdb for low risk
+    # min_t_low = 21  # minimum tdb for low risk
     min_t_medium = 23  # minimum tdb for medium risk
     min_t_high = 25  # minimum tdb for high risk
     min_t_extreme = 26  # minimum tdb for extreme risk

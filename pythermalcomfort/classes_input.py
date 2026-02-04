@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 from enum import Enum
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
@@ -1281,7 +1281,7 @@ class SportsHeatStressInputs(BaseInputs):
         tr: float | int | np.ndarray | list,
         rh: float | int | np.ndarray | list,
         vr: float | int | np.ndarray | list,
-        sport: "_SportsValues",
+        sport: _SportsValues,
     ):
         # Store sport before calling super().__init__() as it's not a BaseInputs field
         self.sport = sport
