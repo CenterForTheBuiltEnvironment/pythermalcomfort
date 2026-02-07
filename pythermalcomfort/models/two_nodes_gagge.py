@@ -27,7 +27,8 @@ def two_nodes_gagge(
     w_max: float | list[float] = False,
     calculate_ce: bool = False,
 ) -> SET | GaggeTwoNodes:
-    """Gagge Two-node model of human temperature regulation Gagge et al (1986) [Gagge1986]_.
+    """Gagge Two-node model of human temperature regulation Gagge et al (1986)
+    [Gagge1986]_.
 
     [Gagge1986]_ This model can be used to calculate a variety of indices, including:
 
@@ -95,7 +96,6 @@ def two_nodes_gagge(
 
         result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # [100.0, 100.0]
-
     """
     # Validate inputs using the TwoNodesInputs class
     GaggeTwoNodesInputs(
@@ -115,14 +115,14 @@ def two_nodes_gagge(
         w_max=w_max,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
-    position = np.array(position)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
+    position = np.asarray(position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
@@ -516,11 +516,16 @@ def _gagge_two_nodes_optimized(
     elif t_body >= tbm_h:
         t_sens = w_max * 4.7 + 0.4685 * (t_body - tbm_h)
 
-    disc = (
-        4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
-    )  # predicted thermal discomfort
+    if t_sens > 0 > e_max * w_max - e_comfort - e_diff:
+        disc = 6.0
+    else:
+        disc = (
+            4.7 * (e_rsw - e_comfort) / (e_max * w_max - e_comfort - e_diff)
+        )  # predicted thermal discomfort
     if disc <= 0:
         disc = t_sens
+    if disc > 6:
+        disc = 6.0
 
     # PMV Gagge
     pmv_gagge = (0.303 * math.exp(-0.036 * m) + 0.028) * (e_req - e_comfort - e_diff)

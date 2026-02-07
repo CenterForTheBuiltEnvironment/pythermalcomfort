@@ -42,7 +42,6 @@ def esi(
 
         result = esi(tdb=[30.2, 27.0], rh=[42.2, 68.8], sol_radiation_global=[766, 289])
         print(result.esi)  # [26.2, 25.6]
-
     """
     ESIInputs(
         tdb=tdb,
@@ -51,9 +50,9 @@ def esi(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
-    sol_radiation_global = np.array(sol_radiation_global)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
+    sol_radiation_global = np.asarray(sol_radiation_global)
 
     _esi = (
         0.63 * tdb

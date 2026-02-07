@@ -22,7 +22,8 @@ def two_nodes_gagge_ji(
     position: str = Postures.sitting.value,
     **kwargs,
 ) -> GaggeTwoNodesJi:
-    """Two-node model for older people under hot and cold exposures proposed by Ji et al. [Ji2022]_.
+    """Two-node model for older people under hot and cold exposures proposed by Ji et
+    al. [Ji2022]_.
 
     Parameters
     ----------
@@ -105,7 +106,6 @@ def two_nodes_gagge_ji(
             body_weight=80.1,
             length_time_simulation=120,
         )
-
     """
     body_weight = kwargs.pop("body_weight", 70)
     length_time_simulation = kwargs.pop("length_time_simulation", 120)
@@ -117,15 +117,15 @@ def two_nodes_gagge_ji(
         error_msg = f"Unexpected keyword arguments: {list(kwargs.keys())}"
         raise TypeError(error_msg)
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    met = np.array(met)
-    clo = np.array(clo)
-    vapor_pressure = np.array(vapor_pressure)
-    wme = np.array(wme)
-    body_surface_area = np.array(body_surface_area)
-    p_atm = np.array(p_atm)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    vapor_pressure = np.asarray(vapor_pressure)
+    wme = np.asarray(wme)
+    body_surface_area = np.asarray(body_surface_area)
+    p_atm = np.asarray(p_atm)
 
     # Validate inputs
     GaggeTwoNodesJiInputs(
@@ -450,4 +450,4 @@ def _two_nodes_ji_optimized(
         skin_temp_hist.append(t_skin)
         core_temp_hist.append(t_core)
 
-    return {"t_core": np.array(core_temp_hist), "t_skin": np.array(skin_temp_hist)}
+    return {"t_core": np.asarray(core_temp_hist), "t_skin": np.asarray(skin_temp_hist)}

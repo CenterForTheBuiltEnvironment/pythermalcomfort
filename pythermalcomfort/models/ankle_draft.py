@@ -23,8 +23,8 @@ def ankle_draft(
     v_ankle: float | list[float],
     units: str = Units.SI.value,
 ) -> AnkleDraft:
-    """Calculate the percentage of thermally dissatisfied people with the
-    ankle draft (0.1 m) above floor level [Liu2017]_.
+    """Calculate the percentage of thermally dissatisfied people with the ankle draft
+    (0.1 m) above floor level [Liu2017]_.
 
     This equation is only applicable for vr < 0.2 m/s (40 fps).
 
@@ -86,7 +86,6 @@ def ankle_draft(
         results = ankle_draft(25, 25, 0.2, 50, 1.2, 0.5, 0.3, units="SI")
         print(results)
         # AnkleDraft(ppd_ad=18.5, acceptability=True)
-
     """
     # Validate inputs using the AnkleDraftInputs class
     AnkleDraftInputs(
@@ -101,13 +100,13 @@ def ankle_draft(
     )
 
     # Convert lists to numpy arrays
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    v_ankle = np.array(v_ankle)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    v_ankle = np.asarray(v_ankle)
 
     if units.upper() == Units.IP.value:
         tdb, tr, vr, v_ankle = units_converter(tdb=tdb, tr=tr, vr=vr, vel=v_ankle)

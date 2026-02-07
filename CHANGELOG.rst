@@ -1,6 +1,50 @@
 Changelog
 =========
 
+3.8.0 (2025-11-12)
+------------------
+
+* Fixed the equation to calculate the dew point temperature in the utilities module to comply with WMO 2024 guidelines.
+
+3.7.0 (2025-10-28)
+------------------
+
+* Added machine learning model to predict skin and rectal temperature `ridge_regression_predict_t_re_t_sk`.
+
+3.6.1 (2025-10-07)
+------------------
+
+* Fix issue with `disc` calculation in the two_nodes_gagge model and limiting its value to 6. Close #251
+* Improve documentation for the `disc` function.
+* PMV ASHRAE model returns the `compliance` boolean value with the ASHRAE 55:2023 standard. Close #253
+* Improve formatting of models outputs to the console.
+
+3.6.0 (2025-09-22)
+------------------
+
+.. warning::
+    breaking change for the `phs` function:
+    - the `phs` function now returns all the outputs needed to use the outputs of a previous calculation as inputs for a new calculation.
+    - removed outputs: ``water_loss``, ``water_loss_watt``
+    - added outputs (with units):
+
+        * ``sweat_loss_g`` [g] — cumulative sweat mass per person (not area‑normalised)
+        * ``sweat_rate_watt`` [W·m⁻²] — instantaneous evaporative heat flux at skin
+        * ``evap_load_wm2_min`` [W·min·m⁻²] — accumulated evaporative load for chaining
+
+    Migration:
+
+    .. code-block:: python
+
+        # <= 3.5.x
+        grams = res.water_loss
+        w_m2 = res.water_loss_watt
+        # >= 3.6.0
+        grams = res.sweat_loss_g
+        w_m2 = res.sweat_rate_watt
+        carry = res.evap_load_wm2_min  # for multi‑segment runs
+
+
 3.5.1 (2025-09-15)
 ------------------
 

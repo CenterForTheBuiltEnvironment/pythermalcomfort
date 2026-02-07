@@ -17,13 +17,13 @@ def pmv_athb(
     t_running_mean: float | list[float],
     clo: bool | float | list[float] = False,
 ) -> ATHB:
-    """Return the PMV value calculated with the Adaptive Thermal Heat Balance
-    Framework [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework
-    introduced a method to account for the three adaptive principals, namely
-    physiological, behavioral, and psychological adaptation, individually
-    within existing heat balance models. The objective is a predictive model of
-    thermal sensation applicable during the design stage or in international
-    standards without knowing characteristics of future occupants.
+    """Return the PMV value calculated with the Adaptive Thermal Heat Balance Framework
+    [Schweiker2022]_. The adaptive thermal heat balance (ATHB) framework introduced a
+    method to account for the three adaptive principals, namely physiological,
+    behavioral, and psychological adaptation, individually within existing heat balance
+    models. The objective is a predictive model of thermal sensation applicable during
+    the design stage or in international standards without knowing characteristics of
+    future occupants.
 
     Parameters
     ----------
@@ -58,21 +58,21 @@ def pmv_athb(
 
     Returns
     -------
-    ATHBResults
-        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHBResults` for more details.
+    ATHB
+        Dataclass containing the results of the ATHB calculation. See :py:class:`~pythermalcomfort.classes_return.ATHB` for more details.
 
     Examples
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models import athb
+        from pythermalcomfort.models import pmv_athb
 
         # calculate the predicted mean vote (PMV) using the Adaptive Thermal Heat Balance model
-        results = athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20)
+        results = pmv_athb(tdb=25, tr=25, vr=0.1, rh=50, met=1.2, t_running_mean=20)
         print(results.athb_pmv)  # returns the PMV value
 
         # for multiple points
-        results = athb(
+        results = pmv_athb(
             tdb=[25, 25, 25],
             tr=[25, 25, 25],
             vr=[0.1, 0.1, 0.1],
@@ -81,17 +81,16 @@ def pmv_athb(
             t_running_mean=[20, 20, 20],
         )
         print(results.athb_pmv)
-
     """
     # Validate inputs using the ATHBInputs class
     ATHBInputs(tdb=tdb, tr=tr, vr=vr, rh=rh, met=met, t_running_mean=t_running_mean)
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    rh = np.array(rh)
-    t_running_mean = np.array(t_running_mean)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    rh = np.asarray(rh)
+    t_running_mean = np.asarray(t_running_mean)
 
     met_adapted = met - (0.234 * t_running_mean) / 58.2
 

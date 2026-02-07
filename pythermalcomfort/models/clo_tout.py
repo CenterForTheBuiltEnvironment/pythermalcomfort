@@ -13,8 +13,8 @@ def clo_tout(
     tout: float | list[float],
     units: Literal["SI", "IP"] = Units.SI.value,
 ) -> CloTOut:
-    """Calculate representative clothing insulation Icl based on outdoor air
-    temperature at 06:00 a.m. [Schiavon2013]_.
+    """Calculate representative clothing insulation Icl based on outdoor air temperature
+    at 06:00 a.m. [Schiavon2013]_.
 
     Parameters
     ----------
@@ -58,7 +58,6 @@ def clo_tout(
 
         result = clo_tout(tout=[27, 25])
         print(result.clo_tout)  # array([0.46, 0.47])
-
     """
     # Validate inputs using the CloTOutInputs class
     CloTOutInputs(
@@ -67,7 +66,7 @@ def clo_tout(
     )
 
     # Convert tout to NumPy array for vectorized operations
-    tout = np.array(tout)
+    tout = np.asarray(tout)
 
     # Convert units if necessary
     if units.upper() == Units.IP.value:

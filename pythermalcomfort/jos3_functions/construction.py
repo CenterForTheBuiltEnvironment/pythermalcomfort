@@ -1,7 +1,8 @@
-"""This module provides models for calculating various body parameters including surface area,
-weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
+"""This module provides models for calculating various body parameters including surface
+area, weight ratio, basal blood flow ratio, thermal conductance, and thermal capacity.
 
-The values of a NumPy array containing 17 elements correspond to the body parts defined in JOS3BodyParts.
+The values of a NumPy array containing 17 elements correspond to the body parts defined
+in JOS3BodyParts.
 """
 
 import numpy as np
@@ -78,12 +79,11 @@ def to_array_body_parts(inp) -> np.ndarray:
     ------
     ValueError
         If the input type is not supported or if the input list or ndarray is not of length 17.
-
     """
     if isinstance(inp, int | float):
         return np.full(Default.num_body_parts, inp)
     if isinstance(inp, dict):
-        return np.array([inp[key] for key in JOS3BodyParts.get_attribute_names()])
+        return np.asarray([inp[key] for key in JOS3BodyParts.get_attribute_names()])
     if isinstance(inp, list | np.ndarray):
         inp = np.asarray(inp)
         if inp.shape == (Default.num_body_parts,):
@@ -133,7 +133,6 @@ def bsa_rate(
 
         bsa_ratio = bsa_rate(height=1.80, weight=75, bsa_equation="dubois")
         print(bsa_ratio)
-
     """
     bsa_all = body_surface_area(
         height=height,
@@ -184,7 +183,6 @@ def local_bsa(
 
         local_bsa_values = local_bsa(height=1.80, weight=75, bsa_equation="dubois")
         print(local_bsa_values)
-
     """
     bsa_ratio = bsa_rate(height=height, weight=weight, bsa_equation=bsa_equation)
     return Default.local_bsa * bsa_ratio
@@ -202,7 +200,6 @@ def weight_rate(weight: float) -> float:
     -------
     float
         The ratio of the body weight to the standard body.
-
     """
     return weight / Default.weight
 
@@ -250,7 +247,6 @@ def bfb_rate(
 
         bfb_ratio = bfb_rate(height=1.80, weight=75, age=30, ci=2.59)
         print(bfb_ratio)
-
     """
     ci *= 60  # Convert unit from L/min/m² to L/h/m²
 
@@ -293,10 +289,9 @@ def conductance(
     conductance : numpy.ndarray
         Thermal conductance between layers [W/K].
         The shape is (NUM_NODES, NUM_NODES).
-
     """
     if fat < 12.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.341,
                 0.930,
@@ -318,7 +313,7 @@ def conductance(
             ],
         )
     elif fat < 17.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.311,
                 0.909,
@@ -340,7 +335,7 @@ def conductance(
             ],
         )
     elif fat < 22.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.282,
                 0.889,
@@ -362,7 +357,7 @@ def conductance(
             ],
         )
     elif fat < 27.5:
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.255,
                 0.870,
@@ -384,7 +379,7 @@ def conductance(
             ],
         )
     else:  # fat >= 27.5
-        cdt_cr_sk = np.array(
+        cdt_cr_sk = np.asarray(
             [
                 1.227,
                 0.852,
@@ -424,7 +419,7 @@ def conductance(
     # stolwijk's core radius.
     # The heat transfer coefficient of the core is assumed as the Michel's
     # counter-flow model 0.66816 [W/(m･K)].
-    cdt_ves_cr = np.array(
+    cdt_ves_cr = np.asarray(
         [
             0,
             0,
@@ -446,7 +441,7 @@ def conductance(
         ],
     )
     # superficial vein to skin
-    cdt_sfv_sk = np.array(
+    cdt_sfv_sk = np.asarray(
         [
             0,
             0,
@@ -471,7 +466,7 @@ def conductance(
     # art to vein (counter-flow) [W/K]
     # The data has been derived Mitchell's model.
     # The values = 15.869 [W/(m･K)] * the segment length [m]
-    cdt_art_vein = np.array(
+    cdt_art_vein = np.asarray(
         [
             0,
             0,
@@ -575,12 +570,11 @@ def capacity(
     np.ndarray
         Thermal capacity [J/K].
         The shape is (NUM_NODES).
-
     """
     # Define capacities [Wh/K]
 
     # artery [Wh/K]
-    cap_art = np.array(
+    cap_art = np.asarray(
         [
             0.096,
             0.025,
@@ -603,7 +597,7 @@ def capacity(
     )
 
     # vein [Wh/K]
-    cap_vein = np.array(
+    cap_vein = np.asarray(
         [
             0.321,
             0.085,
@@ -626,7 +620,7 @@ def capacity(
     )
 
     # superficial vein [Wh/K]
-    cap_sfv = np.array(
+    cap_sfv = np.asarray(
         [
             0,
             0,
@@ -652,7 +646,7 @@ def capacity(
     cap_cb = 1.999
 
     # core [Wh/K]
-    cap_cr = np.array(
+    cap_cr = np.asarray(
         [
             1.7229,
             0.564,
@@ -675,7 +669,7 @@ def capacity(
     )
 
     # muscle [Wh/K]
-    cap_ms = np.array(
+    cap_ms = np.asarray(
         [
             0.305,
             0.0,
@@ -698,7 +692,7 @@ def capacity(
     )
 
     # fat [Wh/K]
-    cap_fat = np.array(
+    cap_fat = np.asarray(
         [
             0.203,
             0.0,
@@ -721,7 +715,7 @@ def capacity(
     )
 
     # skin [Wh/K]
-    cap_sk = np.array(
+    cap_sk = np.asarray(
         [
             0.1885,
             0.058,

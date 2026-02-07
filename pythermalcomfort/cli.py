@@ -25,7 +25,6 @@ def main(argv=sys.argv):
 
     Returns:
         int: Exit code.
-
     """
     print(argv)
     return 0

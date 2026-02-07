@@ -53,6 +53,7 @@ class BaseInputs:
     d: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
+    duration: int = field(default=None, metadata={"types": (int, np.ndarray)})
     e_coefficient: float | int = field(default=None, metadata={"types": (float, int)})
     f_bes: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
@@ -124,7 +125,13 @@ class BaseInputs:
     sol_transmittance: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
+    t_re: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
     t_running_mean: float | int | np.ndarray | list = field(
+        default=None, metadata={"types": (float, int, np.ndarray, list)}
+    )
+    t_sk: float | int | np.ndarray | list = field(
         default=None, metadata={"types": (float, int, np.ndarray, list)}
     )
     tdb: float | int | np.ndarray | list = field(
@@ -200,7 +207,6 @@ class BaseInputs:
     )
 
     def __post_init__(self) -> None:
-        """Validate and normalize fields using metadata declared on each field."""
         """Validate and normalize fields using metadata declared on each field."""
         # Validate and normalise units
         units_str = (
@@ -879,6 +885,114 @@ class GaggeTwoNodesSleepInputs(BaseInputs):
 
         if np.any(np.asarray(self.thickness_quilt, dtype=float) < 0):
             raise ValueError("thickness_quilt must be greater than or equal to 0 cm.")
+
+
+@dataclass
+class RidgeRegressionInputs(BaseInputs):
+    """Input validation for the ridge_regression_predict_t_re_t_sk model."""
+
+    def __init__(
+        self,
+        sex,
+        age,
+        height,
+        weight,
+        tdb,
+        rh,
+        duration,
+        t_re=None,
+        t_sk=None,
+        limit_inputs=True,
+        round_output=True,
+    ):
+        super().__init__(
+            sex=sex,
+            age=age,
+            height=height,
+            weight=weight,
+            tdb=tdb,
+            rh=rh,
+            duration=duration,
+            t_re=t_re,
+            t_sk=t_sk,
+            limit_inputs=limit_inputs,
+            round_output=round_output,
+        )
+
+    def _validate_finite(self, param_name):
+        """Validate that a numeric input is finite."""
+        value = getattr(self, param_name)
+        if value is not None:
+            arr = np.asarray(value)
+            if not np.all(np.isfinite(arr)):
+                message = f"{param_name} must contain only finite values."
+                raise ValueError(message)
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        # Validate duration is positive integer
+        if (
+            isinstance(
+                self.duration, bool
+            )  # bool is a subclass of int; exclude explicitly
+            or not isinstance(self.duration, int)
+            or self.duration <= 0
+        ):
+            raise ValueError("Duration must be a positive integer.")
+
+        # Validate that all numeric inputs are finite
+        for param_name in [
+            "age",
+            "height",
+            "weight",
+            "tdb",
+            "rh",
+            "t_re",
+            "t_sk",
+        ]:
+            self._validate_finite(param_name)
+
+        # Validate that all array-like inputs are broadcastable
+        try:
+            np.broadcast_arrays(
+                self.sex, self.age, self.height, self.weight, self.tdb, self.rh
+            )
+        except ValueError as err:
+            raise ValueError(
+                "Input arrays are not broadcastable to a common shape."
+            ) from err
+
+        # Validate either both initial body temp values are provided or neither
+        if (self.t_re is None) != (self.t_sk is None):
+            raise ValueError("Both t_re and t_sk must be provided, or neither.")
+
+        # If provided, ensure initial_t_* can broadcast to the same shape
+        if self.t_re is not None and self.t_sk is not None:
+            try:
+                # Derive the target shape from a successful broadcast of core inputs
+                target = np.broadcast(
+                    self.sex, self.age, self.height, self.weight, self.tdb, self.rh
+                ).shape
+                np.broadcast_to(np.asarray(self.t_re, dtype=float), target)
+                np.broadcast_to(np.asarray(self.t_sk, dtype=float), target)
+            except ValueError as err:
+                raise ValueError(
+                    "t_re and t_sk must be broadcastable to the core input shape."
+                ) from err
+
+        # Basic plausibility checks
+        rh_arr = np.asarray(self.rh)
+        if np.any(rh_arr < 0) or np.any(rh_arr > 100):
+            raise ValueError("Relative humidity (rh) must be between 0 and 100%.")
+
+        for param_name in ["age", "height", "weight"]:
+            value = getattr(self, param_name)
+            if value is not None:
+                arr = np.asarray(value)
+                if np.any(arr <= 0):
+                    message = f"{param_name} must be a positive value."
+                    raise ValueError(message)
 
 
 @dataclass

@@ -29,8 +29,7 @@ def use_fans_heatwaves(
     limit_inputs: bool = True,
     round_output: bool = True,
 ) -> UseFansHeatwaves:
-    """Estimate if the conditions you have selected would cause
-    heat strain.
+    """Estimate if the conditions you have selected would cause heat strain.
 
     This occurs when either the following variables reaches its
     maximum value:
@@ -93,7 +92,6 @@ def use_fans_heatwaves(
 
         result = use_fans_heatwaves(tdb=35, tr=35, v=1.0, rh=50, met=1.2, clo=0.5)
         print(result.e_skin)  # 63.0
-
     """
     # Validate inputs using the UseFansHeatwavesInputs class
     UseFansHeatwavesInputs(
@@ -111,13 +109,13 @@ def use_fans_heatwaves(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
-    met = np.array(met)
-    clo = np.array(clo)
-    wme = np.array(wme)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    wme = np.asarray(wme)
 
     output = two_nodes_gagge(
         tdb,

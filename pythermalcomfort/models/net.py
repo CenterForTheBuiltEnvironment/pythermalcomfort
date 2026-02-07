@@ -67,9 +67,9 @@ def net(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
+    v = np.asarray(v)
 
     frac = 1.0 / (1.76 + 1.4 * v**0.75)
     et = 37 - (37 - tdb) / (0.68 - 0.0014 * rh + frac) - 0.29 * tdb * (1 - 0.01 * rh)

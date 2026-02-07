@@ -70,7 +70,6 @@ def utci(
 
         result = utci(tdb=[25, 40], tr=25, v=1.0, rh=50)
         print(result.utci)  # [24.6, 40.6]
-
     """
     # Validate inputs using the UtciInputs class
     UTCIInputs(
@@ -82,10 +81,10 @@ def utci(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    v = np.array(v)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    v = np.asarray(v)
+    rh = np.asarray(rh)
 
     if units.upper() == Units.IP.value:
         tdb, tr, v = units_converter(tdb=tdb, tr=tr, v=v)

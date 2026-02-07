@@ -43,14 +43,13 @@ def work_capacity_dunne(
         :py:class:`~pythermalcomfort.classes_return.WorkCapacity` for more details. To access the
         `capacity` value, use the `capacity` attribute of the returned `WorkCapacity` instance, e.g.,
         `result.capacity`.
-
     """
     # validate inputs
     WorkCapacityHothapsInputs(wbgt=wbgt, work_intensity=work_intensity)
 
     # convert str to enum
     work_intensity = WorkIntensity(work_intensity.lower())
-    wbgt = np.array(wbgt)
+    wbgt = np.asarray(wbgt)
 
     capacity = np.clip((100 - (25 * (np.maximum(0, wbgt - 25)) ** (2 / 3))), 0, 100)
 

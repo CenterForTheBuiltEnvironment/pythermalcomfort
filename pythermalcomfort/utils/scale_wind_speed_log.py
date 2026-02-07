@@ -14,8 +14,8 @@ def scale_wind_speed_log(
     d: float | list[float] = 0.0,
     round_output: bool = True,
 ) -> ScaleWindSpeedLog:
-    """Scale wind speed from the reference height to a user specified height
-    using the logarithmic wind profile based on surface roughness length [Oke1987]_.
+    """Scale wind speed from the reference height to a user specified height using the
+    logarithmic wind profile based on surface roughness length [Oke1987]_.
 
     The logarithmic wind profile is a semi-empirical relationship that describes how
     wind speed changes with height above the ground in the surface layer of the
@@ -108,7 +108,6 @@ def scale_wind_speed_log(
 
         # Scale with different surface roughness for each measurement
         scale_wind_speed_log(v_z1=[3.0, 5.0], z2=[1.5, 2.5], z0=[0.02, 0.1])
-
     """
     ScaleWindSpeedLogInputs(
         v_z1=v_z1,

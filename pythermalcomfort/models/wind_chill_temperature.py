@@ -45,7 +45,6 @@ def wind_chill_temperature(
 
         result = wind_chill_temperature(tdb=[-5, -10], v=[5.5, 10], round_output=True)
         print(result.wct)  # [-7.5, -15.3]
-
     """
     # Validate inputs using the WCYInputs class
     WCTInputs(
@@ -54,8 +53,8 @@ def wind_chill_temperature(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    v = np.array(v)
+    tdb = np.asarray(tdb)
+    v = np.asarray(v)
 
     _wct = 13.12 + 0.6215 * tdb - 11.37 * v**0.16 + 0.3965 * tdb * v**0.16
 

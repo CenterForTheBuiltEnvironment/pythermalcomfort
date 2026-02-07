@@ -18,9 +18,9 @@ def vertical_tmp_grad_ppd(
     vertical_tmp_grad: float | list[float],
     round_output: bool = True,
 ) -> VerticalTGradPPD:
-    """Calculate the percentage of thermally dissatisfied people with a
-    vertical temperature gradient between feet and head [55ASHRAE2023]_. This equation is
-    only applicable for vr < 0.2 m/s (40 fps).
+    """Calculate the percentage of thermally dissatisfied people with a vertical
+    temperature gradient between feet and head [55ASHRAE2023]_. This equation is only
+    applicable for vr < 0.2 m/s (40 fps).
 
     Parameters
     ----------
@@ -83,7 +83,6 @@ def vertical_tmp_grad_ppd(
         )
         print(result.ppd_vg)  # 12.6
         print(result.acceptability)  # False
-
     """
     # Validate inputs using the VerticalTmpGradPPDInputs class
     VerticalTGradPPDInputs(
@@ -96,12 +95,12 @@ def vertical_tmp_grad_ppd(
         vertical_tmp_grad=vertical_tmp_grad,
     )
 
-    tdb = np.array(tdb)
-    tr = np.array(tr)
-    vr = np.array(vr)
-    met = np.array(met)
-    clo = np.array(clo)
-    vertical_tmp_grad = np.array(vertical_tmp_grad)
+    tdb = np.asarray(tdb)
+    tr = np.asarray(tr)
+    vr = np.asarray(vr)
+    met = np.asarray(met)
+    clo = np.asarray(clo)
+    vertical_tmp_grad = np.asarray(vertical_tmp_grad)
 
     (
         tdb_valid,

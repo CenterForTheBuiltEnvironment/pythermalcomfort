@@ -13,7 +13,8 @@ def heat_index_rothfusz(
     round_output: bool = True,
     limit_inputs: bool = True,
 ) -> HI:
-    """Calculate the Heat Index (HI) in accordance with the Rothfusz (1990) model [Rothfusz1990]_.
+    """Calculate the Heat Index (HI) in accordance with the Rothfusz (1990) model
+    [Rothfusz1990]_.
 
     Parameters
     ----------
@@ -39,7 +40,6 @@ def heat_index_rothfusz(
         result = heat_index_rothfusz(tdb=29, rh=50)
         print(result.hi)  # 29.7
         print(result.stress_category)  # "caution"
-
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(
@@ -49,8 +49,8 @@ def heat_index_rothfusz(
         limit_inputs=limit_inputs,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     hi = -8.784695 + 1.61139411 * tdb + 2.338549 * rh - 0.14611605 * tdb * rh
     hi += -1.2308094 * 10**-2 * tdb**2 - 1.6424828 * 10**-2 * rh**2

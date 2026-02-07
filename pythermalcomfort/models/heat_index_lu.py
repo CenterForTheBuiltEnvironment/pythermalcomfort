@@ -13,7 +13,8 @@ def heat_index_lu(
     rh: float | list[float],
     round_output: bool = True,
 ) -> HI:
-    """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model [lu]_.
+    """Calculate the Heat Index (HI) in accordance with the Lu and Romps (2022) model
+    [lu]_.
 
     Parameters
     ----------
@@ -38,7 +39,6 @@ def heat_index_lu(
 
         result = heat_index_lu(tdb=25, rh=50)
         print(result.hi)  # 25.9
-
     """
     # Validate inputs using the HeatIndexInputs class
     HIInputs(
@@ -48,8 +48,8 @@ def heat_index_lu(
         limit_inputs=False,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     hi = _lu_heat_index_vectorized(tdb + 273.15, rh / 100) - 273.15
 
@@ -61,7 +61,9 @@ def heat_index_lu(
 
 # combining the two functions find_eqvar and find_T
 @np.vectorize
-def _lu_heat_index_vectorized(tdb, rh):  # Thermodynamic parameters
+def _lu_heat_index_vectorized(
+    tdb: np.ndarray, rh: np.ndarray
+) -> np.ndarray:  # Thermodynamic parameters
     t_c_k = 273.16  # K
     p_triple_point = 611.65  # Pa
     e0v = 2.3740e6  # J/kg

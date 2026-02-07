@@ -1,27 +1,78 @@
 from __future__ import annotations
 
 import datetime as dt
+import textwrap
 from dataclasses import dataclass, fields, is_dataclass
 
 import numpy as np
 import numpy.typing as npt
+from numpy._typing import NDArray
 
 
 class AutoStrMixin:
     def __str__(self) -> str:
+        """Pretty-print dataclass fields as aligned single-line 'name : value'.
+
+        - One line per field, no header/title.
+        - NumPy arrays with >10 elements show first 5 and last 5.
+        - Other long strings are shortened to 80 chars with an ellipsis.
+        """
         if not is_dataclass(self):
             return super().__str__()
 
-        # determine width by max variable name length
+        MAX_STR_WIDTH = 80
         names = [f.name for f in fields(type(self))]
-        width = max((len(n) for n in names), default=0)
-        lines = [f"-------- {self.__class__.__name__} --------"]
-        for n in names:
-            v = getattr(self, n)
-            # Format multi-line values or very long values properly
-            v_str = str(v).replace("\n", "\n" + " " * (width + 3 + 3))
-            lines.append(f"{n.ljust(width)} : {v_str}")
-        return "\n".join(lines)
+        values = [getattr(self, n) for n in names]
+
+        # Format values as strings, using comma separation for arrays/lists
+        def value_to_str(val):
+            if isinstance(val, np.ndarray):
+                v = np.array2string(
+                    val,
+                    separator=", ",
+                    max_line_width=MAX_STR_WIDTH,
+                    precision=2,
+                    threshold=10,
+                    edgeitems=5,
+                    formatter={"float_kind": lambda x: f"{x:.2f}"},
+                )
+            elif isinstance(val, (list | tuple)):
+                if len(val) > 10:
+                    head = ", ".join(str(x) for x in val[:5])
+                    tail = ", ".join(str(x) for x in val[-5:])
+                    v = f"[{head}, ..., {tail}]"
+                else:
+                    v = f"[{', '.join(str(x) for x in val)}]"
+            else:
+                v = str(val)
+            # Shorten if needed
+            if isinstance(val, str) and len(v) > MAX_STR_WIDTH:
+                v = textwrap.shorten(v, width=MAX_STR_WIDTH, placeholder="...")
+            return v
+
+        value_strs = [value_to_str(v) for v in values]
+        # Find max name length for alignment
+        max_name_len = max(len(n) for n in names) if names else 0
+        # Compose lines with aligned colons
+        lines = [
+            f"{n.ljust(max_name_len)} : {v}"
+            for n, v in zip(names, value_strs, strict=True)
+        ]
+        # Shorten each line to MAX_STR_WIDTH
+        lines = [
+            textwrap.shorten(line, width=MAX_STR_WIDTH, placeholder="...")
+            if len(line) > MAX_STR_WIDTH
+            else line
+            for line in lines
+        ]
+
+        # Compute header length
+        header_base = f"{self.__class__.__name__}"
+        max_line_len = max([len(header_base)] + [len(line) for line in lines])
+        header = f"{'-' * (max_line_len)}"
+        title = f"{header_base}".center(max_line_len)
+        result = [header, title, header] + lines
+        return "\n".join(result)
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -46,7 +97,6 @@ class APMV(AutoStrMixin):
     ----------
     a_pmv : float or list of floats
         Predicted Mean Vote.
-
     """
 
     a_pmv: float | list[float]
@@ -73,7 +123,6 @@ class AdaptiveASHRAE(AutoStrMixin):
         Acceptability for 80% occupants.
     acceptability_90 : bool or list of bools
         Acceptability for 90% occupants.
-
     """
 
     tmp_cmf: float | list[float]
@@ -112,7 +161,6 @@ class AdaptiveEN(AutoStrMixin):
         Lower acceptable comfort temperature for category II, default in [°C] or in [°F].
     tmp_cmf_cat_iii_low : float or list of floats
         Lower acceptable comfort temperature for category III, default in [°C] or in [°F].
-
     """
 
     tmp_cmf: float | list[float]
@@ -137,7 +185,6 @@ class AnkleDraft(AutoStrMixin):
         Predicted Percentage of Dissatisfied occupants with ankle draft, [%].
     acceptability : bool or list of bools
         Indicates if the air speed at the ankle level is acceptable according to ASHRAE 55 2020 standard.
-
     """
 
     ppd_ad: float | list[float]
@@ -152,7 +199,6 @@ class AT(AutoStrMixin):
     ----------
     at : float or list of floats
         Apparent temperature, [°C]
-
     """
 
     at: float
@@ -167,7 +213,6 @@ class ATHB(AutoStrMixin):
     ----------
     athb_pmv : float or list of floats
         Predicted Mean Vote calculated with the Adaptive Thermal Heat Balance framework.
-
     """
 
     athb_pmv: float | list[float]
@@ -182,7 +227,6 @@ class CloTOut(AutoStrMixin):
     ----------
     clo_tout : float or list of floats
         Representative clothing insulation Icl.
-
     """
 
     clo_tout: float | list[float]
@@ -196,7 +240,6 @@ class CE(AutoStrMixin):
     ----------
     ce : float or list of floats
         Cooling Effect value.
-
     """
 
     ce: float | list[float]
@@ -212,7 +255,6 @@ class DI(AutoStrMixin):
         Discomfort Index, [°C].
     discomfort_condition : str or list of str
         Classification of the thermal comfort conditions according to the discomfort index.
-
     """
 
     di: float | list[float]
@@ -228,7 +270,6 @@ class EPMV(AutoStrMixin):
     ----------
     e_pmv : float or list of floats
         Adjusted Predicted Mean Votes with Expectancy Factor.
-
     """
 
     e_pmv: float | list[float]
@@ -242,7 +283,6 @@ class ESI(AutoStrMixin):
     ----------
     esi : float or list of floats
         Environmental Stress Index.
-
     """
 
     esi: float | list[float]
@@ -256,7 +296,6 @@ class HI(AutoStrMixin):
     ----------
     hi : float or list of floats
         Heat Index, [°C] or [°F] depending on the units.
-
     """
 
     hi: npt.ArrayLike
@@ -273,7 +312,6 @@ class Humidex(AutoStrMixin):
         Humidex value, [°C].
     discomfort : str or list of str
         Degree of comfort or discomfort as defined in Havenith and Fiala (2016).
-
     """
 
     humidex: float | list[float]
@@ -288,7 +326,6 @@ class NET(AutoStrMixin):
     ----------
     net : float or list of floats
         Normal Effective Temperature, [°C].
-
     """
 
     net: float | list[float]
@@ -302,7 +339,6 @@ class PETSteady(AutoStrMixin):
     ----------
     pet : float or list of floats
         Physiological Equivalent Temperature.
-
     """
 
     pet: float | list[float]
@@ -325,16 +361,23 @@ class PHS(AutoStrMixin):
     t_sk_t_cr_wg : float or list of floats
         Fraction of the body mass at the skin temperature.
     d_lim_loss_50 : float or list of floats
-        Maximum allowable exposure time for water loss, mean subject, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for a mean worker (dehydration constraint), [minutes].
     d_lim_loss_95 : float or list of floats
-        Maximum allowable exposure time for water loss, 95% of the working population, [minutes].
+        Maximum allowable exposure time limited by cumulative sweat mass loss
+        for 95% of the working population (dehydration constraint), [minutes].
     d_lim_t_re : float or list of floats
         Maximum allowable exposure time for heat storage, [minutes].
-    water_loss_watt : float or list of floats
-        Maximum water loss in watts, [W].
-    water_loss : float or list of floats
-        Maximum water loss, [g].
-
+    sweat_loss_g : float or list of floats
+        Cumulative evaporated sweat mass for the whole person over the simulated duration, [grams (g)].
+        This is a total mass per person (not per unit area).
+    sweat_rate_watt : float or list of floats
+        Instantaneous evaporative heat flux due to regulatory sweating at the skin,
+        per unit area, [W·m⁻²]. Used at each simulation time step.
+    evap_load_wm2_min : float or list of floats
+        Accumulated evaporative load per unit area over the simulated duration, [W·min·m⁻²].
+        Computed as the running sum of the instantaneous evaporative heat flux (W·m⁻²)
+        at each 1 minute step. Intended for chaining simulation segments.
     """
 
     t_re: float | list[float]
@@ -345,8 +388,9 @@ class PHS(AutoStrMixin):
     d_lim_loss_50: float | list[float]
     d_lim_loss_95: float | list[float]
     d_lim_t_re: float | list[float]
-    water_loss_watt: float | list[float]
-    water_loss: float | list[float]
+    sweat_loss_g: float | list[float]
+    sweat_rate_watt: float | list[float]
+    evap_load_wm2_min: float | list[float]
 
 
 @dataclass(frozen=True, repr=False)
@@ -357,7 +401,6 @@ class PMV(AutoStrMixin):
     ----------
     pmv : float or list of floats
         Predicted Mean Vote.
-
     """
 
     pmv: float | list[float]
@@ -390,22 +433,25 @@ class PMVPPD(AutoStrMixin):
         Predicted Percentage of Dissatisfied.
     tsv : str or list of strings
         Predicted thermal sensation vote.
-
+    compliance : bool or list of bools, optional
+        True if PMV is within the acceptable range (-0.5 < PMV < 0.5) according to
+        ASHRAE Standard 55-2023. Only returned by pmv_ppd_ashrae function.
     """
 
     pmv: float | list[float]
     ppd: float | list[float]
     tsv: float | list[float]
+    compliance: bool | list[bool] | None = None
 
 
 @dataclass(frozen=True, repr=False)
 class PsychrometricValues(AutoStrMixin):
-    p_sat: float | list[float]
-    p_vap: float | list[float]
-    hr: float | list[float]
-    wet_bulb_tmp: float | list[float]
-    dew_point_tmp: float | list[float]
-    h: float | list[float]
+    p_sat: NDArray[np.float64]
+    p_vap: NDArray[np.float64]
+    hr: NDArray[np.float64]
+    wet_bulb_tmp: NDArray[np.float64]
+    dew_point_tmp: NDArray[np.float64]
+    h: NDArray[np.float64]
 
 
 @dataclass(frozen=True, repr=False)
@@ -416,7 +462,6 @@ class SET(AutoStrMixin):
     ----------
     set : float or list of floats
         Standard effective temperature, [°C].
-
     """
 
     set: float | list[float]
@@ -433,7 +478,6 @@ class SolarGain(AutoStrMixin):
     delta_mrt : float or list of floats
         Delta mean radiant temperature. The amount by which the mean radiant
         temperature of the space should be increased if no solar radiation is present.
-
     """
 
     erf: float | list[float]
@@ -483,7 +527,6 @@ class GaggeTwoNodes(AutoStrMixin):
         Thermal discomfort.
     t_sens : float or list of floats
         Predicted Thermal Sensation.
-
     """
 
     e_skin: float | list[float]
@@ -516,7 +559,6 @@ class GaggeTwoNodesJi(AutoStrMixin):
         Core temperature, [°C].
     t_skin : float or list of floats
         Skin temperature, [°C].
-
     """
 
     t_core: float | list[float]
@@ -531,7 +573,6 @@ class THI(AutoStrMixin):
     ----------
     thi : float or list of floats
         Temperature-Humidity Index (THI).
-
     """
 
     thi: float | list[float]
@@ -563,7 +604,6 @@ class GaggeTwoNodesSleep(AutoStrMixin):
         Dynamic fraction of total body mass assigned to the skin node (dimensionless).
     skin_blood_flow: float or list of floats
         Skin-blood-flow rate per unit surface area, [kg/h/m2].
-
     """
 
     set: float | list[float]
@@ -616,7 +656,6 @@ class UseFansHeatwaves(AutoStrMixin):
         True if heat strain is caused by skin wettedness (w) reaching its maximum value.
     heat_strain_sweating : bool or list of bools
         True if heat strain is caused by regulatory sweating (m_rsw) reaching its maximum value.
-
     """
 
     e_skin: float | list[float]
@@ -647,7 +686,6 @@ class UTCI(AutoStrMixin):
         Universal Thermal Climate Index, [°C] or in [°F].
     stress_category : str or list of strs
         UTCI categorized in terms of thermal stress [Blazejczyk2013]_.
-
     """
 
     utci: float | list[float]
@@ -665,7 +703,6 @@ class VerticalTGradPPD(AutoStrMixin):
         Predicted Percentage of Dissatisfied occupants with vertical temperature gradient.
     acceptability : bool or list of bools
         True if the value of air speed at the ankle level is acceptable (PPD_vg <= 5%).
-
     """
 
     ppd_vg: float | list[float]
@@ -680,7 +717,6 @@ class WBGT(AutoStrMixin):
     ----------
     wbgt : float or list of floats
         Wet Bulb Globe Temperature Index.
-
     """
 
     wbgt: float | list[float]
@@ -694,7 +730,6 @@ class WCI(AutoStrMixin):
     ----------
     wci : float or list of floats
         Wind Chill Index, [W/m^2].
-
     """
 
     wci: float | list[float]
@@ -708,7 +743,6 @@ class WCT(AutoStrMixin):
     ----------
     wct : float or list of floats
         Wind Chill Temperature, [°C].
-
     """
 
     wct: float | list[float]
@@ -722,7 +756,6 @@ class WorkCapacity(AutoStrMixin):
     ----------
     capacity : float or list of floats
         Work capacity affected by heat.
-
     """
 
     capacity: float | list[float]
@@ -774,7 +807,6 @@ class JOS3BodyParts(AutoStrMixin):
         Index of the right leg.
     right_foot : float
         Index of the right hand.
-
     """
 
     head: float | None = None
@@ -801,7 +833,7 @@ class JOS3BodyParts(AutoStrMixin):
 
 
 def get_attribute_values(cls):
-    return np.array([getattr(cls, field.name) for field in fields(cls)])
+    return np.asarray([getattr(cls, field.name) for field in fields(cls)])
 
 
 @dataclass(frozen=True, repr=False)
@@ -928,7 +960,6 @@ class JOS3Output(AutoStrMixin):
         Sensible heat loss by respiration [W].
     q_res_latent : np.ndarray
         Latent heat loss by respiration [W].
-
     """
 
     simulation_time: dt.timedelta | None = None
@@ -990,6 +1021,29 @@ class JOS3Output(AutoStrMixin):
     q_skin2env_latent: JOS3BodyParts | None = None
     q_res_sensible: float | None = None
     q_res_latent: float | None = None
+
+
+@dataclass(frozen=True, repr=False)
+class PredictedBodyTemperatures(AutoStrMixin):
+    """Dataclass for returning predicted temperature history.
+
+    The `duration` mentioned in the shapes below is the `duration` parameter
+    passed to the prediction function.
+
+    Attributes
+    ----------
+    t_re : numpy.ndarray of float, in °C
+        Predicted rectal temperature history.
+        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
+        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
+    t_sk : numpy.ndarray of float, in °C
+        Predicted mean skin temperature history.
+        - If scalar inputs are provided, this is a 1D array of shape (`duration`,).
+        - If vector inputs are provided, this is a 2D array of shape (`n_inputs`, `duration`).
+    """
+
+    t_re: np.ndarray
+    t_sk: np.ndarray
 
 
 @dataclass(frozen=True, repr=False)

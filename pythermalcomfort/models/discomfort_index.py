@@ -53,7 +53,6 @@ def discomfort_index(
         print(
             result.discomfort_condition
         )  # ['Less than 50% feels discomfort', 'Most of the population feels discomfort']
-
     """
     # Validate inputs using the DiscomfortIndexInputs class
     DIInputs(
@@ -61,8 +60,8 @@ def discomfort_index(
         rh=rh,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     di = tdb - 0.55 * (1 - 0.01 * rh) * (tdb - 14.5)
 

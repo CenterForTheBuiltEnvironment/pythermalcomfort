@@ -11,8 +11,8 @@ def thi(
     rh: float | list[float],
     round_output: bool = True,
 ) -> THI:
-    """Calculate the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent to
-    the definition in [Schlatter1987]_, but uses Celsius instead of Fahrenheit.
+    """Calculate the Temperature-Humidity Index (THI) defined in [Yan2025]_, equivalent
+    to the definition in [Schlatter1987]_, but uses Celsius instead of Fahrenheit.
 
     Parameters
     ----------
@@ -30,7 +30,6 @@ def thi(
         See :py:class:`~pythermalcomfort.classes_return.THI` for more details.
         To access the `thi` value, use the `thi` attribute of the returned `THI`
         instance, e.g., `result.thi`.
-
     """
     # Validate inputs using the THIInputs class
     THIInputs(
@@ -39,8 +38,8 @@ def thi(
         round_output=round_output,
     )
 
-    tdb = np.array(tdb)
-    rh = np.array(rh)
+    tdb = np.asarray(tdb)
+    rh = np.asarray(rh)
 
     _thi = 1.8 * tdb + 32 - 0.55 * (1 - 0.01 * rh) * (1.8 * tdb - 26)
 
