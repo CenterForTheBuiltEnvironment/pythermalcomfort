@@ -22,6 +22,7 @@ Contributors
 .. _Jonas Kittner: https://github.com/jkittner/
 .. _Akihisa Nomoto: https://www.linkedin.com/in/akihisa-nomoto-3b872611b/
 .. _Connor Forbes: https://www.linkedin.com/in/connor-forbes-1a490117b/
+.. _Ben Gottfried Gottkehaskamp: https://www.linkedin.com/in/ben-gottkehaskamp/
 
 Acknowledgements
 ----------------
