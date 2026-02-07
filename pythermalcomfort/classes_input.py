@@ -18,7 +18,7 @@ class WorkIntensity(str, Enum):
     LIGHT = "light"
 
 
-#Revisit: Can we add Parameter description here?
+# Revisit: Can we add Parameter description here?
 @dataclass
 class BaseInputs:
     """
@@ -192,10 +192,10 @@ class BaseInputs:
     wme: float | int | np.ndarray | list = field(
         default=0, metadata={"types": (float, int, np.ndarray, list)}
     )
-    eps_sky: float | int | np.ndarray |list = field(
+    eps_sky: float | int | np.ndarray | list = field(
         default=0.7, metadata={"types": (float, int, np.ndarray, list)}
     )
-    fcn: float | int | np.ndarray |list = field(
+    fcn: float | int | np.ndarray | list = field(
         default=1, metadata={"types": (float, int, np.ndarray, list)}
     )
 
@@ -730,12 +730,10 @@ class SETInputs(BaseInputs):
             limit_inputs=limit_inputs,
         )
 
+
 @dataclass
 class SkyEmissivityBruntInputs(BaseInputs):
-    def __init__(
-        self,
-        tdp
-    ):
+    def __init__(self, tdp):
         super().__init__(
             tdp=tdp,
         )
@@ -743,27 +741,16 @@ class SkyEmissivityBruntInputs(BaseInputs):
 
 @dataclass
 class SkyEmissivitySwinbankInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb
-    ):
+    def __init__(self, tdb):
         super().__init__(
             tdb=tdb,
         )
+
 
 @dataclass
 class SkyEmissivityClarkAllenInputs(BaseInputs):
-    def __init__(
-        self,
-        tdb,
-        fcn
-    ):
-        super().__init__(
-            tdb=tdb,
-            fcn = fcn
-        )
-
-
+    def __init__(self, tdb, fcn):
+        super().__init__(tdb=tdb, fcn=fcn)
 
 
 @dataclass
