@@ -1297,7 +1297,10 @@ class SportsHeatStressInputs(BaseInputs):
         # Validate sport is a _SportsValues instance before calling super().__post_init__()
         from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
 
-        validate_type(self.sport, "sport", (_SportsValues,))
+        if not isinstance(self.sport, _SportsValues):
+            raise TypeError(
+                "sport must be a _SportsValues instance from the Sports dataclass."
+            )
 
         super().__post_init__()
 
