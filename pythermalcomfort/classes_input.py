@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
 
 import numpy as np
 
@@ -1278,7 +1281,7 @@ class SportsHeatStressInputs(BaseInputs):
         tr: float | int | np.ndarray | list,
         rh: float | int | np.ndarray | list,
         vr: float | int | np.ndarray | list,
-        sport,  # Type hint would require importing _SportsValues here
+        sport: _SportsValues,
     ):
         # Store sport before calling super().__init__() as it's not a BaseInputs field
         self.sport = sport
@@ -1294,10 +1297,7 @@ class SportsHeatStressInputs(BaseInputs):
         # Validate sport is a _SportsValues instance before calling super().__post_init__()
         from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
 
-        if not isinstance(self.sport, _SportsValues):
-            raise TypeError(
-                "sport must be a _SportsValues instance from the Sports dataclass"
-            )
+        validate_type(self.sport, "sport", (_SportsValues,))
 
         super().__post_init__()
 

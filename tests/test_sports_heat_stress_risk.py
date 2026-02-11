@@ -137,7 +137,7 @@ def test_sports_heat_stress_risk_invalid_inputs():
         sports_heat_stress_risk(tdb=30, tr=30, rh=50, vr=-1, sport=Sports.RUNNING)
 
     # Test invalid sport type
-    with pytest.raises(TypeError, match="sport must be a _SportsValues instance"):
+    with pytest.raises(TypeError, match="sport must be one of the following types"):
         sports_heat_stress_risk(tdb=30, tr=30, rh=50, vr=0.5, sport="invalid")
 
 
