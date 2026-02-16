@@ -358,14 +358,14 @@ def _calc_risk_single_value(
     if np.isnan(risk_level_interpolated):
         raise ValueError("Risk level could not be determined due to NaN thresholds.")
 
-    # Round the risk level first
-    risk_level_rounded = round(risk_level_interpolated, 1)
+    # Truncate to one decimal place toward negative infinity.
+    risk_level_floor = np.floor(risk_level_interpolated * 10.0) / 10.0
 
-    # Generate recommendation based on the ROUNDED risk level for consistency
-    recommendation = _get_recommendation(risk_level_rounded)
+    # Generate recommendation based on the FLOORED risk level for consistency
+    recommendation = _get_recommendation(risk_level_floor)
 
     return (
-        risk_level_rounded,
+        risk_level_floor,
         round(t_medium, 1),
         round(t_high, 1),
         round(t_extreme, 1),
