@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
 
 import numpy as np
 
@@ -1237,3 +1240,88 @@ class ScaleWindSpeedLogInputs(BaseInputs):
         self.z1 = z1
         self.z0 = z0
         self.d = d
+
+
+@dataclass
+class SportsHeatStressInputs(BaseInputs):
+    """Inputs for :func:`pythermalcomfort.models.sports_heat_stress_risk.sports_heat_stress_risk`.
+
+    Parameters
+    ----------
+    tdb : float or array-like
+        Dry bulb air temperature in degrees Celsius (°C).
+    tr : float or array-like
+        Mean radiant temperature in degrees Celsius (°C).
+    rh : float or array-like
+        Relative humidity in percent (%). Values must be in the interval [0, 100].
+    vr : float or array-like
+        Relative air speed in metres per second (m/s). Values must be non-negative.
+    sport : _SportsValues
+        Sport-specific parameters. Use one of the entries from
+        :class:`pythermalcomfort.models.sports_heat_stress_risk.Sports` (e.g. ``Sports.RUNNING``).
+
+    Raises
+    ------
+    TypeError
+        If ``sport`` is not a ``_SportsValues`` instance.
+    ValueError
+        If ``rh`` contains values outside [0, 100], ``vr`` contains negative values,
+        or the input arrays are not broadcastable to a common shape.
+
+    Examples
+    --------
+    >>> from pythermalcomfort.classes_input import SportsHeatStressInputs
+    >>> from pythermalcomfort.models.sports_heat_stress_risk import Sports
+    >>> SportsHeatStressInputs(tdb=35, tr=35, rh=40, vr=0.5, sport=Sports.RUNNING)
+    """
+
+    def __init__(
+        self,
+        tdb: float | int | np.ndarray | list,
+        tr: float | int | np.ndarray | list,
+        rh: float | int | np.ndarray | list,
+        vr: float | int | np.ndarray | list,
+        sport: _SportsValues,
+    ):
+        # Store sport before calling super().__init__() as it's not a BaseInputs field
+        self.sport = sport
+
+        super().__init__(
+            tdb=tdb,
+            tr=tr,
+            rh=rh,
+            vr=vr,
+        )
+
+    def __post_init__(self):
+        # Validate sport is a _SportsValues instance before calling super().__post_init__()
+        from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
+
+        if not isinstance(self.sport, _SportsValues):
+            raise TypeError(
+                "sport must be a _SportsValues instance from the Sports dataclass."
+            )
+
+        super().__post_init__()
+
+        # Convert to numpy arrays for validation
+        tdb = np.asarray(self.tdb, dtype=float)
+        tr = np.asarray(self.tr, dtype=float)
+        rh = np.asarray(self.rh, dtype=float)
+        vr = np.asarray(self.vr, dtype=float)
+
+        # Check broadcasting compatibility
+        try:
+            np.broadcast_arrays(tdb, tr, rh, vr)
+        except ValueError as err:
+            raise ValueError(
+                "Input arrays (tdb, tr, rh, vr) are not broadcastable to a common shape."
+            ) from err
+
+        # Validate relative humidity range
+        if np.any(rh < 0) or np.any(rh > 100):
+            raise ValueError("Relative humidity (rh) must be between 0 and 100%.")
+
+        # Validate air speed is non-negative
+        if np.any(vr < 0):
+            raise ValueError("Relative air speed (vr) must be non-negative.")

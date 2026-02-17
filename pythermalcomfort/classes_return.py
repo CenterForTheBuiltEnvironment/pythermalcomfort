@@ -1044,3 +1044,29 @@ class ScaleWindSpeedLog(AutoStrMixin):
     """
 
     v_z2: npt.ArrayLike
+
+
+@dataclass(frozen=True, repr=False)
+class SportsHeatStressRisk(AutoStrMixin):
+    """Dataclass to represent the Sports Heat Stress Risk calculation results.
+
+    Attributes
+    ----------
+    risk_level_interpolated : float or list of floats
+        Interpolated risk level (0.0-3.0), [dimensionless].
+        Risk levels: 0-1 = low, 1-2 = moderate, 2-3 = high, 3+ = extreme.
+    t_medium : float or list of floats
+        Temperature threshold for medium risk level, [°C].
+    t_high : float or list of floats
+        Temperature threshold for high risk level, [°C].
+    t_extreme : float or list of floats
+        Temperature threshold for extreme risk level, [°C].
+    recommendation : str or list of str
+        Heat stress management recommendations for the calculated risk level.
+    """
+
+    risk_level_interpolated: float | list[float]
+    t_medium: float | list[float]
+    t_high: float | list[float]
+    t_extreme: float | list[float]
+    recommendation: str | list[str]

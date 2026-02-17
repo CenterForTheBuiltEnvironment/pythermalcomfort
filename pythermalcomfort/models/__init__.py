@@ -21,6 +21,7 @@ from .pmv_ppd_iso import pmv_ppd_iso
 from .ridge_regression_predict_t_re_t_sk import ridge_regression_predict_t_re_t_sk
 from .set_tmp import set_tmp
 from .solar_gain import solar_gain
+from .sports_heat_stress_risk import Sports, sports_heat_stress_risk
 from .thi import thi
 from .two_nodes_gagge import two_nodes_gagge
 from .two_nodes_gagge_ji import two_nodes_gagge_ji
@@ -38,6 +39,7 @@ from .work_capacity_niosh import work_capacity_niosh
 
 __all__ = [
     "JOS3",
+    "Sports",
     "adaptive_ashrae",
     "adaptive_en",
     "ankle_draft",
@@ -60,6 +62,7 @@ __all__ = [
     "ridge_regression_predict_t_re_t_sk",
     "set_tmp",
     "solar_gain",
+    "sports_heat_stress_risk",
     "thi",
     "two_nodes_gagge",
     "two_nodes_gagge_ji",
