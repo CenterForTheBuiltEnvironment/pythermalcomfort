@@ -227,8 +227,8 @@ Stats
     :target: https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort/actions/workflows/build-test-publish.yml
     :alt: Tests to ensure pythermalcomfort works on different Python versions and OS
 
-.. |package-health| image:: https://snyk.io/advisor/python/pythermalcomfort/badge.svg
-    :target: https://snyk.io/advisor/python/pythermalcomfort
+.. |package-health| image:: https://img.shields.io/snyk/vulnerability-score/pip/pythermalcomfort.svg
+    :target: https://security.snyk.io/package/pip/pythermalcomfort
     :alt: pythermalcomfort
 
 .. |license| image:: https://img.shields.io/pypi/l/pythermalcomfort?color=brightgreen

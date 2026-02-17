@@ -1,10 +1,10 @@
 Changelog
 =========
 
-3.8.0 (2025-11-12)
+3.9.0 (2026-02-03)
 ------------------
 
-* Fixed the equation to calculate the dew point temperature in the utilities module to comply with WMO 2024 guidelines.
+* Added `sports_heat_stress_risk` function to assess heat stress risk for athletes during outdoor sports activities based on environmental conditions. Addresses issue #237.
 
 3.7.0 (2025-10-28)
 ------------------
