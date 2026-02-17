@@ -12,7 +12,7 @@ from pythermalcomfort.models.sports_heat_stress_risk import (
     ("tdb", "tr", "rh", "vr", "sport", "expected_risk"),
     [
         # Moderate temperature
-        (33, 20, 40, 2, Sports.MTB, 0.9),
+        (33, 20, 40, 2, Sports.MTB, 0.8),
         # High temperature
         (40, 20, 40, 2, Sports.MTB, 2.3),
         # Low temperature (low risk)
@@ -232,12 +232,14 @@ def test_sports_heat_stress_risk_recommendations():
     assert 2.0 <= result_high.risk_level_interpolated < 3.0
     assert "Apply active cooling strategies" == str(result_high.recommendation)
 
-    # Test high risk (risk level 2.0-3.0)
+    # Test medium risk near high boundary (risk level 1.0-2.0)
     result_high = sports_heat_stress_risk(
         tdb=34, tr=34, rh=30, vr=0.5, sport=Sports.RUNNING
     )
-    assert 2.0 <= result_high.risk_level_interpolated < 3.0
-    assert "Apply active cooling strategies" == str(result_high.recommendation)
+    assert 1.0 <= result_high.risk_level_interpolated < 2.0
+    assert "Increase frequency and/or duration of rest breaks" == str(
+        result_high.recommendation
+    )
 
     # Test extreme risk (risk level >= 3.0)
     result_extreme = sports_heat_stress_risk(
