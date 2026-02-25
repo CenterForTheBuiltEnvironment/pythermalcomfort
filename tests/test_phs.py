@@ -160,7 +160,7 @@ a_dubois = 0.202 * (weight**0.425) * (height**0.725)
                 "v": 1.0,
                 "met": 250 / met_to_w_m2 / a_dubois,
                 "clo": 1,
-                "posture": "sitting",
+                "posture": ["sitting", "sitting"],
                 "wme": 0,
                 "a_p": 0.2,
                 "f_r": 0.85,
