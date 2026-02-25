@@ -233,8 +233,8 @@ def phs(
         "f_r": 0.97,
         "t_sk": 34.1,
         "t_cr": 36.8,
-        "t_re": False,
-        "t_cr_eq": False,
+        "t_re": None,
+        "t_cr_eq": None,
         "t_sk_t_cr_wg": 0.3,
         "sweat_rate_watt": 0,
         "limit_inputs": True,
@@ -311,9 +311,10 @@ def phs(
             "The weight of the person should be in kg and it cannot exceed 1000",
         )
 
-    if not t_re:
+    # Use explicit None sentinel for missing t_re and t_cr_eq
+    if t_re is None:
         t_re = t_cr
-    if not t_cr_eq:
+    if t_cr_eq is None:
         t_cr_eq = t_cr
 
     posture_code = _posture_to_code(posture)
@@ -472,6 +473,35 @@ _POSTURE_CROUCHING = 2
 
 
 def _posture_to_code(posture: np.ndarray | str) -> np.ndarray | int:
+    """Map posture string(s) to integer code(s) for PHS calculations.
+
+    Accepts either a scalar string or an array of strings representing posture.
+    Valid values are Postures.standing.value, Postures.sitting.value, and Postures.crouching.value.
+    Comparisons are vectorized using numpy for array inputs.
+
+    Parameters
+    ----------
+    posture : np.ndarray or str
+        Scalar or array of posture strings. Valid values are
+        Postures.standing.value, Postures.sitting.value, Postures.crouching.value.
+
+    Returns
+    -------
+    np.ndarray or int
+        If input is scalar, returns the corresponding integer code:
+        _POSTURE_STANDING, _POSTURE_SITTING, or _POSTURE_CROUCHING.
+        If input is array-like, returns a np.ndarray of dtype int64 with mapped codes.
+
+    Raises
+    ------
+    ValueError
+        If any supplied posture is not one of the valid values.
+
+    Notes
+    -----
+    - Scalar input returns an int code; array input returns a np.ndarray of codes.
+    - Comparisons are vectorized for array inputs using numpy.
+    """
     posture_arr = np.asarray(posture)
     if posture_arr.ndim == 0:
         posture_value = posture_arr.item()
@@ -828,18 +858,20 @@ def _phs_optimized_array(
     sweat_rate_watt,
     model_code,
 ):
+    # n == number of flattened input elements
+    out_t_re = np.empty_like(tdb, dtype=np.float64)
+    out_t_sk = np.empty_like(tdb, dtype=np.float64)
+    out_t_cr = np.empty_like(tdb, dtype=np.float64)
+    out_t_cr_eq = np.empty_like(tdb, dtype=np.float64)
+    out_t_sk_t_cr_wg = np.empty_like(tdb, dtype=np.float64)
+    out_sweat_rate_watt = np.empty_like(tdb, dtype=np.float64)
+    out_evap_load_wm2_min = np.empty_like(tdb, dtype=np.float64)
+    out_sw_tot_g = np.empty_like(tdb, dtype=np.float64)
+    out_d_lim_loss_50 = np.empty_like(tdb, dtype=np.float64)
+    out_d_lim_loss_95 = np.empty_like(tdb, dtype=np.float64)
+    out_d_lim_t_re = np.empty_like(tdb, dtype=np.float64)
+
     n = tdb.size
-    out_t_re = np.empty(n, dtype=np.float64)
-    out_t_sk = np.empty(n, dtype=np.float64)
-    out_t_cr = np.empty(n, dtype=np.float64)
-    out_t_cr_eq = np.empty(n, dtype=np.float64)
-    out_t_sk_t_cr_wg = np.empty(n, dtype=np.float64)
-    out_sweat_rate_watt = np.empty(n, dtype=np.float64)
-    out_evap_load_wm2_min = np.empty(n, dtype=np.float64)
-    out_sw_tot_g = np.empty(n, dtype=np.float64)
-    out_d_lim_loss_50 = np.empty(n, dtype=np.float64)
-    out_d_lim_loss_95 = np.empty(n, dtype=np.float64)
-    out_d_lim_t_re = np.empty(n, dtype=np.float64)
 
     for i in prange(n):
         (
