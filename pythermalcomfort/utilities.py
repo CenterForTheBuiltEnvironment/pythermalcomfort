@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import time
 import warnings
 from enum import Enum
 from typing import NamedTuple
@@ -22,6 +23,74 @@ h_fg = 2501000
 r_air = 287.055
 g = 9.81  # m/s2
 met_to_w_m2 = 58.15
+
+
+class _TimingResult(NamedTuple):
+    """Performance timing results for repeated function calls."""
+
+    avg_seconds: float
+    min_seconds: float
+    max_seconds: float
+    runs: int
+    number: int
+
+
+def _time_function(
+    func,
+    *args,
+    repeat: int = 3,
+    number: int = 1,
+    warmup: int = 1,
+    **kwargs,
+) -> _TimingResult:
+    """Measure average execution time for a function.
+
+    Parameters
+    ----------
+    func : callable
+        Function to time.
+    *args
+        Positional arguments passed to func.
+    repeat : int, optional
+        Number of repeated timing samples. Defaults to 3.
+    number : int, optional
+        Number of function calls per sample. Defaults to 1.
+    warmup : int, optional
+        Number of warmup calls before timing. Defaults to 1.
+    **kwargs
+        Keyword arguments passed to func.
+
+    Returns
+    -------
+    _TimingResult
+        Average, min, max per-call duration across repeats.
+    """
+    if repeat <= 0:
+        raise ValueError("repeat must be > 0")
+    if number <= 0:
+        raise ValueError("number must be > 0")
+    if warmup < 0:
+        raise ValueError("warmup must be >= 0")
+
+    for _ in range(warmup):
+        func(*args, **kwargs)
+
+    samples = []
+    for _ in range(repeat):
+        start = time.perf_counter()
+        for _ in range(number):
+            func(*args, **kwargs)
+        end = time.perf_counter()
+        samples.append((end - start) / number)
+
+    avg_seconds = float(sum(samples) / len(samples))
+    return _TimingResult(
+        avg_seconds=avg_seconds,
+        min_seconds=float(min(samples)),
+        max_seconds=float(max(samples)),
+        runs=repeat,
+        number=number,
+    )
 
 
 class Models(Enum):

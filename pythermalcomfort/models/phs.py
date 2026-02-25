@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from numba import jit
+from numba import jit, prange
 
 from pythermalcomfort.classes_input import PHSInputs
 from pythermalcomfort.classes_return import PHS
@@ -316,6 +316,44 @@ def phs(
     if not t_cr_eq:
         t_cr_eq = t_cr
 
+    posture_code = _posture_to_code(posture)
+    model_code = _MODEL_2023 if model == Models.iso_7933_2023.value else _MODEL_2004
+
+    (
+        tdb_b,
+        tr_b,
+        v_b,
+        p_a_b,
+        met_b,
+        clo_b,
+        posture_code_b,
+        t_sk_b,
+        t_cr_b,
+        t_re_b,
+        t_cr_eq_b,
+        t_sk_t_cr_wg_b,
+        evap_load_wm2_min_b,
+        sweat_rate_watt_b,
+        wme_b,
+    ) = np.broadcast_arrays(
+        tdb,
+        tr,
+        v,
+        p_a,
+        met,
+        clo,
+        posture_code,
+        t_sk,
+        t_cr,
+        t_re,
+        t_cr_eq,
+        t_sk_t_cr_wg,
+        evap_load_wm2_min,
+        sweat_rate_watt,
+        wme,
+    )
+    output_shape = tdb_b.shape
+
     (
         t_re,
         t_sk,
@@ -328,18 +366,18 @@ def phs(
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
-    ) = _phs_optimized(
-        tdb=tdb,
-        tr=tr,
-        v=v,
-        p_a=p_a,
-        met=met,
-        clo=clo,
-        posture=posture,
+    ) = _phs_optimized_array(
+        tdb=np.ravel(tdb_b),
+        tr=np.ravel(tr_b),
+        v=np.ravel(v_b),
+        p_a=np.ravel(p_a_b),
+        met=np.ravel(met_b),
+        clo=np.ravel(clo_b),
+        posture_code=np.ravel(posture_code_b),
         drink=drink,
         acclimatized=acclimatized,
         weight=weight,
-        wme=wme,
+        wme=np.ravel(wme_b),
         i_mst=i_mst,
         a_p=a_p,
         height=height,
@@ -347,15 +385,27 @@ def phs(
         theta=theta,
         duration=duration,
         f_r=f_r,
-        t_sk=t_sk,
-        t_cr=t_cr,
-        t_re=t_re,
-        t_cr_eq=t_cr_eq,
-        t_sk_t_cr_wg=t_sk_t_cr_wg,
-        evap_load_wm2_min=evap_load_wm2_min,
-        sweat_rate_watt=sweat_rate_watt,
-        model=model,
+        t_sk=np.ravel(t_sk_b),
+        t_cr=np.ravel(t_cr_b),
+        t_re=np.ravel(t_re_b),
+        t_cr_eq=np.ravel(t_cr_eq_b),
+        t_sk_t_cr_wg=np.ravel(t_sk_t_cr_wg_b),
+        evap_load_wm2_min=np.ravel(evap_load_wm2_min_b),
+        sweat_rate_watt=np.ravel(sweat_rate_watt_b),
+        model_code=model_code,
     )
+
+    t_re = t_re.reshape(output_shape)
+    t_sk = t_sk.reshape(output_shape)
+    t_cr = t_cr.reshape(output_shape)
+    t_cr_eq = t_cr_eq.reshape(output_shape)
+    t_sk_t_cr_wg = t_sk_t_cr_wg.reshape(output_shape)
+    sweat_rate_watt = sweat_rate_watt.reshape(output_shape)
+    evap_load_wm2_min = evap_load_wm2_min.reshape(output_shape)
+    sw_tot_g = sw_tot_g.reshape(output_shape)
+    d_lim_loss_50 = d_lim_loss_50.reshape(output_shape)
+    d_lim_loss_95 = d_lim_loss_95.reshape(output_shape)
+    d_lim_t_re = d_lim_t_re.reshape(output_shape)
 
     output = {
         "t_re": t_re,
@@ -414,17 +464,51 @@ const_t_eq = math.exp(-1 / 10)
 const_t_sk = math.exp(-1 / 3)
 const_sw = math.exp(-1 / 10)
 
+_MODEL_2004 = 0
+_MODEL_2023 = 1
+_POSTURE_STANDING = 0
+_POSTURE_SITTING = 1
+_POSTURE_CROUCHING = 2
 
-@np.vectorize
+
+def _posture_to_code(posture: np.ndarray | str) -> np.ndarray | int:
+    posture_arr = np.asarray(posture)
+    if posture_arr.ndim == 0:
+        posture_value = posture_arr.item()
+        if posture_value == Postures.standing.value:
+            return _POSTURE_STANDING
+        if posture_value == Postures.sitting.value:
+            return _POSTURE_SITTING
+        if posture_value == Postures.crouching.value:
+            return _POSTURE_CROUCHING
+        error_msg = "Posture has to be either 'standing', 'sitting', or 'crouching'."
+        raise ValueError(error_msg)
+
+    valid = (
+        (posture_arr == Postures.standing.value)
+        | (posture_arr == Postures.sitting.value)
+        | (posture_arr == Postures.crouching.value)
+    )
+    if not np.all(valid):
+        error_msg = "Posture has to be either 'standing', 'sitting', or 'crouching'."
+        raise ValueError(error_msg)
+
+    posture_code = np.empty(posture_arr.shape, dtype=np.int64)
+    posture_code[posture_arr == Postures.standing.value] = _POSTURE_STANDING
+    posture_code[posture_arr == Postures.sitting.value] = _POSTURE_SITTING
+    posture_code[posture_arr == Postures.crouching.value] = _POSTURE_CROUCHING
+    return posture_code
+
+
 @jit(nopython=True, cache=True)
-def _phs_optimized(
+def _phs_optimized_scalar(
     tdb,
     tr,
     v,
     p_a,
     met,
     clo,
-    posture,
+    posture_code,
     drink,
     acclimatized,
     weight,
@@ -443,7 +527,7 @@ def _phs_optimized(
     t_sk_t_cr_wg,
     evap_load_wm2_min,
     sweat_rate_watt,
-    model,
+    model_code,
 ):
     # DuBois body surface area [m2]
     a_dubois = 0.202 * (weight**0.425) * (height**0.725)
@@ -458,7 +542,7 @@ def _phs_optimized(
     # set the sweat rate in grams to zero
     sw_tot_g = 0
 
-    if model == Models.iso_7933_2023.value:
+    if model_code == _MODEL_2023:
         # 2023 standard only has one d_max value
         d_max_50 = (0.03 if drink == 0 else 0.05) * weight * 1000
         d_max_95 = (0.03 if drink == 0 else 0.05) * weight * 1000
@@ -473,15 +557,15 @@ def _phs_optimized(
     def_speed = 0 if walk_sp == 0 else 1
 
     # radiating area dubois
-    if posture == Postures.standing.value:
+    if posture_code == _POSTURE_STANDING:
         a_r_du = 0.77
-    elif posture == Postures.sitting.value:
+    elif posture_code == _POSTURE_SITTING:
         a_r_du = 0.7
     else:  # posture == Postures.crouching.value:
         a_r_du = 0.67
 
     # evaluation of the max sweat rate as a function of the metabolic rate
-    if model == Models.iso_7933_2004.value:
+    if model_code == _MODEL_2004:
         sw_max = (met - 32) * a_dubois
         sw_max = min(sw_max, 400)
         sw_max = max(sw_max, 250)
@@ -496,7 +580,7 @@ def _phs_optimized(
     # static clothing insulation
     i_cl_st = clo * 0.155
 
-    fcl = 1 + 0.28 * clo if model == Models.iso_7933_2023.value else 1 + 0.3 * clo
+    fcl = 1 + 0.28 * clo if model_code == _MODEL_2023 else 1 + 0.3 * clo
 
     # Static boundary layer thermal insulation in quiet air
     i_a_st = 0.111
@@ -553,7 +637,7 @@ def _phs_optimized(
         z = 8.7 * v_r**0.6
 
     # dynamic convective heat transfer coefficient
-    if model == Models.iso_7933_2004.value:
+    if model_code == _MODEL_2004:
         hc_dyn = 2.38 * abs(t_sk - tdb) ** 0.25
     else:  # model == Models.iso_7933_2023.value:
         t_cl = tr + 0.1  # clothing surface temperature
@@ -563,7 +647,7 @@ def _phs_optimized(
 
     aux_r = 5.67e-08 * a_r_du
 
-    if model == Models.iso_7933_2023.value:
+    if model_code == _MODEL_2023:
         f_cl_r = (1 - a_p) * 0.97 + a_p * (1 - f_r)
     else:  # model == Models.iso_7933_2004.value:
         f_cl_r = (1 - a_p) * 0.97 + a_p * f_r
@@ -712,4 +796,103 @@ def _phs_optimized(
         d_lim_loss_50,
         d_lim_loss_95,
         d_lim_t_re,
+    )
+
+
+@jit(nopython=True, parallel=True, cache=True)
+def _phs_optimized_array(
+    tdb,
+    tr,
+    v,
+    p_a,
+    met,
+    clo,
+    posture_code,
+    drink,
+    acclimatized,
+    weight,
+    wme,
+    i_mst,
+    a_p,
+    height,
+    walk_sp,
+    theta,
+    duration,
+    f_r,
+    t_sk,
+    t_cr,
+    t_re,
+    t_cr_eq,
+    t_sk_t_cr_wg,
+    evap_load_wm2_min,
+    sweat_rate_watt,
+    model_code,
+):
+    n = tdb.size
+    out_t_re = np.empty(n, dtype=np.float64)
+    out_t_sk = np.empty(n, dtype=np.float64)
+    out_t_cr = np.empty(n, dtype=np.float64)
+    out_t_cr_eq = np.empty(n, dtype=np.float64)
+    out_t_sk_t_cr_wg = np.empty(n, dtype=np.float64)
+    out_sweat_rate_watt = np.empty(n, dtype=np.float64)
+    out_evap_load_wm2_min = np.empty(n, dtype=np.float64)
+    out_sw_tot_g = np.empty(n, dtype=np.float64)
+    out_d_lim_loss_50 = np.empty(n, dtype=np.float64)
+    out_d_lim_loss_95 = np.empty(n, dtype=np.float64)
+    out_d_lim_t_re = np.empty(n, dtype=np.float64)
+
+    for i in prange(n):
+        (
+            out_t_re[i],
+            out_t_sk[i],
+            out_t_cr[i],
+            out_t_cr_eq[i],
+            out_t_sk_t_cr_wg[i],
+            out_sweat_rate_watt[i],
+            out_evap_load_wm2_min[i],
+            out_sw_tot_g[i],
+            out_d_lim_loss_50[i],
+            out_d_lim_loss_95[i],
+            out_d_lim_t_re[i],
+        ) = _phs_optimized_scalar(
+            tdb[i],
+            tr[i],
+            v[i],
+            p_a[i],
+            met[i],
+            clo[i],
+            posture_code[i],
+            drink,
+            acclimatized,
+            weight,
+            wme[i],
+            i_mst,
+            a_p,
+            height,
+            walk_sp,
+            theta,
+            duration,
+            f_r,
+            t_sk[i],
+            t_cr[i],
+            t_re[i],
+            t_cr_eq[i],
+            t_sk_t_cr_wg[i],
+            evap_load_wm2_min[i],
+            sweat_rate_watt[i],
+            model_code,
+        )
+
+    return (
+        out_t_re,
+        out_t_sk,
+        out_t_cr,
+        out_t_cr_eq,
+        out_t_sk_t_cr_wg,
+        out_sweat_rate_watt,
+        out_evap_load_wm2_min,
+        out_sw_tot_g,
+        out_d_lim_loss_50,
+        out_d_lim_loss_95,
+        out_d_lim_t_re,
     )
