@@ -6,7 +6,10 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from pythermalcomfort.models.sports_heat_stress_risk import _SportsValues
+    from pythermalcomfort.models.sports_heat_stress_risk import (
+        _ProfileSportValues,
+        _SportsValues,
+    )
 
 import numpy as np
 
@@ -1282,9 +1285,11 @@ class SportsHeatStressInputs(BaseInputs):
         rh: float | int | np.ndarray | list,
         vr: float | int | np.ndarray | list,
         sport: _SportsValues,
+        profile: _ProfileSportValues,
     ):
         # Store sport before calling super().__init__() as it's not a BaseInputs field
         self.sport = sport
+        self.profile = profile
 
         super().__init__(
             tdb=tdb,
@@ -1300,6 +1305,13 @@ class SportsHeatStressInputs(BaseInputs):
         if not isinstance(self.sport, _SportsValues):
             raise TypeError(
                 "sport must be a _SportsValues instance from the Sports dataclass."
+            )
+
+        from pythermalcomfort.models.sports_heat_stress_risk import _ProfileSportValues
+
+        if not isinstance(self.profile, _ProfileSportValues):
+            raise TypeError(
+                "profile must be a _ProfileSportValues instance from the ProfileSport dataclass."
             )
 
         super().__post_init__()
