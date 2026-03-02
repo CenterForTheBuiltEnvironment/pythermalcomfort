@@ -7,7 +7,7 @@ on top of Scene visualizations.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -151,7 +151,7 @@ class DataSeries:
         >>> print(categories)  # ['Neutral', 'Warm', 'Neutral', ...]
         """
         categories = []
-        for xi, yi in zip(self.x, self.y):
+        for xi, yi in zip(self.x, self.y, strict=False):
             cat = scene.get_category(float(xi), float(yi))
             categories.append(cat)
         return np.array(categories, dtype=object)
@@ -171,7 +171,7 @@ class DataSeries:
         """
         categories = self.compute_categories(scene)
         unique, counts = np.unique(categories, return_counts=True)
-        return dict(zip(unique, counts))
+        return dict(zip(unique, counts, strict=False))
 
     def compute_category_percentages(self, scene: BaseScene) -> dict[str, float]:
         """Compute percentages for each category.

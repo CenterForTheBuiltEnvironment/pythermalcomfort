@@ -40,6 +40,10 @@ class Preset:
         Default (min, max) for y-axis.
     xy_mapper_name : str
         Name of the mapper function to use (e.g., "mapper_tdb_rh").
+    cmap : str
+        Default colormap name.
+    band_colors : tuple or None
+        Explicit colors for each region. Overrides cmap if provided.
     """
 
     name: str
@@ -51,8 +55,8 @@ class Preset:
     x_range: tuple[float, float] | None = None
     y_range: tuple[float, float] | None = None
     xy_mapper_name: str = "mapper_tdb_rh"
-    cmap: str = "coolwarm"  # Default colormap
-    band_colors: tuple | None = None # explicit colors override cmap
+    cmap: str = "coolwarm"
+    band_colors: tuple[tuple[float, ...], ...] | None = None
 
     def get_xy_mapper(self) -> Callable[[float, float, dict[str, Any]], dict[str, Any]]:
         """Get the xy_to_kwargs mapper function for this preset."""
@@ -75,9 +79,9 @@ ADAPTIVE_PRESET = Preset(
     x_range=(10.0, 33.5),
     y_range=(14.0, 36.0),
     band_colors=(
-        (1.0, 0.0, 0.0, 0.3),      # Discomfort (red)
-        (0.0, 0.0, 1.0, 0.3),      # 80% (blue)
-        (0.0, 0.5, 0.0, 0.3),      # 90% (green)
+        (1.0, 0.0, 0.0, 0.3),  # Discomfort (red)
+        (0.0, 0.0, 1.0, 0.3),  # 80% (blue)
+        (0.0, 0.5, 0.0, 0.3),  # 90% (green)
     ),
 )
 
@@ -133,9 +137,9 @@ PSYCHROMETRIC_PRESET = Preset(
     x_range=(10.0, 36.0),
     y_range=(0.0, 30.0),
     band_colors=(
-        (0.0, 0.0, 1.0, 0.5),      # Cooler (blue)
-        (0.0, 0.5, 0.0, 0.5),      # Comfortable (green)
-        (1.0, 0.0, 0.0, 0.5),      # Warmer (red)
+        (0.0, 0.0, 1.0, 0.5),  # Cooler (blue)
+        (0.0, 0.5, 0.0, 0.5),  # Comfortable (green)
+        (1.0, 0.0, 0.0, 0.5),  # Warmer (red)
     ),
 )
 

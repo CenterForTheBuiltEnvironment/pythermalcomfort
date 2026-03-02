@@ -52,10 +52,14 @@ DEFAULT_THRESHOLDS: dict[str, list[float]] = {
 def get_default_thresholds(model_func: Callable[..., Any]) -> list[float] | None:
     """Return default thresholds for a model function if known.
 
-    Args:
-        model_func: The model function from pythermalcomfort.models.
+    Parameters
+    ----------
+    model_func : Callable
+        The model function from pythermalcomfort.models.
 
-    Returns:
+    Returns
+    -------
+    list[float] or None
         A list of float thresholds or None if no defaults are registered.
     """
     return DEFAULT_THRESHOLDS.get(getattr(model_func, "__name__", ""))
@@ -102,17 +106,24 @@ def rh_from_t_w(t_c: float, w: float, p_pa: float = 101325.0) -> float:
 def extract_metric(result: Any, metric_attr: str | None = None) -> float:
     """Extract a scalar metric from a model result.
 
-    Args:
-        result: Object returned by the model function.
-        metric_attr: If provided, the attribute name to read (e.g., "pmv",
-            "set", "hi", "utci"). If None, attempt to infer a single
-            numeric attribute among common names.
+    Parameters
+    ----------
+    result : Any
+        Object returned by the model function.
+    metric_attr : str or None
+        If provided, the attribute name to read (e.g., "pmv", "set", "hi",
+        "utci"). If None, attempt to infer a single numeric attribute among
+        common names.
 
-    Returns:
+    Returns
+    -------
+    float
         Scalar metric value.
 
-    Raises:
-        ValueError: If a metric cannot be determined.
+    Raises
+    ------
+    ValueError
+        If a metric cannot be determined.
     """
     if metric_attr is not None:
         try:
@@ -148,23 +159,29 @@ def make_metric_eval(
 ) -> Callable[[float, float], float]:
     """Build a metric(x, y) evaluator from a model and a mapper.
 
-    Args:
-        model_func: The pythermalcomfort model function to call.
-        xy_to_kwargs: A small function that maps (x, y, fixed_params) to the
-            keyword arguments for the model function (e.g., {'tdb': x, 'rh': y}).
-        fixed_params: Model parameters that are constant across the grid.
-            This must include any required parameters other than x and y.
-        metric_attr: The attribute name to extract from the result; if None,
-            a common name will be inferred (pmv, set, hi, utci) or the result
-            coerced to float.
+    Parameters
+    ----------
+    model_func : Callable
+        The pythermalcomfort model function to call.
+    xy_to_kwargs : Callable
+        A small function that maps (x, y, fixed_params) to the keyword
+        arguments for the model function (e.g., {'tdb': x, 'rh': y}).
+    fixed_params : dict or None
+        Model parameters that are constant across the grid. This must include
+        any required parameters other than x and y.
+    metric_attr : str or None
+        The attribute name to extract from the result; if None, a common name
+        will be inferred (pmv, set, hi, utci) or the result coerced to float.
 
-    Returns:
+    Returns
+    -------
+    Callable[[float, float], float]
         A function metric(x, y) -> float.
 
-    Notes:
-        No hidden defaults are applied. If the model requires parameters
-        beyond those produced by xy_to_kwargs, they must be provided via
-        fixed_params.
+    Notes
+    -----
+    No hidden defaults are applied. If the model requires parameters beyond
+    those produced by xy_to_kwargs, they must be provided via fixed_params.
     """
     fixed = dict(fixed_params or {})
 
@@ -182,11 +199,16 @@ def make_metric_eval(
 def _smooth_single_curve(x_of_y: np.ndarray, sigma: float) -> np.ndarray:
     """Apply Gaussian smoothing along y on contiguous valid segments.
 
-    Args:
-        x_of_y: Array of x values (may contain NaNs) indexed by y.
-        sigma: Standard deviation (in index units) for Gaussian filter.
+    Parameters
+    ----------
+    x_of_y : np.ndarray
+        Array of x values (may contain NaNs) indexed by y.
+    sigma : float
+        Standard deviation (in index units) for Gaussian filter.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         Smoothed array with NaNs preserved where values were invalid.
     """
     if sigma <= 0 or not np.isfinite(x_of_y).any():
@@ -229,24 +251,35 @@ def solve_threshold_curves(
 ) -> dict[str, Any]:
     """Compute x(y) curves such that metric(x, y) == threshold for each threshold.
 
-    Args:
-        metric_xy: Callable returning the metric value given (x, y).
-        thresholds: Threshold values to solve for.
-        y_values: Sequence of y values at which to find the boundary.
-        x_bounds: (x_min, x_max) bounds for searching.
-        x_scan_step: Step size for the uniform scan used to find brackets.
-        brent_tol: Absolute tolerance for Brent's method (xtol and rtol).
-        brent_maxiter: Maximum iterations for Brent's method.
-        smooth_sigma: Gaussian smoothing sigma (in y-index units). Set 0 to
-            disable smoothing.
-        warn_on_unsolved: If True, warn when no root is found for a y.
+    Parameters
+    ----------
+    metric_xy : Callable[[float, float], float]
+        Callable returning the metric value given (x, y).
+    thresholds : Sequence[float]
+        Threshold values to solve for.
+    y_values : Sequence[float]
+        Sequence of y values at which to find the boundary.
+    x_bounds : tuple[float, float]
+        (x_min, x_max) bounds for searching.
+    x_scan_step : float
+        Step size for the uniform scan used to find brackets.
+    brent_tol : float
+        Absolute tolerance for Brent's method (xtol and rtol).
+    brent_maxiter : int
+        Maximum iterations for Brent's method.
+    smooth_sigma : float
+        Gaussian smoothing sigma (in y-index units). Set 0 to disable smoothing.
+    warn_on_unsolved : bool
+        If True, warn when no root is found for a y.
 
-    Returns:
+    Returns
+    -------
+    dict[str, Any]
         A dict with:
-          - 'curves': list[np.ndarray] with shape (len(y_values),) per threshold
-          - 'y_values': np.ndarray of y positions
-          - 'thresholds': list of thresholds
-          - 'unsolved_counts': list[int] per threshold
+        - 'curves': list[np.ndarray] with shape (len(y_values),) per threshold
+        - 'y_values': np.ndarray of y positions
+        - 'thresholds': list of thresholds
+        - 'unsolved_counts': list[int] per threshold
     """
     y_arr = np.asarray(list(y_values), dtype=float)
     x_min, x_max = float(x_bounds[0]), float(x_bounds[1])

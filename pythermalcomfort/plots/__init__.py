@@ -65,16 +65,21 @@ Custom styling:
 from pythermalcomfort.plots.data_series import DataSeries
 from pythermalcomfort.plots.plot import Plot
 from pythermalcomfort.plots.presets import (
+    ADAPTIVE_PRESET,
     HEAT_INDEX_PRESET,
     PMV_EXTENDED_PRESET,
     PMV_PRESET,
-    ADAPTIVE_PRESET,
-    PSYCHROMETRIC_PRESET,
     PSYCHROMETRIC_EXTENDED_PRESET,
+    PSYCHROMETRIC_PRESET,
     Preset,
     get_preset,
 )
-from pythermalcomfort.plots.scenes import AdaptiveScene, BaseScene, RangeScene, PsychrometricScene
+from pythermalcomfort.plots.scenes import (
+    AdaptiveScene,
+    BaseScene,
+    PsychrometricScene,
+    RangeScene,
+)
 from pythermalcomfort.plots.style import Style
 from pythermalcomfort.plots.summary import SummaryRenderer
 

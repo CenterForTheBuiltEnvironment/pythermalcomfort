@@ -10,15 +10,15 @@ from contextlib import nullcontext as _nullcontext
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
 import numpy as np
+from matplotlib.gridspec import GridSpec
 
 from pythermalcomfort.plots.data_series import DataSeries
-from pythermalcomfort.plots.scenes.adaptive_scene import AdaptiveScene
-from pythermalcomfort.plots.scenes.range_scene import RangeScene
-from pythermalcomfort.plots.scenes.psy_scene import PsychrometricScene
-from pythermalcomfort.plots.style import Style
 from pythermalcomfort.plots.presets import get_preset
+from pythermalcomfort.plots.scenes.adaptive_scene import AdaptiveScene
+from pythermalcomfort.plots.scenes.psy_scene import PsychrometricScene
+from pythermalcomfort.plots.scenes.range_scene import RangeScene
+from pythermalcomfort.plots.style import Style
 from pythermalcomfort.plots.summary import SummaryRenderer
 
 if TYPE_CHECKING:
@@ -204,8 +204,6 @@ class Plot:
         else:
             plot_style = style
 
-        # plot_style = style if style is not None else Style()
-
         # Set axis labels from scene if not explicitly set
         if plot_style.xlabel is None:
             plot_style.xlabel = scene.xlabel
@@ -269,7 +267,7 @@ class Plot:
             plot_style.ylabel = "Operative Temperature [°C]"
 
         return cls(scene=scene, style=plot_style)
-    
+
     @classmethod
     def psychrometric(
         cls,
@@ -432,13 +430,6 @@ class Plot:
         >>> plt.savefig("my_plot.png")
         >>> plt.show()
         """
-        # Determine if we need summary bar
-        show_summary = (
-            self._style.show_summary
-            and self._data_series is not None
-            and len(self._data_series) > 0
-        )
-
         # Use base_style as context so our explicit settings can override
         style_context = (
             plt.style.context(self._style.base_style)
@@ -461,8 +452,12 @@ class Plot:
             if show_info_panel:
                 fig = plt.figure(figsize=self._style.figsize, dpi=self._style.dpi)
                 gs = GridSpec(
-                    1, 2,
-                    width_ratios=[1 - self._style.info_panel_width, self._style.info_panel_width],
+                    1,
+                    2,
+                    width_ratios=[
+                        1 - self._style.info_panel_width,
+                        self._style.info_panel_width,
+                    ],
                     wspace=0.05,
                 )
                 main_ax = fig.add_subplot(gs[0])
@@ -523,7 +518,7 @@ class Plot:
 
     def _apply_style(self, ax: plt.Axes, include_legend: bool = True) -> None:
         """Apply style settings to the axes.
-        
+
         Parameters
         ----------
         ax : matplotlib.axes.Axes
@@ -531,7 +526,7 @@ class Plot:
         include_legend : bool
             Whether to include the legend (False when using info panel).
         """
-        
+
         style = self._style
 
         # Labels
@@ -540,7 +535,11 @@ class Plot:
         if style.ylabel:
             ax.set_ylabel(style.ylabel, fontsize=style.font_sizes.get("label", 12))
         if style.title:
-            ax.set_title(style.title, fontsize=style.font_sizes.get("title", 14), loc=style.title_alignment)
+            ax.set_title(
+                style.title,
+                fontsize=style.font_sizes.get("title", 14),
+                loc=style.title_alignment,
+            )
         if style.title_x_position is not None:
             ax.title.set_position((style.title_x_position, style.title_y_position))
 
@@ -578,7 +577,8 @@ class Plot:
             text = self._scene.get_fixed_params_text()
             if text:
                 ax.text(
-                    0.05, y_pos,
+                    0.05,
+                    y_pos,
                     text,
                     transform=ax.transAxes,
                     ha="left",
@@ -593,17 +593,22 @@ class Plot:
             labels = self._scene.get_labels()
             colors = self._scene.get_colors(style)
 
-            for i, (label, color) in enumerate(zip(labels, colors)):
+            for label, color in zip(labels, colors, strict=False):
                 # Color patch
-                ax.add_patch(plt.Rectangle(
-                    (0.05, y_pos - 0.03), 0.08, 0.025,
-                    facecolor=color,
-                    alpha=style.band_alpha,
-                    transform=ax.transAxes,
-                ))
+                ax.add_patch(
+                    plt.Rectangle(
+                        (0.05, y_pos - 0.03),
+                        0.08,
+                        0.025,
+                        facecolor=color,
+                        alpha=style.band_alpha,
+                        transform=ax.transAxes,
+                    )
+                )
                 # Label text
                 ax.text(
-                    0.15, y_pos - 0.015,
+                    0.15,
+                    y_pos - 0.015,
                     label,
                     transform=ax.transAxes,
                     ha="left",
@@ -616,7 +621,6 @@ class Plot:
 
         # 3. Summary bar
         if style.show_summary and has_data:
-            from pythermalcomfort.plots.summary import SummaryRenderer
             renderer = SummaryRenderer()
             # Render at bottom of info panel
             renderer.render(ax, self._data_series, self._scene, style)
@@ -628,7 +632,8 @@ class Plot:
             return
 
         ax.text(
-            1.04, 0.95,
+            1.04,
+            0.95,
             text,
             transform=ax.transAxes,
             ha="left",

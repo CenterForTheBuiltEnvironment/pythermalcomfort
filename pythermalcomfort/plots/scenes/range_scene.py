@@ -299,7 +299,7 @@ class RangeScene(BaseScene):
             "curves": curve_artists,
             "legend": legend_artist,
         }
-    
+
     def _get_band_colors(self, style: Style, n_regions: int) -> list:
         """Get colors for each region band."""
         if style.band_colors is not None:
@@ -327,7 +327,9 @@ class RangeScene(BaseScene):
         legend_elements = []
         for i, label in enumerate(label_list):
             patch = plt.Rectangle(
-                (0, 0), 1, 1,
+                (0, 0),
+                1,
+                1,
                 facecolor=band_colors[i],
                 alpha=style.band_alpha,
                 label=label,
@@ -344,23 +346,11 @@ class RangeScene(BaseScene):
         )
 
     def _get_region_labels(self) -> list[str]:
-        """Get labels for each region (for legend)."""
-        if self.labels is not None:
-            return list(self.labels)
+        """Get labels for each region (for legend).
 
-        # Auto-generate labels from thresholds
-        n_regions = len(self.thresholds) + 1
-        result = []
-        for i in range(n_regions):
-            if i == 0 and self.thresholds:
-                result.append(f"< {self.thresholds[0]:.1f}")
-            elif i == n_regions - 1 and self.thresholds:
-                result.append(f"> {self.thresholds[-1]:.1f}")
-            elif self.thresholds:
-                result.append(f"{self.thresholds[i-1]:.1f} to {self.thresholds[i]:.1f}")
-            else:
-                result.append("Region")
-        return result
+        This is an alias for get_labels() for internal use.
+        """
+        return self.get_labels()
 
     def get_category(self, x: float, y: float) -> str:
         """Get the category label for a data point.

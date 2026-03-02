@@ -78,7 +78,7 @@ class SummaryRenderer:
         text_artists = []
         x_pos = bar_left
 
-        for i, (pct, color) in enumerate(zip(percentages, colors)):
+        for pct, color in zip(percentages, colors, strict=False):
             if pct > 0:
                 segment_width = (pct / 100.0) * bar_width
 

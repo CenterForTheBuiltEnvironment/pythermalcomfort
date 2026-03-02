@@ -21,18 +21,15 @@ if TYPE_CHECKING:
     from pythermalcomfort.plots.style import Style
 
 
-# Default colors matching the earlier Plotly examples
-ADAPTIVE_COLORS = [
-    "rgba(255, 0, 0, 0.2)",    # Discomfort (outside 80%)
-    "rgba(0, 0, 255, 0.2)",    # 80% Acceptability band
-    "rgba(0, 128, 0, 0.2)",    # 90% Acceptability band
-]
+# Comfort band tolerances (°C deviation from comfort temperature)
+ACCEPTABILITY_90_DELTA = 2.5  # ±2.5°C for 90% acceptability
+ACCEPTABILITY_80_DELTA = 3.5  # ±3.5°C for 80% acceptability
 
-# Matplotlib-compatible colors
+# Matplotlib-compatible colors for comfort bands
 ADAPTIVE_COLORS_MPL = [
-    (0.859, 0.447, 0.373, 1),      # Discomfort
-    (0.8, 0.95, 0.7, 1),      # 80% band
-    (0.35, 0.55, 0.3, 1),      # 90% band
+    (0.859, 0.447, 0.373, 1),  # Discomfort (salmon red)
+    (0.8, 0.95, 0.7, 1),  # 80% Acceptability (light green)
+    (0.35, 0.55, 0.3, 1),  # 90% Acceptability (dark green)
 ]
 
 
@@ -72,10 +69,12 @@ class AdaptiveScene(BaseScene):
     show_80_band: bool = True
     show_90_band: bool = True
     x_padding: float = 2.0
-    band_colors: tuple | None = None,
+    band_colors: tuple[tuple[float, ...], ...] | None = None
 
     # Override base class defaults
-    thresholds: Sequence[float] = field(default_factory=lambda: [2.5, 3.5])
+    thresholds: Sequence[float] = field(
+        default_factory=lambda: [ACCEPTABILITY_90_DELTA, ACCEPTABILITY_80_DELTA]
+    )
     labels: Sequence[str] | None = field(
         default_factory=lambda: [
             "Discomfort",
@@ -153,11 +152,11 @@ class AdaptiveScene(BaseScene):
         t_outdoor = np.linspace(self.x_range[0], self.x_range[1], 100)
         t_cmf = self._compute_comfort_temperature(t_outdoor)
 
-        # Compute band boundaries
-        t_90_upper = t_cmf + 2.5
-        t_90_lower = t_cmf - 2.5
-        t_80_upper = t_cmf + 3.5
-        t_80_lower = t_cmf - 3.5
+        # Compute band boundaries using module constants
+        t_90_upper = t_cmf + ACCEPTABILITY_90_DELTA
+        t_90_lower = t_cmf - ACCEPTABILITY_90_DELTA
+        t_80_upper = t_cmf + ACCEPTABILITY_80_DELTA
+        t_80_lower = t_cmf - ACCEPTABILITY_80_DELTA
 
         band_artists = []
         legend_elements = []
@@ -176,7 +175,9 @@ class AdaptiveScene(BaseScene):
             band_artists.append(band_90)
             legend_elements.append(
                 plt.Rectangle(
-                    (0, 0), 1, 1,
+                    (0, 0),
+                    1,
+                    1,
                     facecolor=ADAPTIVE_COLORS_MPL[2],
                     alpha=style.band_alpha,
                     label="90% Acceptability",
@@ -208,7 +209,9 @@ class AdaptiveScene(BaseScene):
             band_artists.extend([band_80_upper, band_80_lower])
             legend_elements.append(
                 plt.Rectangle(
-                    (0, 0), 1, 1,
+                    (0, 0),
+                    1,
+                    1,
                     facecolor=ADAPTIVE_COLORS_MPL[1],
                     alpha=style.band_alpha,
                     label="80% Acceptability",
@@ -253,9 +256,9 @@ class AdaptiveScene(BaseScene):
         t_cmf = self._compute_comfort_temperature(x)
         deviation = abs(y - t_cmf)
 
-        if deviation <= 2.5:
+        if deviation <= ACCEPTABILITY_90_DELTA:
             return "90% Acceptability"
-        elif deviation <= 3.5:
+        elif deviation <= ACCEPTABILITY_80_DELTA:
             return "80% Acceptability"
         else:
             return "Discomfort"

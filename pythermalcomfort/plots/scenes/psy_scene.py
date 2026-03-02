@@ -14,8 +14,8 @@ import numpy as np
 from scipy.optimize import brentq
 
 from pythermalcomfort.models import pmv_ppd_iso
-from pythermalcomfort.utilities import psy_ta_rh, v_relative
 from pythermalcomfort.plots.scenes.base import BaseScene
+from pythermalcomfort.utilities import psy_ta_rh, v_relative
 
 if TYPE_CHECKING:
     from pythermalcomfort.plots.style import Style
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 @dataclass(frozen=True)
 class PsychrometricScene(BaseScene):
     """Psychrometric chart with PMV comfort zone.
-    
+
     Visualizes a psychrometric chart with:
     - X-axis: Dry bulb temperature
     - Y-axis: Humidity ratio
@@ -40,18 +40,17 @@ class PsychrometricScene(BaseScene):
     y_range: tuple[float, float] = (0.0, 30.0)
 
     # RH curves to display (%)
-    rh_lines: tuple[float, ...] = ( 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+    rh_lines: tuple[float, ...] = (10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
     # Whether to show all 7 PMV categories or just 3 (simple)
     extended_categories: bool = False
 
-    band_colors: tuple | None = None  # Custom colors for zones
+    # Custom colors for zones (tuple of RGBA tuples)
+    band_colors: tuple[tuple[float, ...], ...] | None = None
 
     # PMV thresholds for comfort zone
     thresholds: tuple[float, ...] = field(default_factory=lambda: (-0.5, 0.5))
-    labels: tuple[str, ...] | None = field(default_factory=lambda: (
-        "Neutral",
-    ))
+    labels: tuple[str, ...] | None = field(default_factory=lambda: ("Neutral",))
 
     @classmethod
     def create(
@@ -96,7 +95,7 @@ class PsychrometricScene(BaseScene):
             extended_categories=extended_categories,
             band_colors=band_colors,
         )
-    
+
     def _rh_to_humidity_ratio(self, tdb: float, rh: float) -> float:
         """Convert relative humidity to humidity ratio.
 
@@ -112,9 +111,10 @@ class PsychrometricScene(BaseScene):
         float
             Humidity ratio [g water / kg dry air].
         """
-        # psy_ta_rh returns hr in kg/kg, multiply by 100000 for g/kg
-        result = psy_ta_rh(tdb, rh / 100, 101325)
-        return result["hr"] * 100000
+        # psy_ta_rh expects rh as percentage (0-100), returns hr in kg/kg
+        # Multiply by 1000 to convert kg/kg to g/kg
+        result = psy_ta_rh(tdb, rh, 101325)
+        return result["hr"] * 1000
 
     def _compute_pmv(self, tdb: float, rh: float) -> float:
         """Compute PMV at given temperature and RH.
@@ -158,6 +158,7 @@ class PsychrometricScene(BaseScene):
         float or None
             Temperature [°C] where PMV = target, or None if not found.
         """
+
         def pmv_root(tdb):
             return self._compute_pmv(tdb, rh) - target_pmv
 
@@ -165,7 +166,7 @@ class PsychrometricScene(BaseScene):
             return brentq(pmv_root, 0, 120)
         except ValueError:
             return None
-        
+
     def render(self, ax: plt.Axes, style: Style) -> dict[str, Any]:
         """Render psychrometric chart on the axes.
 
@@ -187,31 +188,20 @@ class PsychrometricScene(BaseScene):
         rh_curve_artists = []
         for rh in self.rh_lines:
             hr_values = [self._rh_to_humidity_ratio(t, rh) for t in t_dry]
-            line, = ax.plot(
-                t_dry, hr_values,
+            (line,) = ax.plot(
+                t_dry,
+                hr_values,
                 color="lightgrey",
                 linewidth=0.8,
                 zorder=0,
             )
             rh_curve_artists.append(line)
 
-        # 2. Define thresholds and labels based on mode
+        # 2. Define thresholds based on mode
         if self.extended_categories:
-            pmv_thresholds = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5]
-            zone_labels = ["Cold", "Cool", "Slightly Cool", "Neutral", "Slightly Warm", "Warm", "Hot"]
-            # Use custom colors or colormap
-            if self.band_colors is not None:
-                zone_colors = list(self.band_colors)
-            else:
-                cmap = plt.get_cmap(style.cmap)
-                zone_colors = [cmap(i / 6) for i in range(7)]
-        else:
-            pmv_thresholds = [-0.5, 0.5]
-            zone_labels = ["Comfortable"]
-            if self.band_colors is not None:
-                zone_colors = [self.band_colors[0]]
-            else:
-                zone_colors = [(0, 0.5, 0, 1)]
+            raise NotImplementedError("Extended categories not yet implemented")
+
+        pmv_thresholds = [-0.5, 0.5]
 
         # 3. Compute comfort zone boundaries for each threshold
         rh_levels = np.linspace(0, 100, 10)
@@ -228,37 +218,34 @@ class PsychrometricScene(BaseScene):
                     valid_rh.append(rh)
             if temps:
                 # Convert to humidity ratio
-                hr = [self._rh_to_humidity_ratio(t, rh) for t, rh in zip(temps, valid_rh)]
+                hr = [
+                    self._rh_to_humidity_ratio(t, rh)
+                    for t, rh in zip(temps, valid_rh, strict=False)
+                ]
                 threshold_curves[pmv_val] = (temps, hr)
 
-        # 4. Draw comfort zones
+        # 4. Draw comfort zone (simple mode: just draw neutral zone)
         comfort_artists = []
+        lower_curve = threshold_curves.get(-0.5)
+        upper_curve = threshold_curves.get(0.5)
 
-        if self.extended_categories:
-            pass # still to be implemented: extended categories
-        else:
-            # Simple mode: just draw neutral zone
-            lower_curve = threshold_curves.get(-0.5)
-            upper_curve = threshold_curves.get(0.5)
-
-            if lower_curve and upper_curve:
-                fill = ax.fill(
-                    np.concatenate([upper_curve[0], lower_curve[0][::-1]]),
-                    np.concatenate([upper_curve[1], lower_curve[1][::-1]]),
-                    # color=zone_colors[0],
-                    color=(0.8, 0.875, 0.7, 0.5),
-                    alpha=style.band_alpha,
-                    linewidth=0,
-                    zorder=1,
-                    label="Comfort Zone",
-                )
-                comfort_artists.append(fill)
+        if lower_curve and upper_curve:
+            fill = ax.fill(
+                np.concatenate([upper_curve[0], lower_curve[0][::-1]]),
+                np.concatenate([upper_curve[1], lower_curve[1][::-1]]),
+                color=(0.8, 0.875, 0.7, 0.5),
+                alpha=style.band_alpha,
+                linewidth=0,
+                zorder=1,
+                label="Comfort Zone",
+            )
+            comfort_artists.append(fill)
 
         ax.set_xlim(self.x_range)
         ax.set_ylim(self.y_range)
 
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
 
         legend_artist = None
         if style.show_legend:
@@ -273,7 +260,7 @@ class PsychrometricScene(BaseScene):
             "comfort_zone": comfort_artists,
             "legend": legend_artist,
         }
-    
+
     def get_category(self, x: float, y: float) -> str:
         """Get category for a data point.
 
@@ -299,7 +286,7 @@ class PsychrometricScene(BaseScene):
             pmv = self._compute_pmv(x, rh)
 
             if self.extended_categories:
-                pass # still to be implemented: extended categories
+                raise NotImplementedError("Extended categories not yet implemented")
             else:
                 if pmv < -0.5:
                     return "Cooler than neutral"
@@ -307,16 +294,14 @@ class PsychrometricScene(BaseScene):
                     return "Warmer than neutral"
                 else:
                     return "Neutral"
-        except (ValueError, Exception):
+        except Exception:
             return "Out of Range"
 
     def get_labels(self) -> list[str]:
         """Get category labels."""
         if self.extended_categories:
-            return None # still to be implemented: extended categories
-        else:
-            return ["Cooler than neutral", "Neutral", "Warmer than neutral"]
-
+            raise NotImplementedError("Extended categories not yet implemented")
+        return ["Cooler than neutral", "Neutral", "Warmer than neutral"]
 
     def get_colors(self, style: Style) -> list:
         """Get colors for each category."""
@@ -344,4 +329,3 @@ class PsychrometricScene(BaseScene):
     def get_fixed_params(self) -> dict[str, Any]:
         """Get fixed parameters."""
         return dict(self.fixed_params)
-

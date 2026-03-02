@@ -132,7 +132,7 @@ class Style:
 
     # Info panel settings
     info_panel_width: float = 0.25  # fraction of figure width (0-1)
-    info_panel_background: str = None  # None for transparent
+    info_panel_background: str | None = None  # None for transparent
     info_panel_alpha: float = 0.3
 
     # Grid settings
