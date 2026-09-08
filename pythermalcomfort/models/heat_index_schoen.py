@@ -76,5 +76,5 @@ def heat_index_schoen(
     ],
     cache=True,
 )
-def _schoen_heat_index_optimized(tdb: float64, t_dew: float64) -> float64:
+def _schoen_heat_index_optimized(tdb, t_dew):
     return tdb - 1.0799 * np.exp(0.03755 * tdb) * (1 - np.exp(0.0801 * (t_dew - 14)))

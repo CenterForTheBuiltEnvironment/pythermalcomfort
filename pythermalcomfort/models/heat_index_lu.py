@@ -346,7 +346,7 @@ def _find_t(eq_var_code, eq_var):
     ],
     cache=True,
 )
-def _lu_heat_index_optimized(tdb: float64, rh: float64) -> float64:
+def _lu_heat_index_optimized(tdb, rh):
     # combining the two functions find_eq_var and find_t
     eq_var_code, phi, rf, rs, d_tc_dt = _find_eq_var(tdb, rh)
     if eq_var_code == _EQ_PHI:
