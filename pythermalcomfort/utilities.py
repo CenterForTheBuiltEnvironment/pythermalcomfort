@@ -203,15 +203,16 @@ def psy_ta_rh(
     :math:`p_{atm} \approx 82,500\text{ Pa}`), the moisture-holding capacity
     of dry air increases. At 25°C and 50% RH:
     - At sea level (101,325 Pa): :math:`W \approx 0.00988\text{ kg}_w/\text{kg}_{da}`
-    - At 1,609 m (82,500 Pa): :math:`W \approx 0.01213\text{ kg}_w/\text{kg}_{da}` (+22.8% delta)
+    - At 1,609 m (82,500 Pa): :math:`W \approx 0.01218\text{ kg}_w/\text{kg}_{da}` (+23.3% delta)
 
     Omitting local atmospheric pressure when calling comfort models that
     derive latent heat exchange or skin wettedness will result in systematic
     deviations in elevated or non-standard barometric conditions.
 
     For rigorous real-gas calculations incorporating enhancement factors
-    (:math:`f_w`), see ASHRAE RP-1485 / Hyland-Wexler formulations or the
-    `psychrolib` library.
+    (:math:`f_w`), see ASHRAE RP-1485 / Hyland-Wexler formulations. The
+    `psychrolib` library provides a standard ideal-gas psychrometric
+    implementation.
     """
     tdb = np.asarray(tdb, dtype=np.float64)
     rh = np.asarray(rh, dtype=np.float64)
