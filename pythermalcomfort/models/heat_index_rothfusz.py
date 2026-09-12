@@ -89,7 +89,7 @@ def heat_index_rothfusz(
     ],
     cache=True,
 )
-def _rothfusz_heat_index_optimized(tdb: float64, rh: float64) -> float64:
+def _rothfusz_heat_index_optimized(tdb, rh):
     return (
         -8.784695
         + 1.61139411 * tdb
