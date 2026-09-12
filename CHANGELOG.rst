@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ----------
 
+* Sped up ``two_nodes_gagge_sleep`` by compiling its stateful simulation loop
+  with Numba while preserving its public output values and shapes. Empty
+  ``tdb``/``tr``/``v``/``rh``/``clo``/``thickness_quilt`` inputs now raise a
+  clear ``ValueError`` instead of failing with an unrelated ``TypeError``.
 * Pinned ``tests/conftest.py``'s ``validation-data-comfort-models`` fixture URL to the
   ``v1.0.0`` tag instead of ``main``, so upstream fixture changes can't silently affect
   CI before the pin is deliberately bumped and reviewed. See ``CONTRIBUTING.rst``'s
@@ -11,6 +15,14 @@ Unreleased
 * Addressed Copilot review feedback on the 4.4.1 ``phs`` fix: pass ``param_name``
   explicitly to ``valid_range()`` for the ``(tr - tdb)`` check, and added regression
   tests for the applicability-limit and minute-1 skin-temperature behavior.
+* Fixed the saturation vapour pressure calculation in ``utci``
+  (`#372 <https://github.com/pythermalcomfort/pythermalcomfort/issues/372>`_): the
+  Hardy/Wexler equation's ``ln(T)`` term used ``np.log1p`` (which computes
+  ``ln(1 + T)``) instead of ``np.log``, inflating the saturation vapour pressure by
+  ~1%. The resulting UTCI error is negligible in mild conditions (~0.03 °C at 25 °C,
+  50% RH) but grows to ~0.7 °C at 40 °C, 80% RH, where UTCI matters most for heat
+  stress assessment. Updated the affected hard-coded test expectations and added a
+  regression test cross-checking ``utci``'s vapour pressure against ``p_sat``.
 
 4.4.1 (2026-08-18)
 ------------------
