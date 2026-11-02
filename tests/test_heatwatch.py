@@ -55,8 +55,14 @@ def test_persona_health_conditions():
         ({"age": -1}, ValueError),
         ({"age": 9}, ValueError),
         ({"met": 0}, ValueError),
+        ({"met": float("nan")}, ValueError),
+        ({"met": float("inf")}, ValueError),
         ({"clo": -0.1}, ValueError),
+        ({"clo": float("nan")}, ValueError),
         ({"posture": "walking"}, ValueError),
+        # Valid Postures values that two_nodes_gagge does not accept.
+        ({"posture": "supine"}, ValueError),
+        ({"posture": "sedentary"}, ValueError),
         ({"illness": 1}, TypeError),
     ],
 )

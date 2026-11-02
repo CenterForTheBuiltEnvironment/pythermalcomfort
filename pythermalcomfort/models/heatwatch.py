@@ -40,6 +40,8 @@ _AGE_BANDS = (
     (np.inf, 0.65),
 )
 _W_MAX_FACTOR_HEALTH_CONDITION = 0.95
+# two_nodes_gagge accepts only these two positions.
+_POSTURES = (Postures.sitting.value, Postures.standing.value)
 
 
 @dataclass(frozen=True)
@@ -58,8 +60,8 @@ class Persona:
     clo : float
         Clothing insulation, [clo].
     posture : str, optional
-        Posture passed to the Gagge two-node model. One of the values of
-        :py:class:`~pythermalcomfort.utilities.Postures`. Defaults to "standing".
+        Posture passed to the Gagge two-node model, either "sitting" or "standing".
+        Defaults to "standing".
     obesity : bool, optional
         True if the person has obesity. Defaults to False.
     medication : bool, optional
@@ -112,15 +114,14 @@ class Persona:
         if self.age < _MIN_AGE:
             msg = f"age must be an integer >= {_MIN_AGE}, got {self.age}"
             raise ValueError(msg)
-        if self.met <= 0:
-            msg = f"met must be a positive number > 0, got {self.met}"
+        if not (np.isfinite(self.met) and self.met > 0):
+            msg = f"met must be a finite number > 0, got {self.met}"
             raise ValueError(msg)
-        if self.clo < 0:
-            msg = f"clo must be a non-negative number >= 0, got {self.clo}"
+        if not (np.isfinite(self.clo) and self.clo >= 0):
+            msg = f"clo must be a finite number >= 0, got {self.clo}"
             raise ValueError(msg)
-        allowed_postures = [posture.value for posture in Postures]
-        if self.posture not in allowed_postures:
-            msg = f"posture must be one of {allowed_postures}, got {self.posture!r}"
+        if self.posture not in _POSTURES:
+            msg = f"posture must be one of {list(_POSTURES)}, got {self.posture!r}"
             raise ValueError(msg)
 
     @property
