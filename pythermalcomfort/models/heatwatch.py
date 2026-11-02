@@ -28,6 +28,9 @@ _RISK_CATEGORIES = {
     6: "Extreme",
 }
 
+# Children aged 10-16 years have a similar hyperthermia risk to adults [Smallcombe2025],
+# so they use the adult w_max. There is no comparable evidence for younger children.
+_MIN_AGE = 10
 # Age bands (upper edge, exclusive) with the maximum skin wettedness.
 _AGE_BANDS = (
     (40, 0.85),
@@ -37,7 +40,6 @@ _AGE_BANDS = (
     (np.inf, 0.65),
 )
 _W_MAX_FACTOR_HEALTH_CONDITION = 0.95
-_W_MAX_FACTOR_ACCLIMATISED = 1 / 0.9
 
 
 @dataclass(frozen=True)
@@ -47,7 +49,10 @@ class Persona:
     Parameters
     ----------
     age : int
-        Age, [years].
+        Age, [years]. Must be 10 or older. Children aged 10 to 16 years have a
+        similar risk of hyperthermia to adults during exercise in the heat
+        [Smallcombe2025]_, so they use the adult maximum skin wettedness. There is
+        no comparable evidence for younger children.
     met : float
         Metabolic rate, [met].
     clo : float
@@ -55,8 +60,6 @@ class Persona:
     posture : str, optional
         Posture passed to the Gagge two-node model. One of the values of
         :py:class:`~pythermalcomfort.utilities.Postures`. Defaults to "standing".
-    acclimatised : bool, optional
-        True if the person is acclimatised to heat. Raises w_max. Defaults to False.
     obesity : bool, optional
         True if the person has obesity. Defaults to False.
     medication : bool, optional
@@ -86,7 +89,6 @@ class Persona:
     met: float
     clo: float
     posture: str = Postures.standing.value
-    acclimatised: bool = False
     obesity: bool = False
     medication: bool = False
     pregnancy: bool = False
@@ -99,7 +101,6 @@ class Persona:
         validate_type(value=self.clo, name="clo", allowed_types=(int, float))
         validate_type(value=self.posture, name="posture", allowed_types=(str,))
         for name in (
-            "acclimatised",
             "obesity",
             "medication",
             "pregnancy",
@@ -108,8 +109,8 @@ class Persona:
         ):
             validate_type(value=getattr(self, name), name=name, allowed_types=(bool,))
 
-        if self.age < 0:
-            msg = f"age must be a non-negative integer >= 0, got {self.age}"
+        if self.age < _MIN_AGE:
+            msg = f"age must be an integer >= {_MIN_AGE}, got {self.age}"
             raise ValueError(msg)
         if self.met <= 0:
             msg = f"met must be a positive number > 0, got {self.met}"
@@ -126,13 +127,10 @@ class Persona:
     def w_max(self) -> float:
         """Maximum skin wettedness, [dimensionless].
 
-        Depends on age, is divided by 0.9 for acclimatised people, and is multiplied by
-        0.95 for each of obesity, medication, pregnancy, mobility impairment and
-        illness.
+        Depends on age and is multiplied by 0.95 for each of obesity,
+        medication, pregnancy, mobility impairment and illness.
         """
         w_max = next(w for upper_age, w in _AGE_BANDS if self.age < upper_age)
-        if self.acclimatised:
-            w_max *= _W_MAX_FACTOR_ACCLIMATISED
         health_conditions = sum(
             (
                 self.obesity,

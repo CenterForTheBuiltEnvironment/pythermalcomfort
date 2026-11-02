@@ -1,6 +1,20 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Added ``heatwatch`` and ``Persona``, the HeatWatch heat-health risk score (HHRS).
+  The score runs ``two_nodes_gagge`` with the person's metabolic rate, clothing,
+  posture and maximum skin wettedness, which ``Persona`` derives from age and health
+  conditions. It follows whichever is closer to its limit: relative skin wettedness
+  (``disc / 4.7``) or core temperature between 36.8 °C and the 38.0 °C rectal
+  temperature limit used by ``phs``. It returns the score from 0 to 6 and one of six
+  categories, from Minimal to Extreme. ``Persona`` accepts ages of 10 years and over,
+  because evidence that children have a similar hyperthermia risk to adults covers
+  ages 10 to 16 only
+  (`#503 <https://github.com/pythermalcomfort/pythermalcomfort/pull/503>`_).
+
 4.8.0 (2026-10-31)
 ------------------
 

@@ -32,7 +32,7 @@ def test_persona_age_bands(age, w_max):
     assert persona.w_max == pytest.approx(w_max)
 
 
-def test_persona_health_conditions_and_acclimatisation():
+def test_persona_health_conditions():
     assert OLDER_ADULT.w_max == pytest.approx(0.7 * 0.95**2)
 
     all_conditions = Persona(
@@ -47,15 +47,13 @@ def test_persona_health_conditions_and_acclimatisation():
     )
     assert all_conditions.w_max == pytest.approx(0.85 * 0.95**5)
 
-    acclimatised = Persona(age=30, met=1.2, clo=0.5, acclimatised=True)
-    assert acclimatised.w_max == pytest.approx(0.85 / 0.9)
-
 
 @pytest.mark.parametrize(
     ("kwargs", "error"),
     [
         ({"age": 30.5}, TypeError),
         ({"age": -1}, ValueError),
+        ({"age": 9}, ValueError),
         ({"met": 0}, ValueError),
         ({"clo": -0.1}, ValueError),
         ({"posture": "walking"}, ValueError),
@@ -70,7 +68,7 @@ def test_persona_validation(kwargs, error):
 
 @pytest.mark.parametrize(
     "field",
-    ["acclimatised", "obesity", "medication", "pregnancy", "mobility_impairment"],
+    ["obesity", "medication", "pregnancy", "mobility_impairment", "illness"],
 )
 def test_persona_bool_fields_reject_non_bool(field):
     """Each flag goes through validate_type, not the dataclass constructor."""
