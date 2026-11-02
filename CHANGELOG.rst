@@ -14,6 +14,10 @@ Unreleased
   Removed three roughness lengths (0.4, 0.6 and 1.6 m) that are not in the cited
   report, and noted that the profile does not describe wind inside a building or tree
   canopy.
+* ``heat_index_lu`` is about 13 times faster. Its root finder now uses Brent's method
+  instead of bisection, which needs about a third of the residual evaluations at each
+  level. Unrounded results change by less than 1e-6 °C
+  (`#497 <https://github.com/pythermalcomfort/pythermalcomfort/issues/497>`_).
 
 4.8.0 (2026-10-31)
 ------------------

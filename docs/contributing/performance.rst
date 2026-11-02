@@ -94,7 +94,7 @@ workload on one core (same machine as above).
    * - ``heat_index_lu``
      - 53,000
      - ~5 days
-     - nested bisection, tolerance 1e-8 (#497)
+     - nested bisection, tolerance 1e-8 (#497); now Brent's method, ~13× faster
    * - ``pet_steady``
      - 630,000
      - ~2 months

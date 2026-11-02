@@ -101,6 +101,7 @@ _ZA_UN = 60.6 / 12.3  # Pa m^2/W, mass transfer resistance through air, naked
 _TOL = 1e-8
 _TOL_T = 1e-8
 _MAX_ITER = 100
+_EPS = np.finfo(np.float64).eps
 
 # equivalent-variable codes, replacing the original string keys so this can be
 # jitted in nopython mode ("rs" and "rs*" collapse to the same code because
@@ -110,7 +111,7 @@ _EQ_RF = 2
 _EQ_RS = 3
 _EQ_DTCDT = 4
 
-# residual-function codes dispatched by _residual/_bisect
+# residual-function codes dispatched by _residual/_brentq
 _R_TS = 1
 _R_TF = 2
 _R_TF_REGION_II_III = 3
@@ -209,11 +210,11 @@ def _find_eq_var(ta, rh):
 
     lo_ts = max(0.0, min(_T_CR, ta) - rs * abs(m))
     hi_ts = max(_T_CR, ta) + rs * abs(m)
-    ts = _bisect(kind=_R_TS, p0=ta, p1=pa, p2=rs, p3=0.0, x1=lo_ts, x2=hi_ts, tol=_TOL)
+    ts = _brentq(kind=_R_TS, p0=ta, p1=pa, p2=rs, p3=0.0, x1=lo_ts, x2=hi_ts, tol=_TOL)
 
     lo_tf = max(0.0, min(_T_CR, ta) - rs * abs(m_bar))
     hi_tf = max(_T_CR, ta) + rs * abs(m_bar)
-    tf = _bisect(kind=_R_TF, p0=ta, p1=pa, p2=rs, p3=0.0, x1=lo_tf, x2=hi_tf, tol=_TOL)
+    tf = _brentq(kind=_R_TF, p0=ta, p1=pa, p2=rs, p3=0.0, x1=lo_tf, x2=hi_tf, tol=_TOL)
 
     q_minus_qv = _Q - _qv(ta, pa)
     flux1 = q_minus_qv - (1.0 - phi) * (_T_CR - ts) / rs  # C*dTc/dt when rf=Zf=inf
@@ -228,7 +229,7 @@ def _find_eq_var(ta, rh):
     elif flux2 <= 0.0:  # region II&III
         eq_var_code = _EQ_RF
         ts_bar = _T_CR - q_minus_qv * rs / phi + (1.0 / phi - 1.0) * (_T_CR - ts)
-        tf = _bisect(
+        tf = _brentq(
             kind=_R_TF_REGION_II_III,
             p0=ta,
             p1=pa,
@@ -247,7 +248,7 @@ def _find_eq_var(ta, rh):
             - (_PHI_SALT * _pv_star(_T_CR) - pa) / _ZA_UN
         )
         if flux3 < 0.0:  # region IV,V
-            ts = _bisect(
+            ts = _brentq(
                 kind=_R_TS_REGION_IV_V,
                 p0=ta,
                 p1=pa,
@@ -261,7 +262,7 @@ def _find_eq_var(ta, rh):
             eq_var_code = _EQ_RS
             ps = _P_CR - (_P_CR - pa) * _zs(rs) / (_zs(rs) + _ZA_UN)
             if ps > _PHI_SALT * _pv_star(ts):  # region V
-                ts = _bisect(
+                ts = _brentq(
                     kind=_R_TS_REGION_V,
                     p0=ta,
                     p1=pa,
@@ -324,7 +325,8 @@ def _residual(kind, x, p0, p1, p2, p3):
     if kind == _R_T_RF:  # x=t, p0=eq_var
         rh_trial = min(1.0, _PA0 / _pv_star(x))
         _, _, rf, _, _ = _find_eq_var(x, rh_trial)
-        return rf - p0
+        # rf is inf in region I; cap it so _brentq never interpolates with inf
+        return min(rf, 1e30) - p0
     if kind == _R_T_RS:  # x=t, p0=eq_var
         rh_trial = _PA0 / _pv_star(x)
         _, _, _, rs, _ = _find_eq_var(x, rh_trial)
@@ -336,33 +338,71 @@ def _residual(kind, x, p0, p1, p2, p3):
 
 
 @njit(cache=True)
-def _bisect(kind, p0, p1, p2, p3, x1, x2, tol):
-    a = x1
-    b = x2
-    fa = _residual(kind=kind, x=a, p0=p0, p1=p1, p2=p2, p3=p3)
-    fb = _residual(kind=kind, x=b, p0=p0, p1=p1, p2=p2, p3=p3)
-    if fa * fb > 0.0:
+def _brentq(kind, p0, p1, p2, p3, x1, x2, tol):
+    # Brent's method, ported from scipy's brentq (BSD-3), with xtol=tol, rtol=4*eps
+    xpre = x1
+    xcur = x2
+    fpre = _residual(kind=kind, x=xpre, p0=p0, p1=p1, p2=p2, p3=p3)
+    fcur = _residual(kind=kind, x=xcur, p0=p0, p1=p1, p2=p2, p3=p3)
+    if fpre * fcur > 0.0:
         raise ValueError("wrong initial interval in the root solver")
-    c = b
-    for i in range(_MAX_ITER):
-        c = (a + b) / 2.0
-        fc = _residual(kind=kind, x=c, p0=p0, p1=p1, p2=p2, p3=p3)
-        if fb * fc > 0.0:
-            b = c
-            fb = fc
+    if fpre == 0.0:
+        return xpre
+    if fcur == 0.0:
+        return xcur
+    xblk = 0.0
+    fblk = 0.0
+    spre = 0.0
+    scur = 0.0
+    for _ in range(_MAX_ITER):
+        if fpre != 0.0 and fcur != 0.0 and (fpre < 0.0) != (fcur < 0.0):
+            xblk = xpre
+            fblk = fpre
+            spre = scur = xcur - xpre
+        if abs(fblk) < abs(fcur):
+            xpre, xcur, xblk = xcur, xblk, xcur
+            fpre, fcur, fblk = fcur, fblk, fcur
+
+        delta = (tol + 4.0 * _EPS * abs(xcur)) / 2.0
+        sbis = (xblk - xcur) / 2.0
+        if fcur == 0.0 or abs(sbis) < delta:
+            return xcur
+
+        if abs(spre) > delta and abs(fcur) < abs(fpre):
+            if xpre == xblk:
+                # secant
+                stry = -fcur * (xcur - xpre) / (fcur - fpre)
+            else:
+                # inverse quadratic interpolation
+                dpre = (fpre - fcur) / (xpre - xcur)
+                dblk = (fblk - fcur) / (xblk - xcur)
+                stry = (
+                    -fcur * (fblk * dblk - fpre * dpre) / (dblk * dpre * (fblk - fpre))
+                )
+            if 2.0 * abs(stry) < min(abs(spre), 3.0 * abs(sbis) - delta):
+                spre = scur
+                scur = stry
+            else:
+                spre = sbis
+                scur = sbis
         else:
-            a = c
-        if abs(a - b) < tol:
-            return c
-        if i == _MAX_ITER - 1:
-            raise ValueError("reaching maximum iteration in the root solver")
-    return c
+            spre = sbis
+            scur = sbis
+
+        xpre = xcur
+        fpre = fcur
+        if abs(scur) > delta:
+            xcur += scur
+        else:
+            xcur += delta if sbis > 0.0 else -delta
+        fcur = _residual(kind=kind, x=xcur, p0=p0, p1=p1, p2=p2, p3=p3)
+    raise ValueError("reaching maximum iteration in the root solver")
 
 
 @njit(cache=True)
 def _find_t(eq_var_code, eq_var):
     if eq_var_code == _EQ_PHI:
-        return _bisect(
+        return _brentq(
             kind=_R_T_PHI,
             p0=eq_var,
             p1=0.0,
@@ -373,7 +413,7 @@ def _find_t(eq_var_code, eq_var):
             tol=_TOL_T,
         )
     if eq_var_code == _EQ_RF:
-        return _bisect(
+        return _brentq(
             kind=_R_T_RF,
             p0=eq_var,
             p1=0.0,
@@ -384,7 +424,7 @@ def _find_t(eq_var_code, eq_var):
             tol=_TOL_T,
         )
     if eq_var_code == _EQ_RS:
-        return _bisect(
+        return _brentq(
             kind=_R_T_RS,
             p0=eq_var,
             p1=0.0,
@@ -394,7 +434,7 @@ def _find_t(eq_var_code, eq_var):
             x2=350.0,
             tol=_TOL_T,
         )
-    return _bisect(
+    return _brentq(
         kind=_R_T_DTCDT,
         p0=eq_var,
         p1=0.0,
