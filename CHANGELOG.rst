@@ -14,6 +14,13 @@ Unreleased
   Removed three roughness lengths (0.4, 0.6 and 1.6 m) that are not in the cited
   report, and noted that the profile does not describe wind inside a building or tree
   canopy.
+* ``solar_gain`` now has ``limit_inputs``, ``True`` by default as in the other models.
+  Inputs outside the ranges of Table C-2 of ASHRAE 55 return NaN with a warning:
+  ``sol_radiation_dir`` 200 to 1000 W/m², ``asw`` 0.2 to 0.9, and
+  ``sol_transmittance``, ``f_svv`` and ``f_bes`` 0 to 1. This includes
+  ``sol_radiation_dir=0`` (no direct sun), which used to return 0. Pass
+  ``limit_inputs=False`` for the previous results
+  (`#476 <https://github.com/pythermalcomfort/pythermalcomfort/issues/476>`_).
 
 4.8.0 (2026-10-31)
 ------------------
