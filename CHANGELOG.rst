@@ -14,6 +14,10 @@ Unreleased
   because evidence that children have a similar hyperthermia risk to adults covers
   ages 10 to 16 only
   (`#503 <https://github.com/pythermalcomfort/pythermalcomfort/pull/503>`_).
+* ``two_nodes_gagge``, and so ``set_tmp`` and ``use_fans_heatwaves``, now return NaN
+  for a point where ``tdb``, ``tr``, ``v``, ``rh``, ``met`` or ``clo`` is NaN or
+  infinite. Before, one such point raised ``StopIteration`` ("Max iterations
+  exceeded") and no results were returned for any point.
 
 4.8.0 (2026-10-31)
 ------------------
