@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* ``two_nodes_gagge``, and so ``set_tmp`` and ``use_fans_heatwaves``, now return NaN
+  for a point where ``tdb``, ``tr``, ``v``, ``rh``, ``met`` or ``clo`` is NaN or
+  infinite. Before, one such point raised ``StopIteration`` ("Max iterations
+  exceeded") and no results were returned for any point.
+
 4.8.0 (2026-10-31)
 ------------------
 
