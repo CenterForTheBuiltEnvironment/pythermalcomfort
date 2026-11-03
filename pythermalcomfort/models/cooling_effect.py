@@ -10,16 +10,19 @@ from scipy import optimize
 
 from pythermalcomfort.classes_input import CEInputs, NumericInput
 from pythermalcomfort.classes_return import CE
-from pythermalcomfort.models.two_nodes_gagge import _gagge_two_nodes_optimized
+from pythermalcomfort.models.two_nodes_gagge import (
+    _POSITION_STANDING,
+    _gagge_two_nodes_optimized,
+)
 from pythermalcomfort.utilities import Units, units_converter
 
 # set_tmp()/two_nodes_gagge() defaults that cooling_effect() relies on but never
 # exposes as parameters itself
 _BODY_SURFACE_AREA = 1.8258
 _P_ATM = 101325
-# two_nodes_gagge()'s calculate_ce=True path hardcodes position=1 (forces the
-# "standing" branch) regardless of the position argument, so this matches it
-_POSITION_STANDING_CODE = 1
+# two_nodes_gagge()'s calculate_ce=True path hardcodes the "standing" position
+# regardless of the position argument, so this matches it
+_POSITION_STANDING_CODE = _POSITION_STANDING
 
 
 def cooling_effect(

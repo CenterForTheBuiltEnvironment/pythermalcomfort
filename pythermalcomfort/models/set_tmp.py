@@ -77,6 +77,12 @@ def set_tmp(
         A dataclass containing the Standard Effective Temperature. See :py:class:`~pythermalcomfort.classes_return.SetTmp` for more details.
         To access the `set` value, use the corresponding attribute of the returned `SetTmp` instance, e.g., `result.set`.
 
+    Notes
+    -----
+    Large array inputs use every CPU core. See the Notes of
+    :py:meth:`pythermalcomfort.models.two_nodes_gagge` for when, and for how to limit
+    the number of threads.
+
     Examples
     --------
     .. code-block:: python
