@@ -1,14 +1,51 @@
 from __future__ import annotations
 
 import math
+import threading
 
 import numpy as np
-from numba import float64, jit, vectorize
+from numba import float64, jit, prange, vectorize
 
 from pythermalcomfort.classes_input import GaggeTwoNodesInputs, NumericInput
 from pythermalcomfort.classes_return import SET, GaggeTwoNodes
 from pythermalcomfort.psychrometrics import p_sat_torr
 from pythermalcomfort.utilities import Postures, met_to_w_m2
+
+# integer codes for `position`: numba kernels compare integers far faster than strings
+_POSITION_SITTING = 0
+_POSITION_STANDING = 1
+
+# number of outputs of _gagge_two_nodes_optimized
+_N_OUTPUTS = 18
+
+# what _gagge_two_nodes_kernel returns when the clothing temperature does not converge:
+# a converged flag of 0.0 followed by NaN for every output
+_NOT_CONVERGED = (0.0,) + (math.nan,) * _N_OUTPUTS
+# what it returns when an input is NaN or infinite: NaN for every output, but no
+# error, so that one missing value does not stop the other points
+_NON_FINITE_INPUT = (1.0,) + (math.nan,) * _N_OUTPUTS
+
+# inputs that vary per point, in the order of the rows of the `inputs` array that
+# _gagge_two_nodes_point reads
+_ARRAY_INPUTS = (
+    "tdb",
+    "tr",
+    "v",
+    "met",
+    "clo",
+    "vapor_pressure",
+    "wme",
+    "body_surface_area",
+    "p_atm",
+    "max_skin_blood_flow",
+    "max_sweating",
+    "w_max",
+)
+
+# below this many points the serial loop is used: starting numba's threads costs
+# about 80 µs per call, more than computing a few points on one core. On an 8-core
+# Apple M1 Pro the parallel loop became faster at about 30 points.
+_PARALLEL_MIN_POINTS = 50
 
 
 def two_nodes_gagge(
@@ -89,6 +126,22 @@ def two_nodes_gagge(
         See :py:class:`~pythermalcomfort.classes_return.GaggeTwoNodes` for more details.
         To access the results, use the corresponding attributes of the returned `GaggeTwoNodes` instance, e.g., `result.e_skin`.
 
+    Raises
+    ------
+    StopIteration
+        If the clothing surface temperature does not converge for any point, for
+        example with an extreme `tr`. A NaN or infinite input does not raise: it gives
+        NaN for that point.
+
+    Notes
+    -----
+    Array inputs are computed in a compiled numba loop. Inputs with 50 or more points,
+    called from the main thread, use every CPU core. Calls from other threads, such as
+    the worker threads of dask's default scheduler, run on one core so that they do not
+    start more threads than there are cores. If you run chunks in separate processes,
+    limit the threads of each with ``numba.set_num_threads`` or the
+    ``NUMBA_NUM_THREADS`` environment variable.
+
     Examples
     --------
     .. code-block:: python
@@ -96,10 +149,10 @@ def two_nodes_gagge(
         from pythermalcomfort.models import two_nodes_gagge
 
         result = two_nodes_gagge(tdb=25, tr=25, v=0.1, rh=50, clo=0.5, met=1.2)
-        print(result.w)  # 100.0
+        print(result.w)  # 0.12
 
         result = two_nodes_gagge(tdb=[25, 25], tr=25, v=0.3, rh=50, met=1.2, clo=0.5)
-        print(result.e_skin)  # [100.0, 100.0]
+        print(result.e_skin)  # [16.17 16.17]
     """
     # Validate inputs using the TwoNodesInputs class
     GaggeTwoNodesInputs(
@@ -126,7 +179,6 @@ def two_nodes_gagge(
     met = np.asarray(met)
     clo = np.asarray(clo)
     wme = np.asarray(wme)
-    position = np.asarray(position)
 
     vapor_pressure = rh * p_sat_torr(tdb) / 100
 
@@ -144,6 +196,66 @@ def two_nodes_gagge(
             1,
         )
         return SET(set=result)
+
+    position_code = np.where(
+        np.asarray(position) == Postures.sitting.value,
+        _POSITION_SITTING,
+        _POSITION_STANDING,
+    )
+    # False, None and 0 all mean that the kernel computes w_max from v and clo
+    w_max = np.asarray(0.0 if w_max is None else w_max, dtype=np.float64)
+
+    values = {
+        "tdb": tdb,
+        "tr": tr,
+        "v": v,
+        "met": met,
+        "clo": clo,
+        "vapor_pressure": vapor_pressure,
+        "wme": wme,
+        "body_surface_area": body_surface_area,
+        "p_atm": p_atm,
+        "max_skin_blood_flow": max_skin_blood_flow,
+        "max_sweating": max_sweating,
+        "w_max": w_max,
+    }
+    # broadcast the scalars against the arrays and flatten them into one row per
+    # input, so that the numba loop can read point i from column i
+    *broadcast, position_code = np.broadcast_arrays(
+        *(values[name] for name in _ARRAY_INPUTS), position_code
+    )
+    shape = position_code.shape
+    n_points = position_code.size
+    inputs = np.empty((len(_ARRAY_INPUTS), n_points), dtype=np.float64)
+    for row, value in enumerate(broadcast):
+        inputs[row] = value.ravel()
+    position_code = position_code.astype(np.int64).ravel()
+
+    # Use every CPU core only for large inputs called from the main thread. From other
+    # threads the loop runs on one core: numba's default thread pool ("workqueue")
+    # aborts the whole process if two Python threads use it at once, and callers that
+    # run chunks on threads, such as dask, already keep every core busy.
+    if (
+        n_points >= _PARALLEL_MIN_POINTS
+        and threading.current_thread() is threading.main_thread()
+    ):
+        array_loop = _gagge_two_nodes_array_parallel
+    else:
+        array_loop = _gagge_two_nodes_array_serial
+    results, converged = array_loop(inputs=inputs, position=position_code)
+    # numba silently drops exceptions raised inside a prange loop, so the kernel
+    # flags non-convergence and the error is raised here instead
+    if not converged.all():
+        # A point the parallel loop flagged may instead have raised an exception
+        # that numba dropped, such as ZeroDivisionError for p_atm=0. Rerun those
+        # points on one core, where the original exception propagates.
+        if array_loop is _gagge_two_nodes_array_parallel:
+            failed = ~converged
+            _gagge_two_nodes_array_serial(
+                inputs=inputs[:, failed], position=position_code[failed]
+            )
+        max_iteration_exceeded = "Max iterations exceeded"
+        raise StopIteration(max_iteration_exceeded)
 
     (
         _set,
@@ -164,22 +276,7 @@ def two_nodes_gagge(
         pmv_set,
         disc,
         t_sens,
-    ) = np.vectorize(_gagge_two_nodes_optimized, cache=True)(
-        tdb=tdb,
-        tr=tr,
-        v=v,
-        met=met,
-        clo=clo,
-        vapor_pressure=vapor_pressure,
-        wme=wme,
-        body_surface_area=body_surface_area,
-        p_atm=p_atm,
-        position=position,
-        calculate_ce=calculate_ce,
-        max_skin_blood_flow=max_skin_blood_flow,
-        max_sweating=max_sweating,
-        w_max=w_max,
-    )
+    ) = (row.reshape(shape) for row in results)
 
     output = {
         "e_skin": e_skin,
@@ -210,7 +307,7 @@ def two_nodes_gagge(
 
 
 @jit(nopython=True, cache=True)
-def _gagge_two_nodes_optimized(
+def _gagge_two_nodes_kernel(
     tdb,
     tr,
     v,
@@ -225,26 +322,15 @@ def _gagge_two_nodes_optimized(
     max_skin_blood_flow=90,
     max_sweating=500,
     w_max=None,
-) -> tuple[
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-    float,
-]:
+) -> tuple[float, ...]:
+    """Two-node model for one point.
+
+    Returns a converged flag then the 18 outputs. It does not raise when the clothing
+    temperature fails to converge: numba drops exceptions raised inside a prange loop,
+    so it returns `_NOT_CONVERGED` instead and the caller raises. A non-finite input
+    returns `_NON_FINITE_INPUT`, NaN outputs without an error. `position` is
+    `_POSITION_SITTING` or `_POSITION_STANDING`.
+    """
     # A missing or infinite input never converges in the clothing temperature loop
     # below, so return NaN for every output instead of raising StopIteration.
     if not (
@@ -255,27 +341,7 @@ def _gagge_two_nodes_optimized(
         and math.isfinite(clo)
         and math.isfinite(vapor_pressure)
     ):
-        nan = math.nan
-        return (
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-            nan,
-        )
+        return _NON_FINITE_INPUT
 
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
@@ -366,7 +432,7 @@ def _gagge_two_nodes_optimized(
 
         while not tc_converged:
             # 0.95 is the clothing emissivity from ASHRAE fundamentals Ch. 9.7 Eq. 35
-            if position == Postures.sitting.value:
+            if position == _POSITION_SITTING:
                 # 0.7 ratio between radiation area of the body and the body area
                 h_r = 4.0 * 0.95 * sbc * ((t_cl + tr) / 2.0 + 273.15) ** 3.0 * 0.7
             else:  # if standing
@@ -382,8 +448,7 @@ def _gagge_two_nodes_optimized(
             n_iterations += 1
 
             if n_iterations > iteration_limit:
-                max_iteration_exceeded = "Max iterations exceeded"
-                raise StopIteration(max_iteration_exceeded)
+                return _NOT_CONVERGED
 
         q_sensible = (t_skin - t_op) / (r_a + r_clo)  # total sensible heat loss, W
         # hf_cs rate of energy transport between core and skin, W
@@ -577,6 +642,7 @@ def _gagge_two_nodes_optimized(
     # ps = 100 * (1.13 * (t_op**0.5) - 0.24 * t_op + 2.7 * (v**0.5) - 0.99 * v)
 
     return (
+        1.0,  # converged
         _set,
         e_skin,
         e_rsw,
@@ -596,6 +662,122 @@ def _gagge_two_nodes_optimized(
         disc,
         t_sens,
     )
+
+
+@jit(nopython=True, cache=True)
+def _gagge_two_nodes_optimized(
+    tdb,
+    tr,
+    v,
+    met,
+    clo,
+    vapor_pressure,
+    wme,
+    body_surface_area,
+    p_atm,
+    position,
+    calculate_ce=False,
+    max_skin_blood_flow=90,
+    max_sweating=500,
+    w_max=None,
+) -> tuple[float, ...]:
+    """Two-node model for one point; raises StopIteration if it does not converge."""
+    result = _gagge_two_nodes_kernel(
+        tdb=tdb,
+        tr=tr,
+        v=v,
+        met=met,
+        clo=clo,
+        vapor_pressure=vapor_pressure,
+        wme=wme,
+        body_surface_area=body_surface_area,
+        p_atm=p_atm,
+        position=position,
+        calculate_ce=calculate_ce,
+        max_skin_blood_flow=max_skin_blood_flow,
+        max_sweating=max_sweating,
+        w_max=w_max,
+    )
+    if result[0] == 0.0:
+        max_iteration_exceeded = "Max iterations exceeded"
+        raise StopIteration(max_iteration_exceeded)
+    return result[1:]
+
+
+@jit(nopython=True, cache=True)
+def _gagge_two_nodes_point(
+    i: int,
+    inputs: np.ndarray,
+    position: np.ndarray,
+    results: np.ndarray,
+    converged: np.ndarray,
+) -> None:
+    """Run the kernel on point i and write its outputs to column i of `results`.
+
+    The inputs of point i are column i of `inputs`, whose rows are in the order of
+    `_ARRAY_INPUTS`. Sets `converged[i]` to False if the point did not converge.
+    """
+    result = _gagge_two_nodes_kernel(
+        tdb=inputs[0, i],
+        tr=inputs[1, i],
+        v=inputs[2, i],
+        met=inputs[3, i],
+        clo=inputs[4, i],
+        vapor_pressure=inputs[5, i],
+        wme=inputs[6, i],
+        body_surface_area=inputs[7, i],
+        p_atm=inputs[8, i],
+        position=position[i],
+        calculate_ce=False,
+        max_skin_blood_flow=inputs[9, i],
+        max_sweating=inputs[10, i],
+        w_max=inputs[11, i],
+    )
+    converged[i] = result[0] == 1.0
+    for j in range(_N_OUTPUTS):
+        results[j, i] = result[j + 1]
+
+
+# Two compiled loops with the same body: numba caches each function's machine code
+# on disk by name, so one function compiled twice with different flags would share
+# its cache entry.
+@jit(nopython=True, cache=True)
+def _gagge_two_nodes_array_serial(
+    inputs: np.ndarray, position: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Run the two-node model on every column of `inputs`, on one CPU core.
+
+    Returns a (18, n) array with one row per output, in the order of
+    `_gagge_two_nodes_optimized`, and a boolean array that is False where the clothing
+    temperature did not converge.
+    """
+    n = inputs.shape[1]
+    results = np.empty((_N_OUTPUTS, n), dtype=np.float64)
+    # zeros, not empty: a point whose kernel raised never writes its flag, and
+    # must not pass as converged
+    converged = np.zeros(n, dtype=np.bool_)
+    for i in range(n):
+        _gagge_two_nodes_point(
+            i=i, inputs=inputs, position=position, results=results, converged=converged
+        )
+    return results, converged
+
+
+@jit(nopython=True, parallel=True, cache=True)
+def _gagge_two_nodes_array_parallel(
+    inputs: np.ndarray, position: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Run `_gagge_two_nodes_array_serial` on all CPU cores instead of one."""
+    n = inputs.shape[1]
+    results = np.empty((_N_OUTPUTS, n), dtype=np.float64)
+    # zeros, not empty: a point whose kernel raised never writes its flag, and
+    # must not pass as converged
+    converged = np.zeros(n, dtype=np.bool_)
+    for i in prange(n):
+        _gagge_two_nodes_point(
+            i=i, inputs=inputs, position=position, results=results, converged=converged
+        )
+    return results, converged
 
 
 @vectorize(

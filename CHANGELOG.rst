@@ -8,6 +8,18 @@ Unreleased
   for a point where ``tdb``, ``tr``, ``v``, ``rh``, ``met`` or ``clo`` is NaN or
   infinite. Before, one such point raised ``StopIteration`` ("Max iterations
   exceeded") and no results were returned for any point.
+* ``two_nodes_gagge`` and ``set_tmp`` are about 10 times faster on large arrays. They
+  now run the model in a compiled numba loop instead of calling it once per point
+  through ``np.vectorize``. On 200,000 points the time per point fell from 7.6 µs to
+  4.1 µs on one core and to 0.7 µs on eight. Single-point calls are also slightly
+  faster. Results are unchanged. All CPU cores are used only for 50 or more points
+  called from the main thread. Calls from other threads run on one core, so running
+  chunks on threads, as dask's default scheduler does, neither crashes numba's thread
+  pool nor starts more threads than there are cores. If you run chunks in separate
+  processes, limit the threads of each with ``numba.set_num_threads`` or the
+  ``NUMBA_NUM_THREADS`` environment variable. Empty inputs now return empty arrays
+  instead of raising ``ValueError``
+  (`#496 <https://github.com/pythermalcomfort/pythermalcomfort/issues/496>`_).
 
 4.8.0 (2026-10-31)
 ------------------
