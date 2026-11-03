@@ -124,6 +124,19 @@ def test_two_nodes_raises_if_any_point_does_not_converge(n_points) -> None:
         two_nodes_gagge(tdb=25, tr=tr, v=0.1, rh=50, met=1.2, clo=0.5)
 
 
+@pytest.mark.parametrize("n_points", [3, 2 * _PARALLEL_MIN_POINTS])
+def test_two_nodes_keeps_kernel_exception_from_either_loop(n_points) -> None:
+    """An exception in the kernel is raised as itself, from either loop (#518).
+
+    numba drops it inside a prange loop, so without the serial rerun p_atm=0 gave
+    StopIteration or uninitialized outputs instead of ZeroDivisionError.
+    """
+    p_atm = np.full(n_points, 101325.0)
+    p_atm[1] = 0
+    with pytest.raises(ZeroDivisionError):
+        two_nodes_gagge(tdb=25, tr=25, v=0.1, rh=50, met=1.2, clo=0.5, p_atm=p_atm)
+
+
 def _large_array_inputs() -> dict:
     """Return inputs with enough points that two_nodes_gagge uses the parallel loop."""
     n = 2 * _PARALLEL_MIN_POINTS

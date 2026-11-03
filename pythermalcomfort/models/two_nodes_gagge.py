@@ -246,6 +246,14 @@ def two_nodes_gagge(
     # numba silently drops exceptions raised inside a prange loop, so the kernel
     # flags non-convergence and the error is raised here instead
     if not converged.all():
+        # A point the parallel loop flagged may instead have raised an exception
+        # that numba dropped, such as ZeroDivisionError for p_atm=0. Rerun those
+        # points on one core, where the original exception propagates.
+        if array_loop is _gagge_two_nodes_array_parallel:
+            failed = ~converged
+            _gagge_two_nodes_array_serial(
+                inputs=inputs[:, failed], position=position_code[failed]
+            )
         max_iteration_exceeded = "Max iterations exceeded"
         raise StopIteration(max_iteration_exceeded)
 
@@ -697,7 +705,13 @@ def _gagge_two_nodes_optimized(
 
 
 @jit(nopython=True, cache=True)
-def _gagge_two_nodes_point(i, inputs, position, results, converged):
+def _gagge_two_nodes_point(
+    i: int,
+    inputs: np.ndarray,
+    position: np.ndarray,
+    results: np.ndarray,
+    converged: np.ndarray,
+) -> None:
     """Run the kernel on point i and write its outputs to column i of `results`.
 
     The inputs of point i are column i of `inputs`, whose rows are in the order of
@@ -728,7 +742,9 @@ def _gagge_two_nodes_point(i, inputs, position, results, converged):
 # on disk by name, so one function compiled twice with different flags would share
 # its cache entry.
 @jit(nopython=True, cache=True)
-def _gagge_two_nodes_array_serial(inputs, position):
+def _gagge_two_nodes_array_serial(
+    inputs: np.ndarray, position: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     """Run the two-node model on every column of `inputs`, on one CPU core.
 
     Returns a (18, n) array with one row per output, in the order of
@@ -737,7 +753,9 @@ def _gagge_two_nodes_array_serial(inputs, position):
     """
     n = inputs.shape[1]
     results = np.empty((_N_OUTPUTS, n), dtype=np.float64)
-    converged = np.empty(n, dtype=np.bool_)
+    # zeros, not empty: a point whose kernel raised never writes its flag, and
+    # must not pass as converged
+    converged = np.zeros(n, dtype=np.bool_)
     for i in range(n):
         _gagge_two_nodes_point(
             i=i, inputs=inputs, position=position, results=results, converged=converged
@@ -746,11 +764,15 @@ def _gagge_two_nodes_array_serial(inputs, position):
 
 
 @jit(nopython=True, parallel=True, cache=True)
-def _gagge_two_nodes_array_parallel(inputs, position):
+def _gagge_two_nodes_array_parallel(
+    inputs: np.ndarray, position: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     """Run `_gagge_two_nodes_array_serial` on all CPU cores instead of one."""
     n = inputs.shape[1]
     results = np.empty((_N_OUTPUTS, n), dtype=np.float64)
-    converged = np.empty(n, dtype=np.bool_)
+    # zeros, not empty: a point whose kernel raised never writes its flag, and
+    # must not pass as converged
+    converged = np.zeros(n, dtype=np.bool_)
     for i in prange(n):
         _gagge_two_nodes_point(
             i=i, inputs=inputs, position=position, results=results, converged=converged
