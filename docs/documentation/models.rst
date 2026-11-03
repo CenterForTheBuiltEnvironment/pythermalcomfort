@@ -171,7 +171,7 @@ HeatWatch Heat-Health Risk Score
 
 .. autofunction:: pythermalcomfort.models.heatwatch.heatwatch
 
-.. autoclass:: pythermalcomfort.models.heatwatch.Persona
+.. autoclass:: pythermalcomfort.models.heatwatch.HeatWatchPersona
     :members:
 
 .. autoclass:: pythermalcomfort.classes_return.HeatWatch

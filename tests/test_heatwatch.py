@@ -3,13 +3,13 @@ import pytest
 
 from pythermalcomfort.classes_return import HeatWatch
 from pythermalcomfort.models import two_nodes_gagge
-from pythermalcomfort.models.heatwatch import Persona, heatwatch
+from pythermalcomfort.models.heatwatch import HeatWatchPersona, heatwatch
 
-OLDER_ADULT = Persona(
+OLDER_ADULT = HeatWatchPersona(
     age=75, met=1.2, clo=0.45, posture="sitting", illness=True, medication=True
 )
-PREGNANT_ADULT = Persona(age=30, met=1.5, clo=0.36, pregnancy=True)
-OUTDOOR_WORKER = Persona(age=30, met=1.8, clo=0.55)
+PREGNANT_ADULT = HeatWatchPersona(age=30, met=1.5, clo=0.36, pregnancy=True)
+OUTDOOR_WORKER = HeatWatchPersona(age=30, met=1.8, clo=0.55)
 
 
 @pytest.mark.parametrize(
@@ -28,14 +28,14 @@ OUTDOOR_WORKER = Persona(age=30, met=1.8, clo=0.55)
     ],
 )
 def test_persona_age_bands(age, w_max):
-    persona = Persona(age=age, met=1.2, clo=0.5)
+    persona = HeatWatchPersona(age=age, met=1.2, clo=0.5)
     assert persona.w_max == pytest.approx(w_max)
 
 
 def test_persona_health_conditions():
     assert OLDER_ADULT.w_max == pytest.approx(0.7 * 0.95**2)
 
-    all_conditions = Persona(
+    all_conditions = HeatWatchPersona(
         age=30,
         met=1.2,
         clo=0.5,
@@ -55,6 +55,7 @@ def test_persona_health_conditions():
         ({"age": -1}, ValueError),
         ({"age": 9}, ValueError),
         ({"met": 0}, ValueError),
+        ({"met": 3.8}, ValueError),
         ({"met": float("nan")}, ValueError),
         ({"met": float("inf")}, ValueError),
         ({"clo": -0.1}, ValueError),
@@ -69,7 +70,7 @@ def test_persona_health_conditions():
 def test_persona_validation(kwargs, error):
     values = {"age": 30, "met": 1.2, "clo": 0.5} | kwargs
     with pytest.raises(error):
-        Persona(**values)
+        HeatWatchPersona(**values)
 
 
 @pytest.mark.parametrize(
@@ -80,7 +81,7 @@ def test_persona_bool_fields_reject_non_bool(field):
     """Each flag goes through validate_type, not the dataclass constructor."""
     values = {"age": 30, "met": 1.2, "clo": 0.5, field: "yes"}
     with pytest.raises(TypeError, match="must be one of the following types"):
-        Persona(**values)
+        HeatWatchPersona(**values)
 
 
 def test_heatwatch_rejects_other_persona_types():
@@ -108,7 +109,8 @@ def test_heatwatch_matches_formula(persona):
         round_output=False,
     )
     d = gagge.disc / 4.7
-    c = (gagge.t_core - 36.8) / (38.0 - 36.8)
+    base = persona.t_core_baseline
+    c = (gagge.t_core - base) / (38.0 - base)
     expected = 6 * np.clip(np.maximum(d, c), 0, 1)
 
     np.testing.assert_allclose(result.hhrs, expected)
@@ -119,7 +121,7 @@ def test_heatwatch_matches_formula(persona):
 def test_heatwatch_reference_values():
     tdb = [20, 22.5, 26, 30, 34, 38, 42]
     result = heatwatch(tdb=tdb, tr=tdb, v=0.2, rh=50, persona=OLDER_ADULT)
-    np.testing.assert_allclose(result.hhrs, [0.2, 0.3, 0.6, 2.2, 4.2, 6.0, 6.0])
+    np.testing.assert_allclose(result.hhrs, [0.1, 0.2, 0.6, 2.2, 4.2, 6.0, 6.0])
     assert list(result.risk_category) == [
         "Minimal",
         "Minimal",
@@ -134,10 +136,11 @@ def test_heatwatch_reference_values():
 def test_core_temperature_only_raises_the_score():
     # In hot, dry air during heavy work, core temperature raises the score above the
     # relative skin wettedness term.
-    heavy_worker = Persona(age=30, met=3.0, clo=0.55)
+    heavy_worker = HeatWatchPersona(age=30, met=3.0, clo=0.55)
     kwargs = {"tdb": 40, "tr": 40, "v": 0.5, "rh": 5, "round_output": False}
     result = heatwatch(persona=heavy_worker, **kwargs)
-    assert result.hhrs == pytest.approx(6 * (result.t_core - 36.8) / 1.2)
+    base = heavy_worker.t_core_baseline
+    assert result.hhrs == pytest.approx(6 * (result.t_core - base) / (38.0 - base))
     assert result.hhrs > 6 * result.disc / 4.7
 
     # In hot, humid air the score equals the relative skin wettedness term.
@@ -204,9 +207,25 @@ def test_scalar_and_array_inputs_agree():
 
 
 def test_posture_changes_the_score():
-    standing = Persona(age=75, met=1.2, clo=0.45, posture="standing")
-    sitting = Persona(age=75, met=1.2, clo=0.45, posture="sitting")
+    standing = HeatWatchPersona(age=75, met=1.2, clo=0.45, posture="standing")
+    sitting = HeatWatchPersona(age=75, met=1.2, clo=0.45, posture="sitting")
     kwargs = {"tdb": 34, "tr": 34, "v": 0.2, "rh": 50, "round_output": False}
     assert heatwatch(persona=standing, **kwargs).hhrs != pytest.approx(
         heatwatch(persona=sitting, **kwargs).hhrs
     )
+
+
+def test_core_baseline_follows_activity():
+    # Seated, the cool-air core temperature is close to the Gagge neutral value.
+    assert 36.8 <= OLDER_ADULT.t_core_baseline < 36.85
+    heavy_worker = HeatWatchPersona(age=30, met=3.0, clo=0.55)
+    assert 37.0 < heavy_worker.t_core_baseline < 37.2
+
+
+def test_heavy_work_in_cool_air_scores_minimal():
+    # Work raises core temperature in any climate. Only the rise caused by heat
+    # counts, so heavy work in cool air stays Minimal.
+    heavy_worker = HeatWatchPersona(age=30, met=3.0, clo=0.55)
+    tdb = [0, 5, 10, 15]
+    result = heatwatch(tdb=tdb, tr=tdb, v=0.5, rh=50, persona=heavy_worker)
+    assert list(result.risk_category) == ["Minimal"] * 4

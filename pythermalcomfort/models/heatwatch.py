@@ -12,10 +12,23 @@ from pythermalcomfort.utilities import Postures
 
 # DISC equals 4.7 when skin wettedness reaches w_max, so D = 1 at the person's limit.
 _DISC_AT_W_MAX = 4.7
-# Core temperature is normalised between the Gagge neutral value and the rectal
-# temperature limit used by the Predicted Heat Strain model (ISO 7933), both in °C.
+# Core temperature is normalised between the person's core temperature at the same
+# activity in cool air and the rectal temperature limit used by the Predicted Heat
+# Strain model (ISO 7933), both in °C. The baseline is never below the Gagge neutral
+# value.
 _T_CORE_NEUTRAL = 36.8
 _T_CORE_LIMIT = 38.0
+# Cool reference environment for the baseline. At a given metabolic rate, core
+# temperature does not depend on the environment over a wide range of cool climates
+# (the "prescriptive zone") [Lind1963]. In the Gagge model the baseline changes by
+# less than 0.05 °C between 10 and 15 °C for metabolic rates up to 3 met.
+_REFERENCE_TMP = 15.0
+_REFERENCE_V = 0.2
+_REFERENCE_RH = 50.0
+# The Gagge model's largest core temperature errors occur above 3.75 met in hot
+# environments [Joshi2025], and at higher rates the baseline approaches the core
+# temperature limit even in cool air.
+_MET_MAX = 3.75
 _HHRS_MAX = 6.0
 
 # Each category covers one unit of the score, including its upper edge.
@@ -45,7 +58,7 @@ _POSTURES = (Postures.sitting.value, Postures.standing.value)
 
 
 @dataclass(frozen=True)
-class Persona:
+class HeatWatchPersona:
     """Personal characteristics used by :py:func:`heatwatch`.
 
     Parameters
@@ -56,7 +69,9 @@ class Persona:
         [Smallcombe2025]_, so they use the adult maximum skin wettedness. There is
         no comparable evidence for younger children.
     met : float
-        Metabolic rate, [met].
+        Metabolic rate, [met]. Must be greater than 0 and no more than 3.75, because
+        the Gagge two-node model has its largest core temperature errors above
+        3.75 met in hot environments [Joshi2025]_.
     clo : float
         Clothing insulation, [clo].
     posture : str, optional
@@ -79,9 +94,9 @@ class Persona:
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models.heatwatch import Persona
+        from pythermalcomfort.models.heatwatch import HeatWatchPersona
 
-        older_adult = Persona(
+        older_adult = HeatWatchPersona(
             age=75, met=1.2, clo=0.45, posture="sitting", illness=True, medication=True
         )
         print(round(older_adult.w_max, 3))  # 0.632
@@ -114,8 +129,8 @@ class Persona:
         if self.age < _MIN_AGE:
             msg = f"age must be an integer >= {_MIN_AGE}, got {self.age}"
             raise ValueError(msg)
-        if not (np.isfinite(self.met) and self.met > 0):
-            msg = f"met must be a finite number > 0, got {self.met}"
+        if not (np.isfinite(self.met) and 0 < self.met <= _MET_MAX):
+            msg = f"met must be a number > 0 and <= {_MET_MAX}, got {self.met}"
             raise ValueError(msg)
         if not (np.isfinite(self.clo) and self.clo >= 0):
             msg = f"clo must be a finite number >= 0, got {self.clo}"
@@ -128,8 +143,8 @@ class Persona:
     def w_max(self) -> float:
         """Maximum skin wettedness, [dimensionless].
 
-        Depends on age and is multiplied by 0.95 for each of obesity,
-        medication, pregnancy, mobility impairment and illness.
+        Depends on age and is multiplied by 0.95 for each of obesity, medication,
+        pregnancy, mobility impairment and illness.
         """
         w_max = next(w for upper_age, w in _AGE_BANDS if self.age < upper_age)
         health_conditions = sum(
@@ -143,13 +158,36 @@ class Persona:
         )
         return w_max * _W_MAX_FACTOR_HEALTH_CONDITION**health_conditions
 
+    @property
+    def t_core_baseline(self) -> float:
+        """Core temperature at the same activity in cool air, [°C].
+
+        Calculated with the Gagge two-node model at 15 °C air and mean radiant
+        temperature, 50 % relative humidity and 0.2 m/s, with the person's metabolic
+        rate, clothing, posture and ``w_max``. It is never below 36.8 °C, the Gagge
+        neutral core temperature. The rise in core temperature above this value is the
+        part caused by heat rather than by the activity itself [Lind1963]_.
+        """
+        t_core = two_nodes_gagge(
+            tdb=_REFERENCE_TMP,
+            tr=_REFERENCE_TMP,
+            v=_REFERENCE_V,
+            rh=_REFERENCE_RH,
+            met=self.met,
+            clo=self.clo,
+            position=self.posture,
+            w_max=self.w_max,
+            round_output=False,
+        ).t_core
+        return max(_T_CORE_NEUTRAL, float(t_core))
+
 
 def heatwatch(
     tdb: NumericInput,
     tr: NumericInput,
     v: NumericInput,
     rh: NumericInput,
-    persona: Persona,
+    persona: HeatWatchPersona,
     round_output: bool = True,
 ) -> HeatWatch:
     """Calculate the HeatWatch heat-health risk score (HHRS) for a person.
@@ -160,9 +198,12 @@ def heatwatch(
 
     * relative skin wettedness, ``D = disc / 4.7``, which is 0 at thermal comfort and
       1 when skin wettedness reaches ``w_max``;
-    * relative core temperature, ``C = (t_core - 36.8) / (38.0 - 36.8)``, which is 0
-      at the Gagge neutral core temperature and 1 at 38.0 °C, the rectal temperature
-      limit used by the Predicted Heat Strain model (ISO 7933).
+    * relative core temperature, ``C = (t_core - t_base) / (38.0 - t_base)``, which
+      is 0 at ``t_base`` and 1 at 38.0 °C, the rectal temperature limit used by the
+      Predicted Heat Strain model (ISO 7933). ``t_base`` is
+      :py:attr:`HeatWatchPersona.t_core_baseline`, the person's core temperature at
+      the same activity in cool air, so the normal rise in core temperature during
+      work does not count as heat strain [Lind1963]_.
 
     The score follows whichever limit the person is closer to:
 
@@ -198,7 +239,7 @@ def heatwatch(
         Air speed, [m/s].
     rh : float or list of floats
         Relative humidity, [%].
-    persona : Persona
+    persona : HeatWatchPersona
         Personal characteristics, including ``met``, ``clo`` and ``posture``.
     round_output : bool, optional
         If True, rounds the score to one decimal place. Defaults to True.
@@ -213,23 +254,23 @@ def heatwatch(
     Raises
     ------
     TypeError
-        If ``persona`` is not a :py:class:`Persona` instance.
+        If ``persona`` is not a :py:class:`HeatWatchPersona` instance.
 
     Examples
     --------
     .. code-block:: python
 
-        from pythermalcomfort.models.heatwatch import Persona, heatwatch
+        from pythermalcomfort.models.heatwatch import HeatWatchPersona, heatwatch
 
-        older_adult = Persona(
+        older_adult = HeatWatchPersona(
             age=75, met=1.2, clo=0.45, posture="sitting", illness=True, medication=True
         )
         result = heatwatch(tdb=[30, 38], tr=[30, 38], v=0.2, rh=50, persona=older_adult)
         print(result.hhrs)  # [2.2 6. ]
         print(result.risk_category)  # ['Moderate' 'Extreme']
     """
-    if not isinstance(persona, Persona):
-        raise TypeError("persona must be a Persona instance.")
+    if not isinstance(persona, HeatWatchPersona):
+        raise TypeError("persona must be a HeatWatchPersona instance.")
 
     gagge = two_nodes_gagge(
         tdb=tdb,
@@ -246,7 +287,8 @@ def heatwatch(
     t_core = np.asarray(gagge.t_core, dtype=float)
 
     relative_wettedness = disc / _DISC_AT_W_MAX
-    relative_core = (t_core - _T_CORE_NEUTRAL) / (_T_CORE_LIMIT - _T_CORE_NEUTRAL)
+    t_core_baseline = persona.t_core_baseline
+    relative_core = (t_core - t_core_baseline) / (_T_CORE_LIMIT - t_core_baseline)
     combined = np.maximum(relative_wettedness, relative_core)
     hhrs = _HHRS_MAX * np.clip(combined, 0, 1)
 
