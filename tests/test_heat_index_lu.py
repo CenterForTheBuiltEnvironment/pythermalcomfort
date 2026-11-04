@@ -1,3 +1,5 @@
+import importlib
+
 import numpy as np
 
 from pythermalcomfort.models import heat_index_lu
@@ -97,3 +99,31 @@ def test_heat_index_lu_regression_values() -> None:
     for tdb, rh, expected in cases:
         hi = heat_index_lu(tdb=tdb, rh=rh, round_output=False).hi
         assert np.isclose(hi, expected, atol=1e-6), (tdb, rh, hi, expected)
+
+
+def test_heat_index_lu_root_solver_evaluations(monkeypatch) -> None:
+    """The root solver needs far fewer residual evaluations than bisection.
+
+    Bisection on [230, 300] K down to 1e-8 K takes 35 evaluations (the two end points
+    and 33 halvings).
+    """
+    hi_lu = importlib.import_module("pythermalcomfort.models.heat_index_lu")
+
+    residual = hi_lu._residual
+    calls = []
+
+    def counting_residual(kind, x, p0, p1, p2, p3):
+        calls.append(x)
+        return residual(kind=kind, x=x, p0=p0, p1=p1, p2=p2, p3=p3)
+
+    monkeypatch.setattr(hi_lu, "_residual", counting_residual)
+
+    # 0 °C and 50 % is in region II, where the outer solve is on rf
+    eq_var_code, _, rf, _, _ = hi_lu._find_eq_var(273.15, 0.5)
+    assert eq_var_code == hi_lu._EQ_RF
+    t = hi_lu._brentq.py_func(
+        kind=hi_lu._R_T_RF, p0=rf, p1=0.0, p2=0.0, p3=0.0, x1=230.0, x2=300.0, tol=1e-8
+    )
+
+    assert abs(residual(kind=hi_lu._R_T_RF, x=t, p0=rf, p1=0.0, p2=0.0, p3=0.0)) < 1e-6
+    assert len(calls) < 20
