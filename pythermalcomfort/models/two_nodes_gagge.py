@@ -245,6 +245,38 @@ def _gagge_two_nodes_optimized(
     float,
     float,
 ]:
+    # A missing or infinite input never converges in the clothing temperature loop
+    # below, so return NaN for every output instead of raising StopIteration.
+    if not (
+        math.isfinite(tdb)
+        and math.isfinite(tr)
+        and math.isfinite(v)
+        and math.isfinite(met)
+        and math.isfinite(clo)
+        and math.isfinite(vapor_pressure)
+    ):
+        nan = math.nan
+        return (
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+            nan,
+        )
+
     # Initial variables as defined in the ASHRAE 55-2020
     air_speed = max(v, 0.1)
     k_clo = 0.25

@@ -44,6 +44,11 @@ def scale_wind_speed_log(
         Moreover, this function does not account for obstacles or complex terrain
         effects which may require computational fluid dynamics (CFD) simulations or
         measurements.
+        The profile only describes wind well above the obstacles. Among buildings
+        or trees, a target height of about 2 m is inside the canopy, where the
+        logarithmic profile does not apply for any value of ``d``. The function
+        then gives a rough estimate only, and street-level wind in dense urban
+        areas needs a canopy-layer model or measurements.
 
     Parameters
     ----------
@@ -54,28 +59,28 @@ def scale_wind_speed_log(
     z1 : float or list of floats, optional
         Reference height, [m]. Default is 10.0 m.
     z0 : float or list of floats, optional
-        Surface roughness length, [m]. Default is 0.01 (open terrain). This value accounts
-        for the roughness of the terrain and varies based on land use source [Sharples2023]_:
+        Surface roughness length, [m]. Default is 0.01 (open terrain). This value
+        accounts for the roughness of the terrain and depends on land use. Values from
+        Table 1 of [Sharples2023]_, which maps Australian land classes to Davenport
+        roughness classes:
 
-        - 0.005 m: Inland waterbodies (lakes, dams)
-        - 0.03 m: Irrigated Pasture (e.g., grassland, alfalfa)
-        - 0.1 m: Irrigated cropping (e.g., wheat, soybeans)
-        - 0.25 m: Irrigated Sugar (e.g., sugarcane, corn)
-        - 0.4 m: Towns, villages, agricultural land with many or high hedges, forests and very rough and uneven terrain
-        - 0.6 m: Large towns with tall buildings
+        - 0.005 m: Inland waterbodies (lakes and dams)
+        - 0.03 m: Irrigated pasture
+        - 0.1 m: Irrigated cropping
+        - 0.25 m: Irrigated sugar
+        - 0.43 m: Closed forest
         - 1.0 m: Urban areas
-        - 1.6 m: Large cities with very tall buildings
 
     d : float or list of floats, optional
         Zero-plane displacement height, [m]. Default is 0.0 (no displacement).
         This value accounts for the height at which the wind speed effectively becomes
-        zero due to obstacles like trees or buildings. Based on [Sharples2023]_:
-
-        - 0.0 m: Inland waterbodies (lakes, dams)
-        - 0.0 m: Irrigated Pasture (e.g., grassland, alfalfa)
-        - 0.5 m: Irrigated cropping (e.g., wheat, soybeans)
-        - 0.5 m: Irrigated Sugar (e.g., sugarcane, corn)
-        - 0.5 m: Urban areas
+        zero due to obstacles like trees or buildings. For scaling 10 m wind to about
+        2 m, use 0.0, as recommended in Section 3.3 of [Sharples2023]_. The report
+        found that its non-zero values lowered the scaled wind speed and smoothed out
+        extremes. Its Table 1 lists 0.5 m for many land classes, including urban areas,
+        but those values were capped at 0.5 m because the target height is only 2 m
+        (Section 2.4). They are not displacement heights of real buildings, which are
+        usually several metres in a city.
 
     round_output : bool, optional
         If True, rounds output value. If False, it does not round it. Defaults to True.

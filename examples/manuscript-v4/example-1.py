@@ -89,7 +89,9 @@ legend_kws.update({"ncol": 2})
 )
 axes[1].set_ylabel("Relative humidity (%)")
 axes[1].set_xlabel("")
-axes[1].set_title("UTCI", y=Y_TITLE_OFFSET + 0.15)
+# higher than the other titles: the "Out of model limits" entry (UTCI returns NaN
+# above its vapour-pressure limit) adds a third legend row
+axes[1].set_title("UTCI", y=Y_TITLE_OFFSET + 0.3)
 
 # Panel C -- Heat Index (Lu and Romps 2022)
 # heat_index_lu only requires tdb and rh; no set_params needed.

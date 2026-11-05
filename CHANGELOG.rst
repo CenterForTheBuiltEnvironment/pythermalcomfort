@@ -1,6 +1,23 @@
 Changelog
 =========
 
+4.8.1 (2026-11-05)
+------------------
+
+* ``two_nodes_gagge``, and so ``set_tmp`` and ``use_fans_heatwaves``, now return NaN
+  for a point where ``tdb``, ``tr``, ``v``, ``rh``, ``met`` or ``clo`` is NaN or
+  infinite. Before, one such point raised ``StopIteration`` ("Max iterations
+  exceeded") and no results were returned for any point.
+* Corrected the ``scale_wind_speed_log`` docstring. Sharples and Baron-Hay (2023)
+  recommend a zero-plane displacement of 0 for scaling 10 m wind to 2 m, and the
+  0.5 m values in their Table 1 are a cap, not a displacement height for urban areas.
+  Removed three roughness lengths (0.4, 0.6 and 1.6 m) that are not in the cited
+  report, and noted that the profile does not describe wind inside a building or tree
+  canopy.
+* Fixed the UTCI panel of ``examples/manuscript-v4/example-1.py``: since 4.8.0 the
+  legend has an extra "Out of model limits" entry, and its third row covered the panel
+  title.
+
 4.8.0 (2026-10-31)
 ------------------
 
