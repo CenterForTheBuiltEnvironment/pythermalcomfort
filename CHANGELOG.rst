@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+4.8.1 (2026-11-05)
+------------------
 
 * ``two_nodes_gagge``, and so ``set_tmp`` and ``use_fans_heatwaves``, now return NaN
   for a point where ``tdb``, ``tr``, ``v``, ``rh``, ``met`` or ``clo`` is NaN or
@@ -14,6 +14,9 @@ Unreleased
   Removed three roughness lengths (0.4, 0.6 and 1.6 m) that are not in the cited
   report, and noted that the profile does not describe wind inside a building or tree
   canopy.
+* Fixed the UTCI panel of ``examples/manuscript-v4/example-1.py``: since 4.8.0 the
+  legend has an extra "Out of model limits" entry, and its third row covered the panel
+  title.
 
 4.8.0 (2026-10-31)
 ------------------
